@@ -1,0 +1,6 @@
+node_modules/
+site-spec/
+site-spec*/
+captures/
+artifacts/
+*.log

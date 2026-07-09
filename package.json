@@ -1,0 +1,16 @@
+{
+  "name": "site-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Extract buildable website specifications through Chrome DevTools Protocol.",
+  "type": "module",
+  "bin": {
+    "site-spec": "src/extract.mjs"
+  },
+  "scripts": {
+    "check": "node --check src/extract.mjs && node --check src/lifecycle-recorder.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
