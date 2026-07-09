@@ -1141,7 +1141,10 @@ async function settlePage() {
 async function waitForApplicationReady() {
   const startedAt = Date.now();
   let state = {};
-  for (let attempt = 0; attempt < 40; attempt++) {
+  let lastNodeCount = 0;
+  let stableCount = 0;
+  // Up to 80 attempts (20 seconds) to let SPAs finish rendering
+  for (let attempt = 0; attempt < 80; attempt++) {
     try {
       state = (
         await cdp.send('Runtime.evaluate', {
@@ -1151,22 +1154,38 @@ async function waitForApplicationReady() {
             isLoading: document.documentElement.classList.contains('is-loading'),
             isLoaded: document.documentElement.classList.contains('is-loaded'),
             hasLenisWrapper: Boolean(window.lenis),
-            hasLenisScroll: Boolean(window.lenis?.scroll)
+            hasLenisScroll: Boolean(window.lenis?.scroll),
+            nodeCount: document.querySelectorAll('*').length
           })`,
           returnByValue: true,
         })
       ).result.value;
-      if (
+
+      const baseReady =
         state.readyState === 'complete' &&
         state.fonts === 'loaded' &&
         (!state.isLoading || state.isLoaded) &&
-        (!state.hasLenisWrapper || state.hasLenisScroll)
-      ) {
-        return {
-          ready: true,
-          waitMs: Date.now() - startedAt,
-          state,
-        };
+        (!state.hasLenisWrapper || state.hasLenisScroll);
+
+      if (baseReady) {
+        const n = state.nodeCount ?? 0;
+        if (n > 100 && n === lastNodeCount) {
+          stableCount++;
+          // Require 3 stable polls (~750ms) before declaring ready
+          if (stableCount >= 3) {
+            return {
+              ready: true,
+              waitMs: Date.now() - startedAt,
+              state,
+            };
+          }
+        } else {
+          stableCount = 0;
+          lastNodeCount = n;
+        }
+      } else {
+        stableCount = 0;
+        lastNodeCount = 0;
       }
     } catch {}
     await new Promise((resolve) => setTimeout(resolve, 250));
@@ -1179,6 +1198,149 @@ async function waitForApplicationReady() {
 }
 
 const liveScriptSources = new Map();
+let navigationDoneByMultiPage = false;
+const multiPageStates = [];
+
+async function capturePageSnapshot(index) {
+  // Let the browser paint before screenshotting
+  await new Promise((r) => setTimeout(r, 600));
+  const slug = String(index).padStart(3, '0');
+  const pageDir = path.join(outDir, 'pages');
+  fs.mkdirSync(pageDir, { recursive: true });
+  let data = {};
+  try {
+    const r = await cdp.send('Runtime.evaluate', {
+      expression: `JSON.stringify({
+        url: location.href,
+        title: document.title,
+        nodeCount: document.querySelectorAll('*').length,
+        text: (document.body || document.documentElement).innerText.substring(0, 3000),
+        bodyHeight: document.body ? document.body.scrollHeight : 0
+      })`,
+      returnByValue: true,
+    });
+    data = JSON.parse(r.result?.value || '{}');
+  } catch (_) {}
+  let screenshot;
+  try {
+    // Set viewport so the screenshot captures the full 1440px width
+    await cdp.send('Emulation.setDeviceMetricsOverride', {
+      width: 1440, height: 900, deviceScaleFactor: 1, mobile: false,
+    });
+    const s = await cdp.send('Page.captureScreenshot', { format: 'png' });
+    screenshot = s.data;
+    fs.writeFileSync(path.join(pageDir, `${slug}.png`), Buffer.from(screenshot, 'base64'));
+  } catch (_) {}
+  let htmlFile;
+  try {
+    const h = await cdp.send('Runtime.evaluate', {
+      expression: `'<!DOCTYPE html>\\n' + document.documentElement.outerHTML`,
+      returnByValue: true,
+    });
+    const html = h.result?.value || '';
+    if (html) {
+      fs.writeFileSync(path.join(pageDir, `${slug}.html`), html);
+      htmlFile = `pages/${slug}.html`;
+    }
+  } catch (_) {}
+  return {
+    index,
+    url: data.url || '',
+    title: data.title || '',
+    nodeCount: data.nodeCount || 0,
+    text: data.text || '',
+    bodyHeight: data.bodyHeight || 0,
+    html: htmlFile,
+    screenshot: screenshot ? `pages/${slug}.png` : undefined,
+    capturedAt: new Date().toISOString(),
+  };
+}
+
+async function navigateAndCaptureAllPages(targetUrl) {
+  console.error('phase: multi-page navigate');
+
+  // Intercept pushState/replaceState so URL changes inside SPAs are visible via polling
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: `(function(){
+      const orig = history.pushState.bind(history);
+      history.pushState = function(){ orig.apply(this, arguments); window.__siteSpecUrlChanged = location.href; };
+      const origR = history.replaceState.bind(history);
+      history.replaceState = function(){ origR.apply(this, arguments); window.__siteSpecUrlChanged = location.href; };
+    })();`
+  });
+
+  await cdp.send('Page.navigate', { url: targetUrl });
+
+  let lastCapturedUrl = '';
+  let lastCapturedNodeCount = 0;
+  let lastUrl = '';
+  let lastNodeCount = 0;
+  let sameUrlPolls = 0;
+  const deadline = Date.now() + 40000;
+  let targetHost;
+  try { targetHost = new URL(targetUrl).hostname; } catch (_) {}
+
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 200));
+
+    let currentUrl = '', currentNodeCount = 0, readyState = '';
+    try {
+      const r = await cdp.send('Runtime.evaluate', {
+        expression: `JSON.stringify({u:location.href,n:document.querySelectorAll('*').length,rs:document.readyState})`,
+        returnByValue: true,
+      });
+      const d = JSON.parse(r.result?.value || '{}');
+      currentUrl = d.u || '';
+      currentNodeCount = d.n || 0;
+      readyState = d.rs || '';
+    } catch (_) { sameUrlPolls = 0; continue; }
+
+    const urlChanged = currentUrl !== lastUrl;
+    if (urlChanged) {
+      sameUrlPolls = 0;
+      lastUrl = currentUrl;
+      lastNodeCount = currentNodeCount;
+      continue;
+    }
+
+    if (readyState !== 'complete') {
+      sameUrlPolls = 0;
+      lastNodeCount = currentNodeCount;
+      continue;
+    }
+
+    const nodeCountDelta = Math.abs(currentNodeCount - lastNodeCount);
+    if (nodeCountDelta > 10) {
+      sameUrlPolls = 0;
+      lastNodeCount = currentNodeCount;
+      continue;
+    }
+
+    sameUrlPolls++;
+
+    // Capture after 2 stable polls (~400ms) if this state looks new
+    const nodeCountJump = Math.abs(currentNodeCount - lastCapturedNodeCount) > 30;
+    const newUrl = currentUrl !== lastCapturedUrl;
+
+    if (sameUrlPolls >= 2 && (newUrl || nodeCountJump)) {
+      lastCapturedUrl = currentUrl;
+      lastCapturedNodeCount = currentNodeCount;
+      console.error(`phase: capture page state ${multiPageStates.length} url=${currentUrl} nodes=${currentNodeCount}`);
+      const state = await capturePageSnapshot(multiPageStates.length);
+      multiPageStates.push(state);
+      sameUrlPolls = 0;
+
+      // Done once back on the target domain with real content and stable
+      try {
+        const currentHost = new URL(currentUrl).hostname;
+        if (currentHost === targetHost && currentNodeCount > 200) break;
+      } catch (_) {}
+    }
+  }
+
+  navigationDoneByMultiPage = true;
+  console.error(`phase: multi-page done — ${multiPageStates.length} page states captured`);
+}
 
 async function extractViewport(viewport, captureIndex) {
   const timings = {};
@@ -1203,7 +1365,7 @@ async function extractViewport(viewport, captureIndex) {
   );
   latestDocumentResponse = undefined;
   latestDocumentBody = undefined;
-  if (created && captureIndex === 0) {
+  if (created && captureIndex === 0 && !navigationDoneByMultiPage) {
     await cdp.send('Page.navigate', { url });
   } else {
     await cdp.send('Page.reload', { ignoreCache: false });
@@ -1678,6 +1840,11 @@ try {
 } catch (_) {}
 
 const captures = [];
+
+if (created) {
+  await navigateAndCaptureAllPages(url);
+}
+
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
   const viewport = viewports[captureIndex];
   console.error(`Capturing ${viewport.width}x${viewport.height}: ${page.url || url}`);
@@ -2205,6 +2372,7 @@ const output = {
     reusedAuthenticatedTarget: reuse,
     capturedAt: new Date().toISOString(),
   },
+  pages: multiPageStates,
   viewports,
   captures,
   responsive,
