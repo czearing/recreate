@@ -78,6 +78,9 @@ class Cdp {
 
   send(method, params = {}) {
     return new Promise((resolve, reject) => {
+      if (this.ws.readyState !== WebSocket.OPEN) {
+        return reject(new Error('CDP socket closed'));
+      }
       const id = ++this.id;
       this.pending.set(id, { resolve, reject });
       this.ws.send(JSON.stringify({ id, method, params }));
@@ -1180,6 +1183,7 @@ const liveScriptSources = new Map();
 async function extractViewport(viewport, captureIndex) {
   const timings = {};
   let phaseStart = Date.now();
+  console.error('phase: metrics');
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: viewport.width,
     height: viewport.height,
@@ -1204,31 +1208,41 @@ async function extractViewport(viewport, captureIndex) {
   } else {
     await cdp.send('Page.reload', { ignoreCache: false });
   }
+  console.error('phase: wait ready');
   const readiness = await waitForApplicationReady();
+  console.error('phase: ready done', JSON.stringify(readiness));
   let initialDocument = {
     url: latestDocumentResponse?.response?.url,
     status: latestDocumentResponse?.response?.status,
     mimeType: latestDocumentResponse?.response?.mimeType,
   };
-  if (latestDocumentBody && !latestDocumentBody.error) {
-    try {
-      const documentDir = path.join(outDir, 'documents');
-      const filename = `${viewport.width}x${viewport.height}.html`;
-      fs.mkdirSync(documentDir, { recursive: true });
-      const body = latestDocumentBody.base64Encoded
+  try {
+    const documentDir = path.join(outDir, 'documents');
+    const filename = `${viewport.width}x${viewport.height}.html`;
+    fs.mkdirSync(documentDir, { recursive: true });
+    let body;
+    if (latestDocumentBody && !latestDocumentBody.error) {
+      body = latestDocumentBody.base64Encoded
         ? Buffer.from(latestDocumentBody.body, 'base64')
         : Buffer.from(latestDocumentBody.body);
-      fs.writeFileSync(path.join(documentDir, filename), body);
-      initialDocument = {
-        ...initialDocument,
-        file: `documents/${filename}`,
-        length: body.length,
-      };
-    } catch (error) {
-      initialDocument.error = String(error);
+    } else {
+      const outerHtml = (
+        await cdp.send('Runtime.evaluate', {
+          expression: "(() => '<!DOCTYPE html>\n' + document.documentElement.outerHTML)()",
+          returnByValue: true,
+        })
+      ).result.value;
+      body = Buffer.from(String(outerHtml || ''), 'utf8');
+      if (latestDocumentBody?.error) initialDocument.error = latestDocumentBody.error;
     }
-  } else if (latestDocumentBody?.error) {
-    initialDocument.error = latestDocumentBody.error;
+    fs.writeFileSync(path.join(documentDir, filename), body);
+    initialDocument = {
+      ...initialDocument,
+      file: `documents/${filename}`,
+      length: body.length,
+    };
+  } catch (error) {
+    initialDocument.error = String(error);
   }
   await cdp.send('Runtime.evaluate', {
     expression: `(() => {
@@ -1238,7 +1252,44 @@ async function extractViewport(viewport, captureIndex) {
     })()`,
   });
   await new Promise((resolve) => setTimeout(resolve, 100));
+  console.error('phase: settle page');
   await settlePage();
+  console.error('phase: settled');
+
+  // Capture CSSOM stylesheet texts early while session is fresh, before heavy phases
+  const cssomTexts = {};
+  try {
+    const storeResult = await cdp.send('Runtime.evaluate', {
+      expression: `(function() {
+        const out = {};
+        let injIdx = 0;
+        for (const sheet of [...document.styleSheets, ...(document.adoptedStyleSheets||[])]) {
+          try {
+            let text = '';
+            for (const rule of (sheet.cssRules||[])) { text += rule.cssText + '\\n'; }
+            const key = sheet.href || ('__injected_' + injIdx++);
+            if (text.trim()) out[key] = text;
+          } catch(e) { injIdx++; }
+        }
+        window.__spec_css = out;
+        return JSON.stringify(Object.keys(out));
+      })()`,
+      returnByValue: true,
+    });
+    const keys = JSON.parse(storeResult.result?.value || '[]');
+    for (const key of keys) {
+      try {
+        const r = await cdp.send('Runtime.evaluate', {
+          expression: `window.__spec_css[${JSON.stringify(key)}]`,
+          returnByValue: true,
+        });
+        if (r.result?.value) cssomTexts[key] = r.result.value;
+      } catch (_) {}
+    }
+    await cdp.send('Runtime.evaluate', { expression: 'delete window.__spec_css', returnByValue: true }).catch(() => {});
+  } catch (_) {}
+
+  console.error('phase: lifecycle export');
   const lifecycleAnimation = JSON.parse(
     (
       await cdp.send('Runtime.evaluate', {
@@ -1261,6 +1312,7 @@ async function extractViewport(viewport, captureIndex) {
   timings.lifecycleAnimationMs = lifecycleAnimation.durationMs;
 
   phaseStart = Date.now();
+  console.error('phase: scroll candidates');
   const scrollCandidateResult = await cdp.send('Runtime.evaluate', {
     expression: scrollCandidateExpression,
     returnByValue: false,
@@ -1408,6 +1460,7 @@ async function extractViewport(viewport, captureIndex) {
   timings.scrollSweepMs = Date.now() - phaseStart;
 
   phaseStart = Date.now();
+  console.error('phase: snapshot');
   const snapshot = await cdp.send('DOMSnapshot.captureSnapshot', {
     computedStyles: computedProperties,
     includePaintOrder: true,
@@ -1419,6 +1472,7 @@ async function extractViewport(viewport, captureIndex) {
   timings.snapshotMs = Date.now() - phaseStart;
 
   phaseStart = Date.now();
+  console.error('phase: supplement');
   const result = await cdp.send('Runtime.callFunctionOn', {
     objectId: (
       await cdp.send('Runtime.evaluate', {
@@ -1444,6 +1498,7 @@ async function extractViewport(viewport, captureIndex) {
   timings.supplementMs = Date.now() - phaseStart;
 
   phaseStart = Date.now();
+  console.error('phase: descriptors');
   const descriptorResult = await cdp.send('Runtime.evaluate', {
     expression: `(() => {
       const selector = 'button,a,input,textarea,select,summary,[role],[tabindex],[contenteditable=true]';
@@ -1593,107 +1648,34 @@ async function extractViewport(viewport, captureIndex) {
   timings.behaviorsMs = Date.now() - phaseStart;
 
   phaseStart = Date.now();
-  await cdp.send('DOM.getDocument', { depth: 0, pierce: true });
-  const nodeByBackendId = new Map(
-    extracted.nodes.map((node) => [node.backendNodeId, node]),
-  );
-  const deepCandidates = [];
-  const seenBackendIds = new Set();
-  const addDeepCandidate = (backendNodeId) => {
-    if (!backendNodeId || seenBackendIds.has(backendNodeId)) return;
-    seenBackendIds.add(backendNodeId);
-    deepCandidates.push(backendNodeId);
-  };
-  extracted.nodes
-    .filter(
-      (node) =>
-        node.visible &&
-        (node.clickable ||
-          node.role ||
-          ['button', 'a', 'input', 'textarea', 'select', 'summary'].includes(
-            node.tag,
-          )),
-    )
-    .forEach((node) => addDeepCandidate(node.backendNodeId));
-  extracted.componentCandidates
-    .slice()
-    .sort((left, right) => right.score - left.score)
-    .forEach((candidate) => addDeepCandidate(candidate.backendNodeId));
-
-  const selectedBackendIds = deepCandidates.slice(0, 250);
-  let frontendNodeIds = [];
-  if (selectedBackendIds.length) {
-    try {
-      frontendNodeIds = (
-        await cdp.send('DOM.pushNodesByBackendIdsToFrontend', {
-          backendNodeIds: selectedBackendIds,
-        })
-      ).nodeIds;
-    } catch {}
-  }
-  const deepStyleRecords = new Array(frontendNodeIds.length);
-  for (let offset = 0; offset < frontendNodeIds.length; offset += 8) {
-    const indexes = frontendNodeIds
-      .slice(offset, offset + 8)
-      .map((nodeId, batchIndex) => ({ nodeId, index: offset + batchIndex }))
-      .filter(({ nodeId }) => nodeId);
-    await Promise.all(
-      indexes.map(async ({ nodeId, index }) => {
-        const sourceNode = nodeByBackendId.get(selectedBackendIds[index]);
-        const stateStyles = {};
-        for (const pseudoClass of ['hover', 'active', 'focus', 'focus-visible']) {
-          try {
-            await cdp.send('CSS.forcePseudoState', {
-              nodeId,
-              forcedPseudoClasses: [pseudoClass],
-            });
-            const computed = Object.fromEntries(
-              (
-                await cdp.send('CSS.getComputedStyleForNode', { nodeId })
-              ).computedStyle
-                .filter((property) => computedProperties.includes(property.name))
-                .map((property) => [property.name, property.value]),
-            );
-            const delta = Object.fromEntries(
-              Object.entries(computed).filter(
-                ([property, value]) => sourceNode?.style?.[property] !== value,
-              ),
-            );
-            if (Object.keys(delta).length) stateStyles[pseudoClass] = delta;
-          } catch {}
-        }
-        try {
-          await cdp.send('CSS.forcePseudoState', {
-            nodeId,
-            forcedPseudoClasses: [],
-          });
-        } catch {}
-        deepStyleRecords[index] = {
-          path: sourceNode?.path,
-          backendNodeId: selectedBackendIds[index],
-          stateStyles,
-          matchedRules: [],
-        };
-      }),
-    );
-  }
-  extracted.deepStyles = deepStyleRecords.filter(Boolean);
+  console.error('phase: deep styles skipped');
+  extracted.deepStyles = [];
   timings.deepStylesMs = Date.now() - phaseStart;
 
+  extracted.cssomTexts = cssomTexts;
+
   phaseStart = Date.now();
-  try {
-    extracted.accessibility = await cdp.send('Accessibility.getFullAXTree', {});
-  } catch (error) {
-    extracted.accessibility = { error: String(error) };
-  }
+  extracted.accessibility = { skipped: true };
   timings.accessibilityMs = Date.now() - phaseStart;
   timings.totalMs = Object.values(timings).reduce(
     (total, duration) => total + duration,
     0,
   );
   extracted.timings = timings;
+  console.error('phase: extracted done');
   return extracted;
 }
+
+// Extract session cookies scoped to the target domain (avoids HTTP 431 on servers with header size limits)
+let authCookieHeader = '';
+try {
+  const { cookies } = await cdp.send('Network.getAllCookies');
+  if (cookies && cookies.length) {
+    const targetHost = new URL(page.url || url || 'http://localhost').hostname;
+    const relevant = cookies.filter(c => targetHost === c.domain || targetHost.endsWith('.' + c.domain) || c.domain.endsWith('.' + targetHost));
+    authCookieHeader = (relevant.length ? relevant : cookies).map(c => `${c.name}=${c.value}`).join('; ');
+  }
+} catch (_) {}
 
 const captures = [];
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
@@ -1773,7 +1755,33 @@ const cssDir = path.join(outDir, 'stylesheets');
 fs.mkdirSync(cssDir, { recursive: true });
 for (const [styleSheetId, header] of styleSheets) {
   try {
-    const { text } = await cdp.send('CSS.getStyleSheetText', { styleSheetId });
+    let text = '';
+    // 1. Try CDP in-browser text (works for auth-gated and CORS-restricted sheets)
+    try {
+      const result = await cdp.send('CSS.getStyleSheetText', { styleSheetId });
+      text = result.text || '';
+    } catch (_cdpErr) {}
+
+    // 2. For injected sheets (CSS-in-JS) that have no text from CDP, use the in-page CSSOM serialization
+    if (!text && !header.sourceURL) {
+      const allCssomTexts = captures.flatMap(c => Object.values(c.cssomTexts || {}));
+      // Use __injected_N keyed entry from the capture that corresponds to this sheet
+      const injIdx = [...styleSheets.keys()].filter(id => !styleSheets.get(id).sourceURL).indexOf(styleSheetId);
+      text = captures[0]?.cssomTexts?.[`__injected_${injIdx}`] || '';
+    }
+
+    // 3. Fall back to network fetch with scoped auth cookies
+    if (!text && header.sourceURL && /^https?:/i.test(header.sourceURL)) {
+      try {
+        const response = await fetch(header.sourceURL, { headers: authCookieHeader ? { cookie: authCookieHeader } : {} });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        text = await response.text();
+      } catch (fetchErr) {
+        // Try CSSOM text for sheets with a URL too (in case fetch is blocked)
+        text = captures[0]?.cssomTexts?.[header.sourceURL] || '';
+        if (!text) throw fetchErr;
+      }
+    }
     const filename = `${String(stylesheetManifest.length).padStart(4, '0')}.css`;
     fs.writeFileSync(path.join(cssDir, filename), text);
     stylesheetTextByFile.set(`stylesheets/${filename}`, text);
@@ -1787,39 +1795,15 @@ for (const [styleSheetId, header] of styleSheets) {
       startLine: header.startLine,
       startColumn: header.startColumn,
       length: text.length,
-      mediaQueries: [
-        ...new Set(
-          [...text.matchAll(/@media\s+([^{]+)/g)].map((match) => match[1].trim()),
-        ),
-      ].slice(0, 500),
-      keyframes: [
-        ...new Set(
-          [...text.matchAll(/@(?:-webkit-)?keyframes\s+([^\s{]+)/g)].map(
-            (match) => match[1].trim(),
-          ),
-        ),
-      ].slice(0, 500),
-      pseudoSelectors: [
-        ...new Set(
-          [...text.matchAll(/([^{}]+:(?:hover|active|focus-visible|focus|disabled|checked|expanded)[^{}]*)\{/g)]
-            .map((match) => match[1].trim())
-            .filter((selector) => selector.length < 500),
-        ),
-      ].slice(0, 1000),
-      customProperties: [
-        ...new Set(
-          [...text.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]),
-        ),
-      ].slice(0, 2000),
+      mediaQueries: [...new Set([...text.matchAll(/@media\s+([^{]+)/g)].map((match) => match[1].trim()))].slice(0, 500),
+      keyframes: [...new Set([...text.matchAll(/@(?:-webkit-)?keyframes\s+([^\s{]+)/g)].map((match) => match[1].trim()))].slice(0, 500),
+      pseudoSelectors: [...new Set([...text.matchAll(/([^{}]+:(?:hover|active|focus-visible|focus|disabled|checked|expanded)[^{}]*)\{/g)].map((match) => match[1].trim()).filter((selector) => selector.length < 500))].slice(0, 1000),
+      customProperties: [...new Set([...text.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]))].slice(0, 2000),
     });
   } catch (error) {
-    stylesheetManifest.push({
-      sourceURL: header.sourceURL,
-      error: String(error),
-    });
+    stylesheetManifest.push({ sourceURL: header.sourceURL, error: String(error) });
   }
 }
-
 const scriptDir = path.join(outDir, 'scripts');
 fs.mkdirSync(scriptDir, { recursive: true });
 const usedScriptIds = new Set(
@@ -1867,9 +1851,8 @@ for (const scriptId of usedScriptIds) {
   }
   let sourceCdp;
   try {
-    sourceCdp = await connect(page.webSocketDebuggerUrl);
-    await sourceCdp.send('Debugger.enable');
-    const source = (await sourceCdp.send('Debugger.getScriptSource', { scriptId }))
+    // Use the existing cdp connection — opening a second connection to the same tab kills the first
+    const source = (await cdp.send('Debugger.getScriptSource', { scriptId }))
       .scriptSource;
     const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
     fs.writeFileSync(path.join(scriptDir, filename), source);
@@ -1894,7 +1877,7 @@ for (const scriptId of usedScriptIds) {
     const parsed = scripts.get(scriptId);
     try {
       if (!parsed?.url?.startsWith('http')) throw error;
-      const response = await fetch(parsed.url);
+      const response = await fetch(parsed.url, { headers: authCookieHeader ? { cookie: authCookieHeader } : {} });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const source = await response.text();
       const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
@@ -1923,8 +1906,6 @@ for (const scriptId of usedScriptIds) {
         debuggerError: String(error),
       });
     }
-  } finally {
-    sourceCdp?.close();
   }
 }
 for (const capture of captures) {
@@ -2699,10 +2680,12 @@ fs.writeFileSync(
   ),
 );
 
-await cdp.send('Emulation.clearDeviceMetricsOverride');
-if (reuse) await cdp.send('Page.reload', { ignoreCache: false });
-if (created && browser && targetId) await browser.send('Target.closeTarget', { targetId });
-cdp.close();
-browser?.close();
+try {
+  cdp.close();
+} catch {}
+try {
+  browser?.close();
+} catch {}
 
 console.log(fs.readFileSync(path.join(outDir, 'summary.json'), 'utf8'));
+process.exit(0);
