@@ -6,6 +6,8 @@ const VOID_TAGS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link',
   'meta', 'param', 'source', 'track', 'wbr',
 ]);
+const TRANSPARENT_IMAGE =
+  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 function parseArgs(argv) {
   const args = {};
@@ -195,7 +197,7 @@ function createRenderer(nodes, triggers, sourceUrl) {
     const tag = node.tag;
     if (tag === '#document' || tag === 'html' || tag === 'head') return '';
     if (tag === '#text') return escapeHtml(node.text || '');
-    if (!tag || tag.startsWith('#')) return '';
+    if (!tag || !/^[a-z][a-z0-9-]*$/.test(tag)) return '';
 
     const trigger = triggerByPath.get(node.path);
     const extra = trigger
@@ -235,6 +237,10 @@ function sanitizeCapturedHtml(
   );
   output = output.replace(/\s+crossorigin(?:=["'][^"']*["'])?/gi, '');
   output = output.replace(/\s+on[a-z]+\s*=\s*(["'])[\s\S]*?\1/gi, '');
+  output = output.replace(
+    /(<img\b[^>]*\bsrc=)(["'])blob:[^"']+\2/gi,
+    `$1$2${TRANSPARENT_IMAGE}$2`,
+  );
 
   let baseUrl;
   try {
@@ -271,6 +277,15 @@ function runtimeSource(manifest) {
   for (const stylesheet of document.querySelectorAll('link[data-site-spec-href]')) {
     stylesheet.href = location.origin + stylesheet.dataset.siteSpecHref;
   }
+  const elementForPath = path => {
+    const selector = String(path || '').replace(/^doc\\(0\\)>/, '');
+    if (!selector) return null;
+    try {
+      return document.querySelector(selector);
+    } catch {
+      return null;
+    }
+  };
   const normalized = value => String(value || '')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/[^a-z0-9]+/gi, ' ')
@@ -287,14 +302,33 @@ function runtimeSource(manifest) {
     if (trigger.testId && (element.getAttribute('data-testid') || '') !== trigger.testId) return false;
     const actual = normalized(labelFor(element));
     const expected = normalized(trigger.label);
-    return actual === expected || actual.startsWith(expected + ' ');
+    if (!expected) return false;
+    return (
+      actual === expected ||
+      actual.startsWith(expected) ||
+      actual.endsWith(' ' + expected)
+    );
   };
   const interactive = element => element?.closest?.(
     'a[href],button,[role="button"],[role="link"],[data-site-spec-target],[tabindex]:not([tabindex="-1"])'
   );
+  const interactiveElements = Array.from(document.querySelectorAll(
+    'a[href],button,[role="button"],[role="link"],[tabindex]:not([tabindex="-1"])'
+  ));
+  for (const trigger of manifest.triggers) {
+    const exact = elementForPath(trigger.path);
+    const semantic = exact
+      ? []
+      : interactiveElements.filter(element => matches(element, trigger));
+    for (const element of exact ? [exact] : semantic) {
+      element.dataset.siteSpecTarget = trigger.target;
+      element.dataset.siteSpecState = String(trigger.stateIndex);
+    }
+  }
   const navigateTo = target => {
-    history.pushState(null, '', target);
-    location.reload();
+    const localUrl = new URL(target, location.origin);
+    history.pushState(null, '', location.href);
+    location.assign(localUrl.href);
   };
   const navigate = element => {
     const direct = element.getAttribute('data-site-spec-target');
@@ -423,9 +457,37 @@ export function buildStatic({ specDir, buildDir }) {
   const cssLinks = cssFiles
     .map((file) => `<link rel="stylesheet" href="/stylesheets/${escapeAttribute(file)}">`)
     .join('\n');
-  const body = (childrenOf.get(bodyNode.path) || []).map(renderNode).join('\n');
-  const title = escapeHtml(capture.document?.title || 'Site specification');
-  const homeHtml = `<!doctype html>
+  let homeHtml;
+  const homeSourceFile = spec.home?.html
+    ? path.join(resolvedSpecDir, spec.home.html)
+    : '';
+  if (homeSourceFile && fs.existsSync(homeSourceFile)) {
+    let homeStylesheet = '';
+    if (spec.home.stylesheet) {
+      const stylesheetSourceFile = path.join(
+        resolvedSpecDir,
+        spec.home.stylesheet,
+      );
+      if (fs.existsSync(stylesheetSourceFile)) {
+        const stateStylesDir = path.join(resolvedBuildDir, 'state-styles');
+        fs.mkdirSync(stateStylesDir, { recursive: true });
+        fs.copyFileSync(
+          stylesheetSourceFile,
+          path.join(stateStylesDir, 'home.css'),
+        );
+        homeStylesheet = '/state-styles/home.css';
+      }
+    }
+    homeHtml = sanitizeCapturedHtml(
+      fs.readFileSync(homeSourceFile, 'utf8'),
+      spec.home.url || sourceUrl,
+      cssFiles,
+      homeStylesheet,
+    );
+  } else {
+    const body = (childrenOf.get(bodyNode.path) || []).map(renderNode).join('\n');
+    const title = escapeHtml(capture.document?.title || 'Site specification');
+    homeHtml = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -438,6 +500,7 @@ export function buildStatic({ specDir, buildDir }) {
 ${body}
 </body>
 </html>`;
+  }
   fs.writeFileSync(path.join(resolvedBuildDir, 'index.html'), homeHtml);
 
   for (const state of spec.pages || []) {
@@ -475,6 +538,12 @@ ${body}
     schemaVersion: 1,
     source: sourceUrl,
     generatedAt: new Date().toISOString(),
+    home: spec.home
+      ? {
+          sourceUrl: spec.home.url,
+          stylesheet: spec.home.stylesheet,
+        }
+      : undefined,
     triggers,
     states: (spec.pages || []).map((state) => ({
       index: state.index,

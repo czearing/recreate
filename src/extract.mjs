@@ -1148,8 +1148,8 @@ async function waitForApplicationReady() {
   let state = {};
   let lastNodeCount = 0;
   let stableCount = 0;
-  // Up to 80 attempts (20 seconds) to let SPAs finish rendering
-  for (let attempt = 0; attempt < 80; attempt++) {
+  // Slow authenticated prototypes can keep a visual splash after DOM readiness.
+  for (let attempt = 0; attempt < 180; attempt++) {
     try {
       state = (
         await cdp.send('Runtime.evaluate', {
@@ -1160,6 +1160,23 @@ async function waitForApplicationReady() {
             isLoaded: document.documentElement.classList.contains('is-loaded'),
             hasLenisWrapper: Boolean(window.lenis),
             hasLenisScroll: Boolean(window.lenis?.scroll),
+            hasBlockingVisual: Array.from(document.images).some(image => {
+              const rect = image.getBoundingClientRect();
+              const parentRect = image.parentElement?.getBoundingClientRect();
+              const identity = [
+                image.currentSrc,
+                image.alt,
+                image.id,
+                image.className,
+              ].join(' ');
+              return (
+                /(?:load|splash|intro|boot)/i.test(identity) &&
+                rect.width * rect.height > innerWidth * innerHeight * 0.1 &&
+                parentRect &&
+                parentRect.width * parentRect.height >
+                  innerWidth * innerHeight * 0.75
+              );
+            }),
             nodeCount: document.querySelectorAll('*').length
           })`,
           returnByValue: true,
@@ -1170,7 +1187,8 @@ async function waitForApplicationReady() {
         state.readyState === 'complete' &&
         state.fonts === 'loaded' &&
         (!state.isLoading || state.isLoaded) &&
-        (!state.hasLenisWrapper || state.hasLenisScroll);
+        (!state.hasLenisWrapper || state.hasLenisScroll) &&
+        !state.hasBlockingVisual;
 
       if (baseReady) {
         const n = state.nodeCount ?? 0;
@@ -1205,6 +1223,7 @@ async function waitForApplicationReady() {
 const liveScriptSources = new Map();
 let navigationDoneByMultiPage = false;
 const multiPageStates = [];
+let homePageState;
 
 function absolutizeCssUrls(cssText, sourceUrl) {
   if (!sourceUrl) return cssText;
@@ -1220,10 +1239,9 @@ function absolutizeCssUrls(cssText, sourceUrl) {
   );
 }
 
-async function capturePageSnapshot(index) {
+async function capturePageSnapshot(index, slug = String(index).padStart(3, '0')) {
   // Let the browser paint before screenshotting
   await new Promise((r) => setTimeout(r, 600));
-  const slug = String(index).padStart(3, '0');
   const pageDir = path.join(outDir, 'pages');
   fs.mkdirSync(pageDir, { recursive: true });
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -1235,23 +1253,23 @@ async function capturePageSnapshot(index) {
   const [snapshotResult, screenshotResult] = await Promise.allSettled([
     cdp.send('Runtime.evaluate', {
         expression: `JSON.stringify({
-          url: location.href,
-          title: document.title,
-          nodeCount: document.querySelectorAll('*').length,
-          text: (document.body || document.documentElement).innerText.substring(0, 3000),
-          bodyHeight: document.body ? document.body.scrollHeight : 0,
-          html: '<!DOCTYPE html>\\n' + document.documentElement.outerHTML,
-          stylesheets: Array.from(document.styleSheets).map(sheet => {
-            try {
-              return {
-                href: sheet.href || location.href,
-                text: Array.from(sheet.cssRules || [], rule => rule.cssText).join('\\n')
-              };
-            } catch {
-              return null;
-            }
-          }).filter(Boolean)
-        })`,
+            url: location.href,
+            title: document.title,
+            nodeCount: document.querySelectorAll('*').length,
+            text: (document.body || document.documentElement).innerText.substring(0, 3000),
+            bodyHeight: document.body ? document.body.scrollHeight : 0,
+            html: '<!DOCTYPE html>\\n' + document.documentElement.outerHTML,
+            stylesheets: Array.from(document.styleSheets).map(sheet => {
+              try {
+                return {
+                  href: sheet.href || location.href,
+                  text: Array.from(sheet.cssRules || [], rule => rule.cssText).join('\\n')
+                };
+              } catch {
+                return null;
+              }
+            }).filter(Boolean)
+          })`,
         returnByValue: true,
       }),
     cdp.send('Page.captureScreenshot', { format: 'png' }),
@@ -2225,14 +2243,84 @@ try {
   }
 } catch (_) {}
 
+async function inlineSnapshotImages(snapshots) {
+  const files = snapshots
+    .filter((snapshot) => snapshot?.html)
+    .map((snapshot) => path.join(outDir, snapshot.html))
+    .filter((file) => fs.existsSync(file));
+  const htmlByFile = new Map(
+    files.map((file) => [file, fs.readFileSync(file, 'utf8')]),
+  );
+  const imageUrls = [
+    ...new Set(
+      [...htmlByFile.values()].flatMap((html) =>
+        [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(https?:\/\/[^"']+)\1/gi)]
+          .map((match) => match[2]),
+      ),
+    ),
+  ];
+  const replacements = new Map();
+  const targetHost = new URL(page.url || requestedUrl).hostname;
+  let nextIndex = 0;
+  const workers = Array.from(
+    { length: Math.min(6, imageUrls.length) },
+    async () => {
+      while (nextIndex < imageUrls.length) {
+        const imageUrl = imageUrls[nextIndex++];
+        try {
+          const imageHost = new URL(imageUrl).hostname;
+          const sameSite =
+            imageHost === targetHost ||
+            imageHost.endsWith(`.${targetHost}`) ||
+            targetHost.endsWith(`.${imageHost}`);
+          const response = await fetch(imageUrl, {
+            headers:
+              sameSite && authCookieHeader
+                ? { cookie: authCookieHeader }
+                : {},
+            signal: AbortSignal.timeout(5000),
+          });
+          if (!response.ok) continue;
+          const contentType = response.headers.get('content-type') || '';
+          if (!contentType.startsWith('image/')) continue;
+          const bytes = Buffer.from(await response.arrayBuffer());
+          if (bytes.length > 5 * 1024 * 1024) continue;
+          replacements.set(
+            imageUrl,
+            `data:${contentType};base64,${bytes.toString('base64')}`,
+          );
+        } catch {}
+      }
+    },
+  );
+  await Promise.all(workers);
+  for (const [file, originalHtml] of htmlByFile) {
+    let html = originalHtml;
+    for (const [imageUrl, dataUrl] of replacements) {
+      html = html.split(imageUrl).join(dataUrl);
+    }
+    fs.writeFileSync(file, html);
+  }
+  return replacements.size;
+}
+
 const captures = [];
 
 if (created) {
   await navigateAndCaptureAllPages(url);
 }
+await waitForApplicationReady();
+homePageState = await capturePageSnapshot(-1, 'home');
+homePageState.type = 'home';
 if (crawl) {
   await crawlRoutes(requestedUrl, maxRoutes);
 }
+console.error(
+  `phase: localized ${await inlineSnapshotImages([
+    homePageState,
+    ...multiPageStates,
+  ])} snapshot images`,
+);
 
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
   if (captureIndex > 0) {
@@ -2776,6 +2864,7 @@ const output = {
     reusedAuthenticatedTarget: reuse,
     capturedAt: new Date().toISOString(),
   },
+  home: homePageState,
   pages: multiPageStates,
   viewports,
   captures,

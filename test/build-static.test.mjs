@@ -169,11 +169,65 @@ test('builds local state routes and wires distinct interactive controls', () => 
     path.join(buildDir, 'site-spec-runtime.js'),
     'utf8',
   );
-  assert.match(runtime, /history\.pushState\(null, '', target\)/);
-  assert.match(runtime, /location\.reload\(\)/);
+  assert.match(runtime, /new URL\(target, location\.origin\)/);
+  assert.match(runtime, /history\.pushState\(null, '', location\.href\)/);
+  assert.match(runtime, /location\.assign\(localUrl\.href\)/);
+  assert.match(runtime, /document\.querySelector\(selector\)/);
+  assert.match(runtime, /if \(!expected\) return false/);
+  assert.match(runtime, /actual\.endsWith\(' ' \+ expected\)/);
   const server = fs.readFileSync(path.join(buildDir, 'server.mjs'), 'utf8');
   assert.match(
     server,
     /"\/app\/notebook\/my-notebook\?view=compact":"\/__site-spec\/query\/003"/,
+  );
+});
+
+test('uses the settled captured home document when available', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-home-'));
+  const specDir = path.join(temp, 'spec');
+  const buildDir = path.join(temp, 'build');
+  fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
+  fs.writeFileSync(
+    path.join(specDir, 'pages', 'home.html'),
+    '<!doctype html><html><head><script src="app.js"></script></head><body><main data-captured-home>Settled home<img src="blob:https://example.test/avatar"></main></body></html>',
+  );
+  fs.writeFileSync(
+    path.join(specDir, 'pages', 'home.css'),
+    'main{display:block}',
+  );
+  fs.writeFileSync(
+    path.join(specDir, 'spec.json'),
+    JSON.stringify({
+      source: { capturedUrl: 'https://example.test/app/' },
+      home: {
+        type: 'home',
+        url: 'https://example.test/app/',
+        html: 'pages/home.html',
+        stylesheet: 'pages/home.css',
+      },
+      captures: [{
+        document: { title: 'Fixture' },
+        nodes: [
+          node(htmlPath, 'doc(0)', 'html'),
+          node(bodyPath, htmlPath, 'body'),
+          node(rootPath, bodyPath, 'div', { id: 'loading-fallback' }),
+        ],
+      }],
+      pages: [],
+    }),
+  );
+
+  buildStatic({ specDir, buildDir });
+
+  const home = fs.readFileSync(path.join(buildDir, 'index.html'), 'utf8');
+  assert.match(home, /data-captured-home/);
+  assert.match(home, /data-site-spec-href="\/state-styles\/home\.css"/);
+  assert.doesNotMatch(home, /loading-fallback/);
+  assert.doesNotMatch(home, /<script src="app\.js"/);
+  assert.doesNotMatch(home, /blob:https:/);
+  assert.match(home, /data:image\/gif;base64/);
+  assert.equal(
+    fs.readFileSync(path.join(buildDir, 'state-styles', 'home.css'), 'utf8'),
+    'main{display:block}',
   );
 });
