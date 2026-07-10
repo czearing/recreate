@@ -1170,21 +1170,56 @@ async function waitForApplicationReady() {
               document.body &&
               (document.body.children.length || (document.body.textContent || '').trim())
             ),
-            hasBlockingVisual: Array.from(document.images).some(image => {
-              const rect = image.getBoundingClientRect();
-              const parentRect = image.parentElement?.getBoundingClientRect();
+            hasBlockingVisual: Array.from(new Set([
+              ...Array.from(document.body?.children || []),
+              ...document.querySelectorAll([
+                'img',
+                '[aria-busy="true"]',
+                '[role="progressbar"]',
+                '[id*="load" i]',
+                '[class*="load" i]',
+                '[id*="splash" i]',
+                '[class*="splash" i]',
+                '[id*="intro" i]',
+                '[class*="intro" i]',
+                '[id*="boot" i]',
+                '[class*="boot" i]'
+              ].join(','))
+            ])).some(element => {
+              const rect = element.getBoundingClientRect();
+              const style = getComputedStyle(element);
               const identity = [
-                image.currentSrc,
-                image.alt,
-                image.id,
-                image.className,
+                element instanceof HTMLImageElement ? element.currentSrc : '',
+                element.getAttribute('alt'),
+                element.getAttribute('aria-label'),
+                element.getAttribute('aria-busy'),
+                element.getAttribute('role'),
+                element.id,
+                element.className,
+                element.textContent?.trim().slice(0, 100),
               ].join(' ');
-              return (
-                /(?:load|splash|intro|boot)/i.test(identity) &&
+              const coversViewport =
+                rect.width * rect.height > innerWidth * innerHeight * 0.5;
+              const parentRect = element.parentElement?.getBoundingClientRect();
+              const largeSplashImage =
+                element instanceof HTMLImageElement &&
                 rect.width * rect.height > innerWidth * innerHeight * 0.1 &&
                 parentRect &&
                 parentRect.width * parentRect.height >
-                  innerWidth * innerHeight * 0.75
+                  innerWidth * innerHeight * 0.75;
+              const visuallyPresent =
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity || 1) > 0;
+              return (
+                /(?:load|splash|intro|boot)/i.test(identity) &&
+                visuallyPresent &&
+                (
+                  coversViewport ||
+                  largeSplashImage ||
+                  element.getAttribute('aria-busy') === 'true' ||
+                  element.getAttribute('role') === 'progressbar'
+                )
               );
             }),
             nodeCount: document.querySelectorAll('*').length
@@ -2317,7 +2352,9 @@ async function inlineSnapshotImages(snapshots) {
           if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
           replacements.set(
             imageUrl,
-            `/snapshot-assets/${filename}`,
+            fullProfile
+              ? `data:${contentType};base64,${bytes.toString('base64')}`
+              : `/snapshot-assets/${filename}`,
           );
         } catch {}
       }
