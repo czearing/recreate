@@ -43,7 +43,9 @@ node src/extract.mjs --url https://example.com --out site-spec-output --viewport
 
 ## Output
 
-- `spec.json`: complete machine-readable specification
+- `implementation.json`: concise agent-facing build plan and evidence index
+- `spec.json`: machine-readable evidence index and global relationships
+- `evidence/capture-*.json`: exact geometry and behavior for one viewport
 - `summary.json`: timings, counts, coverage, and validation
 - `documents/`: exact pre-execution HTML responses
 - `stylesheets/`: authored CSS source
@@ -54,6 +56,23 @@ node src/extract.mjs --url https://example.com --out site-spec-output --viewport
 The `full` profile also writes `scripts/` and isolated `components/` payloads.
 Screenshots are ground-truth validation evidence. Pixel comparison belongs in
 the final implementation-validation pass and is not run during extraction.
+
+Implementation agents should read `implementation.json` first, then open only
+the HTML, CSS, component, or exact geometry needed for the state currently
+being built. The default profile excludes minified scripts, source excerpts,
+inline asset encodings, repeated computed-style maps, and full scroll DOM
+snapshots from the primary context path.
+
+## Agent-context benchmark
+
+| Fixture | Extraction | Agent entrypoint | Exact spec index |
+| --- | ---: | ---: | ---: |
+| Responsive docs, 2 viewports | 7.44 s | ~2.2k tokens | 14.7 KB or less |
+| Commerce SPA, 2 viewports + crawl | 11.76 s | ~3.6k tokens | 14.7 KB |
+
+The commerce capture retained its route and modal states, rebuilt successfully,
+and contained no base64, data URLs, script excerpts, or minified script blobs
+in the default text artifacts.
 
 ## Build an interactive static mock
 

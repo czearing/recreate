@@ -4,6 +4,11 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import {
+  compactCapture,
+  compactRect,
+  compactStyleDelta,
+} from './capture-compaction.mjs';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -163,6 +168,7 @@ async function initializeCdp(client) {
   });
   client.on('Network.loadingFinished', async ({ requestId }) => {
     if (requestId !== latestDocumentResponse?.requestId) return;
+    if (!fullProfile) return;
     try {
       latestDocumentBody = await client.send('Network.getResponseBody', { requestId });
     } catch (error) {
@@ -242,7 +248,7 @@ const computedProperties = [
   'clip-path',
 ];
 
-const supplementFunction = String.raw`async ({ computedProperties }) => {
+const supplementFunction = String.raw`async ({ computedProperties, includeForensics }) => {
   const pathFor = (element) => {
     const parts = [];
     let current = element;
@@ -268,7 +274,11 @@ const supplementFunction = String.raw`async ({ computedProperties }) => {
   };
   const assetFor = (element) => {
     const tag = element.tagName.toLowerCase();
-    if (tag === 'svg') return { type: 'inline-svg', value: element.outerHTML, path: pathFor(element) };
+    if (tag === 'svg') return {
+      type: 'inline-svg',
+      path: pathFor(element),
+      value: includeForensics ? element.outerHTML : undefined,
+    };
     if (tag === 'img') return {
       type: 'image',
       path: pathFor(element),
@@ -287,7 +297,13 @@ const supplementFunction = String.raw`async ({ computedProperties }) => {
     };
     if (tag === 'canvas') {
       try {
-        return { type: 'canvas', path: pathFor(element), dataUrl: element.toDataURL(), width: element.width, height: element.height };
+        return {
+          type: 'canvas',
+          path: pathFor(element),
+          dataUrl: includeForensics ? element.toDataURL() : undefined,
+          width: element.width,
+          height: element.height,
+        };
       } catch (error) {
         return { type: 'canvas', path: pathFor(element), error: String(error), width: element.width, height: element.height };
       }
@@ -717,7 +733,7 @@ const scrollDescriptorFunction = String.raw`function () {
   };
 }`;
 
-const scrollCheckpointFunction = String.raw`function () {
+const scrollCheckpointFunction = String.raw`function (includeVisibleElements) {
   const pathFor = (element) => {
     const parts = [];
     let current = element;
@@ -748,7 +764,7 @@ const scrollCheckpointFunction = String.raw`function () {
     visit(document);
     return elements;
   };
-  const visibleElements = allElements()
+  const visibleElements = includeVisibleElements ? allElements()
     .map((element) => {
       const rect = element.getBoundingClientRect();
       if (
@@ -810,7 +826,7 @@ const scrollCheckpointFunction = String.raw`function () {
       };
     })
     .filter(Boolean)
-    .slice(0, 1500);
+    .slice(0, 1500) : [];
   const animations = document
     .getAnimations({ subtree: true })
     .slice(0, 500)
@@ -1833,7 +1849,7 @@ async function extractViewport(viewport, captureIndex) {
     status: latestDocumentResponse?.response?.status,
     mimeType: latestDocumentResponse?.response?.mimeType,
   };
-  try {
+  if (fullProfile) try {
     const documentDir = path.join(outDir, 'documents');
     const filename = `${viewport.width}x${viewport.height}.html`;
     fs.mkdirSync(documentDir, { recursive: true });
@@ -2040,6 +2056,7 @@ async function extractViewport(viewport, captureIndex) {
         await cdp.send('Runtime.callFunctionOn', {
           objectId: documentObjectId,
           functionDeclaration: scrollCheckpointFunction,
+          arguments: [{ value: fullProfile }],
           returnByValue: true,
         })
       ).result.value;
@@ -2098,7 +2115,7 @@ async function extractViewport(viewport, captureIndex) {
       })
     ).result.objectId,
     functionDeclaration: supplementFunction,
-    arguments: [{ value: { computedProperties } }],
+    arguments: [{ value: { computedProperties, includeForensics: fullProfile } }],
     awaitPromise: true,
     returnByValue: true,
   });
@@ -2192,22 +2209,24 @@ async function extractViewport(viewport, captureIndex) {
       listenerFor(listener, index === 0 ? 'window' : 'document'),
     ),
   );
-  await Promise.all(
-    [...new Set(allListeners.map((listener) => listener.scriptId))]
-      .filter((scriptId) => scriptId && scriptId !== '0')
-      .map(async (scriptId) => {
-        if (liveScriptSources.has(scriptId)) return;
-        try {
-          const source = (
-            await cdp.send('Debugger.getScriptSource', { scriptId })
-          ).scriptSource;
-          liveScriptSources.set(scriptId, {
-            source,
-            parsed: scripts.get(scriptId),
-          });
-        } catch {}
-      }),
-  );
+  if (fullProfile) {
+    await Promise.all(
+      [...new Set(allListeners.map((listener) => listener.scriptId))]
+        .filter((scriptId) => scriptId && scriptId !== '0')
+        .map(async (scriptId) => {
+          if (liveScriptSources.has(scriptId)) return;
+          try {
+            const source = (
+              await cdp.send('Debugger.getScriptSource', { scriptId })
+            ).scriptSource;
+            liveScriptSources.set(scriptId, {
+              source,
+              parsed: scripts.get(scriptId),
+            });
+          } catch {}
+        }),
+    );
+  }
   const listenersByBackendId = new Map();
   for (const listener of allListeners.filter(
     (listener) => listener.backendNodeId,
@@ -2296,15 +2315,16 @@ try {
 
 async function inlineSnapshotImages(snapshots) {
   const files = snapshots
-    .filter((snapshot) => snapshot?.html)
-    .map((snapshot) => path.join(outDir, snapshot.html))
+    .flatMap((snapshot) => [snapshot?.html, snapshot?.stylesheet])
+    .filter(Boolean)
+    .map((file) => path.join(outDir, file))
     .filter((file) => fs.existsSync(file));
-  const htmlByFile = new Map(
+  const textByFile = new Map(
     files.map((file) => [file, fs.readFileSync(file, 'utf8')]),
   );
   const imageUrls = [
     ...new Set(
-      [...htmlByFile.values()].flatMap((html) =>
+      [...textByFile.values()].flatMap((html) =>
         [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(https?:\/\/[^"']+)\1/gi)]
           .map((match) => match[2]),
       ),
@@ -2313,6 +2333,50 @@ async function inlineSnapshotImages(snapshots) {
   const replacements = new Map();
   const assetDir = path.join(outDir, 'snapshot-assets');
   const targetHost = new URL(requestedUrl).hostname;
+  const extensionByType = {
+    'font/otf': '.otf',
+    'font/ttf': '.ttf',
+    'font/woff': '.woff',
+    'font/woff2': '.woff2',
+    'image/avif': '.avif',
+    'image/gif': '.gif',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/svg+xml': '.svg',
+    'image/webp': '.webp',
+  };
+  const storeAsset = (source, contentType, bytes) => {
+    if (!bytes.length || bytes.length > 5 * 1024 * 1024) return;
+    fs.mkdirSync(assetDir, { recursive: true });
+    const extension = extensionByType[contentType.split(';')[0]] || '.bin';
+    const filename =
+      `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
+    const assetPath = path.join(assetDir, filename);
+    if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
+    replacements.set(source, `/snapshot-assets/${filename}`);
+  };
+  if (!fullProfile) {
+    const dataUrls = [
+      ...new Set(
+        [...textByFile.values()].flatMap((text) =>
+          [...text.matchAll(/data:([a-z0-9.+-]+\/[a-z0-9.+-]+)(;charset=[^;,]+)?(;base64)?,([^"'()\s]+)/gi)]
+            .map((match) => match[0]),
+        ),
+      ),
+    ];
+    for (const dataUrl of dataUrls) {
+      try {
+        const match = dataUrl.match(
+          /^data:([a-z0-9.+-]+\/[a-z0-9.+-]+)(?:;charset=[^;,]+)?(;base64)?,([\s\S]+)$/i,
+        );
+        if (!match) continue;
+        const bytes = match[2]
+          ? Buffer.from(match[3], 'base64')
+          : Buffer.from(decodeURIComponent(match[3]));
+        storeAsset(dataUrl, match[1], bytes);
+      } catch {}
+    }
+  }
   let nextIndex = 0;
   const workers = Array.from(
     { length: Math.min(6, imageUrls.length) },
@@ -2336,37 +2400,25 @@ async function inlineSnapshotImages(snapshots) {
           const contentType = response.headers.get('content-type') || '';
           if (!contentType.startsWith('image/')) continue;
           const bytes = Buffer.from(await response.arrayBuffer());
-          if (bytes.length > 5 * 1024 * 1024) continue;
-          fs.mkdirSync(assetDir, { recursive: true });
-          const extensionByType = {
-            'image/avif': '.avif',
-            'image/gif': '.gif',
-            'image/jpeg': '.jpg',
-            'image/png': '.png',
-            'image/svg+xml': '.svg',
-            'image/webp': '.webp',
-          };
-          const extension = extensionByType[contentType.split(';')[0]] || '.img';
-          const filename = `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
-          const assetPath = path.join(assetDir, filename);
-          if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
-          replacements.set(
-            imageUrl,
-            fullProfile
-              ? `data:${contentType};base64,${bytes.toString('base64')}`
-              : `/snapshot-assets/${filename}`,
-          );
+          if (fullProfile) {
+            replacements.set(
+              imageUrl,
+              `data:${contentType};base64,${bytes.toString('base64')}`,
+            );
+          } else {
+            storeAsset(imageUrl, contentType, bytes);
+          }
         } catch {}
       }
     },
   );
   await Promise.all(workers);
-  for (const [file, originalHtml] of htmlByFile) {
-    let html = originalHtml;
-    for (const [imageUrl, dataUrl] of replacements) {
-      html = html.split(imageUrl).join(dataUrl);
+  for (const [file, originalText] of textByFile) {
+    let text = originalText;
+    for (const [source, replacement] of replacements) {
+      text = text.split(source).join(replacement);
     }
-    fs.writeFileSync(file, html);
+    fs.writeFileSync(file, text);
   }
   return replacements.size;
 }
@@ -2553,6 +2605,19 @@ for (const scriptId of usedScriptIds) {
     });
     continue;
   }
+  if (!fullProfile) {
+    const parsed = scripts.get(scriptId);
+    scriptManifest.push({
+      scriptId,
+      url: parsed?.url,
+      startLine: parsed?.startLine,
+      startColumn: parsed?.startColumn,
+      hash: parsed?.hash,
+      sourceMapURL: parsed?.sourceMapURL,
+      retrieval: 'omitted-by-profile',
+    });
+    continue;
+  }
   const liveScript = liveScriptSources.get(scriptId);
   if (liveScript) {
     const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
@@ -2666,11 +2731,14 @@ for (const capture of captures) {
   ];
   for (const listener of listeners) {
       if (listener.sourceStatus) continue;
+      listener.sourceUrl = scripts.get(listener.scriptId)?.url;
       listener.sourceStatus = listener.handlerSource
         ? 'captured'
         : listener.scriptId === '0' || listener.lineNumber < 0
           ? 'protocol-opaque'
-          : 'unavailable';
+          : fullProfile
+            ? 'unavailable'
+            : 'located';
   }
 }
 
@@ -2934,7 +3002,7 @@ for (const [nodePath, values] of byPath) {
 }
 
 const output = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   profile,
   source: {
     requestedUrl,
@@ -3098,8 +3166,11 @@ for (const [captureIndex, capture] of captures.entries()) {
     validationErrors.push(`capture ${captureIndex}: application readiness timed out`);
   }
   if (
-    !capture.initialDocument?.file ||
-    !fs.existsSync(path.join(outDir, capture.initialDocument.file))
+    fullProfile &&
+    (
+      !capture.initialDocument?.file ||
+      !fs.existsSync(path.join(outDir, capture.initialDocument.file))
+    )
   ) {
     validationErrors.push(
       `capture ${captureIndex}: missing initial document artifact`,
@@ -3333,20 +3404,138 @@ output.validation = {
   errors: validationErrors,
 };
 
+const captureEvidenceFiles = [];
 if (!fullProfile) {
-  output.captures = captures.map(
-    ({ documents: _documents, componentCandidates: _componentCandidates, ...capture }) =>
-      capture,
-  );
+  const evidenceDir = path.join(outDir, 'evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  output.captures = captures.map((capture) => {
+    const compact = compactCapture(capture);
+    const viewport = capture.document.viewport;
+    const filename = `capture-${viewport.width}x${viewport.height}.json`;
+    const relativeFile = `evidence/${filename}`;
+    fs.writeFileSync(
+      path.join(evidenceDir, filename),
+      JSON.stringify(compact, null, 2),
+    );
+    captureEvidenceFiles.push(relativeFile);
+    return {
+      file: relativeFile,
+      viewport,
+      url: capture.document.url,
+      title: capture.document.title,
+      nodeCount: capture.nodes.length,
+      behaviorCount: capture.behaviors.length,
+      animationTrackCount: compact.lifecycleAnimation.tracks.length,
+      readiness: capture.readiness,
+    };
+  });
 }
 
+const implementationBlueprint = {
+  schemaVersion: 1,
+  purpose:
+    'Agent-facing implementation blueprint. Read this before opening detailed evidence.',
+  source: output.source,
+  profile,
+  readOrder: [
+    'implementation.json',
+    'component-map.json',
+    'pages/*.html and pages/*.css for the state being implemented',
+    'stylesheets/*.css for authored rules and design tokens',
+    'the matching evidence/capture-*.json only for exact geometry or animation evidence',
+    'pages/*.png only for final visual validation',
+  ],
+  rules: [
+    'Implement native components in the destination stack; do not copy captured application scripts.',
+    'Use words, routes, control identities, authored CSS, rects, and responsive deltas as build inputs.',
+    'Use screenshots as validation evidence, not as the source of implementation facts.',
+    'Do not load binary screenshots or the full spec into model context unless a targeted check requires them.',
+  ],
+  viewports,
+  states: [
+    homePageState,
+    ...multiPageStates,
+  ].filter(Boolean).map((state) => ({
+    index: state.index,
+    type: state.type,
+    url: state.url,
+    title: state.title,
+    trigger: state.trigger,
+    triggerElement: state.triggerElement,
+    html: state.html,
+    stylesheet: state.stylesheet,
+    screenshot: state.screenshot,
+  })),
+  interactions: multiPageStates.map((state) => ({
+    stateIndex: state.index,
+    type: state.type,
+    trigger: state.triggerElement || {
+      label: state.trigger,
+    },
+    destination: state.url,
+  })),
+  components: componentPackages.map((component) => ({
+    id: component.id,
+    identity: component.identity,
+    path: component.path,
+    parentId: component.parentId,
+    childIds: component.childIds,
+    reasons: component.reasons,
+    viewports: captures.map((capture) => {
+      const root = capture.nodes.find((node) => node.path === component.path);
+      const parent = capture.nodes.find((node) => node.path === root?.parentPath);
+      return {
+        viewport: capture.document.viewport,
+        visible: root?.visible || false,
+        rect: root?.visible ? compactRect(root.rect) : undefined,
+        styleDelta: root?.visible
+          ? compactStyleDelta(root.style, parent?.style)
+          : undefined,
+      };
+    }),
+  })),
+  responsive,
+  authoredStylesheets: stylesheetManifest.map((sheet) => ({
+    file: sheet.file,
+    sourceURL: sheet.sourceURL,
+    mediaQueries: sheet.mediaQueries,
+    keyframes: sheet.keyframes,
+    customProperties: sheet.customProperties,
+  })),
+  evidence: {
+    exactSpec: 'spec.json',
+    componentMap: 'component-map.json',
+    summary: 'summary.json',
+    captures: captureEvidenceFiles,
+    initialDocuments: captures.map((capture) => capture.initialDocument?.file).filter(Boolean),
+  },
+  validation: output.validation,
+  confidence: output.confidence,
+};
+
 fs.writeFileSync(path.join(outDir, 'spec.json'), JSON.stringify(output, null, 2));
+fs.writeFileSync(
+  path.join(outDir, 'implementation.json'),
+  JSON.stringify(implementationBlueprint, null, 2),
+);
 fs.writeFileSync(
   path.join(outDir, 'summary.json'),
   JSON.stringify(
     {
       source: output.source,
       profile,
+      agentContext: {
+        entrypoint: 'implementation.json',
+        implementationBytes: Buffer.byteLength(
+          JSON.stringify(implementationBlueprint, null, 2),
+        ),
+        implementationEstimatedTokens: Math.ceil(
+          Buffer.byteLength(JSON.stringify(implementationBlueprint)) / 3.5,
+        ),
+        specBytes: fs.statSync(path.join(outDir, 'spec.json')).size,
+        guidance:
+          'Load implementation.json first and open exact evidence only for the active component or state.',
+      },
       viewports,
       captures: captures.map((capture) => ({
         viewport: capture.document.viewport,

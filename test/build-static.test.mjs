@@ -28,6 +28,7 @@ test('builds local state routes and wires distinct interactive controls', () => 
   const buildDir = path.join(temp, 'build');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
   fs.mkdirSync(path.join(specDir, 'stylesheets'), { recursive: true });
+  fs.mkdirSync(path.join(specDir, 'evidence'), { recursive: true });
   fs.writeFileSync(path.join(specDir, 'stylesheets', '0000.css'), 'body{color:#111}');
 
   const selectorPath = `${rootPath}>button:nth-of-type(1)`;
@@ -64,13 +65,18 @@ test('builds local state routes and wires distinct interactive controls', () => 
   fs.writeFileSync(path.join(specDir, 'pages', '000.css'), '.route{display:block}');
 
   fs.writeFileSync(
+    path.join(specDir, 'evidence', 'capture-1440x900.json'),
+    JSON.stringify({
+      document: { title: 'Fixture' },
+      nodes,
+      behaviors: [],
+    }),
+  );
+  fs.writeFileSync(
     path.join(specDir, 'spec.json'),
     JSON.stringify({
       source: { capturedUrl: 'https://example.test/app/' },
-      captures: [{
-        document: { title: 'Fixture' },
-        nodes,
-      }],
+      captures: [{ file: 'evidence/capture-1440x900.json' }],
       pages: [
         {
           index: 0,

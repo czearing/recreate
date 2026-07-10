@@ -417,7 +417,12 @@ export function buildStatic({ specDir, buildDir }) {
   const spec = JSON.parse(
     fs.readFileSync(path.join(resolvedSpecDir, 'spec.json'), 'utf8'),
   );
-  const capture = spec.captures?.[0];
+  const captureRecord = spec.captures?.[0];
+  const capture = captureRecord?.file
+    ? JSON.parse(
+        fs.readFileSync(path.join(resolvedSpecDir, captureRecord.file), 'utf8'),
+      )
+    : captureRecord;
   if (!capture?.nodes?.length) {
     throw new Error('The specification has no captured nodes to build.');
   }
