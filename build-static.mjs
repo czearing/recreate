@@ -424,6 +424,14 @@ export function buildStatic({ specDir, buildDir }) {
 
   fs.rmSync(resolvedBuildDir, { recursive: true, force: true });
   fs.mkdirSync(resolvedBuildDir, { recursive: true });
+  const snapshotAssetSource = path.join(resolvedSpecDir, 'snapshot-assets');
+  if (fs.existsSync(snapshotAssetSource)) {
+    fs.cpSync(
+      snapshotAssetSource,
+      path.join(resolvedBuildDir, 'snapshot-assets'),
+      { recursive: true },
+    );
+  }
 
   const triggers = (spec.pages || [])
     .map((state) => triggerRecord(

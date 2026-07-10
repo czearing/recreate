@@ -2,7 +2,7 @@
 
 Extract a buildable website specification from browser ground truth through the Chrome DevTools Protocol.
 
-The extractor records the exact initial document response, loaded DOM, authored CSS, scripts, assets, computed constraints, accessibility, listeners, responsive states, startup animation trajectories, scroll checkpoints, and component packages. It does not use image interpretation to infer implementation.
+The extractor records the exact initial document response, loaded DOM, authored CSS, assets, computed constraints, listeners, responsive states, startup animation trajectories, scroll checkpoints, and component boundaries. It does not use image interpretation to infer implementation.
 
 ## Run
 
@@ -17,6 +17,11 @@ Capture a public site:
 ```powershell
 node src/extract.mjs --url https://example.com --out site-spec-output
 ```
+
+The default `implementation` profile keeps the evidence needed to rebuild and
+validate the site while omitting duplicated forensic payloads. Use
+`--profile full` when raw DOMSnapshot documents, complete script blobs, and
+standalone component payloads are required for debugging.
 
 Capture an authenticated tab already open in that browser:
 
@@ -41,10 +46,14 @@ node src/extract.mjs --url https://example.com --out site-spec-output --viewport
 - `spec.json`: complete machine-readable specification
 - `summary.json`: timings, counts, coverage, and validation
 - `documents/`: exact pre-execution HTML responses
-- `stylesheets/` and `scripts/`: authored source blobs
+- `stylesheets/`: authored CSS source
 - `pages/`: captured route/panel HTML, CSSOM, and screenshots
-- `components/`: isolated component packages
-- `component-map.json`: hierarchy and package index
+- `snapshot-assets/`: content-addressed images shared by captured states
+- `component-map.json`: component hierarchy, identity, and DOM paths
+
+The `full` profile also writes `scripts/` and isolated `components/` payloads.
+Screenshots are ground-truth validation evidence. Pixel comparison belongs in
+the final implementation-validation pass and is not run during extraction.
 
 ## Build an interactive static mock
 

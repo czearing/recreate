@@ -187,9 +187,14 @@ test('uses the settled captured home document when available', () => {
   const specDir = path.join(temp, 'spec');
   const buildDir = path.join(temp, 'build');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
+  fs.mkdirSync(path.join(specDir, 'snapshot-assets'), { recursive: true });
+  fs.writeFileSync(
+    path.join(specDir, 'snapshot-assets', 'fixture.png'),
+    Buffer.from([137, 80, 78, 71]),
+  );
   fs.writeFileSync(
     path.join(specDir, 'pages', 'home.html'),
-    '<!doctype html><html><head><script src="app.js"></script></head><body><main data-captured-home>Settled home<img src="blob:https://example.test/avatar"></main></body></html>',
+    '<!doctype html><html><head><script src="app.js"></script></head><body><main data-captured-home>Settled home<img src="/snapshot-assets/fixture.png"><img src="blob:https://example.test/avatar"></main></body></html>',
   );
   fs.writeFileSync(
     path.join(specDir, 'pages', 'home.css'),
@@ -226,6 +231,10 @@ test('uses the settled captured home document when available', () => {
   assert.doesNotMatch(home, /<script src="app\.js"/);
   assert.doesNotMatch(home, /blob:https:/);
   assert.match(home, /data:image\/gif;base64/);
+  assert.equal(
+    fs.existsSync(path.join(buildDir, 'snapshot-assets', 'fixture.png')),
+    true,
+  );
   assert.equal(
     fs.readFileSync(path.join(buildDir, 'state-styles', 'home.css'), 'utf8'),
     'main{display:block}',

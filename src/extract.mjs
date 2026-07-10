@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -19,6 +20,11 @@ const outDir = path.resolve(String(args.out || 'site-spec'));
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
+const profile = String(args.profile || 'implementation').toLowerCase();
+if (!['implementation', 'full'].includes(profile)) {
+  throw new Error('Pass --profile implementation or --profile full.');
+}
+const fullProfile = profile === 'full';
 const lifecycleRecorderSource = fs.readFileSync(
   new URL('./lifecycle-recorder.js', import.meta.url),
   'utf8',
@@ -1160,6 +1166,10 @@ async function waitForApplicationReady() {
             isLoaded: document.documentElement.classList.contains('is-loaded'),
             hasLenisWrapper: Boolean(window.lenis),
             hasLenisScroll: Boolean(window.lenis?.scroll),
+            hasContent: Boolean(
+              document.body &&
+              (document.body.children.length || (document.body.textContent || '').trim())
+            ),
             hasBlockingVisual: Array.from(document.images).some(image => {
               const rect = image.getBoundingClientRect();
               const parentRect = image.parentElement?.getBoundingClientRect();
@@ -1192,7 +1202,7 @@ async function waitForApplicationReady() {
 
       if (baseReady) {
         const n = state.nodeCount ?? 0;
-        if (n > 100 && n === lastNodeCount) {
+        if (state.hasContent && n > 0 && n === lastNodeCount) {
           stableCount++;
           // Require 3 stable polls (~750ms) before declaring ready
           if (stableCount >= 3) {
@@ -1240,8 +1250,14 @@ function absolutizeCssUrls(cssText, sourceUrl) {
 }
 
 async function capturePageSnapshot(index, slug = String(index).padStart(3, '0')) {
-  // Let the browser paint before screenshotting
-  await new Promise((r) => setTimeout(r, 600));
+  await cdp.send('Runtime.evaluate', {
+    expression: `Promise.race([
+      new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      new Promise(resolve => setTimeout(resolve, 100))
+    ])`,
+    awaitPromise: true,
+    returnByValue: true,
+  }).catch(() => {});
   const pageDir = path.join(outDir, 'pages');
   fs.mkdirSync(pageDir, { recursive: true });
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -1380,6 +1396,11 @@ async function navigateAndCaptureAllPages(targetUrl) {
     const newUrl = currentUrl !== lastCapturedUrl;
 
     if (sameUrlPolls >= 2 && (newUrl || nodeCountJump)) {
+      try {
+        const currentHost = new URL(currentUrl).hostname;
+        if (currentHost === targetHost && currentNodeCount > 0) break;
+      } catch (_) {}
+
       lastCapturedUrl = currentUrl;
       lastCapturedNodeCount = currentNodeCount;
       console.error(`phase: capture page state ${multiPageStates.length} url=${currentUrl} nodes=${currentNodeCount}`);
@@ -1387,11 +1408,6 @@ async function navigateAndCaptureAllPages(targetUrl) {
       multiPageStates.push(state);
       sameUrlPolls = 0;
 
-      // Done once back on the target domain with real content and stable
-      try {
-        const currentHost = new URL(currentUrl).hostname;
-        if (currentHost === targetHost && currentNodeCount > 200) break;
-      } catch (_) {}
     }
   }
 
@@ -1523,7 +1539,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           returnByValue: true,
         });
         const d2 = JSON.parse(r2.result?.value || '{}');
-        if (d2.u === homeUrl && Math.abs(d2.n - homeN) < 5 && d2.n > 50) {
+        if (d2.u === homeUrl && Math.abs(d2.n - homeN) < 5 && d2.n > 0) {
           homeStab++;
           if (homeStab >= 2) break;
         } else { homeStab = 0; }
@@ -1640,8 +1656,8 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           expression: `JSON.stringify({
             u: location.href,
             n: document.querySelectorAll('*').length,
-            modal: !!document.querySelector('[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
-            modalText: (document.querySelector('[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200)
+            modal: !!document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
+            modalText: (document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200)
           })`,
           returnByValue: true,
         });
@@ -2237,7 +2253,7 @@ let authCookieHeader = '';
 try {
   const { cookies } = await cdp.send('Network.getAllCookies');
   if (cookies && cookies.length) {
-    const targetHost = new URL(page.url || url || 'http://localhost').hostname;
+    const targetHost = new URL(requestedUrl).hostname;
     const relevant = cookies.filter(c => targetHost === c.domain || targetHost.endsWith('.' + c.domain) || c.domain.endsWith('.' + targetHost));
     authCookieHeader = (relevant.length ? relevant : cookies).map(c => `${c.name}=${c.value}`).join('; ');
   }
@@ -2260,7 +2276,8 @@ async function inlineSnapshotImages(snapshots) {
     ),
   ];
   const replacements = new Map();
-  const targetHost = new URL(page.url || requestedUrl).hostname;
+  const assetDir = path.join(outDir, 'snapshot-assets');
+  const targetHost = new URL(requestedUrl).hostname;
   let nextIndex = 0;
   const workers = Array.from(
     { length: Math.min(6, imageUrls.length) },
@@ -2285,9 +2302,22 @@ async function inlineSnapshotImages(snapshots) {
           if (!contentType.startsWith('image/')) continue;
           const bytes = Buffer.from(await response.arrayBuffer());
           if (bytes.length > 5 * 1024 * 1024) continue;
+          fs.mkdirSync(assetDir, { recursive: true });
+          const extensionByType = {
+            'image/avif': '.avif',
+            'image/gif': '.gif',
+            'image/jpeg': '.jpg',
+            'image/png': '.png',
+            'image/svg+xml': '.svg',
+            'image/webp': '.webp',
+          };
+          const extension = extensionByType[contentType.split(';')[0]] || '.img';
+          const filename = `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
+          const assetPath = path.join(assetDir, filename);
+          if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
           replacements.set(
             imageUrl,
-            `data:${contentType};base64,${bytes.toString('base64')}`,
+            `/snapshot-assets/${filename}`,
           );
         } catch {}
       }
@@ -2464,7 +2494,7 @@ for (const [styleSheetId, header] of styleSheets) {
   }
 }
 const scriptDir = path.join(outDir, 'scripts');
-fs.mkdirSync(scriptDir, { recursive: true });
+if (fullProfile) fs.mkdirSync(scriptDir, { recursive: true });
 const usedScriptIds = new Set(
   captures.flatMap((capture) =>
     [
@@ -2489,15 +2519,18 @@ for (const scriptId of usedScriptIds) {
   const liveScript = liveScriptSources.get(scriptId);
   if (liveScript) {
     const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
-    fs.writeFileSync(path.join(scriptDir, filename), liveScript.source);
+    if (fullProfile) {
+      fs.writeFileSync(path.join(scriptDir, filename), liveScript.source);
+    }
     sourceByScriptId.set(scriptId, {
+      scriptId,
       source: liveScript.source,
       filename,
       lines: liveScript.source.split(/\r?\n/),
     });
     scriptManifest.push({
       scriptId,
-      file: `scripts/${filename}`,
+      file: fullProfile ? `scripts/${filename}` : undefined,
       url: liveScript.parsed?.url,
       startLine: liveScript.parsed?.startLine,
       startColumn: liveScript.parsed?.startColumn,
@@ -2514,8 +2547,9 @@ for (const scriptId of usedScriptIds) {
     const source = (await cdp.send('Debugger.getScriptSource', { scriptId }))
       .scriptSource;
     const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
-    fs.writeFileSync(path.join(scriptDir, filename), source);
+    if (fullProfile) fs.writeFileSync(path.join(scriptDir, filename), source);
     sourceByScriptId.set(scriptId, {
+      scriptId,
       source,
       filename,
       lines: source.split(/\r?\n/),
@@ -2523,7 +2557,7 @@ for (const scriptId of usedScriptIds) {
     const parsed = scripts.get(scriptId);
     scriptManifest.push({
       scriptId,
-      file: `scripts/${filename}`,
+      file: fullProfile ? `scripts/${filename}` : undefined,
       url: parsed?.url,
       startLine: parsed?.startLine,
       startColumn: parsed?.startColumn,
@@ -2540,15 +2574,16 @@ for (const scriptId of usedScriptIds) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const source = await response.text();
       const filename = `${scriptId.replace(/[^\w.-]+/g, '_')}.js`;
-      fs.writeFileSync(path.join(scriptDir, filename), source);
+      if (fullProfile) fs.writeFileSync(path.join(scriptDir, filename), source);
       sourceByScriptId.set(scriptId, {
+        scriptId,
         source,
         filename,
         lines: source.split(/\r?\n/),
       });
       scriptManifest.push({
         scriptId,
-        file: `scripts/${filename}`,
+        file: fullProfile ? `scripts/${filename}` : undefined,
         url: parsed.url,
         length: source.length,
         hash: parsed.hash,
@@ -2578,6 +2613,8 @@ for (const capture of captures) {
       const line = script.lines[listener.lineNumber] || '';
       const center = listener.columnNumber || 0;
       listener.sourceFile = `scripts/${script.filename}`;
+      if (!fullProfile) delete listener.sourceFile;
+      listener.sourceUrl = scripts.get(listener.scriptId)?.url;
       listener.sourceExcerpt =
         line.length <= 1200
           ? line
@@ -2664,7 +2701,8 @@ const animationImplementations = animationTypes.map((type) => {
     }
     if (offsets.length || implementation) {
       references.push({
-        sourceFile: `scripts/${script.filename}`,
+        sourceFile: fullProfile ? `scripts/${script.filename}` : undefined,
+        sourceUrl: scripts.get(script.scriptId)?.url,
         offsets: [...new Set(offsets)].slice(0, 20),
         excerpts: [...new Set(offsets)]
           .slice(0, 3)
@@ -2732,7 +2770,8 @@ for (const [scriptId, script] of sourceByScriptId) {
   if (Object.keys(signals).length) {
     animationLibrarySignals.push({
       scriptId,
-      sourceFile: `scripts/${script.filename}`,
+      sourceFile: fullProfile ? `scripts/${script.filename}` : undefined,
+      sourceUrl: scripts.get(scriptId)?.url,
       signals,
     });
   }
@@ -2774,7 +2813,8 @@ const dataAttributeImplementations = dataAttributeNames
       }
       if (offsets.length) {
         references.push({
-          sourceFile: `scripts/${script.filename}`,
+          sourceFile: fullProfile ? `scripts/${script.filename}` : undefined,
+          sourceUrl: scripts.get(script.scriptId)?.url,
           matchedTerm,
           offsets: offsets.slice(0, 50),
           excerpts: offsets.slice(0, 3).map((value) =>
@@ -2858,6 +2898,7 @@ for (const [nodePath, values] of byPath) {
 
 const output = {
   schemaVersion: 2,
+  profile,
   source: {
     requestedUrl,
     capturedUrl: captures[0]?.document.url,
@@ -2890,7 +2931,7 @@ const output = {
 const isWithin = (pathValue, rootPath) =>
   pathValue === rootPath || pathValue?.startsWith(`${rootPath}>`);
 const componentDir = path.join(outDir, 'components');
-fs.mkdirSync(componentDir, { recursive: true });
+if (fullProfile) fs.mkdirSync(componentDir, { recursive: true });
 const componentPackages = (captures[0]?.componentCandidates || []).map(
   (candidate, index) => {
     const filename = `component-${String(index + 1).padStart(3, '0')}.json`;
@@ -2975,13 +3016,15 @@ const componentPackages = (captures[0]?.componentCandidates || []).map(
       (implementation) =>
         componentAnimationTypes.includes(implementation.type),
     );
-    fs.writeFileSync(
-      path.join(componentDir, filename),
-      JSON.stringify(component, null, 2),
-    );
+    if (fullProfile) {
+      fs.writeFileSync(
+        path.join(componentDir, filename),
+        JSON.stringify(component, null, 2),
+      );
+    }
     return {
       id: component.id,
-      file: `components/${filename}`,
+      file: fullProfile ? `components/${filename}` : undefined,
       identity,
       path: candidate.representativePath,
       score: candidate.score,
@@ -3089,7 +3132,7 @@ for (const script of scriptManifest.filter((item) => item.file)) {
     validationErrors.push(`missing script artifact ${script.file}`);
   }
 }
-for (const component of componentPackages) {
+for (const component of componentPackages.filter((item) => item.file)) {
   if (!fs.existsSync(path.join(outDir, component.file))) {
     validationErrors.push(`missing component artifact ${component.file}`);
   }
@@ -3253,12 +3296,20 @@ output.validation = {
   errors: validationErrors,
 };
 
+if (!fullProfile) {
+  output.captures = captures.map(
+    ({ documents: _documents, componentCandidates: _componentCandidates, ...capture }) =>
+      capture,
+  );
+}
+
 fs.writeFileSync(path.join(outDir, 'spec.json'), JSON.stringify(output, null, 2));
 fs.writeFileSync(
   path.join(outDir, 'summary.json'),
   JSON.stringify(
     {
       source: output.source,
+      profile,
       viewports,
       captures: captures.map((capture) => ({
         viewport: capture.document.viewport,
