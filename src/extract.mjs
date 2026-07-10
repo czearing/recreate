@@ -1206,57 +1206,90 @@ const liveScriptSources = new Map();
 let navigationDoneByMultiPage = false;
 const multiPageStates = [];
 
+function absolutizeCssUrls(cssText, sourceUrl) {
+  if (!sourceUrl) return cssText;
+  return cssText.replace(
+    /url\(\s*(['"]?)(?!data:|blob:|https?:|\/\/|#)([^'")]+)\1\s*\)/gi,
+    (match, quote, value) => {
+      try {
+        return `url("${new URL(value.trim(), sourceUrl).href}")`;
+      } catch {
+        return match;
+      }
+    },
+  );
+}
+
 async function capturePageSnapshot(index) {
   // Let the browser paint before screenshotting
   await new Promise((r) => setTimeout(r, 600));
   const slug = String(index).padStart(3, '0');
   const pageDir = path.join(outDir, 'pages');
   fs.mkdirSync(pageDir, { recursive: true });
-  let data = {};
-  try {
-    const r = await cdp.send('Runtime.evaluate', {
-      expression: `JSON.stringify({
-        url: location.href,
-        title: document.title,
-        nodeCount: document.querySelectorAll('*').length,
-        text: (document.body || document.documentElement).innerText.substring(0, 3000),
-        bodyHeight: document.body ? document.body.scrollHeight : 0
-      })`,
-      returnByValue: true,
-    });
-    data = JSON.parse(r.result?.value || '{}');
-  } catch (_) {}
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: 1440, height: 900, deviceScaleFactor: 1, mobile: false,
+  }).catch(() => {});
+
+  let pageData = {};
   let screenshot;
-  try {
-    // Set viewport so the screenshot captures the full 1440px width
-    await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: 1440, height: 900, deviceScaleFactor: 1, mobile: false,
-    });
-    const s = await cdp.send('Page.captureScreenshot', { format: 'png' });
-    screenshot = s.data;
+  const [snapshotResult, screenshotResult] = await Promise.allSettled([
+    cdp.send('Runtime.evaluate', {
+        expression: `JSON.stringify({
+          url: location.href,
+          title: document.title,
+          nodeCount: document.querySelectorAll('*').length,
+          text: (document.body || document.documentElement).innerText.substring(0, 3000),
+          bodyHeight: document.body ? document.body.scrollHeight : 0,
+          html: '<!DOCTYPE html>\\n' + document.documentElement.outerHTML,
+          stylesheets: Array.from(document.styleSheets).map(sheet => {
+            try {
+              return {
+                href: sheet.href || location.href,
+                text: Array.from(sheet.cssRules || [], rule => rule.cssText).join('\\n')
+              };
+            } catch {
+              return null;
+            }
+          }).filter(Boolean)
+        })`,
+        returnByValue: true,
+      }),
+    cdp.send('Page.captureScreenshot', { format: 'png' }),
+  ]);
+  if (snapshotResult.status === 'fulfilled') {
+    pageData = JSON.parse(snapshotResult.value.result?.value || '{}');
+  }
+  if (screenshotResult.status === 'fulfilled') {
+    screenshot = screenshotResult.value.data;
     fs.writeFileSync(path.join(pageDir, `${slug}.png`), Buffer.from(screenshot, 'base64'));
-  } catch (_) {}
+  }
+
   let htmlFile;
-  try {
-    const h = await cdp.send('Runtime.evaluate', {
-      expression: `'<!DOCTYPE html>\\n' + document.documentElement.outerHTML`,
-      returnByValue: true,
-    });
-    const html = h.result?.value || '';
-    if (html) {
-      fs.writeFileSync(path.join(pageDir, `${slug}.html`), html);
-      htmlFile = `pages/${slug}.html`;
-    }
-  } catch (_) {}
+  if (pageData.html) {
+    fs.writeFileSync(path.join(pageDir, `${slug}.html`), pageData.html);
+    htmlFile = `pages/${slug}.html`;
+  }
+
+  let stylesheetFile;
+  const stylesheetText = (pageData.stylesheets || [])
+    .map((sheet) => absolutizeCssUrls(sheet.text || '', sheet.href))
+    .filter(Boolean)
+    .join('\n');
+  if (stylesheetText) {
+    fs.writeFileSync(path.join(pageDir, `${slug}.css`), stylesheetText);
+    stylesheetFile = `pages/${slug}.css`;
+  }
+
   return {
     index,
     type: 'route',
-    url: data.url || '',
-    title: data.title || '',
-    nodeCount: data.nodeCount || 0,
-    text: data.text || '',
-    bodyHeight: data.bodyHeight || 0,
+    url: pageData.url || '',
+    title: pageData.title || '',
+    nodeCount: pageData.nodeCount || 0,
+    text: pageData.text || '',
+    bodyHeight: pageData.bodyHeight || 0,
     html: htmlFile,
+    stylesheet: stylesheetFile,
     screenshot: screenshot ? `pages/${slug}.png` : undefined,
     capturedAt: new Date().toISOString(),
   };
@@ -1401,10 +1434,23 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           i,
           tag: el.tagName,
           href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
-          text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 60).trim(),
+          text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 500).trim(),
           role: el.getAttribute('role') || '',
           testId: el.getAttribute('data-testid') || '',
           y: Math.round(el.getBoundingClientRect().top),
+          snapshotPath: (() => {
+            const parts = [];
+            let node = el;
+            while (node && node.nodeType === Node.ELEMENT_NODE) {
+              const tag = node.tagName.toLowerCase();
+              const siblings = Array.from(node.parentElement?.children || [])
+                .filter((sibling) => sibling.tagName === node.tagName);
+              const position = siblings.indexOf(node);
+              parts.unshift(tag + ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')');
+              node = node.parentElement;
+            }
+            return 'doc(0)>' + parts.join('>');
+          })(),
           path: (() => {
             let p = [], n = el; 
             while(n && n !== document.body){ p.unshift(Array.from(n.parentElement?.children||[]).indexOf(n)); n=n.parentElement; }
@@ -1428,6 +1474,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   };
   candidates.sort((left, right) => candidatePriority(right) - candidatePriority(left));
   console.error(`phase: route crawl found ${candidates.length} candidates`);
+  const triggerElementFor = (candidate) => ({
+    path: candidate.snapshotPath,
+    label: candidate.text,
+    tag: candidate.tag.toLowerCase(),
+    role: candidate.role || undefined,
+    testId: candidate.testId || undefined,
+  });
 
   for (const candidate of candidates) {
     if (multiPageStates.length >= maxRoutes) break;
@@ -1445,7 +1498,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     let homeN = 0, homeStab = 0;
     const backDeadline = Date.now() + 10000;
     while (Date.now() < backDeadline) {
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 200));
       try {
         const r2 = await cdp.send('Runtime.evaluate', {
           expression: 'JSON.stringify({u:location.href,n:document.querySelectorAll("*").length})',
@@ -1454,7 +1507,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         const d2 = JSON.parse(r2.result?.value || '{}');
         if (d2.u === homeUrl && Math.abs(d2.n - homeN) < 5 && d2.n > 50) {
           homeStab++;
-          if (homeStab >= 3) break;
+          if (homeStab >= 2) break;
         } else { homeStab = 0; }
         homeN = d2.n;
       } catch (_) {}
@@ -1479,7 +1532,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       }).catch(() => ({ result: { value: homeN } }))).result.value;
       if (Math.abs(reCheckN - initialNodeCount) > initialNodeCount * 0.3) {
         await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
-        await new Promise((r) => setTimeout(r, 2500));
+        await waitForApplicationReady();
       }
     }
 
@@ -1489,7 +1542,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         type: evType, key: 'Escape', code: 'Escape', keyCode: 27, windowsVirtualKeyCode: 27,
       }).catch(() => {});
     }
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 100));
 
     // Log node count to verify page is fully rendered
     const preClickState = (await cdp.send('Runtime.evaluate', {
@@ -1601,20 +1654,21 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         // Tag it as a modal state
         state.type = 'modal';
         state.trigger = candidate.text;
+        state.triggerElement = triggerElementFor(candidate);
         multiPageStates.push(state);
         // Dismiss modal
         await cdp.send('Runtime.evaluate', {
           expression: `document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`,
           returnByValue: true,
         }).catch(() => {});
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 250));
       }
       continue;
     }
 
     // Capture panel/drawer state if DOM grew significantly without URL change
     if (panelOpened) {
-      const panelKey = 'panel:' + candidate.text.substring(0, 40);
+      const panelKey = `panel:${candidate.path}`;
       if (!visitedUrls.has(panelKey)) {
         visitedUrls.add(panelKey);
         await new Promise((r) => setTimeout(r, 400));
@@ -1622,10 +1676,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         const state = await capturePageSnapshot(multiPageStates.length);
         state.type = 'panel';
         state.trigger = candidate.text;
+        state.triggerElement = triggerElementFor(candidate);
         multiPageStates.push(state);
         // Return to home to reset state
         await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
-        await new Promise((r) => setTimeout(r, 1500));
+        await waitForApplicationReady();
       }
       continue;
     }
@@ -1662,26 +1717,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     console.error(`phase: route crawl capture ${multiPageStates.length} url=${afterUrl} nodes=${nodeCount} text="${candidate.text}"`);
     const state = await capturePageSnapshot(multiPageStates.length);
+    state.trigger = candidate.text;
+    state.triggerElement = triggerElementFor(candidate);
     multiPageStates.push(state);
 
     // Navigate back to home
     await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
-    await new Promise((r) => setTimeout(r, 1500));
-
-    // Re-inject intercept after navigation back
-    await cdp.send('Runtime.evaluate', {
-      expression: `(function(){
-        if (window.__siteSpecCrawlReady) return;
-        window.__siteSpecCrawlReady = true;
-        const orig = history.pushState.bind(history);
-        history.pushState = function(s,t,u){ orig(s,t,u); window.__siteSpecLastPush = location.href; };
-        const origR = history.replaceState.bind(history);
-        history.replaceState = function(s,t,u){ origR(s,t,u); window.__siteSpecLastPush = location.href; };
-      })()`,
-      returnByValue: true,
-    }).catch(() => {});
-
-    await new Promise((r) => setTimeout(r, 500));
   }
 
   console.error(`phase: route crawl done — ${multiPageStates.length} total page states`);

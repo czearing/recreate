@@ -1,0 +1,179 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { buildStatic } from '../build-static.mjs';
+
+const htmlPath = 'doc(0)>html:nth-of-type(1)';
+const bodyPath = `${htmlPath}>body:nth-of-type(1)`;
+const rootPath = `${bodyPath}>div:nth-of-type(1)`;
+
+function node(pathname, parentPath, tag, attrs = {}, text = '') {
+  return {
+    path: pathname,
+    parentPath,
+    tag,
+    attrs,
+    text,
+    visible: true,
+    style: { display: 'block' },
+  };
+}
+
+test('builds local state routes and wires distinct interactive controls', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-build-'));
+  const specDir = path.join(temp, 'spec');
+  const buildDir = path.join(temp, 'build');
+  fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
+  fs.mkdirSync(path.join(specDir, 'stylesheets'), { recursive: true });
+  fs.writeFileSync(path.join(specDir, 'stylesheets', '0000.css'), 'body{color:#111}');
+
+  const selectorPath = `${rootPath}>button:nth-of-type(1)`;
+  const cardPath = `${rootPath}>div:nth-of-type(1)`;
+  const taskPath = `${rootPath}>button:nth-of-type(2)`;
+  const queryPath = `${rootPath}>button:nth-of-type(3)`;
+  const nodes = [
+    node(htmlPath, 'doc(0)', 'html'),
+    node(bodyPath, htmlPath, 'body'),
+    node(rootPath, bodyPath, 'div', { id: 'root' }),
+    node(selectorPath, rootPath, 'button', {
+      'aria-haspopup': 'listbox',
+      title: 'Asking on: My Notebook',
+    }, 'My Notebook'),
+    node(cardPath, rootPath, 'div', {
+      role: 'button',
+      'aria-label': 'My Notebook',
+      'data-testid': 'notebook-card',
+    }),
+    node(taskPath, rootPath, 'button', {
+      'aria-label': 'Build a status deck. Adds to My Notebook.',
+    }),
+    node(queryPath, rootPath, 'button', {
+      'aria-label': 'Open compact notebook view',
+    }),
+  ];
+
+  for (let index = 0; index < 4; index++) {
+    fs.writeFileSync(
+      path.join(specDir, 'pages', `${String(index).padStart(3, '0')}.html`),
+      `<!doctype html><html><head><base href="/app/"><link rel="stylesheet" crossorigin href="./app.css"><script src="app.js"></script></head><body><button title="Home">Home</button><p>state-${index}</p></body></html>`,
+    );
+  }
+  fs.writeFileSync(path.join(specDir, 'pages', '000.css'), '.route{display:block}');
+
+  fs.writeFileSync(
+    path.join(specDir, 'spec.json'),
+    JSON.stringify({
+      source: { capturedUrl: 'https://example.test/app/' },
+      captures: [{
+        document: { title: 'Fixture' },
+        nodes,
+      }],
+      pages: [
+        {
+          index: 0,
+          type: 'route',
+          url: 'https://example.test/app/notebook/my-notebook',
+          html: 'pages/000.html',
+          stylesheet: 'pages/000.css',
+          text: 'My Notebook',
+        },
+        {
+          index: 1,
+          type: 'panel',
+          trigger: 'My Notebook',
+          url: 'https://example.test/app/',
+          html: 'pages/001.html',
+        },
+        {
+          index: 2,
+          type: 'route',
+          url: 'https://example.test/chat/session-123',
+          html: 'pages/002.html',
+          text: 'Here are the deliverables for "Build a status deck".',
+        },
+        {
+          index: 3,
+          type: 'route',
+          url: 'https://example.test/app/notebook/my-notebook?view=compact',
+          html: 'pages/003.html',
+          trigger: 'Open compact notebook view',
+          triggerElement: {
+            path: queryPath,
+            label: 'Open compact notebook view',
+            tag: 'button',
+            role: '',
+            testId: '',
+          },
+        },
+      ],
+    }),
+  );
+
+  const result = buildStatic({ specDir, buildDir });
+  assert.equal(result.stateCount, 4);
+  assert.equal(result.triggerCount, 4);
+
+  const home = fs.readFileSync(path.join(buildDir, 'index.html'), 'utf8');
+  assert.match(
+    home,
+    /data-site-spec-target="\/app\/notebook\/my-notebook"/,
+  );
+  assert.match(
+    home,
+    /data-site-spec-target="\/__site-spec\/state\/001"/,
+  );
+  assert.match(home, /data-site-spec-target="\/chat\/session-123"/);
+  assert.match(
+    home,
+    /data-site-spec-target="\/app\/notebook\/my-notebook\?view=compact"/,
+  );
+
+  const route = fs.readFileSync(
+    path.join(buildDir, 'app', 'notebook', 'my-notebook', 'index.html'),
+    'utf8',
+  );
+  assert.doesNotMatch(route, /<script src="app\.js"/);
+  assert.doesNotMatch(route, /crossorigin/i);
+  assert.doesNotMatch(route, /href="\.\/app\.css"/);
+  assert.match(route, /data-site-spec-href="\/stylesheets\/0000\.css"/);
+  assert.match(route, /data-site-spec-href="\/state-styles\/000\.css"/);
+  assert.match(route, /<base href="https:\/\/example\.test\/app\/">/);
+  assert.match(route, /script\.src=location\.origin\+"\/site-spec-runtime\.js"/);
+
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(buildDir, 'site-spec-manifest.json'), 'utf8'),
+  );
+  const routeTrigger = manifest.triggers.find(
+    (trigger) => trigger.target === '/app/notebook/my-notebook',
+  );
+  assert.equal(routeTrigger.testId, 'notebook-card');
+  assert.equal(routeTrigger.tag, 'div');
+  assert.equal(
+    fs.existsSync(path.join(buildDir, '__site-spec', 'state', '001', 'index.html')),
+    true,
+  );
+  assert.equal(
+    fs.readFileSync(path.join(buildDir, 'state-styles', '000.css'), 'utf8'),
+    '.route{display:block}',
+  );
+  assert.match(route, /state-0/);
+  const queryRoute = fs.readFileSync(
+    path.join(buildDir, '__site-spec', 'query', '003', 'index.html'),
+    'utf8',
+  );
+  assert.match(queryRoute, /state-3/);
+  const runtime = fs.readFileSync(
+    path.join(buildDir, 'site-spec-runtime.js'),
+    'utf8',
+  );
+  assert.match(runtime, /history\.pushState\(null, '', target\)/);
+  assert.match(runtime, /location\.reload\(\)/);
+  const server = fs.readFileSync(path.join(buildDir, 'server.mjs'), 'utf8');
+  assert.match(
+    server,
+    /"\/app\/notebook\/my-notebook\?view=compact":"\/__site-spec\/query\/003"/,
+  );
+});

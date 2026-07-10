@@ -8,7 +8,9 @@
     "site-spec": "src/extract.mjs"
   },
   "scripts": {
-    "check": "node --check src/extract.mjs && node --check src/lifecycle-recorder.js"
+    "build:static": "node build-static.mjs",
+    "check": "node --check src/extract.mjs && node --check src/lifecycle-recorder.js && node --check build-static.mjs",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=22"

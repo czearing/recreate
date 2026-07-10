@@ -24,6 +24,12 @@ Capture an authenticated tab already open in that browser:
 node src/extract.mjs --reuse --match example.com --out site-spec-output
 ```
 
+Capture internal routes, panels, and other state-changing controls:
+
+```powershell
+node src/extract.mjs --reuse --match example.com --crawl --max-routes 30 --out site-spec-output
+```
+
 Set explicit viewports:
 
 ```powershell
@@ -36,8 +42,20 @@ node src/extract.mjs --url https://example.com --out site-spec-output --viewport
 - `summary.json`: timings, counts, coverage, and validation
 - `documents/`: exact pre-execution HTML responses
 - `stylesheets/` and `scripts/`: authored source blobs
+- `pages/`: captured route/panel HTML, CSSOM, and screenshots
 - `components/`: isolated component packages
 - `component-map.json`: hierarchy and package index
+
+## Build an interactive static mock
+
+```powershell
+node build-static.mjs --spec site-spec-output --out site-spec-build
+node site-spec-build/server.mjs 4317
+```
+
+The generated build maps captured controls to local route and panel states,
+preserves browser back navigation, loads captured per-state CSS, and excludes
+captured application scripts.
 
 Captured output can contain source code and user-visible data. Keep it out of version control unless you have permission to publish it.
 
