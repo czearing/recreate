@@ -128,31 +128,14 @@ async function findOrOpenTarget() {
 
 const { page, created, browser, targetId } = await findOrOpenTarget();
 const requestedUrl = url || page.url;
-const cdp = await connect(page.webSocketDebuggerUrl);
+let cdp = await connect(page.webSocketDebuggerUrl);
 const styleSheets = new Map();
 const scripts = new Map();
 let latestDocumentResponse;
 let latestDocumentBody;
 let mainFrameId;
 
-cdp.on('CSS.styleSheetAdded', ({ header }) => styleSheets.set(header.styleSheetId, header));
-cdp.on('CSS.styleSheetRemoved', ({ styleSheetId }) => styleSheets.delete(styleSheetId));
-cdp.on('Debugger.scriptParsed', (script) => scripts.set(script.scriptId, script));
-cdp.on('Network.responseReceived', (event) => {
-  if (event.type === 'Document' && event.frameId === mainFrameId) {
-    latestDocumentResponse = event;
-  }
-});
-cdp.on('Network.loadingFinished', async ({ requestId }) => {
-  if (requestId !== latestDocumentResponse?.requestId) return;
-  try {
-    latestDocumentBody = await cdp.send('Network.getResponseBody', { requestId });
-  } catch (error) {
-    latestDocumentBody = { error: String(error) };
-  }
-});
-
-for (const domain of [
+const cdpDomains = [
   'Page.enable',
   'Runtime.enable',
   'DOM.enable',
@@ -161,10 +144,30 @@ for (const domain of [
   'Network.enable',
   'Accessibility.enable',
   'Debugger.enable',
-]) {
-  await cdp.send(domain);
+];
+
+async function initializeCdp(client) {
+  client.on('CSS.styleSheetAdded', ({ header }) => styleSheets.set(header.styleSheetId, header));
+  client.on('CSS.styleSheetRemoved', ({ styleSheetId }) => styleSheets.delete(styleSheetId));
+  client.on('Debugger.scriptParsed', (script) => scripts.set(script.scriptId, script));
+  client.on('Network.responseReceived', (event) => {
+    if (event.type === 'Document' && event.frameId === mainFrameId) {
+      latestDocumentResponse = event;
+    }
+  });
+  client.on('Network.loadingFinished', async ({ requestId }) => {
+    if (requestId !== latestDocumentResponse?.requestId) return;
+    try {
+      latestDocumentBody = await client.send('Network.getResponseBody', { requestId });
+    } catch (error) {
+      latestDocumentBody = { error: String(error) };
+    }
+  });
+  for (const domain of cdpDomains) await client.send(domain);
+  mainFrameId = (await client.send('Page.getFrameTree')).frameTree.frame.id;
 }
-mainFrameId = (await cdp.send('Page.getFrameTree')).frameTree.frame.id;
+
+await initializeCdp(cdp);
 
 const computedProperties = [
   'display',
@@ -1348,6 +1351,14 @@ async function navigateAndCaptureAllPages(targetUrl) {
 async function crawlRoutes(baseUrl, maxRoutes = 30) {
   console.error('phase: route crawl start');
 
+  const currentUrl = (await cdp.send('Runtime.evaluate', {
+    expression: 'location.href', returnByValue: true,
+  }).catch(() => ({ result: { value: '' } }))).result.value;
+  if (baseUrl && currentUrl !== baseUrl) {
+    await cdp.send('Page.navigate', { url: baseUrl });
+    await waitForApplicationReady();
+  }
+
   // Inject pushState intercept on the live page so clicks are trackable
   await cdp.send('Runtime.evaluate', {
     expression: `(function(){
@@ -1383,14 +1394,16 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         .filter(el => {
           const rect = el.getBoundingClientRect();
           // Skip header/toolbar elements (top 80px) — they toggle panels, not navigate routes
-          return rect.width > 4 && rect.height > 4 && rect.top > 80 && rect.top < window.innerHeight;
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          return rect.width > 4 && rect.height > 4 && (rect.top + scrollTop) > 80;
         })
         .map((el, i) => ({
           i,
           tag: el.tagName,
           href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
-          text: (el.innerText || el.getAttribute('aria-label') || '').substring(0, 60).trim(),
+          text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 60).trim(),
           role: el.getAttribute('role') || '',
+          testId: el.getAttribute('data-testid') || '',
           y: Math.round(el.getBoundingClientRect().top),
           path: (() => {
             let p = [], n = el; 
@@ -1406,6 +1419,14 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
   let candidates = [];
   try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
+  const candidatePriority = (candidate) => {
+    if (candidate.href) return 100;
+    if (candidate.testId === 'notebook-card') return 90;
+    if (candidate.role === 'link' || candidate.tag === 'A') return 80;
+    if (candidate.role === 'button') return 50;
+    return 10;
+  };
+  candidates.sort((left, right) => candidatePriority(right) - candidatePriority(left));
   console.error(`phase: route crawl found ${candidates.length} candidates`);
 
   for (const candidate of candidates) {
@@ -1509,19 +1530,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     const clicked = await cdp.send('Runtime.evaluate', {
       expression: `(() => {
         const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url], [tabindex]:not([tabindex="-1"])');
-        const visible = Array.from(all).filter(el => {
-          const r = el.getBoundingClientRect();
-          return r.width > 4 && r.height > 4 && r.top >= 0 && r.top < window.innerHeight;
-        });
-        // Try index first, then text fallback
-        let el = visible[${candidate.i}];
+        // Search all rendered elements (not just in-viewport) — scroll into view before clicking
+        const rendered = Array.from(all).filter(el => { const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4; });
+        const path = ${JSON.stringify(candidate.path)}.split('>').map(Number);
+        let el = path.reduce((node, index) => node?.children?.[index], document.body);
         const searchText = ${JSON.stringify(candidate.text.substring(0, 20))};
-        if (!el || !(el.innerText||el.getAttribute('aria-label')||'').trim().startsWith(searchText)) {
-          el = visible.find(e => (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith(searchText));
+        const matchesCandidate = e =>
+          rendered.includes(e) &&
+          e.tagName === ${JSON.stringify(candidate.tag)} &&
+          (e.getAttribute('role') || '') === ${JSON.stringify(candidate.role)} &&
+          (e.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)} &&
+          (e.getAttribute('aria-label') || e.innerText || '').trim().startsWith(searchText);
+        if (!matchesCandidate(el)) {
+          el = rendered.find(matchesCandidate);
         }
         if (!el) return 'not-found:' + searchText;
+        el.scrollIntoView({ block: 'center', behavior: 'instant' });
         el.click();
-        return 'clicked:' + (el.innerText||'').trim().substring(0,30);
+        return 'clicked:' + (el.getAttribute('aria-label') || el.innerText || '').trim().substring(0, 30);
       })()`,
       returnByValue: true,
     }).catch(() => ({ result: { value: 'error' } }));
@@ -1550,10 +1576,10 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         });
         const d = JSON.parse(r.result?.value || '{}');
         afterUrl = d.u || beforeUrl;
-        nodeCount = d.n || 0;
+        nodeCount = d.n || nodeCount;
         modalAppeared = d.modal && d.modalText?.trim().length > 0;
-        // Stop polling once something changed
-        if (afterUrl !== beforeUrl || modalAppeared) break;
+        // Stop on URL change, modal, or significant DOM growth (panel/drawer opened)
+        if (afterUrl !== beforeUrl || modalAppeared || (nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15)) break;
       } catch (_) { break; }
     }
 
@@ -1561,6 +1587,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     const isInternal = (() => {
       try { return new URL(afterUrl).hostname === baseHost; } catch (_) { return false; }
     })();
+    const panelOpened = !urlChanged && !modalAppeared && nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15;
 
     // Capture modal state if one appeared (no URL change needed)
     if (!urlChanged && modalAppeared) {
@@ -1581,6 +1608,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           returnByValue: true,
         }).catch(() => {});
         await new Promise((r) => setTimeout(r, 500));
+      }
+      continue;
+    }
+
+    // Capture panel/drawer state if DOM grew significantly without URL change
+    if (panelOpened) {
+      const panelKey = 'panel:' + candidate.text.substring(0, 40);
+      if (!visitedUrls.has(panelKey)) {
+        visitedUrls.add(panelKey);
+        await new Promise((r) => setTimeout(r, 400));
+        console.error('phase: route crawl capture ' + multiPageStates.length + ' panel by "' + candidate.text + '" nodes:' + preClickN + '->' + nodeCount);
+        const state = await capturePageSnapshot(multiPageStates.length);
+        state.type = 'panel';
+        state.trigger = candidate.text;
+        multiPageStates.push(state);
+        // Return to home to reset state
+        await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+        await new Promise((r) => setTimeout(r, 1500));
       }
       continue;
     }
@@ -2143,12 +2188,27 @@ const captures = [];
 
 if (created) {
   await navigateAndCaptureAllPages(url);
-  if (crawl) {
-    await crawlRoutes(url, maxRoutes);
-  }
+}
+if (crawl) {
+  await crawlRoutes(requestedUrl, maxRoutes);
 }
 
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
+  if (captureIndex > 0) {
+    cdp.close();
+    const refreshedPage = (await getJson('/json/list')).find(
+      (item) => item.id === page.id,
+    );
+    if (!refreshedPage) {
+      throw new Error(`Browser target disappeared before viewport ${captureIndex + 1}.`);
+    }
+    cdp = await connect(refreshedPage.webSocketDebuggerUrl);
+    styleSheets.clear();
+    scripts.clear();
+    latestDocumentResponse = undefined;
+    latestDocumentBody = undefined;
+    await initializeCdp(cdp);
+  }
   const viewport = viewports[captureIndex];
   console.error(`Capturing ${viewport.width}x${viewport.height}: ${page.url || url}`);
   captures.push(await extractViewport(viewport, captureIndex));
