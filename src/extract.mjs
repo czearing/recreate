@@ -17,6 +17,8 @@ const match = String(args.match || url);
 const requestedTargetId = String(args.target || '');
 const outDir = path.resolve(String(args.out || 'site-spec'));
 const reuse = Boolean(args.reuse);
+const crawl = Boolean(args.crawl);
+const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const lifecycleRecorderSource = fs.readFileSync(
   new URL('./lifecycle-recorder.js', import.meta.url),
   'utf8',
@@ -1342,6 +1344,189 @@ async function navigateAndCaptureAllPages(targetUrl) {
   console.error(`phase: multi-page done — ${multiPageStates.length} page states captured`);
 }
 
+async function crawlRoutes(baseUrl, maxRoutes = 30) {
+  console.error('phase: route crawl start');
+
+  // Inject pushState intercept on the live page so clicks are trackable
+  await cdp.send('Runtime.evaluate', {
+    expression: `(function(){
+      if (window.__siteSpecCrawlReady) return;
+      window.__siteSpecCrawlReady = true;
+      window.__siteSpecLastPush = location.href;
+      const orig = history.pushState.bind(history);
+      history.pushState = function(s,t,u){ orig(s,t,u); window.__siteSpecLastPush = location.href; };
+      const origR = history.replaceState.bind(history);
+      history.replaceState = function(s,t,u){ origR(s,t,u); window.__siteSpecLastPush = location.href; };
+    })()`,
+    returnByValue: true,
+  }).catch(() => {});
+
+  const visitedUrls = new Set(multiPageStates.map((p) => p.url));
+  const homeUrl = (await cdp.send('Runtime.evaluate', {
+    expression: 'location.href', returnByValue: true,
+  })).result.value;
+  visitedUrls.add(homeUrl);
+
+  let baseHost;
+  try { baseHost = new URL(baseUrl).hostname; } catch (_) {}
+
+  // Find all candidate clickable elements that might trigger route changes
+  const candidatesResult = await cdp.send('Runtime.evaluate', {
+    expression: `JSON.stringify(
+      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url]'))
+        .filter(el => {
+          const rect = el.getBoundingClientRect();
+          return rect.width > 4 && rect.height > 4 && rect.top >= 0 && rect.top < window.innerHeight;
+        })
+        .map((el, i) => ({
+          i,
+          tag: el.tagName,
+          href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
+          text: (el.innerText || el.getAttribute('aria-label') || '').substring(0, 60).trim(),
+          role: el.getAttribute('role') || '',
+          path: (() => {
+            let p = [], n = el; 
+            while(n && n !== document.body){ p.unshift(Array.from(n.parentElement?.children||[]).indexOf(n)); n=n.parentElement; }
+            return p.join('>');
+          })()
+        }))
+        .filter(e => e.text || e.href)
+        .slice(0, 60)
+    )`,
+    returnByValue: true,
+  });
+
+  let candidates = [];
+  try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
+  console.error(`phase: route crawl found ${candidates.length} candidates`);
+
+  for (const candidate of candidates) {
+    if (multiPageStates.length >= maxRoutes) break;
+
+    // If it has an explicit href pointing to same origin, use it directly
+    let targetRoute = '';
+    if (candidate.href && !candidate.href.startsWith('http') && !candidate.href.startsWith('./') &&
+        !candidate.href.match(/\.(js|css|svg|png|jpg|woff|ico)$/)) {
+      targetRoute = candidate.href;
+    } else if (candidate.href && candidate.href.startsWith('http')) {
+      try {
+        const u = new URL(candidate.href);
+        if (u.hostname === baseHost) targetRoute = u.pathname + u.search;
+      } catch (_) {}
+    }
+
+    const beforeUrl = (await cdp.send('Runtime.evaluate', {
+      expression: 'location.href', returnByValue: true,
+    }).catch(() => ({ result: { value: '' } }))).result.value;
+
+    if (targetRoute) {
+      // Direct navigation
+      const fullUrl = targetRoute.startsWith('/') ? `${new URL(baseUrl).origin}${targetRoute}` : targetRoute;
+      if (visitedUrls.has(fullUrl)) continue;
+    }
+
+    // Reset intercept and click the element
+    await cdp.send('Runtime.evaluate', {
+      expression: `window.__siteSpecLastPush = location.href`,
+      returnByValue: true,
+    }).catch(() => {});
+
+    const clicked = await cdp.send('Runtime.evaluate', {
+      expression: `(() => {
+        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url]');
+        const visible = Array.from(all).filter(el => {
+          const r = el.getBoundingClientRect();
+          return r.width > 4 && r.height > 4 && r.top >= 0 && r.top < window.innerHeight;
+        });
+        const el = visible[${candidate.i}] || visible.find(e => 
+          (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith(${JSON.stringify(candidate.text.substring(0, 20))})
+        );
+        if (!el) return 'not-found';
+        el.click();
+        return 'clicked';
+      })()`,
+      returnByValue: true,
+    }).catch(() => ({ result: { value: 'error' } }));
+
+    if (clicked.result?.value !== 'clicked') continue;
+
+    // Wait briefly for pushState or navigation
+    await new Promise((r) => setTimeout(r, 800));
+
+    let afterUrl = '';
+    let nodeCount = 0;
+    try {
+      const r = await cdp.send('Runtime.evaluate', {
+        expression: 'JSON.stringify({u:location.href,n:document.querySelectorAll("*").length})',
+        returnByValue: true,
+      });
+      const d = JSON.parse(r.result?.value || '{}');
+      afterUrl = d.u || '';
+      nodeCount = d.n || 0;
+    } catch (_) { continue; }
+
+    const urlChanged = afterUrl !== beforeUrl;
+    const isInternal = (() => {
+      try { return new URL(afterUrl).hostname === baseHost; } catch (_) { return false; }
+    })();
+
+    if (!urlChanged || !isInternal || visitedUrls.has(afterUrl)) {
+      // Navigate back if we went somewhere unexpected
+      if (urlChanged && afterUrl !== homeUrl) {
+        await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+      continue;
+    }
+
+    visitedUrls.add(afterUrl);
+
+    // Wait for this page to stabilize
+    let stable = 0, lastN = 0;
+    const deadline = Date.now() + 8000;
+    while (Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 300));
+      try {
+        const r = await cdp.send('Runtime.evaluate', {
+          expression: 'JSON.stringify({n:document.querySelectorAll("*").length,rs:document.readyState})',
+          returnByValue: true,
+        });
+        const d = JSON.parse(r.result?.value || '{}');
+        if (d.rs === 'complete' && Math.abs(d.n - lastN) < 5) {
+          stable++;
+          if (stable >= 3) { nodeCount = d.n; break; }
+        } else { stable = 0; }
+        lastN = d.n;
+      } catch (_) { break; }
+    }
+
+    console.error(`phase: route crawl capture ${multiPageStates.length} url=${afterUrl} nodes=${nodeCount} text="${candidate.text}"`);
+    const state = await capturePageSnapshot(multiPageStates.length);
+    multiPageStates.push(state);
+
+    // Navigate back to home
+    await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    await new Promise((r) => setTimeout(r, 1500));
+
+    // Re-inject intercept after navigation back
+    await cdp.send('Runtime.evaluate', {
+      expression: `(function(){
+        if (window.__siteSpecCrawlReady) return;
+        window.__siteSpecCrawlReady = true;
+        const orig = history.pushState.bind(history);
+        history.pushState = function(s,t,u){ orig(s,t,u); window.__siteSpecLastPush = location.href; };
+        const origR = history.replaceState.bind(history);
+        history.replaceState = function(s,t,u){ origR(s,t,u); window.__siteSpecLastPush = location.href; };
+      })()`,
+      returnByValue: true,
+    }).catch(() => {});
+
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
+  console.error(`phase: route crawl done — ${multiPageStates.length} total page states`);
+}
+
 async function extractViewport(viewport, captureIndex) {
   const timings = {};
   let phaseStart = Date.now();
@@ -1843,6 +2028,9 @@ const captures = [];
 
 if (created) {
   await navigateAndCaptureAllPages(url);
+  if (crawl) {
+    await crawlRoutes(url, maxRoutes);
+  }
 }
 
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
