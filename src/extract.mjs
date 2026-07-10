@@ -1247,6 +1247,7 @@ async function capturePageSnapshot(index) {
   } catch (_) {}
   return {
     index,
+    type: 'route',
     url: data.url || '',
     title: data.title || '',
     nodeCount: data.nodeCount || 0,
@@ -1367,16 +1368,22 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   })).result.value;
   visitedUrls.add(homeUrl);
 
+  const initialNodeCount = (await cdp.send('Runtime.evaluate', {
+    expression: 'document.querySelectorAll("*").length', returnByValue: true,
+  }).catch(() => ({ result: { value: 0 } }))).result.value || 0;
+  console.error(`phase: route crawl initial node count: ${initialNodeCount}`);
+
   let baseHost;
   try { baseHost = new URL(baseUrl).hostname; } catch (_) {}
 
   // Find all candidate clickable elements that might trigger route changes
   const candidatesResult = await cdp.send('Runtime.evaluate', {
     expression: `JSON.stringify(
-      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url]'))
+      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
         .filter(el => {
           const rect = el.getBoundingClientRect();
-          return rect.width > 4 && rect.height > 4 && rect.top >= 0 && rect.top < window.innerHeight;
+          // Skip header/toolbar elements (top 80px) — they toggle panels, not navigate routes
+          return rect.width > 4 && rect.height > 4 && rect.top > 80 && rect.top < window.innerHeight;
         })
         .map((el, i) => ({
           i,
@@ -1384,6 +1391,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
           text: (el.innerText || el.getAttribute('aria-label') || '').substring(0, 60).trim(),
           role: el.getAttribute('role') || '',
+          y: Math.round(el.getBoundingClientRect().top),
           path: (() => {
             let p = [], n = el; 
             while(n && n !== document.body){ p.unshift(Array.from(n.parentElement?.children||[]).indexOf(n)); n=n.parentElement; }
@@ -1402,6 +1410,73 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
   for (const candidate of candidates) {
     if (multiPageStates.length >= maxRoutes) break;
+
+    // Always navigate back to home before each candidate to ensure clean state
+    const currentUrl = (await cdp.send('Runtime.evaluate', {
+      expression: 'location.href', returnByValue: true,
+    }).catch(() => ({ result: { value: '' } }))).result.value;
+
+    if (currentUrl !== homeUrl) {
+      await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    }
+
+    // Wait for home page to stabilize
+    let homeN = 0, homeStab = 0;
+    const backDeadline = Date.now() + 10000;
+    while (Date.now() < backDeadline) {
+      await new Promise((r) => setTimeout(r, 400));
+      try {
+        const r2 = await cdp.send('Runtime.evaluate', {
+          expression: 'JSON.stringify({u:location.href,n:document.querySelectorAll("*").length})',
+          returnByValue: true,
+        });
+        const d2 = JSON.parse(r2.result?.value || '{}');
+        if (d2.u === homeUrl && Math.abs(d2.n - homeN) < 5 && d2.n > 50) {
+          homeStab++;
+          if (homeStab >= 3) break;
+        } else { homeStab = 0; }
+        homeN = d2.n;
+      } catch (_) {}
+    }
+
+    // If node count is far from expected, an overlay is open — dismiss and re-navigate
+    if (Math.abs(homeN - initialNodeCount) > initialNodeCount * 0.3) {
+      for (const evType of ['keyDown', 'keyUp']) {
+        await cdp.send('Input.dispatchKeyEvent', {
+          type: evType, key: 'Escape', code: 'Escape', keyCode: 27, windowsVirtualKeyCode: 27,
+        }).catch(() => {});
+      }
+      await new Promise((r) => setTimeout(r, 400));
+      // Click body to dismiss any overlay
+      await cdp.send('Runtime.evaluate', {
+        expression: 'document.body.click()', returnByValue: true,
+      }).catch(() => {});
+      await new Promise((r) => setTimeout(r, 500));
+      // Hard re-navigate if still off
+      const reCheckN = (await cdp.send('Runtime.evaluate', {
+        expression: 'document.querySelectorAll("*").length', returnByValue: true,
+      }).catch(() => ({ result: { value: homeN } }))).result.value;
+      if (Math.abs(reCheckN - initialNodeCount) > initialNodeCount * 0.3) {
+        await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+        await new Promise((r) => setTimeout(r, 2500));
+      }
+    }
+
+    // Dismiss any open panels/menus left by previous click
+    for (const evType of ['keyDown', 'keyUp']) {
+      await cdp.send('Input.dispatchKeyEvent', {
+        type: evType, key: 'Escape', code: 'Escape', keyCode: 27, windowsVirtualKeyCode: 27,
+      }).catch(() => {});
+    }
+    await new Promise((r) => setTimeout(r, 300));
+
+    // Log node count to verify page is fully rendered
+    const preClickState = (await cdp.send('Runtime.evaluate', {
+      expression: 'JSON.stringify({n:document.querySelectorAll("*").length,u:location.href})',
+      returnByValue: true,
+    }).catch(() => ({ result: { value: '{}' } }))).result.value;
+    const { n: preClickN } = JSON.parse(preClickState);
+    console.error(`phase: route crawl pre-click url: ${currentUrl.split('/').slice(-2).join('/')} nodes:${preClickN}`);
 
     // If it has an explicit href pointing to same origin, use it directly
     let targetRoute = '';
@@ -1433,42 +1508,82 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     const clicked = await cdp.send('Runtime.evaluate', {
       expression: `(() => {
-        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url]');
+        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url], [tabindex]:not([tabindex="-1"])');
         const visible = Array.from(all).filter(el => {
           const r = el.getBoundingClientRect();
           return r.width > 4 && r.height > 4 && r.top >= 0 && r.top < window.innerHeight;
         });
-        const el = visible[${candidate.i}] || visible.find(e => 
-          (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith(${JSON.stringify(candidate.text.substring(0, 20))})
-        );
-        if (!el) return 'not-found';
+        // Try index first, then text fallback
+        let el = visible[${candidate.i}];
+        const searchText = ${JSON.stringify(candidate.text.substring(0, 20))};
+        if (!el || !(el.innerText||el.getAttribute('aria-label')||'').trim().startsWith(searchText)) {
+          el = visible.find(e => (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith(searchText));
+        }
+        if (!el) return 'not-found:' + searchText;
         el.click();
-        return 'clicked';
+        return 'clicked:' + (el.innerText||'').trim().substring(0,30);
       })()`,
       returnByValue: true,
     }).catch(() => ({ result: { value: 'error' } }));
 
-    if (clicked.result?.value !== 'clicked') continue;
+    const clickedVal = clicked.result?.value || 'error';
+    console.error(`phase: route crawl try "${candidate.text.substring(0,30)}" → ${clickedVal}`);
 
-    // Wait briefly for pushState or navigation
-    await new Promise((r) => setTimeout(r, 800));
+    if (!clickedVal.startsWith('clicked')) continue;
 
-    let afterUrl = '';
+    // Poll for URL change, modal, or DOM shift — up to 3 seconds
+    let afterUrl = beforeUrl;
     let nodeCount = 0;
-    try {
-      const r = await cdp.send('Runtime.evaluate', {
-        expression: 'JSON.stringify({u:location.href,n:document.querySelectorAll("*").length})',
-        returnByValue: true,
-      });
-      const d = JSON.parse(r.result?.value || '{}');
-      afterUrl = d.u || '';
-      nodeCount = d.n || 0;
-    } catch (_) { continue; }
+    let modalAppeared = false;
+    const clickDeadline = Date.now() + 3000;
+    while (Date.now() < clickDeadline) {
+      await new Promise((r) => setTimeout(r, 300));
+      try {
+        const r = await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            u: location.href,
+            n: document.querySelectorAll('*').length,
+            modal: !!document.querySelector('[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
+            modalText: (document.querySelector('[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200)
+          })`,
+          returnByValue: true,
+        });
+        const d = JSON.parse(r.result?.value || '{}');
+        afterUrl = d.u || beforeUrl;
+        nodeCount = d.n || 0;
+        modalAppeared = d.modal && d.modalText?.trim().length > 0;
+        // Stop polling once something changed
+        if (afterUrl !== beforeUrl || modalAppeared) break;
+      } catch (_) { break; }
+    }
 
     const urlChanged = afterUrl !== beforeUrl;
     const isInternal = (() => {
       try { return new URL(afterUrl).hostname === baseHost; } catch (_) { return false; }
     })();
+
+    // Capture modal state if one appeared (no URL change needed)
+    if (!urlChanged && modalAppeared) {
+      const modalKey = `modal:${candidate.text.substring(0, 40)}`;
+      if (!visitedUrls.has(modalKey)) {
+        visitedUrls.add(modalKey);
+        // Let it fully render
+        await new Promise((r) => setTimeout(r, 400));
+        console.error(`phase: route crawl capture ${multiPageStates.length} modal triggered by "${candidate.text}"`);
+        const state = await capturePageSnapshot(multiPageStates.length);
+        // Tag it as a modal state
+        state.type = 'modal';
+        state.trigger = candidate.text;
+        multiPageStates.push(state);
+        // Dismiss modal
+        await cdp.send('Runtime.evaluate', {
+          expression: `document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`,
+          returnByValue: true,
+        }).catch(() => {});
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      continue;
+    }
 
     if (!urlChanged || !isInternal || visitedUrls.has(afterUrl)) {
       // Navigate back if we went somewhere unexpected
