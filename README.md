@@ -58,8 +58,8 @@ node src/extract.mjs --url https://example.com --out site-spec-output --screensh
 - `implementation.json`: concise agent-facing build plan and evidence index
 - `spec.json`: machine-readable evidence index and global relationships
 - `evidence/capture-*.json`: exact geometry and behavior for one viewport
-- `evidence/state-*.json`: exact geometry, styles, focus, and text for each
-  captured interaction state and viewport
+- `evidence/state-*.json`: exact geometry, styles, focus, text, and
+  content-addressed asset references for each interaction state and viewport
 - `summary.json`: timings, counts, coverage, and validation
 - `documents/`: exact pre-execution HTML responses
 - `stylesheets/`: authored CSS source
@@ -78,6 +78,11 @@ the HTML, CSS, component, or exact geometry needed for the state currently
 being built. The default profile excludes minified scripts, source excerpts,
 inline asset encodings, repeated computed-style maps, and full scroll DOM
 snapshots from the primary context path.
+
+Large component and responsive collections are indexed instead of embedded in
+`implementation.json`. Agents open `component-map.json`,
+`evidence/responsive.json`, and one state/viewport evidence file only when the
+active component requires them.
 
 ## Agent-context benchmark
 

@@ -6,8 +6,6 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import {
   compactCapture,
-  compactRect,
-  compactStyleDelta,
 } from './capture-compaction.mjs';
 
 const args = Object.fromEntries(
@@ -1414,14 +1412,15 @@ async function capturePageSnapshot(
                   ) return null;
                   const attrs = {};
                   for (const name of [
-                    'id', 'class', 'role', 'title', 'href', 'type', 'name',
+                    'id', 'class', 'role', 'title', 'href', 'src', 'srcset',
+                    'alt', 'type', 'name',
                     'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
                     'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
                     'checked', 'selected'
                   ]) {
                     const value = element.getAttribute(name);
-                    if (value != null && !/^(?:data|blob):/i.test(value)) {
-                      attrs[name] = value.slice(0, 500);
+                    if (value != null) {
+                      attrs[name] = value.slice(0, 10000);
                     }
                   }
                   return {
@@ -2385,8 +2384,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         const state = await captureResponsivePageSnapshot(multiPageStates.length);
         // Tag it as a modal state
         state.type = 'modal';
-        state.trigger = candidate.text;
+        state.trigger = candidate.text || candidate.placeholder;
         state.triggerElement = triggerElementFor(candidate);
+        state.probe = clickedVal.startsWith('entered')
+          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          : { action: 'click' };
         multiPageStates.push(state);
         // Dismiss modal
         await cdp.send('Runtime.evaluate', {
@@ -2407,8 +2409,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         console.error('phase: route crawl capture ' + multiPageStates.length + ' panel by "' + candidate.text + '" nodes:' + preClickN + '->' + nodeCount);
         const state = await captureResponsivePageSnapshot(multiPageStates.length);
         state.type = 'panel';
-        state.trigger = candidate.text;
+        state.trigger = candidate.text || candidate.placeholder;
         state.triggerElement = triggerElementFor(candidate);
+        state.probe = clickedVal.startsWith('entered')
+          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          : { action: 'click' };
         multiPageStates.push(state);
         // Return to home to reset state
         await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
@@ -2478,8 +2483,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     console.error(`phase: route crawl capture ${multiPageStates.length} url=${afterUrl} nodes=${nodeCount} text="${candidate.text}"`);
     const state = await captureResponsivePageSnapshot(multiPageStates.length);
-    state.trigger = candidate.text;
+    state.trigger = candidate.text || candidate.placeholder;
     state.triggerElement = triggerElementFor(candidate);
+    state.probe = clickedVal.startsWith('entered')
+      ? { action: 'enter', value: 'site-spec probe', submit: true }
+      : { action: 'click' };
     multiPageStates.push(state);
 
     // Navigate back to home
@@ -2991,12 +2999,29 @@ try {
 
 async function inlineSnapshotImages(snapshots) {
   const files = snapshots
-    .flatMap((snapshot) => [snapshot?.html, snapshot?.stylesheet])
+    .flatMap((snapshot) => [
+      snapshot?.html,
+      snapshot?.stylesheet,
+      snapshot?.evidence,
+      ...Object.values(snapshot?.evidenceByViewport || {}),
+    ])
     .filter(Boolean)
     .map((file) => path.join(outDir, file))
     .filter((file) => fs.existsSync(file));
   const textByFile = new Map(
     files.map((file) => [file, fs.readFileSync(file, 'utf8')]),
+  );
+  const jsonByFile = new Map(
+    [...textByFile]
+      .filter(([file]) => path.extname(file) === '.json')
+      .map(([file, text]) => {
+        try {
+          return [file, JSON.parse(text)];
+        } catch {
+          return [file, undefined];
+        }
+      })
+      .filter(([, value]) => value),
   );
   const imageUrls = [
     ...new Set(
@@ -3032,13 +3057,32 @@ async function inlineSnapshotImages(snapshots) {
     replacements.set(source, `/snapshot-assets/${filename}`);
   };
   if (!fullProfile) {
+    const dataUrlSet = new Set();
+    const collectJsonDataUrls = (value) => {
+      if (typeof value === 'string') {
+        if (value.startsWith('data:')) dataUrlSet.add(value);
+        return;
+      }
+      if (Array.isArray(value)) {
+        value.forEach(collectJsonDataUrls);
+        return;
+      }
+      if (value && typeof value === 'object') {
+        Object.values(value).forEach(collectJsonDataUrls);
+      }
+    };
+    [...jsonByFile.values()].forEach(collectJsonDataUrls);
+    for (const [file, text] of textByFile) {
+      if (path.extname(file) === '.json') continue;
+      for (const pattern of [
+        /\b(?:src|href)=(["'])(data:[\s\S]*?)\1/gi,
+        /url\(\s*(["'])(data:[\s\S]*?)\1\s*\)/gi,
+      ]) {
+        for (const match of text.matchAll(pattern)) dataUrlSet.add(match[2]);
+      }
+    }
     const dataUrls = [
-      ...new Set(
-        [...textByFile.values()].flatMap((text) =>
-          [...text.matchAll(/data:([a-z0-9.+-]+\/[a-z0-9.+-]+)(;charset=[^;,]+)?(;base64)?,([^"'()\s]+)/gi)]
-            .map((match) => match[0]),
-        ),
-      ),
+      ...dataUrlSet,
     ];
     for (const dataUrl of dataUrls) {
       try {
@@ -3089,7 +3133,24 @@ async function inlineSnapshotImages(snapshots) {
     },
   );
   await Promise.all(workers);
+  const replaceJsonValues = (value) => {
+    if (typeof value === 'string') return replacements.get(value) || value;
+    if (Array.isArray(value)) return value.map(replaceJsonValues);
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [key, replaceJsonValues(item)]),
+      );
+    }
+    return value;
+  };
   for (const [file, originalText] of textByFile) {
+    if (jsonByFile.has(file)) {
+      fs.writeFileSync(
+        file,
+        JSON.stringify(replaceJsonValues(jsonByFile.get(file)), null, 2),
+      );
+      continue;
+    }
     let text = originalText;
     for (const [source, replacement] of replacements) {
       text = text.split(source).join(replacement);
@@ -3257,6 +3318,15 @@ for (const [styleSheetId, header] of styleSheets) {
   } catch (error) {
     stylesheetManifest.push({ sourceURL: header.sourceURL, error: String(error) });
   }
+}
+if (!fullProfile) {
+  console.error(
+    `phase: localized ${await inlineSnapshotImages(
+      stylesheetManifest
+        .filter((sheet) => sheet.file)
+        .map((sheet) => ({ stylesheet: sheet.file })),
+    )} stylesheet assets`,
+  );
 }
 const scriptDir = path.join(outDir, 'scripts');
 if (fullProfile) fs.mkdirSync(scriptDir, { recursive: true });
@@ -4107,8 +4177,19 @@ if (!fullProfile) {
   });
 }
 
+let responsiveEvidenceFile;
+if (!fullProfile && responsive.length) {
+  const evidenceDir = path.join(outDir, 'evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  responsiveEvidenceFile = 'evidence/responsive.json';
+  fs.writeFileSync(
+    path.join(outDir, responsiveEvidenceFile),
+    JSON.stringify(responsive, null, 2),
+  );
+}
+
 const implementationBlueprint = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   purpose:
     'Agent-facing implementation blueprint. Read this before opening detailed evidence.',
   source: output.source,
@@ -4162,43 +4243,37 @@ const implementationBlueprint = {
     evidenceByViewport: state.evidenceByViewport,
     screenshot: state.screenshot,
   })),
-  interactions: multiPageStates.map((state) => ({
-    stateIndex: state.index,
-    type: state.type,
-    trigger: state.triggerElement || {
-      label: state.trigger,
-    },
-    probe: state.probe,
-    destination: state.url,
-  })),
-  components: componentPackages.map((component) => ({
-    id: component.id,
-    identity: component.identity,
-    path: component.path,
-    parentId: component.parentId,
-    childIds: component.childIds,
-    reasons: component.reasons,
-    viewports: captures.map((capture) => {
-      const root = capture.nodes.find((node) => node.path === component.path);
-      const parent = capture.nodes.find((node) => node.path === root?.parentPath);
-      return {
-        viewport: capture.document.viewport,
-        visible: root?.visible || false,
-        rect: root?.visible ? compactRect(root.rect) : undefined,
-        styleDelta: root?.visible
-          ? compactStyleDelta(root.style, parent?.style)
-          : undefined,
-      };
-    }),
-  })),
-  responsive,
-  authoredStylesheets: stylesheetManifest.map((sheet) => ({
-    file: sheet.file,
-    sourceURL: sheet.sourceURL,
-    mediaQueries: sheet.mediaQueries,
-    keyframes: sheet.keyframes,
-    customProperties: sheet.customProperties,
-  })),
+  interactions: {
+    count: multiPageStates.length,
+    states: multiPageStates.map((state) => ({
+      stateIndex: state.index,
+      type: state.type,
+      destination: state.url,
+    })),
+  },
+  components: {
+    count: componentPackages.length,
+    index: 'component-map.json',
+    roots: componentPackages
+      .filter((component) => !component.parentId)
+      .map((component) => ({
+        id: component.id,
+        identity: component.identity,
+        path: component.path,
+        childIds: component.childIds,
+      })),
+  },
+  responsive: {
+    count: responsive.length,
+    file: responsiveEvidenceFile,
+  },
+  authoredStylesheets: {
+    count: stylesheetManifest.length,
+    files: stylesheetManifest.map((sheet) => ({
+      file: sheet.file,
+      sourceURL: sheet.sourceURL,
+    })),
+  },
   evidence: {
     exactSpec: 'spec.json',
     componentMap: 'component-map.json',
