@@ -25,11 +25,13 @@ const outDir = path.resolve(String(args.out || 'site-spec'));
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
+const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
 if (!['implementation', 'full'].includes(profile)) {
   throw new Error('Pass --profile implementation or --profile full.');
 }
 const fullProfile = profile === 'full';
+const captureScreenshots = fullProfile || Boolean(args.screenshots);
 const lifecycleRecorderSource = fs.readFileSync(
   new URL('./lifecycle-recorder.js', import.meta.url),
   'utf8',
@@ -1300,19 +1302,60 @@ function absolutizeCssUrls(cssText, sourceUrl) {
   );
 }
 
-async function capturePageSnapshot(index, slug = String(index).padStart(3, '0')) {
-  await cdp.send('Runtime.evaluate', {
-    expression: `Promise.race([
-      new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
-      new Promise(resolve => setTimeout(resolve, 100))
-    ])`,
-    awaitPromise: true,
-    returnByValue: true,
-  }).catch(() => {});
+async function capturePageSnapshot(
+  index,
+  slug = String(index).padStart(3, '0'),
+  viewport = viewports[0],
+  writePageArtifacts = true,
+) {
   const pageDir = path.join(outDir, 'pages');
   fs.mkdirSync(pageDir, { recursive: true });
   await cdp.send('Emulation.setDeviceMetricsOverride', {
-    width: 1440, height: 900, deviceScaleFactor: 1, mobile: false,
+    width: viewport.width,
+    height: viewport.height,
+    deviceScaleFactor: viewport.dpr,
+    mobile: viewport.width < 600,
+  }).catch(() => {});
+  await cdp.send('Runtime.evaluate', {
+    expression: `(async () => {
+      const waitForFrame = () => new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      );
+      const signature = () => JSON.stringify(
+        Array.from(document.querySelectorAll('body *'))
+          .slice(0, 1000)
+          .map(element => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return [
+              Math.round(rect.x * 10) / 10,
+              Math.round(rect.y * 10) / 10,
+              Math.round(rect.width * 10) / 10,
+              Math.round(rect.height * 10) / 10,
+              style.display,
+              style.visibility,
+              style.opacity,
+              style.transform
+            ];
+          })
+      );
+      let previous = '';
+      let stable = 0;
+      const deadline = performance.now() + 1500;
+      while (performance.now() < deadline) {
+        await waitForFrame();
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const current = signature();
+        const hasRunningAnimations = document.getAnimations({ subtree: true })
+          .some(animation => animation.playState === 'running');
+        stable = current === previous && !hasRunningAnimations ? stable + 1 : 0;
+        if (stable >= 2) return true;
+        previous = current;
+      }
+      return false;
+    })()`,
+    awaitPromise: true,
+    returnByValue: true,
   }).catch(() => {});
 
   let pageData = {};
@@ -1322,10 +1365,100 @@ async function capturePageSnapshot(index, slug = String(index).padStart(3, '0'))
         expression: `JSON.stringify({
             url: location.href,
             title: document.title,
+            viewport: {
+              width: innerWidth,
+              height: innerHeight,
+              dpr: devicePixelRatio
+            },
             nodeCount: document.querySelectorAll('*').length,
             text: (document.body || document.documentElement).innerText.substring(0, 3000),
             bodyHeight: document.body ? document.body.scrollHeight : 0,
             html: '<!DOCTYPE html>\\n' + document.documentElement.outerHTML,
+            focus: (() => {
+              const element = document.activeElement;
+              if (!element || element === document.body) return null;
+              return {
+                tag: element.tagName.toLowerCase(),
+                id: element.id || null,
+                className: element.className?.baseVal ?? element.className ?? null,
+                testId: element.getAttribute('data-testid'),
+                ariaLabel: element.getAttribute('aria-label'),
+                placeholder: element.getAttribute('placeholder')
+              };
+            })(),
+            structure: (() => {
+              const pathFor = element => {
+                const parts = [];
+                let current = element;
+                while (current && current.nodeType === Node.ELEMENT_NODE) {
+                  const siblings = Array.from(current.parentElement?.children || [])
+                    .filter(sibling => sibling.tagName === current.tagName);
+                  const position = siblings.indexOf(current);
+                  parts.unshift(
+                    current.tagName.toLowerCase() +
+                    ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')'
+                  );
+                  current = current.parentElement;
+                }
+                return 'doc(0)>' + parts.join('>');
+              };
+              return Array.from(document.querySelectorAll('body *'))
+                .map(element => {
+                  const rect = element.getBoundingClientRect();
+                  const style = getComputedStyle(element);
+                  if (
+                    rect.width <= 0 ||
+                    rect.height <= 0 ||
+                    style.display === 'none' ||
+                    style.visibility === 'hidden'
+                  ) return null;
+                  const attrs = {};
+                  for (const name of [
+                    'id', 'class', 'role', 'title', 'href', 'type', 'name',
+                    'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
+                    'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
+                    'checked', 'selected'
+                  ]) {
+                    const value = element.getAttribute(name);
+                    if (value != null && !/^(?:data|blob):/i.test(value)) {
+                      attrs[name] = value.slice(0, 500);
+                    }
+                  }
+                  return {
+                    path: pathFor(element),
+                    parentPath: element.parentElement ? pathFor(element.parentElement) : null,
+                    tag: element.tagName.toLowerCase(),
+                    attrs,
+                    text: (element.getAttribute('aria-label') || element.innerText || '')
+                      .replace(/\\s+/g, ' ').trim().slice(0, 500),
+                    rect: {
+                      x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+                      right: rect.right, bottom: rect.bottom
+                    },
+                    style: {
+                      display: style.display,
+                      position: style.position,
+                      margin: style.margin,
+                      padding: style.padding,
+                      gap: style.gap,
+                      color: style.color,
+                      backgroundColor: style.backgroundColor,
+                      border: style.border,
+                      borderRadius: style.borderRadius,
+                      boxShadow: style.boxShadow,
+                      opacity: style.opacity,
+                      transform: style.transform,
+                      fontFamily: style.fontFamily,
+                      fontSize: style.fontSize,
+                      fontWeight: style.fontWeight,
+                      lineHeight: style.lineHeight,
+                      textAlign: style.textAlign
+                    }
+                  };
+                })
+                .filter(Boolean)
+                .slice(0, 1500);
+            })(),
             stylesheets: Array.from(document.styleSheets).map(sheet => {
               try {
                 return {
@@ -1339,18 +1472,20 @@ async function capturePageSnapshot(index, slug = String(index).padStart(3, '0'))
           })`,
         returnByValue: true,
       }),
-    cdp.send('Page.captureScreenshot', { format: 'png' }),
+    captureScreenshots && writePageArtifacts
+      ? cdp.send('Page.captureScreenshot', { format: 'png' })
+      : Promise.resolve(undefined),
   ]);
   if (snapshotResult.status === 'fulfilled') {
     pageData = JSON.parse(snapshotResult.value.result?.value || '{}');
   }
-  if (screenshotResult.status === 'fulfilled') {
+  if (screenshotResult.status === 'fulfilled' && screenshotResult.value?.data) {
     screenshot = screenshotResult.value.data;
     fs.writeFileSync(path.join(pageDir, `${slug}.png`), Buffer.from(screenshot, 'base64'));
   }
 
   let htmlFile;
-  if (pageData.html) {
+  if (writePageArtifacts && pageData.html) {
     fs.writeFileSync(path.join(pageDir, `${slug}.html`), pageData.html);
     htmlFile = `pages/${slug}.html`;
   }
@@ -1360,9 +1495,31 @@ async function capturePageSnapshot(index, slug = String(index).padStart(3, '0'))
     .map((sheet) => absolutizeCssUrls(sheet.text || '', sheet.href))
     .filter(Boolean)
     .join('\n');
-  if (stylesheetText) {
+  if (writePageArtifacts && stylesheetText) {
     fs.writeFileSync(path.join(pageDir, `${slug}.css`), stylesheetText);
     stylesheetFile = `pages/${slug}.css`;
+  }
+
+  let evidenceFile;
+  if (pageData.structure?.length) {
+    const evidenceDir = path.join(outDir, 'evidence');
+    const filename = `state-${slug}.json`;
+    fs.mkdirSync(evidenceDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(evidenceDir, filename),
+      JSON.stringify(
+        {
+          url: pageData.url,
+          title: pageData.title,
+          viewport: pageData.viewport,
+          focus: pageData.focus,
+          nodes: pageData.structure,
+        },
+        null,
+        2,
+      ),
+    );
+    evidenceFile = `evidence/${filename}`;
   }
 
   return {
@@ -1370,14 +1527,50 @@ async function capturePageSnapshot(index, slug = String(index).padStart(3, '0'))
     type: 'route',
     url: pageData.url || '',
     title: pageData.title || '',
+    viewport: pageData.viewport,
+    focus: pageData.focus,
     nodeCount: pageData.nodeCount || 0,
     text: pageData.text || '',
     bodyHeight: pageData.bodyHeight || 0,
     html: htmlFile,
     stylesheet: stylesheetFile,
+    evidence: evidenceFile,
     screenshot: screenshot ? `pages/${slug}.png` : undefined,
     capturedAt: new Date().toISOString(),
   };
+}
+
+async function captureResponsivePageSnapshot(
+  index,
+  slug = String(index).padStart(3, '0'),
+) {
+  const primaryViewport = viewports[0];
+  const state = await capturePageSnapshot(
+    index,
+    slug,
+    primaryViewport,
+    true,
+  );
+  state.evidenceByViewport = {
+    [`${primaryViewport.width}x${primaryViewport.height}`]: state.evidence,
+  };
+  for (const viewport of viewports.slice(1)) {
+    const key = `${viewport.width}x${viewport.height}`;
+    const supplemental = await capturePageSnapshot(
+      index,
+      `${slug}-${key}`,
+      viewport,
+      false,
+    );
+    state.evidenceByViewport[key] = supplemental.evidence;
+  }
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: primaryViewport.width,
+    height: primaryViewport.height,
+    deviceScaleFactor: primaryViewport.dpr,
+    mobile: primaryViewport.width < 600,
+  }).catch(() => {});
+  return state;
 }
 
 async function navigateAndCaptureAllPages(targetUrl) {
@@ -1455,7 +1648,7 @@ async function navigateAndCaptureAllPages(targetUrl) {
       lastCapturedUrl = currentUrl;
       lastCapturedNodeCount = currentNodeCount;
       console.error(`phase: capture page state ${multiPageStates.length} url=${currentUrl} nodes=${currentNodeCount}`);
-      const state = await capturePageSnapshot(multiPageStates.length);
+      const state = await captureResponsivePageSnapshot(multiPageStates.length);
       multiPageStates.push(state);
       sameUrlPolls = 0;
 
@@ -1504,16 +1697,53 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
   let baseHost;
   try { baseHost = new URL(baseUrl).hostname; } catch (_) {}
+  const basePathname = (() => {
+    try {
+      return new URL(baseUrl).pathname;
+    } catch {
+      return '/';
+    }
+  })();
+  const basePathPrefix = (() => {
+    try {
+      if (basePathname.endsWith('/')) return basePathname;
+      const segment = basePathname.split('/').pop() || '';
+      return segment.includes('.')
+        ? basePathname.slice(0, basePathname.lastIndexOf('/') + 1)
+        : `${basePathname}/`;
+    } catch {
+      return '/';
+    }
+  })();
 
   // Find all candidate clickable elements that might trigger route changes
   const candidatesResult = await cdp.send('Runtime.evaluate', {
     expression: `JSON.stringify(
-      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
+      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
         .filter(el => {
           const rect = el.getBoundingClientRect();
           // Skip header/toolbar elements (top 80px) — they toggle panels, not navigate routes
           const scrollTop = window.scrollY || document.documentElement.scrollTop;
-          return rect.width > 4 && rect.height > 4 && (rect.top + scrollTop) > 80;
+          if (!(rect.width > 4 && rect.height > 4 && (rect.top + scrollTop) > 80)) {
+            return false;
+          }
+          if (el.matches('a[href]')) {
+            try {
+              const target = new URL(el.href, location.href);
+              if (
+                target.origin !== location.origin ||
+                (
+                  target.pathname !== ${JSON.stringify(basePathname)} &&
+                  !target.pathname.startsWith(${JSON.stringify(basePathPrefix)})
+                )
+              ) {
+                return false;
+              }
+            } catch {
+              return false;
+            }
+          }
+          return true;
         })
         .map((el, i) => ({
           i,
@@ -1522,6 +1752,8 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 500).trim(),
           role: el.getAttribute('role') || '',
           testId: el.getAttribute('data-testid') || '',
+          inputType: el instanceof HTMLInputElement ? el.type : '',
+          placeholder: el.getAttribute('placeholder') || '',
           y: Math.round(el.getBoundingClientRect().top),
           snapshotPath: (() => {
             const parts = [];
@@ -1542,7 +1774,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             return p.join('>');
           })()
         }))
-        .filter(e => e.text || e.href)
+        .filter(e => e.text || e.href || e.placeholder || e.inputType)
         .slice(0, 60)
     )`,
     returnByValue: true,
@@ -1551,9 +1783,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   let candidates = [];
   try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
   const candidatePriority = (candidate) => {
+    if (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') return 95;
     if (candidate.href) return 100;
     if (candidate.testId === 'notebook-card') return 90;
     if (candidate.role === 'link' || candidate.tag === 'A') return 80;
+    if (candidate.inputType === 'checkbox' || candidate.inputType === 'radio') return 70;
     if (candidate.role === 'button') return 50;
     return 10;
   };
@@ -1561,11 +1795,348 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   console.error(`phase: route crawl found ${candidates.length} candidates`);
   const triggerElementFor = (candidate) => ({
     path: candidate.snapshotPath,
-    label: candidate.text,
+    label: candidate.text || candidate.placeholder,
     tag: candidate.tag.toLowerCase(),
     role: candidate.role || undefined,
     testId: candidate.testId || undefined,
+    inputType: candidate.inputType || undefined,
   });
+
+  const replayInputProbe = async (candidate) => {
+    await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    await waitForApplicationReady();
+    return (
+      await cdp.send('Runtime.evaluate', {
+        expression: `(() => {
+          const element = document.querySelector(
+            ${JSON.stringify(
+              candidate.testId
+                ? `[data-testid="${candidate.testId}"]`
+                : candidate.placeholder
+                  ? `${candidate.tag.toLowerCase()}[placeholder="${candidate.placeholder}"]`
+                  : candidate.snapshotPath.replace(/^doc\(0\)>/, ''),
+            )}
+          );
+          if (!element) return false;
+          const value = 'site-spec probe';
+          const prototype = element instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype;
+          Object.getOwnPropertyDescriptor(prototype, 'value')
+            .set.call(element, value);
+          element.dispatchEvent(new InputEvent('input', {
+            bubbles: true,
+            inputType: 'insertText',
+            data: value
+          }));
+          element.dispatchEvent(new Event('change', { bubbles: true }));
+          element.focus();
+          element.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
+            keyCode: 13,
+            bubbles: true
+          }));
+          return true;
+        })()`,
+        returnByValue: true,
+      })
+    ).result.value;
+  };
+
+  const captureDerivedInputStates = async (inputCandidate) => {
+    const discovered = (
+      await cdp.send('Runtime.evaluate', {
+        expression: `JSON.stringify((() => {
+          const pathFor = element => {
+            const parts = [];
+            let current = element;
+            while (current && current.nodeType === Node.ELEMENT_NODE) {
+              const siblings = Array.from(current.parentElement?.children || [])
+                .filter(sibling => sibling.tagName === current.tagName);
+              const position = siblings.indexOf(current);
+              parts.unshift(
+                current.tagName.toLowerCase() +
+                ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')'
+              );
+              current = current.parentElement;
+            }
+            return 'doc(0)>' + parts.join('>');
+          };
+          const editHint = /double-click to edit/i.test(
+            document.body?.innerText || ''
+          );
+          return Array.from(document.querySelectorAll(
+            'input[type="checkbox"],a[href^="#"],button,li label,[role="listitem"] label'
+          )).map(element => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            const testId = element.getAttribute('data-testid') || '';
+            const action =
+              editHint &&
+              element.matches('li label,[role="listitem"] label')
+                ? 'doubleClick'
+                : 'click';
+            const includeHidden =
+              element instanceof HTMLButtonElement &&
+              Boolean(testId || element.getAttribute('aria-label'));
+            if (
+              !includeHidden &&
+              (
+                rect.width <= 4 ||
+                rect.height <= 4 ||
+                style.display === 'none' ||
+                style.visibility === 'hidden'
+              )
+            ) return null;
+            return {
+              path: pathFor(element),
+              tag: element.tagName,
+              role: element.getAttribute('role') || '',
+              testId,
+              href: element.getAttribute('href') || '',
+              inputType:
+                element instanceof HTMLInputElement ? element.type : '',
+              label: (
+                element.getAttribute('aria-label') ||
+                element.innerText ||
+                element.getAttribute('title') ||
+                testId
+              ).trim().slice(0, 200),
+              action
+            };
+          }).filter(Boolean);
+        })())`,
+        returnByValue: true,
+      })
+    ).result.value;
+    let actions = [];
+    try {
+      actions = JSON.parse(discovered || '[]');
+    } catch {}
+    const seen = new Set();
+    for (const action of actions) {
+      if (multiPageStates.length >= maxRoutes) break;
+      const identity = `${action.action}:${action.testId}:${action.href}:${action.path}`;
+      if (seen.has(identity)) continue;
+      seen.add(identity);
+      if (!(await replayInputProbe(inputCandidate))) continue;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const before = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            url: location.href,
+            text: document.body?.innerText || '',
+            html: document.body?.innerHTML || '',
+            visibleButtons: Array.from(document.querySelectorAll('button'))
+              .filter(element => {
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                return (
+                  rect.width > 4 &&
+                  rect.height > 4 &&
+                  style.display !== 'none' &&
+                  style.visibility !== 'hidden'
+                );
+              })
+              .map(element => (
+                element.getAttribute('data-testid') ||
+                element.getAttribute('aria-label') ||
+                element.innerText ||
+                ''
+              ).trim())
+          })`,
+          returnByValue: true,
+        })
+      ).result.value;
+      const beforeState = JSON.parse(before || '{}');
+      const acted = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `(() => {
+            let element;
+            if (${JSON.stringify(action.testId)}) {
+              element = document.querySelector(
+                '[data-testid=' + JSON.stringify(${JSON.stringify(action.testId)}) + ']'
+              );
+            } else if (${JSON.stringify(action.href)}) {
+              element = Array.from(document.querySelectorAll('a[href]'))
+                .find(candidate =>
+                  candidate.getAttribute('href') === ${JSON.stringify(action.href)}
+                );
+            }
+            if (!element) {
+              element = document.querySelector(
+                ${JSON.stringify(action.path)}.replace(/^doc\\(0\\)>/, '')
+              );
+            }
+            if (!element) return false;
+            element.scrollIntoView({ block: 'center', behavior: 'instant' });
+            if (${JSON.stringify(action.action)} === 'doubleClick') {
+              element.dispatchEvent(new MouseEvent('dblclick', {
+                bubbles: true,
+                detail: 2
+              }));
+            } else {
+              element.click();
+            }
+            return true;
+          })()`,
+          returnByValue: true,
+        })
+      ).result.value;
+      if (!acted) continue;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const after = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            url: location.href,
+            text: document.body?.innerText || '',
+            html: document.body?.innerHTML || '',
+            visibleButtons: Array.from(document.querySelectorAll('button'))
+              .filter(element => {
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                return (
+                  rect.width > 4 &&
+                  rect.height > 4 &&
+                  style.display !== 'none' &&
+                  style.visibility !== 'hidden'
+                );
+              })
+              .map(element => (
+                element.getAttribute('data-testid') ||
+                element.getAttribute('aria-label') ||
+                element.innerText ||
+                ''
+              ).trim())
+          })`,
+          returnByValue: true,
+        })
+      ).result.value;
+      if (after === before) continue;
+      const stateKey = `derived:${after}`;
+      if (visitedUrls.has(stateKey)) continue;
+      visitedUrls.add(stateKey);
+      const state = await captureResponsivePageSnapshot(
+        multiPageStates.length,
+      );
+      state.type =
+        action.action === 'doubleClick'
+          ? 'edit'
+          : action.inputType === 'checkbox'
+            ? 'toggle'
+            : action.href
+              ? 'route'
+              : 'action';
+      state.trigger = action.label || action.href || action.testId;
+      state.triggerElement = {
+        path: action.path,
+        label: state.trigger,
+        tag: action.tag.toLowerCase(),
+        role: action.role || undefined,
+        testId: action.testId || undefined,
+        inputType: action.inputType || undefined,
+      };
+      state.probe = {
+        sequence: [
+          { action: 'enter', value: 'site-spec probe', submit: true },
+          {
+            action: action.action,
+            testId: action.testId || undefined,
+            href: action.href || undefined,
+          },
+        ],
+      };
+      multiPageStates.push(state);
+      if (
+        action.inputType === 'checkbox' &&
+        multiPageStates.length < maxRoutes
+      ) {
+        const nestedAction = (
+          await cdp.send('Runtime.evaluate', {
+            expression: `(() => {
+              const beforeButtons = new Set(
+                ${JSON.stringify(beforeState.visibleButtons || [])}
+              );
+              const source = ${JSON.stringify(action.testId)}
+                ? document.querySelector(
+                    '[data-testid=' +
+                    JSON.stringify(${JSON.stringify(action.testId)}) +
+                    ']'
+                  )
+                : null;
+              const sourceItem = source?.closest('li,[role="listitem"]');
+              const sourceRoot = source?.closest(
+                'form,section,article,[role="dialog"]'
+              );
+              const button = Array.from(document.querySelectorAll('button'))
+                .find(element => {
+                  const rect = element.getBoundingClientRect();
+                  const style = getComputedStyle(element);
+                  const identity = (
+                    element.getAttribute('data-testid') ||
+                    element.getAttribute('aria-label') ||
+                    element.innerText ||
+                    ''
+                  ).trim();
+                  const related = sourceItem
+                    ? element.closest('li,[role="listitem"]') === sourceItem
+                    : !sourceRoot || element.closest(
+                        'form,section,article,[role="dialog"]'
+                      ) === sourceRoot;
+                  return (
+                    rect.width > 4 &&
+                    rect.height > 4 &&
+                    style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    identity &&
+                    !beforeButtons.has(identity) &&
+                    related &&
+                    /clear|remove|delete|reset/i.test(identity)
+                  );
+                });
+              if (!button) return null;
+              button.click();
+              return {
+                label: (
+                  button.getAttribute('aria-label') ||
+                  button.innerText ||
+                  ''
+                ).trim(),
+                testId: button.getAttribute('data-testid') || null
+              };
+            })()`,
+            returnByValue: true,
+          })
+        ).result.value;
+        if (nestedAction) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          const nestedState = await captureResponsivePageSnapshot(
+            multiPageStates.length,
+          );
+          nestedState.type = 'action';
+          nestedState.trigger = nestedAction.label;
+          nestedState.triggerElement = {
+            label: nestedAction.label,
+            tag: 'button',
+            testId: nestedAction.testId || undefined,
+          };
+          nestedState.probe = {
+            sequence: [
+              { action: 'enter', value: 'site-spec probe', submit: true },
+              { action: 'click', testId: action.testId },
+              {
+                action: 'click',
+                testId: nestedAction.testId || undefined,
+                label: nestedAction.label,
+              },
+            ],
+          };
+          multiPageStates.push(nestedState);
+        }
+      }
+    }
+  };
 
   for (const candidate of candidates) {
     if (multiPageStates.length >= maxRoutes) break;
@@ -1631,10 +2202,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     // Log node count to verify page is fully rendered
     const preClickState = (await cdp.send('Runtime.evaluate', {
-      expression: 'JSON.stringify({n:document.querySelectorAll("*").length,u:location.href})',
+      expression: `JSON.stringify({
+        n: document.querySelectorAll('*').length,
+        u: location.href,
+        fingerprint: JSON.stringify({
+          text: (document.body?.innerText || '').slice(0, 10000),
+          controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
+            value: element.value,
+            checked: element.checked,
+            expanded: element.getAttribute('aria-expanded'),
+            pressed: element.getAttribute('aria-pressed'),
+            selected: element.getAttribute('aria-selected')
+          }))
+        })
+      })`,
       returnByValue: true,
     }).catch(() => ({ result: { value: '{}' } }))).result.value;
-    const { n: preClickN } = JSON.parse(preClickState);
+    const { n: preClickN, fingerprint: beforeFingerprint } =
+      JSON.parse(preClickState);
     console.error(`phase: route crawl pre-click url: ${currentUrl.split('/').slice(-2).join('/')} nodes:${preClickN}`);
 
     // If it has an explicit href pointing to same origin, use it directly
@@ -1667,7 +2252,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     const clicked = await cdp.send('Runtime.evaluate', {
       expression: `(() => {
-        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, [data-href], [data-url], [tabindex]:not([tabindex="-1"])');
+        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])');
         // Search all rendered elements (not just in-viewport) — scroll into view before clicking
         const rendered = Array.from(all).filter(el => { const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4; });
         const path = ${JSON.stringify(candidate.path)}.split('>').map(Number);
@@ -1684,6 +2269,32 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         }
         if (!el) return 'not-found:' + searchText;
         el.scrollIntoView({ block: 'center', behavior: 'instant' });
+        if (
+          (el instanceof HTMLInputElement &&
+            ['text', 'search', 'email', 'url', 'tel'].includes(el.type)) ||
+          el instanceof HTMLTextAreaElement
+        ) {
+          const value = 'site-spec probe';
+          const prototype = el instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype;
+          Object.getOwnPropertyDescriptor(prototype, 'value').set.call(el, value);
+          el.dispatchEvent(new InputEvent('input', {
+            bubbles: true,
+            inputType: 'insertText',
+            data: value
+          }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          const form = el.closest('form');
+          if (form) form.requestSubmit();
+          else el.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
+            keyCode: 13,
+            bubbles: true
+          }));
+          return 'entered:' + value;
+        }
         el.click();
         return 'clicked:' + (el.getAttribute('aria-label') || el.innerText || '').trim().substring(0, 30);
       })()`,
@@ -1693,12 +2304,16 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     const clickedVal = clicked.result?.value || 'error';
     console.error(`phase: route crawl try "${candidate.text.substring(0,30)}" → ${clickedVal}`);
 
-    if (!clickedVal.startsWith('clicked')) continue;
+    if (
+      !clickedVal.startsWith('clicked') &&
+      !clickedVal.startsWith('entered')
+    ) continue;
 
     // Poll for URL change, modal, or DOM shift — up to 3 seconds
     let afterUrl = beforeUrl;
     let nodeCount = 0;
     let modalAppeared = false;
+    let afterFingerprint = beforeFingerprint;
     const clickDeadline = Date.now() + 3000;
     while (Date.now() < clickDeadline) {
       await new Promise((r) => setTimeout(r, 300));
@@ -1708,24 +2323,56 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             u: location.href,
             n: document.querySelectorAll('*').length,
             modal: !!document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
-            modalText: (document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200)
+            modalText: (document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200),
+            fingerprint: JSON.stringify({
+              text: (document.body?.innerText || '').slice(0, 10000),
+              controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
+                value: element.value,
+                checked: element.checked,
+                expanded: element.getAttribute('aria-expanded'),
+                pressed: element.getAttribute('aria-pressed'),
+                selected: element.getAttribute('aria-selected')
+              }))
+            })
           })`,
           returnByValue: true,
         });
         const d = JSON.parse(r.result?.value || '{}');
         afterUrl = d.u || beforeUrl;
         nodeCount = d.n || nodeCount;
+        afterFingerprint = d.fingerprint || afterFingerprint;
         modalAppeared = d.modal && d.modalText?.trim().length > 0;
         // Stop on URL change, modal, or significant DOM growth (panel/drawer opened)
-        if (afterUrl !== beforeUrl || modalAppeared || (nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15)) break;
+        if (
+          afterUrl !== beforeUrl ||
+          modalAppeared ||
+          afterFingerprint !== beforeFingerprint ||
+          (nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15)
+        ) break;
       } catch (_) { break; }
     }
 
     const urlChanged = afterUrl !== beforeUrl;
     const isInternal = (() => {
-      try { return new URL(afterUrl).hostname === baseHost; } catch (_) { return false; }
+      try {
+        const target = new URL(afterUrl);
+        return (
+          target.hostname === baseHost &&
+          (
+            allowCrossScope ||
+            target.pathname === basePathname ||
+            target.pathname.startsWith(basePathPrefix)
+          )
+        );
+      } catch (_) {
+        return false;
+      }
     })();
     const panelOpened = !urlChanged && !modalAppeared && nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15;
+    const stateChanged =
+      !urlChanged &&
+      !modalAppeared &&
+      afterFingerprint !== beforeFingerprint;
 
     // Capture modal state if one appeared (no URL change needed)
     if (!urlChanged && modalAppeared) {
@@ -1735,7 +2382,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         // Let it fully render
         await new Promise((r) => setTimeout(r, 400));
         console.error(`phase: route crawl capture ${multiPageStates.length} modal triggered by "${candidate.text}"`);
-        const state = await capturePageSnapshot(multiPageStates.length);
+        const state = await captureResponsivePageSnapshot(multiPageStates.length);
         // Tag it as a modal state
         state.type = 'modal';
         state.trigger = candidate.text;
@@ -1758,7 +2405,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         visitedUrls.add(panelKey);
         await new Promise((r) => setTimeout(r, 400));
         console.error('phase: route crawl capture ' + multiPageStates.length + ' panel by "' + candidate.text + '" nodes:' + preClickN + '->' + nodeCount);
-        const state = await capturePageSnapshot(multiPageStates.length);
+        const state = await captureResponsivePageSnapshot(multiPageStates.length);
         state.type = 'panel';
         state.trigger = candidate.text;
         state.triggerElement = triggerElementFor(candidate);
@@ -1766,6 +2413,35 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         // Return to home to reset state
         await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
         await waitForApplicationReady();
+      }
+      continue;
+    }
+
+    if (stateChanged) {
+      const stateKey = `state:${candidate.snapshotPath}:${afterFingerprint}`;
+      if (!visitedUrls.has(stateKey)) {
+        visitedUrls.add(stateKey);
+        await new Promise((r) => setTimeout(r, 250));
+        const label = candidate.text || candidate.placeholder;
+        console.error(
+          `phase: route crawl capture ${multiPageStates.length} state by "${label}"`,
+        );
+        const state = await captureResponsivePageSnapshot(multiPageStates.length);
+        state.type =
+          candidate.inputType === 'checkbox' || candidate.inputType === 'radio'
+            ? 'toggle'
+            : candidate.inputType || candidate.tag === 'TEXTAREA'
+              ? 'input'
+              : 'state';
+        state.trigger = label;
+        state.triggerElement = triggerElementFor(candidate);
+        state.probe = clickedVal.startsWith('entered')
+          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          : { action: 'click' };
+        multiPageStates.push(state);
+        if (state.type === 'input') {
+          await captureDerivedInputStates(candidate);
+        }
       }
       continue;
     }
@@ -1801,7 +2477,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     }
 
     console.error(`phase: route crawl capture ${multiPageStates.length} url=${afterUrl} nodes=${nodeCount} text="${candidate.text}"`);
-    const state = await capturePageSnapshot(multiPageStates.length);
+    const state = await captureResponsivePageSnapshot(multiPageStates.length);
     state.trigger = candidate.text;
     state.triggerElement = triggerElementFor(candidate);
     multiPageStates.push(state);
@@ -2429,7 +3105,7 @@ if (created) {
   await navigateAndCaptureAllPages(url);
 }
 await waitForApplicationReady();
-homePageState = await capturePageSnapshot(-1, 'home');
+homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
   await crawlRoutes(requestedUrl, maxRoutes);
@@ -3442,15 +4118,30 @@ const implementationBlueprint = {
     'component-map.json',
     'pages/*.html and pages/*.css for the state being implemented',
     'stylesheets/*.css for authored rules and design tokens',
+    'the matching evidence/state-*.json for dynamic-state geometry and styles',
     'the matching evidence/capture-*.json only for exact geometry or animation evidence',
-    'pages/*.png only for final visual validation',
   ],
   rules: [
     'Implement native components in the destination stack; do not copy captured application scripts.',
     'Use words, routes, control identities, authored CSS, rects, and responsive deltas as build inputs.',
-    'Use screenshots as validation evidence, not as the source of implementation facts.',
-    'Do not load binary screenshots or the full spec into model context unless a targeted check requires them.',
+    'Validate from structured DOM, geometry, styles, assets, and state transitions.',
+    'Screenshots are optional diagnostics only; a mismatch must be resolved by improving structured evidence.',
   ],
+  validationContract: {
+    authority: 'structured-browser-state',
+    requiredMatches: [
+      'text and accessibility identity',
+      'route, query, modal, panel, and browser-back transitions',
+      'component visibility and hierarchy',
+      'element rectangles at each captured viewport',
+      'authored and computed style constraints',
+      'asset identity and intrinsic dimensions',
+      'scroll and animation state samples when present',
+    ],
+    geometryTolerancePx: 1,
+    screenshotPolicy:
+      'Never required for generation or acceptance; diagnostics require --screenshots.',
+  },
   viewports,
   states: [
     homePageState,
@@ -3460,10 +4151,15 @@ const implementationBlueprint = {
     type: state.type,
     url: state.url,
     title: state.title,
+    viewport: state.viewport,
+    focus: state.focus,
     trigger: state.trigger,
     triggerElement: state.triggerElement,
+    probe: state.probe,
     html: state.html,
     stylesheet: state.stylesheet,
+    evidence: state.evidence,
+    evidenceByViewport: state.evidenceByViewport,
     screenshot: state.screenshot,
   })),
   interactions: multiPageStates.map((state) => ({
@@ -3472,6 +4168,7 @@ const implementationBlueprint = {
     trigger: state.triggerElement || {
       label: state.trigger,
     },
+    probe: state.probe,
     destination: state.url,
   })),
   components: componentPackages.map((component) => ({

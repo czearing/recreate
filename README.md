@@ -35,10 +35,22 @@ Capture internal routes, panels, and other state-changing controls:
 node src/extract.mjs --reuse --match example.com --crawl --max-routes 30 --out site-spec-output
 ```
 
+Explicitly allow app transitions to another path subtree on the same host:
+
+```powershell
+node src/extract.mjs --reuse --match example.com --crawl --allow-cross-scope --out site-spec-output
+```
+
 Set explicit viewports:
 
 ```powershell
 node src/extract.mjs --url https://example.com --out site-spec-output --viewports 1440x900,390x844
+```
+
+Capture screenshots only when debugging a structured-data gap:
+
+```powershell
+node src/extract.mjs --url https://example.com --out site-spec-output --screenshots
 ```
 
 ## Output
@@ -46,16 +58,20 @@ node src/extract.mjs --url https://example.com --out site-spec-output --viewport
 - `implementation.json`: concise agent-facing build plan and evidence index
 - `spec.json`: machine-readable evidence index and global relationships
 - `evidence/capture-*.json`: exact geometry and behavior for one viewport
+- `evidence/state-*.json`: exact geometry, styles, focus, and text for each
+  captured interaction state and viewport
 - `summary.json`: timings, counts, coverage, and validation
 - `documents/`: exact pre-execution HTML responses
 - `stylesheets/`: authored CSS source
-- `pages/`: captured route/panel HTML, CSSOM, and screenshots
+- `pages/`: captured route/panel HTML and CSSOM
 - `snapshot-assets/`: content-addressed images shared by captured states
 - `component-map.json`: component hierarchy, identity, and DOM paths
 
-The `full` profile also writes `scripts/` and isolated `components/` payloads.
-Screenshots are ground-truth validation evidence. Pixel comparison belongs in
-the final implementation-validation pass and is not run during extraction.
+The `full` profile also writes scripts, isolated component payloads, initial
+documents, and screenshots. Default validation uses structured DOM, geometry,
+styles, assets, and state transitions. Screenshots and pixel comparison are
+optional diagnostics only; any mismatch must be resolved by capturing the
+missing structured fact instead of asking an agent to interpret an image.
 
 Implementation agents should read `implementation.json` first, then open only
 the HTML, CSS, component, or exact geometry needed for the state currently
@@ -73,6 +89,34 @@ snapshots from the primary context path.
 The commerce capture retained its route and modal states, rebuilt successfully,
 and contained no base64, data URLs, script excerpts, or minified script blobs
 in the default text artifacts.
+
+The crawler probes text submission, toggles, buttons, hash routes, delete
+actions, clear actions, and double-click edit entry. Each resulting state stores
+the action sequence that produced it, so build agents reproduce observed
+behavior rather than infer it from control names.
+
+## Blind Next.js reproduction
+
+The MIT-licensed TodoMVC React demo was captured without screenshots or source
+code, then handed to a generation agent that could read only the structured
+specification. The resulting clean Next.js 16 + TypeScript repository includes
+Storybook stories and normal reusable components.
+
+| Result | Measurement |
+| --- | ---: |
+| Capture time | 30.78 s |
+| Captured states | 9 |
+| Captured interactions | 8 |
+| Viewports per state | 2 |
+| Structured nodes validated | 948 / 948 |
+| Geometry/style/text/focus failures | 0 |
+| Screenshots used | 0 |
+
+The reproduced states cover empty, add, toggle-all, clear-completed, edit entry,
+delete, and All/Active/Completed hash routes at 1440×900 and 390×844. Tests,
+lint, type-check, the production Next.js build, and the Storybook build pass.
+Uncaptured edit commit/cancel behavior and persistence remain explicitly
+unsupported instead of being invented.
 
 ## Build an interactive static mock
 
