@@ -100,6 +100,17 @@ actions, clear actions, and double-click edit entry. Each resulting state stores
 the action sequence that produced it, so build agents reproduce observed
 behavior rather than infer it from control names.
 
+Open shadow roots are included in state evidence and interaction discovery.
+Keyboard-driven games are probed from a clean state when page controls and copy
+identify a bounded arrow-key or WASD interaction.
+
+Implementation evidence excludes cross-frame internals, advertising/consent
+subtrees, duplicate listeners, and known third-party ad listeners. Full profile
+output retains the unfiltered forensic data.
+
+CSS-linked images and fonts are downloaded into `snapshot-assets/`, and
+stylesheet/state references are rewritten to those content-addressed files.
+
 ## Blind Next.js reproduction
 
 The MIT-licensed TodoMVC React demo was captured without screenshots or source
@@ -122,6 +133,23 @@ delete, and All/Active/Completed hash routes at 1440×900 and 390×844. Tests,
 lint, type-check, the production Next.js build, and the Storybook build pass.
 Uncaptured edit commit/cancel behavior and persistence remain explicitly
 unsupported instead of being invented.
+
+## Multi-site component matrix
+
+The extractor was iterated through isolated native translations before
+increasing scope:
+
+| Site class | Isolated proof | Evidence exercised |
+| --- | --- | --- |
+| Stateful todo app | Input and populated item | form, focus, hash routes, responsive state |
+| Existing enterprise component library | Repeated card and controls | exact asset, responsive width, edit, menu, design-system overrides |
+| Commerce SPA | Hero and tour dialog | image asset, modal, query route, desktop/mobile reflow |
+| Documentation site | Navigation and article | sticky layout, typography, code blocks, anchors |
+| Open-source keyboard game | Score header before/after key | trusted keyboard state, grid geometry, font assets, ad filtering |
+
+Each proof has an isolated Storybook state and structured geometry/style
+comparison. Failures were treated as extractor or translation defects rather
+than masked with screenshot interpretation.
 
 ## Build an interactive static mock
 

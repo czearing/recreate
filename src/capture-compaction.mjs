@@ -69,17 +69,6 @@ const compactAttributes = (attrs = {}) => {
   }
   return kept;
 };
-const compactListener = (listener) => ({
-  target: listener.target,
-  type: listener.type,
-  capture: listener.capture || undefined,
-  passive: listener.passive || undefined,
-  once: listener.once || undefined,
-  sourceUrl: listener.sourceUrl,
-  lineNumber: listener.lineNumber >= 0 ? listener.lineNumber : undefined,
-  columnNumber: listener.columnNumber >= 0 ? listener.columnNumber : undefined,
-  sourceStatus: listener.sourceStatus,
-});
 const compactAnimation = (animation) => ({
   target: animation.target || animation.targetPath,
   id: animation.id || undefined,
@@ -111,7 +100,10 @@ const compactTrack = (track) => {
     })),
   };
 };
-export const compactCapture = (capture) => ({
+export const compactCapture = (capture) => {
+  const nodes = implementationNodes(capture.nodes);
+  const paths = new Set(nodes.map((node) => node.path));
+  return {
   document: {
     url: capture.document.url,
     title: capture.document.title,
@@ -121,7 +113,7 @@ export const compactCapture = (capture) => ({
     bodyStyle: compactStyle(capture.document.bodyStyle),
   },
   initialDocument: capture.initialDocument,
-  nodes: capture.nodes.map((node) => ({
+  nodes: nodes.map((node) => ({
     path: node.path,
     parentPath: node.parentPath,
     nodeType: node.nodeType,
@@ -138,7 +130,7 @@ export const compactCapture = (capture) => ({
     pseudoType: node.pseudoType,
     shadowRootType: node.shadowRootType,
   })),
-  behaviors: capture.behaviors.map((behavior) => ({
+  behaviors: capture.behaviors.filter((behavior) => paths.has(behavior.path)).map((behavior) => ({
     path: behavior.path,
     tag: behavior.tag,
     role: behavior.role,
@@ -151,9 +143,9 @@ export const compactCapture = (capture) => ({
     ariaSelected: behavior.ariaSelected,
     ariaHaspopup: behavior.ariaHaspopup,
     label: behavior.label,
-    listeners: (behavior.listeners || []).map(compactListener),
+    listeners: compactListeners(behavior.listeners),
   })),
-  globalListeners: (capture.globalListeners || []).map(compactListener),
+  globalListeners: compactListeners(capture.globalListeners),
   fonts: capture.fonts,
   animations: capture.animations.map(compactAnimation),
   animationElements: (capture.animationElements || []).map((element) => ({
@@ -166,7 +158,9 @@ export const compactCapture = (capture) => ({
   })),
   smoothScroll: capture.smoothScroll,
   horizontalTracks: capture.horizontalTracks,
-  exactAssets: capture.exactAssets.map(compactAsset),
+  exactAssets: capture.exactAssets
+    .filter((asset) => paths.has(asset.path))
+    .map(compactAsset),
   scrollStates: capture.scrollStates.map((state) => ({
     path: state.path,
     clientHeight: state.clientHeight,
@@ -190,4 +184,9 @@ export const compactCapture = (capture) => ({
   readiness: capture.readiness,
   timings: capture.timings,
   cssomBlockedStylesheetCount: capture.cssomBlockedStylesheetCount,
-});
+  };
+};
+import {
+  compactListeners,
+  implementationNodes,
+} from './evidence-filter.mjs';

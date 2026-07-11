@@ -1201,7 +1201,10 @@ async function waitForApplicationReady() {
                 '[id*="boot" i]',
                 '[class*="boot" i]'
               ].join(','))
-            ])).some(element => {
+            ])).filter(element =>
+              element !== document.body &&
+              element !== document.documentElement
+            ).some(element => {
               const rect = element.getBoundingClientRect();
               const style = getComputedStyle(element);
               const identity = [
@@ -1228,7 +1231,7 @@ async function waitForApplicationReady() {
                 style.visibility !== 'hidden' &&
                 Number(style.opacity || 1) > 0;
               return (
-                /(?:load|splash|intro|boot)/i.test(identity) &&
+                /(?:loader|loading|splash|intro|boot)/i.test(identity) &&
                 visuallyPresent &&
                 (
                   coversViewport ||
@@ -1389,6 +1392,7 @@ async function capturePageSnapshot(
                 const parts = [];
                 let current = element;
                 while (current && current.nodeType === Node.ELEMENT_NODE) {
+                  const root = current.getRootNode();
                   const siblings = Array.from(current.parentElement?.children || [])
                     .filter(sibling => sibling.tagName === current.tagName);
                   const position = siblings.indexOf(current);
@@ -1396,11 +1400,24 @@ async function capturePageSnapshot(
                     current.tagName.toLowerCase() +
                     ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')'
                   );
-                  current = current.parentElement;
+                  if (root instanceof ShadowRoot) {
+                    current = root.host;
+                    parts.unshift('::shadow');
+                  } else {
+                    current = current.parentElement;
+                  }
                 }
                 return 'doc(0)>' + parts.join('>');
               };
-              return Array.from(document.querySelectorAll('body *'))
+              const elements = [];
+              const visit = root => {
+                for (const element of root.querySelectorAll('*')) {
+                  elements.push(element);
+                  if (element.shadowRoot) visit(element.shadowRoot);
+                }
+              };
+              visit(document.body);
+              return elements
                 .map(element => {
                   const rect = element.getBoundingClientRect();
                   const style = getComputedStyle(element);
@@ -1425,7 +1442,11 @@ async function capturePageSnapshot(
                   }
                   return {
                     path: pathFor(element),
-                    parentPath: element.parentElement ? pathFor(element.parentElement) : null,
+                    parentPath: element.parentElement
+                      ? pathFor(element.parentElement)
+                      : element.getRootNode() instanceof ShadowRoot
+                        ? pathFor(element.getRootNode().host) + '>::shadow'
+                        : null,
                     tag: element.tagName.toLowerCase(),
                     attrs,
                     text: (element.getAttribute('aria-label') || element.innerText || '')
@@ -1717,13 +1738,20 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
   // Find all candidate clickable elements that might trigger route changes
   const candidatesResult = await cdp.send('Runtime.evaluate', {
-    expression: `JSON.stringify(
-      Array.from(document.querySelectorAll('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
+    expression: `JSON.stringify((() => {
+      const elements = [];
+      const visit = root => {
+        for (const element of root.querySelectorAll('*')) {
+          elements.push(element);
+          if (element.shadowRoot) visit(element.shadowRoot);
+        }
+      };
+      visit(document);
+      return elements
+        .filter(el => el.matches('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
         .filter(el => {
           const rect = el.getBoundingClientRect();
-          // Skip header/toolbar elements (top 80px) — they toggle panels, not navigate routes
-          const scrollTop = window.scrollY || document.documentElement.scrollTop;
-          if (!(rect.width > 4 && rect.height > 4 && (rect.top + scrollTop) > 80)) {
+          if (!(rect.width > 4 && rect.height > 4)) {
             return false;
           }
           if (el.matches('a[href]')) {
@@ -1754,28 +1782,42 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           inputType: el instanceof HTMLInputElement ? el.type : '',
           placeholder: el.getAttribute('placeholder') || '',
           y: Math.round(el.getBoundingClientRect().top),
+          topBar: el.getBoundingClientRect().top < 80,
           snapshotPath: (() => {
             const parts = [];
             let node = el;
             while (node && node.nodeType === Node.ELEMENT_NODE) {
+              const root = node.getRootNode();
               const tag = node.tagName.toLowerCase();
               const siblings = Array.from(node.parentElement?.children || [])
                 .filter((sibling) => sibling.tagName === node.tagName);
               const position = siblings.indexOf(node);
               parts.unshift(tag + ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')');
-              node = node.parentElement;
+              if (root instanceof ShadowRoot) {
+                node = root.host;
+                parts.unshift('::shadow');
+              } else {
+                node = node.parentElement;
+              }
             }
             return 'doc(0)>' + parts.join('>');
           })(),
           path: (() => {
             let p = [], n = el; 
-            while(n && n !== document.body){ p.unshift(Array.from(n.parentElement?.children||[]).indexOf(n)); n=n.parentElement; }
+            while(n && n !== document.body){
+              if (!n.parentElement) return '';
+              p.unshift(Array.from(n.parentElement.children).indexOf(n));
+              n=n.parentElement;
+            }
             return p.join('>');
           })()
         }))
-        .filter(e => e.text || e.href || e.placeholder || e.inputType)
-        .slice(0, 60)
-    )`,
+        .filter(e =>
+          (e.text || e.href || e.placeholder || e.inputType) &&
+          !/^(?:advertisement|ad choices|privacy choices)$/i.test(e.text)
+        )
+        .slice(0, 500)
+    })())`,
     returnByValue: true,
   });
 
@@ -1787,6 +1829,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     if (candidate.testId === 'notebook-card') return 90;
     if (candidate.role === 'link' || candidate.tag === 'A') return 80;
     if (candidate.inputType === 'checkbox' || candidate.inputType === 'radio') return 70;
+    if (candidate.topBar) return 1;
     if (candidate.role === 'button') return 50;
     return 10;
   };
@@ -2251,11 +2294,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     const clicked = await cdp.send('Runtime.evaluate', {
       expression: `(() => {
-        const all = document.querySelectorAll('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])');
+        const all = [];
+        const visit = root => {
+          for (const element of root.querySelectorAll('*')) {
+            if (element.matches('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])')) {
+              all.push(element);
+            }
+            if (element.shadowRoot) visit(element.shadowRoot);
+          }
+        };
+        visit(document);
         // Search all rendered elements (not just in-viewport) — scroll into view before clicking
-        const rendered = Array.from(all).filter(el => { const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4; });
-        const path = ${JSON.stringify(candidate.path)}.split('>').map(Number);
-        let el = path.reduce((node, index) => node?.children?.[index], document.body);
+        const rendered = all.filter(el => { const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4; });
+        const path = ${JSON.stringify(candidate.path)}
+          ? ${JSON.stringify(candidate.path)}.split('>').map(Number)
+          : [];
+        let el = path.length
+          ? path.reduce((node, index) => node?.children?.[index], document.body)
+          : null;
         const searchText = ${JSON.stringify(candidate.text.substring(0, 20))};
         const matchesCandidate = e =>
           rendered.includes(e) &&
@@ -2492,6 +2548,163 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     // Navigate back to home
     await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+  }
+
+  if (multiPageStates.length < maxRoutes) {
+    const keyboardBaseState = multiPageStates.find((state) =>
+      /(?:arrow keys?|\bwasd\b)/i.test(state.text || ''),
+    );
+    const keyboardBaseUrl = keyboardBaseState?.url || homeUrl;
+    if (keyboardBaseUrl) {
+      await cdp.send('Page.navigate', { url: keyboardBaseUrl });
+      await waitForApplicationReady();
+      await cdp.send('Input.dispatchKeyEvent', {
+        type: 'keyDown',
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        windowsVirtualKeyCode: 27,
+      });
+      await cdp.send('Input.dispatchKeyEvent', {
+        type: 'keyUp',
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        windowsVirtualKeyCode: 27,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    const liveKeyboardInstructions = (
+      await cdp.send('Runtime.evaluate', {
+        expression: `(() => {
+          const controls = [];
+          const visit = root => {
+            for (const element of root.querySelectorAll('*')) {
+              if (element.matches('button,[role="button"],[aria-label]')) {
+                controls.push(
+                  element.getAttribute('aria-label') ||
+                  element.innerText ||
+                  element.getAttribute('title') ||
+                  ''
+                );
+              }
+              if (element.shadowRoot) visit(element.shadowRoot);
+            }
+          };
+          visit(document);
+          return [
+            (document.body?.innerText || '').slice(0, 20000),
+            controls.join('\\n')
+          ].join('\\n');
+        })()`,
+        returnByValue: true,
+      }).catch(() => ({ result: { value: '' } }))
+    ).result.value;
+    const keyboardInstructions = [
+      liveKeyboardInstructions,
+      ...multiPageStates.map((state) => state.text || ''),
+    ].join('\n');
+    const arrowGameSignal =
+      /arrow keys?/i.test(keyboardInstructions) ||
+      (
+        /\bscore\b/i.test(keyboardInstructions) &&
+        /\bnew game\b/i.test(keyboardInstructions)
+      );
+    const keyCandidates = arrowGameSignal
+      ? [
+          ['ArrowRight', 'ArrowRight', 39],
+          ['ArrowDown', 'ArrowDown', 40],
+          ['ArrowLeft', 'ArrowLeft', 37],
+          ['ArrowUp', 'ArrowUp', 38],
+        ]
+      : /\bwasd\b/i.test(keyboardInstructions)
+        ? [['d', 'KeyD', 68]]
+        : [];
+    const fingerprint = async () =>
+      (
+        await cdp.send('Runtime.evaluate', {
+          expression: `(() => {
+            const candidates = Array.from(document.querySelectorAll(
+              'main,section,article,div'
+            )).filter(element => {
+              const text = element.innerText || '';
+              return /how to play/i.test(text) && /new game/i.test(text);
+            });
+            const root = candidates.sort(
+              (left, right) =>
+                (left.innerHTML?.length || 0) - (right.innerHTML?.length || 0)
+            )[0] || document.querySelector('main') || document.body;
+            return JSON.stringify({
+              text: (root.innerText || '').slice(0, 10000),
+              html: (root.innerHTML || '').slice(0, 50000)
+            });
+          })()`,
+          returnByValue: true,
+        })
+      ).result.value;
+    for (const [key, code, keyCode] of keyCandidates) {
+      const beforeContext = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            url: location.href,
+            modal: Boolean(document.querySelector(
+              'dialog[open],[role="dialog"],[aria-modal="true"]'
+            ))
+          })`,
+          returnByValue: true,
+        })
+      ).result.value;
+      const before = await fingerprint();
+      await cdp.send('Input.dispatchKeyEvent', {
+        type: 'keyDown',
+        key,
+        code,
+        keyCode,
+        windowsVirtualKeyCode: keyCode,
+      });
+      await cdp.send('Input.dispatchKeyEvent', {
+        type: 'keyUp',
+        key,
+        code,
+        keyCode,
+        windowsVirtualKeyCode: keyCode,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      const after = await fingerprint();
+      const afterContext = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            url: location.href,
+            modal: Boolean(document.querySelector(
+              'dialog[open],[role="dialog"],[aria-modal="true"]'
+            ))
+          })`,
+          returnByValue: true,
+        })
+      ).result.value;
+      if (
+        after === before ||
+        JSON.parse(afterContext).modal ||
+        JSON.parse(beforeContext).url !== JSON.parse(afterContext).url
+      ) {
+        continue;
+      }
+      const state = await captureResponsivePageSnapshot(multiPageStates.length);
+      state.type = 'keyboard';
+      state.trigger = key;
+      state.probe = {
+        sequence: [
+          ...(keyboardBaseState
+            ? [{ action: 'navigate', url: keyboardBaseState.url }]
+            : keyboardBaseUrl
+              ? [{ action: 'navigate', url: keyboardBaseUrl }]
+            : []),
+          { action: 'key', key, code, keyCode },
+        ],
+      };
+      multiPageStates.push(state);
+      break;
+    }
   }
 
   console.error(`phase: route crawl done — ${multiPageStates.length} total page states`);
@@ -2920,19 +3133,24 @@ async function extractViewport(viewport, captureIndex) {
     listenersByBackendId.set(listener.backendNodeId, listeners);
   }
   const nodeByPath = new Map(extracted.nodes.map((node) => [node.path, node]));
+  extracted.exactAssets = extracted.exactAssets.filter((asset) =>
+    nodeByPath.has(asset.path),
+  );
   const descriptors = descriptorResult.result.value || [];
   const behaviorByPath = new Map(
-    descriptors.map((descriptor) => {
+    descriptors.flatMap((descriptor) => {
       const sourceNode = nodeByPath.get(descriptor.path);
-      return [
-        descriptor.path,
-        {
-          ...descriptor,
-          backendNodeId: sourceNode?.backendNodeId,
-          listeners:
-            listenersByBackendId.get(sourceNode?.backendNodeId) || [],
-        },
-      ];
+      return sourceNode
+        ? [[
+            descriptor.path,
+            {
+              ...descriptor,
+              backendNodeId: sourceNode.backendNodeId,
+              listeners:
+                listenersByBackendId.get(sourceNode.backendNodeId) || [],
+            },
+          ]]
+        : [];
     }),
   );
   for (const [backendNodeId, listeners] of listenersByBackendId) {
@@ -3011,6 +3229,14 @@ async function inlineSnapshotImages(snapshots) {
   const textByFile = new Map(
     files.map((file) => [file, fs.readFileSync(file, 'utf8')]),
   );
+  const stylesheetSourceByFile = new Map(
+    snapshots
+      .filter((snapshot) => snapshot?.stylesheet)
+      .map((snapshot) => [
+        path.join(outDir, snapshot.stylesheet),
+        snapshot.sourceURL || snapshot.url || requestedUrl,
+      ]),
+  );
   const jsonByFile = new Map(
     [...textByFile]
       .filter(([file]) => path.extname(file) === '.json')
@@ -3023,14 +3249,30 @@ async function inlineSnapshotImages(snapshots) {
       })
       .filter(([, value]) => value),
   );
-  const imageUrls = [
-    ...new Set(
-      [...textByFile.values()].flatMap((html) =>
-        [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(https?:\/\/[^"']+)\1/gi)]
-          .map((match) => match[2]),
-      ),
-    ),
-  ];
+  const resourceSources = new Map();
+  const addResourceSource = (resolved, raw = resolved) => {
+    const sources = resourceSources.get(resolved) || new Set();
+    sources.add(raw);
+    resourceSources.set(resolved, sources);
+  };
+  for (const text of textByFile.values()) {
+    for (const match of text.matchAll(
+      /<img\b[^>]*\bsrc=(["'])(https?:\/\/[^"']+)\1/gi,
+    )) {
+      addResourceSource(match[2]);
+    }
+  }
+  for (const [file, sourceURL] of stylesheetSourceByFile) {
+    const text = textByFile.get(file) || '';
+    for (const match of text.matchAll(
+      /url\(\s*(["']?)(?!data:|blob:|#)([^'")]+)\1\s*\)/gi,
+    )) {
+      const raw = match[2].trim();
+      try {
+        addResourceSource(new URL(raw, sourceURL).href, raw);
+      } catch {}
+    }
+  }
   const replacements = new Map();
   const assetDir = path.join(outDir, 'snapshot-assets');
   const targetHost = new URL(requestedUrl).hostname;
@@ -3098,18 +3340,19 @@ async function inlineSnapshotImages(snapshots) {
     }
   }
   let nextIndex = 0;
+  const resourceRequests = [...resourceSources.entries()];
   const workers = Array.from(
-    { length: Math.min(6, imageUrls.length) },
+    { length: Math.min(6, resourceRequests.length) },
     async () => {
-      while (nextIndex < imageUrls.length) {
-        const imageUrl = imageUrls[nextIndex++];
+      while (nextIndex < resourceRequests.length) {
+        const [resourceUrl, rawSources] = resourceRequests[nextIndex++];
         try {
-          const imageHost = new URL(imageUrl).hostname;
+          const imageHost = new URL(resourceUrl).hostname;
           const sameSite =
             imageHost === targetHost ||
             imageHost.endsWith(`.${targetHost}`) ||
             targetHost.endsWith(`.${imageHost}`);
-          const response = await fetch(imageUrl, {
+          const response = await fetch(resourceUrl, {
             headers:
               sameSite && authCookieHeader
                 ? { cookie: authCookieHeader }
@@ -3118,15 +3361,25 @@ async function inlineSnapshotImages(snapshots) {
           });
           if (!response.ok) continue;
           const contentType = response.headers.get('content-type') || '';
-          if (!contentType.startsWith('image/')) continue;
+          if (
+            !contentType.startsWith('image/') &&
+            !contentType.startsWith('font/') &&
+            !/(?:font|woff|opentype|truetype)/i.test(contentType)
+          ) {
+            continue;
+          }
           const bytes = Buffer.from(await response.arrayBuffer());
           if (fullProfile) {
-            replacements.set(
-              imageUrl,
-              `data:${contentType};base64,${bytes.toString('base64')}`,
-            );
+            for (const rawSource of rawSources) {
+              replacements.set(
+                rawSource,
+                `data:${contentType};base64,${bytes.toString('base64')}`,
+              );
+            }
           } else {
-            storeAsset(imageUrl, contentType, bytes);
+            for (const rawSource of rawSources) {
+              storeAsset(rawSource, contentType, bytes);
+            }
           }
         } catch {}
       }
@@ -3324,7 +3577,10 @@ if (!fullProfile) {
     `phase: localized ${await inlineSnapshotImages(
       stylesheetManifest
         .filter((sheet) => sheet.file)
-        .map((sheet) => ({ stylesheet: sheet.file })),
+        .map((sheet) => ({
+          stylesheet: sheet.file,
+          sourceURL: sheet.sourceURL,
+        })),
     )} stylesheet assets`,
   );
 }
