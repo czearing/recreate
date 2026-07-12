@@ -25,6 +25,19 @@ test('removes encoded assets and downsamples exact evidence', () => {
     }],
     behaviors: [],
     globalListeners: [],
+    resources: [
+      {
+        url: 'data:image/svg+xml;base64,encoded',
+        initiatorType: 'css',
+      },
+      {
+        url: 'https://example.test/api/items?account=private&limit=10',
+        initiatorType: 'fetch',
+        startTime: 10.123,
+        duration: 20.456,
+        responseEnd: 30.579,
+      },
+    ],
     fonts: [],
     animations: [],
     animationElements: [],
@@ -65,4 +78,16 @@ test('removes encoded assets and downsamples exact evidence', () => {
     '[asset stored in captured state HTML]',
   );
   assert.equal(compact.lifecycleAnimation.tracks[0].samples.length, 5);
+  assert.deepEqual(compact.resources, [{
+    url: 'https://example.test/api/items?account=%3Avalue&limit=%3Avalue',
+    initiatorType: 'fetch',
+    startTime: 10.12,
+    duration: 20.46,
+    fetchStart: undefined,
+    responseStart: undefined,
+    responseEnd: 30.58,
+    transferSize: undefined,
+    decodedBodySize: undefined,
+    nextHopProtocol: undefined,
+  }]);
 });

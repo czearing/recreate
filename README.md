@@ -29,11 +29,38 @@ Capture an authenticated tab already open in that browser:
 node src/extract.mjs --reuse --match example.com --out site-spec-output
 ```
 
+When several tabs match the same URL, pass the exact target ID from
+`http://localhost:9222/json/list`:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --out site-spec-output
+```
+
+Ambiguous matches fail immediately instead of choosing an arbitrary stale tab.
+Every CDP command also has a 30-second deadline.
+
 Capture internal routes, panels, and other state-changing controls:
 
 ```powershell
 node src/extract.mjs --reuse --match example.com --crawl --max-routes 30 --out site-spec-output
 ```
+
+Run destructive editor probes only against a disposable or explicitly approved
+editor target:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --editor-probes --out site-spec-output
+```
+
+Clipboard paste is a separate opt-in because it temporarily uses the system
+clipboard:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --editor-probes --clipboard-probe --out site-spec-output
+```
+
+The prior text clipboard value and clipboard permission setting are restored
+after the probe. Editor probes are disabled by default for authenticated tabs.
 
 Explicitly allow app transitions to another path subtree on the same host:
 
@@ -100,6 +127,19 @@ actions, clear actions, and double-click edit entry. Each resulting state stores
 the action sequence that produced it, so build agents reproduce observed
 behavior rather than infer it from control names.
 
+Contenteditable editors add trusted reset, typing, selection, paragraph,
+slash-menu, formatting, and clipboard probes. State evidence includes focus,
+selection paths and offsets, selected text, and range rectangles.
+
+Newly visible dialogs, menus, listboxes, trees, tooltips, and native popovers
+are captured as modal or overlay states even when a portal places them outside
+the trigger subtree. Form crawls prioritize the primary validation submit over
+individual required fields and nested utility forms.
+
+Interaction states include sanitized Document, Fetch, and XHR timing from the
+trigger until the network becomes quiet. Query keys are retained while query
+values and encoded data/blob resources are excluded.
+
 Open shadow roots are included in state evidence and interaction discovery.
 Keyboard-driven games are probed from a clean state when page controls and copy
 identify a bounded arrow-key or WASD interaction.
@@ -108,8 +148,17 @@ Implementation evidence excludes cross-frame internals, advertising/consent
 subtrees, duplicate listeners, and known third-party ad listeners. Full profile
 output retains the unfiltered forensic data.
 
-CSS-linked images and fonts are downloaded into `snapshot-assets/`, and
-stylesheet/state references are rewritten to those content-addressed files.
+CSS-linked images and fonts plus referenced GLB, glTF, HDR, KTX2, Basis, and
+binary model resources are downloaded into `snapshot-assets/`. Stylesheet and
+state references are rewritten to those content-addressed files.
+
+WebGL evidence records context attributes, drawing-buffer dimensions, resource
+timing, localized model assets, and two compositor-derived numeric samples.
+The temporary compositor pixels are reduced to a small RGBA grid and hash; no
+screenshot is written or supplied as implementation input.
+
+Stable DOM is not sufficient acceptance by itself. Prominent 404 and
+access-denied shells fail validation even when readiness and geometry succeed.
 
 ## Blind Next.js reproduction
 

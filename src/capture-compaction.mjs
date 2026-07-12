@@ -1,5 +1,16 @@
 const rounded = (value) =>
   typeof value === 'number' ? Math.round(value * 100) / 100 : value;
+const compactResourceUrl = (rawUrl) => {
+  try {
+    const value = new URL(rawUrl);
+    for (const key of value.searchParams.keys()) {
+      value.searchParams.set(key, ':value');
+    }
+    return value.href;
+  } catch {
+    return rawUrl;
+  }
+};
 export const compactRect = (rect = {}) =>
   Object.fromEntries(
     ['x', 'y', 'width', 'height', 'right', 'bottom']
@@ -146,6 +157,21 @@ export const compactCapture = (capture) => {
     listeners: compactListeners(behavior.listeners),
   })),
   globalListeners: compactListeners(capture.globalListeners),
+  resources: (capture.resources || [])
+    .filter((resource) => !/^(?:data|blob):/i.test(resource.url))
+    .slice(0, 500)
+    .map((resource) => ({
+      url: compactResourceUrl(resource.url),
+      initiatorType: resource.initiatorType,
+      startTime: rounded(resource.startTime),
+      duration: rounded(resource.duration),
+      fetchStart: rounded(resource.fetchStart),
+      responseStart: rounded(resource.responseStart),
+      responseEnd: rounded(resource.responseEnd),
+      transferSize: resource.transferSize,
+      decodedBodySize: resource.decodedBodySize,
+      nextHopProtocol: resource.nextHopProtocol,
+    })),
   fonts: capture.fonts,
   animations: capture.animations.map(compactAnimation),
   animationElements: (capture.animationElements || []).map((element) => ({

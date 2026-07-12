@@ -22,6 +22,8 @@ const requestedTargetId = String(args.target || '');
 const outDir = path.resolve(String(args.out || 'site-spec'));
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
+const captureEditorProbes = Boolean(args['editor-probes']);
+const captureClipboardProbe = Boolean(args['clipboard-probe']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -69,6 +71,7 @@ class Cdp {
       if (message.id && this.pending.has(message.id)) {
         const pending = this.pending.get(message.id);
         this.pending.delete(message.id);
+        clearTimeout(pending.timeout);
         message.error
           ? pending.reject(new Error(JSON.stringify(message.error)))
           : pending.resolve(message.result);
@@ -82,7 +85,10 @@ class Cdp {
       const error = new Error(
         event?.message || `CDP socket ${event?.type || 'closed'}`,
       );
-      for (const pending of this.pending.values()) pending.reject(error);
+      for (const pending of this.pending.values()) {
+        clearTimeout(pending.timeout);
+        pending.reject(error);
+      }
       this.pending.clear();
     };
     ws.addEventListener('close', rejectPending);
@@ -95,7 +101,11 @@ class Cdp {
         return reject(new Error('CDP socket closed'));
       }
       const id = ++this.id;
-      this.pending.set(id, { resolve, reject });
+      const timeout = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`CDP command timed out after 30s: ${method}`));
+      }, 30_000);
+      this.pending.set(id, { resolve, reject, timeout });
       this.ws.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -120,9 +130,18 @@ async function connect(wsUrl) {
 async function findOrOpenTarget() {
   const pages = (await getJson('/json/list')).filter((item) => item.type === 'page');
   if (reuse) {
-    const existing = requestedTargetId
-      ? pages.find((item) => item.id === requestedTargetId)
-      : pages.find((item) => item.url.includes(match));
+    const matches = requestedTargetId
+      ? pages.filter((item) => item.id === requestedTargetId)
+      : pages.filter((item) => item.url.includes(match));
+    if (matches.length > 1) {
+      const options = matches
+        .map((item) => `${item.id} ${item.title || '(untitled)'} ${item.url}`)
+        .join('\n');
+      throw new Error(
+        `Multiple open pages matched "${match}". Pass --target <id>:\n${options}`,
+      );
+    }
+    const existing = matches[0];
     if (!existing) throw new Error(`No open page matched: ${match}`);
     return { page: existing, created: false };
   }
@@ -145,6 +164,79 @@ const scripts = new Map();
 let latestDocumentResponse;
 let latestDocumentBody;
 let mainFrameId;
+const networkTimeline = [];
+const networkRequestById = new Map();
+
+function sanitizedNetworkUrl(rawUrl) {
+  try {
+    const value = new URL(rawUrl);
+    for (const key of value.searchParams.keys()) {
+      value.searchParams.set(key, ':value');
+    }
+    return value.href;
+  } catch {
+    return rawUrl;
+  }
+}
+
+function networkEvidenceSince(index) {
+  const requests = networkTimeline.slice(index).filter(
+    (request) =>
+      ['Document', 'Fetch', 'XHR'].includes(request.type) &&
+      !/^(?:data|blob):/i.test(request.url),
+  );
+  const baseline = requests[0]?.startTimestamp;
+  return requests.map((request) => ({
+    url: request.url,
+    method: request.method,
+    type: request.type,
+    initiatorType: request.initiatorType,
+    startOffsetMs:
+      baseline == null ? 0 : Math.round((request.startTimestamp - baseline) * 1000),
+    durationMs:
+      request.endTimestamp == null
+        ? undefined
+        : Math.round((request.endTimestamp - request.startTimestamp) * 1000),
+    status: request.status,
+    mimeType: request.mimeType,
+    protocol: request.protocol,
+    transferSize: request.transferSize,
+    fromDiskCache: request.fromDiskCache,
+    failed: request.failed,
+  }));
+}
+
+async function waitForNetworkQuiet(index, maxWaitMs = 3000) {
+  const startedAt = Date.now();
+  let previous = '';
+  let stableSince = startedAt;
+  while (Date.now() - startedAt < maxWaitMs) {
+    const requests = networkTimeline.slice(index);
+    const signature = requests
+      .map((request) => [
+        request.requestId,
+        request.status,
+        request.endTimestamp,
+        request.failed,
+      ].join(':'))
+      .join('|');
+    if (signature !== previous) {
+      previous = signature;
+      stableSince = Date.now();
+    }
+    const allFinished = requests.every(
+      (request) => request.endTimestamp != null || request.failed,
+    );
+    const quietFor = Date.now() - stableSince;
+    if (
+      (requests.length === 0 && Date.now() - startedAt >= 150) ||
+      (requests.length > 0 && allFinished && quietFor >= 250)
+    ) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
 
 const cdpDomains = [
   'Page.enable',
@@ -161,12 +253,46 @@ async function initializeCdp(client) {
   client.on('CSS.styleSheetAdded', ({ header }) => styleSheets.set(header.styleSheetId, header));
   client.on('CSS.styleSheetRemoved', ({ styleSheetId }) => styleSheets.delete(styleSheetId));
   client.on('Debugger.scriptParsed', (script) => scripts.set(script.scriptId, script));
+  client.on('Network.requestWillBeSent', (event) => {
+    const previous = networkRequestById.get(event.requestId);
+    if (previous && event.redirectResponse) {
+      previous.endTimestamp = event.timestamp;
+      previous.status = event.redirectResponse.status;
+      previous.mimeType = event.redirectResponse.mimeType;
+      previous.protocol = event.redirectResponse.protocol;
+    }
+    const request = {
+      requestId: event.requestId,
+      url: sanitizedNetworkUrl(event.request.url),
+      method: event.request.method,
+      type: event.type,
+      initiatorType: event.initiator?.type,
+      startTimestamp: event.timestamp,
+    };
+    networkTimeline.push(request);
+    networkRequestById.set(event.requestId, request);
+  });
   client.on('Network.responseReceived', (event) => {
+    const request = networkRequestById.get(event.requestId);
+    if (request) {
+      Object.assign(request, {
+        type: event.type || request.type,
+        status: event.response.status,
+        mimeType: event.response.mimeType,
+        protocol: event.response.protocol,
+        fromDiskCache: event.response.fromDiskCache,
+      });
+    }
     if (event.type === 'Document' && event.frameId === mainFrameId) {
       latestDocumentResponse = event;
     }
   });
-  client.on('Network.loadingFinished', async ({ requestId }) => {
+  client.on('Network.loadingFinished', async ({ requestId, timestamp, encodedDataLength }) => {
+    const request = networkRequestById.get(requestId);
+    if (request) {
+      request.endTimestamp = timestamp;
+      request.transferSize = encodedDataLength;
+    }
     if (requestId !== latestDocumentResponse?.requestId) return;
     if (!fullProfile) return;
     try {
@@ -174,6 +300,12 @@ async function initializeCdp(client) {
     } catch (error) {
       latestDocumentBody = { error: String(error) };
     }
+  });
+  client.on('Network.loadingFailed', ({ requestId, timestamp, errorText }) => {
+    const request = networkRequestById.get(requestId);
+    if (!request) return;
+    request.endTimestamp = timestamp;
+    request.failed = errorText;
   });
   for (const domain of cdpDomains) await client.send(domain);
   mainFrameId = (await client.send('Page.getFrameTree')).frameTree.frame.id;
@@ -297,12 +429,60 @@ const supplementFunction = String.raw`async ({ computedProperties, includeForens
     };
     if (tag === 'canvas') {
       try {
+        const gl = element.getContext('webgl2') || element.getContext('webgl');
+        let webgl;
+        if (gl) {
+          const width = gl.drawingBufferWidth;
+          const height = gl.drawingBufferHeight;
+          const pixels = new Uint8Array(width * height * 4);
+          gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+          const gridSize = 16;
+          const grid = [];
+          let hash = 2166136261;
+          let red = 0;
+          let green = 0;
+          let blue = 0;
+          let alpha = 0;
+          for (let gy = 0; gy < gridSize; gy++) {
+            for (let gx = 0; gx < gridSize; gx++) {
+              const x = Math.min(width - 1, Math.floor((gx + 0.5) * width / gridSize));
+              const y = Math.min(height - 1, Math.floor((gy + 0.5) * height / gridSize));
+              const offset = (y * width + x) * 4;
+              const sample = [
+                pixels[offset],
+                pixels[offset + 1],
+                pixels[offset + 2],
+                pixels[offset + 3],
+              ];
+              grid.push(sample);
+              for (const value of sample) {
+                hash ^= value;
+                hash = Math.imul(hash, 16777619);
+              }
+              red += sample[0];
+              green += sample[1];
+              blue += sample[2];
+              alpha += sample[3];
+            }
+          }
+          const count = grid.length;
+          webgl = {
+            version: gl.getParameter(gl.VERSION),
+            shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
+            contextAttributes: gl.getContextAttributes(),
+            drawingBuffer: { width, height },
+            sampledGrid: grid,
+            sampleHash: (hash >>> 0).toString(16).padStart(8, '0'),
+            meanRgba: [red / count, green / count, blue / count, alpha / count],
+          };
+        }
         return {
           type: 'canvas',
           path: pathFor(element),
           dataUrl: includeForensics ? element.toDataURL() : undefined,
           width: element.width,
           height: element.height,
+          webgl,
         };
       } catch (error) {
         return { type: 'canvas', path: pathFor(element), error: String(error), width: element.width, height: element.height };
@@ -324,8 +504,14 @@ const supplementFunction = String.raw`async ({ computedProperties, includeForens
   const resources = performance.getEntriesByType('resource').map((entry) => ({
     url: entry.name,
     initiatorType: entry.initiatorType,
+    startTime: entry.startTime,
+    duration: entry.duration,
+    fetchStart: entry.fetchStart,
+    responseStart: entry.responseStart,
+    responseEnd: entry.responseEnd,
     transferSize: entry.transferSize,
     decodedBodySize: entry.decodedBodySize,
+    nextHopProtocol: entry.nextHopProtocol,
   }));
   const fonts = [];
   document.fonts.forEach((font) => fonts.push({
@@ -1186,6 +1372,20 @@ async function waitForApplicationReady() {
               document.body &&
               (document.body.children.length || (document.body.textContent || '').trim())
             ),
+            hasFatalError: (() => {
+              const heading = Array.from(document.querySelectorAll(
+                'main h1,main h2,[role="main"] h1,[role="main"] h2'
+              )).map(element => (element.innerText || '').trim()).join(' ');
+              const bodyText = (document.body?.innerText || '')
+                .replace(/\\s+/g, ' ').trim();
+              return (
+                /(?:this page couldn.t be found|page not found|404 not found)/i.test(heading) ||
+                (
+                  bodyText.length < 1500 &&
+                  /(?:this page couldn.t be found|you may not have access)/i.test(bodyText)
+                )
+              );
+            })(),
             hasBlockingVisual: Array.from(new Set([
               ...Array.from(document.body?.children || []),
               ...document.querySelectorAll([
@@ -1231,7 +1431,7 @@ async function waitForApplicationReady() {
                 style.visibility !== 'hidden' &&
                 Number(style.opacity || 1) > 0;
               return (
-                /(?:loader|loading|splash|intro|boot)/i.test(identity) &&
+                /(?:loader|loading|splash|intro)/i.test(identity) &&
                 visuallyPresent &&
                 (
                   coversViewport ||
@@ -1387,6 +1587,52 @@ async function capturePageSnapshot(
                 placeholder: element.getAttribute('placeholder')
               };
             })(),
+            selection: (() => {
+              const selection = document.getSelection();
+              if (!selection || !selection.rangeCount) return null;
+              const pathFor = node => {
+                let element =
+                  node?.nodeType === Node.ELEMENT_NODE
+                    ? node
+                    : node?.parentElement;
+                if (!element) return null;
+                const parts = [];
+                while (element && element.nodeType === Node.ELEMENT_NODE) {
+                  const root = element.getRootNode();
+                  const siblings = Array.from(element.parentElement?.children || [])
+                    .filter(sibling => sibling.tagName === element.tagName);
+                  const position = siblings.indexOf(element);
+                  parts.unshift(
+                    element.tagName.toLowerCase() +
+                    ':nth-of-type(' + (position >= 0 ? position + 1 : 1) + ')'
+                  );
+                  if (root instanceof ShadowRoot) {
+                    element = root.host;
+                    parts.unshift('::shadow');
+                  } else {
+                    element = element.parentElement;
+                  }
+                }
+                return 'doc(0)>' + parts.join('>');
+              };
+              const range = selection.getRangeAt(0);
+              return {
+                anchorPath: pathFor(selection.anchorNode),
+                anchorOffset: selection.anchorOffset,
+                focusPath: pathFor(selection.focusNode),
+                focusOffset: selection.focusOffset,
+                collapsed: selection.isCollapsed,
+                text: selection.toString().slice(0, 1000),
+                rects: Array.from(range.getClientRects()).map(rect => ({
+                  x: rect.x,
+                  y: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                  right: rect.right,
+                  bottom: rect.bottom
+                })).slice(0, 100)
+              };
+            })(),
             structure: (() => {
               const pathFor = element => {
                 const parts = [];
@@ -1430,7 +1676,7 @@ async function capturePageSnapshot(
                   const attrs = {};
                   for (const name of [
                     'id', 'class', 'role', 'title', 'href', 'src', 'srcset',
-                    'alt', 'type', 'name',
+                    'alt', 'type', 'name', 'contenteditable', 'spellcheck',
                     'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
                     'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
                     'checked', 'selected'
@@ -1533,6 +1779,7 @@ async function capturePageSnapshot(
           title: pageData.title,
           viewport: pageData.viewport,
           focus: pageData.focus,
+          selection: pageData.selection,
           nodes: pageData.structure,
         },
         null,
@@ -1549,6 +1796,7 @@ async function capturePageSnapshot(
     title: pageData.title || '',
     viewport: pageData.viewport,
     focus: pageData.focus,
+    selection: pageData.selection,
     nodeCount: pageData.nodeCount || 0,
     text: pageData.text || '',
     bodyHeight: pageData.bodyHeight || 0,
@@ -1591,6 +1839,409 @@ async function captureResponsivePageSnapshot(
     mobile: primaryViewport.width < 600,
   }).catch(() => {});
   return state;
+}
+
+async function compositorSignatureFor(rect) {
+  const scale = Math.max(0.1, Math.min(1, 128 / Math.max(rect.width, rect.height)));
+  const screenshot = await cdp.send('Page.captureScreenshot', {
+    format: 'png',
+    captureBeyondViewport: false,
+    clip: {
+      x: Math.max(0, rect.x),
+      y: Math.max(0, rect.y),
+      width: rect.width,
+      height: rect.height,
+      scale,
+    },
+  });
+  return (
+    await cdp.send('Runtime.evaluate', {
+      expression: `(async () => {
+        const response = await fetch(
+          ${JSON.stringify(`data:image/png;base64,${screenshot.data}`)}
+        );
+        const bitmap = await createImageBitmap(await response.blob());
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        context.drawImage(bitmap, 0, 0);
+        const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+        const size = 16;
+        const grid = [];
+        let hash = 2166136261;
+        let red = 0, green = 0, blue = 0, alpha = 0;
+        for (let gy = 0; gy < size; gy++) {
+          for (let gx = 0; gx < size; gx++) {
+            const x = Math.min(
+              bitmap.width - 1,
+              Math.floor((gx + 0.5) * bitmap.width / size)
+            );
+            const y = Math.min(
+              bitmap.height - 1,
+              Math.floor((gy + 0.5) * bitmap.height / size)
+            );
+            const offset = (y * bitmap.width + x) * 4;
+            const sample = [
+              pixels[offset],
+              pixels[offset + 1],
+              pixels[offset + 2],
+              pixels[offset + 3]
+            ];
+            grid.push(sample);
+            for (const value of sample) {
+              hash ^= value;
+              hash = Math.imul(hash, 16777619);
+            }
+            red += sample[0];
+            green += sample[1];
+            blue += sample[2];
+            alpha += sample[3];
+          }
+        }
+        const count = grid.length;
+        return {
+          width: bitmap.width,
+          height: bitmap.height,
+          sampledGrid: grid,
+          sampleHash: (hash >>> 0).toString(16).padStart(8, '0'),
+          meanRgba: [red / count, green / count, blue / count, alpha / count]
+        };
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
+    })
+  ).result.value;
+}
+
+async function captureEditorStates(maxStates) {
+  const editorDescriptor = (
+    await cdp.send('Runtime.evaluate', {
+      expression: `(() => {
+        const editors = Array.from(document.querySelectorAll(
+          '[contenteditable="true"],[contenteditable="plaintext-only"]'
+        )).filter(element => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return (
+            rect.width > 80 &&
+            rect.height > 40 &&
+            style.display !== 'none' &&
+            style.visibility !== 'hidden'
+          );
+        }).sort((left, right) => {
+          const a = left.getBoundingClientRect();
+          const b = right.getBoundingClientRect();
+          return b.width * b.height - a.width * a.height;
+        });
+        const editor = editors[0];
+        if (!editor) return null;
+        return {
+          label:
+            editor.getAttribute('aria-label') ||
+            editor.getAttribute('data-placeholder') ||
+            'Rich text editor',
+          role: editor.getAttribute('role') || 'textbox',
+          tag: editor.tagName.toLowerCase()
+        };
+      })()`,
+      returnByValue: true,
+    })
+  ).result.value;
+  if (!editorDescriptor) return;
+
+  const focusEditor = async () =>
+    (
+      await cdp.send('Runtime.evaluate', {
+        expression: `(() => {
+          const editors = Array.from(document.querySelectorAll(
+            '[contenteditable="true"],[contenteditable="plaintext-only"]'
+          )).filter(element => {
+            const rect = element.getBoundingClientRect();
+            return rect.width > 80 && rect.height > 40;
+          }).sort((left, right) => {
+            const a = left.getBoundingClientRect();
+            const b = right.getBoundingClientRect();
+            return b.width * b.height - a.width * a.height;
+          });
+          const editor = editors[0];
+          if (!editor) return false;
+          editor.focus();
+          return true;
+        })()`,
+        returnByValue: true,
+      })
+    ).result.value;
+
+  const dispatchKey = async ({
+    key,
+    code,
+    keyCode,
+    modifiers = 0,
+  }) => {
+    await cdp.send('Input.dispatchKeyEvent', {
+      type: 'keyDown',
+      key,
+      code,
+      keyCode,
+      windowsVirtualKeyCode: keyCode,
+      modifiers,
+    });
+    await cdp.send('Input.dispatchKeyEvent', {
+      type: 'keyUp',
+      key,
+      code,
+      keyCode,
+      windowsVirtualKeyCode: keyCode,
+      modifiers,
+    });
+  };
+
+  const resetEditor = async () => {
+    if (!(await focusEditor())) return false;
+    await dispatchKey({
+      key: 'a',
+      code: 'KeyA',
+      keyCode: 65,
+      modifiers: 2,
+    });
+    await dispatchKey({
+      key: 'a',
+      code: 'KeyA',
+      keyCode: 65,
+      modifiers: 2,
+    });
+    await dispatchKey({
+      key: 'Backspace',
+      code: 'Backspace',
+      keyCode: 8,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    for (const [command, key, code, keyCode] of [
+      ['bold', 'b', 'KeyB', 66],
+      ['italic', 'i', 'KeyI', 73],
+      ['underline', 'u', 'KeyU', 85],
+    ]) {
+      const active = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `document.queryCommandState(${JSON.stringify(command)})`,
+          returnByValue: true,
+        })
+      ).result.value;
+      if (active) {
+        await dispatchKey({
+          key,
+          code,
+          keyCode,
+          modifiers: 2,
+        });
+      }
+    }
+    return true;
+  };
+
+  const capture = async (type, trigger, probe) => {
+    if (multiPageStates.length >= maxStates) return;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const state = await captureResponsivePageSnapshot(multiPageStates.length);
+    state.type = type;
+    state.trigger = trigger;
+    state.triggerElement = editorDescriptor;
+    state.probe = probe;
+    multiPageStates.push(state);
+  };
+
+  const text = 'site-spec editor probe';
+  if (await resetEditor()) {
+    await cdp.send('Input.insertText', { text });
+    await capture('editor-input', text, {
+      sequence: [
+        { action: 'editor-reset' },
+        { action: 'insertText', text },
+      ],
+    });
+
+    await dispatchKey({
+      key: 'ArrowLeft',
+      code: 'ArrowLeft',
+      keyCode: 37,
+      modifiers: 10,
+    });
+    await capture('editor-selection', 'Select previous word', {
+      sequence: [
+        { action: 'editor-reset' },
+        { action: 'insertText', text },
+        {
+          action: 'key',
+          key: 'ArrowLeft',
+          code: 'ArrowLeft',
+          keyCode: 37,
+          modifiers: ['ctrl', 'shift'],
+        },
+      ],
+    });
+  }
+
+  if (await resetEditor()) {
+    await cdp.send('Input.insertText', { text: 'First block' });
+    await dispatchKey({ key: 'Enter', code: 'Enter', keyCode: 13 });
+    await cdp.send('Input.insertText', { text: 'Second block' });
+    await capture('editor-block', 'Insert paragraph block', {
+      sequence: [
+        { action: 'editor-reset' },
+        { action: 'insertText', text: 'First block' },
+        { action: 'key', key: 'Enter', code: 'Enter', keyCode: 13 },
+        { action: 'insertText', text: 'Second block' },
+      ],
+    });
+  }
+
+  if (await resetEditor()) {
+    await cdp.send('Input.insertText', { text: '/' });
+    const menuVisible = (
+      await cdp.send('Runtime.evaluate', {
+        expression: `Boolean(Array.from(document.querySelectorAll(
+          '[role="menu"],[role="listbox"],[data-lexical-typeahead-menu]'
+        )).find(element => {
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        }))`,
+        returnByValue: true,
+      })
+    ).result.value;
+    if (menuVisible) {
+      await capture('editor-slash-menu', 'Open slash menu', {
+        sequence: [
+          { action: 'editor-reset' },
+          { action: 'insertText', text: '/' },
+        ],
+      });
+    }
+  }
+
+  if (await resetEditor()) {
+    await dispatchKey({
+      key: 'b',
+      code: 'KeyB',
+      keyCode: 66,
+      modifiers: 2,
+    });
+    await cdp.send('Input.insertText', { text: 'Bold text' });
+    await capture('editor-format', 'Type bold text', {
+      sequence: [
+        { action: 'editor-reset' },
+        {
+          action: 'key',
+          key: 'b',
+          code: 'KeyB',
+          keyCode: 66,
+          modifiers: ['ctrl'],
+        },
+        { action: 'insertText', text: 'Bold text' },
+      ],
+    });
+  }
+
+  if (
+    captureClipboardProbe &&
+    multiPageStates.length < maxStates &&
+    (await resetEditor())
+  ) {
+    let previousClipboardText;
+    try {
+      const origin = (
+        await cdp.send('Runtime.evaluate', {
+          expression: 'location.origin',
+          returnByValue: true,
+        })
+      ).result.value;
+      await cdp.send('Browser.grantPermissions', {
+        permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'],
+        origin,
+      });
+      previousClipboardText = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `navigator.clipboard.readText().catch(() => undefined)`,
+          awaitPromise: true,
+          returnByValue: true,
+        })
+      ).result.value;
+      const pastedText = 'Pasted editor text';
+      const written = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `Promise.race([
+            navigator.clipboard.writeText(${JSON.stringify(pastedText)})
+              .then(() => true)
+              .catch(() => false),
+            new Promise(resolve => setTimeout(() => resolve(false), 1000))
+          ])`,
+          awaitPromise: true,
+          returnByValue: true,
+        })
+      ).result.value;
+      if (written) {
+        await dispatchKey({
+          key: 'v',
+          code: 'KeyV',
+          keyCode: 86,
+          modifiers: 2,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        const pasted = (
+          await cdp.send('Runtime.evaluate', {
+            expression: `(document.activeElement?.innerText || '').includes(
+              ${JSON.stringify(pastedText)}
+            )`,
+            returnByValue: true,
+          })
+        ).result.value;
+        if (pasted) {
+          await capture('editor-paste', 'Paste clipboard text', {
+            sequence: [
+              { action: 'editor-reset' },
+              { action: 'clipboardWrite', text: pastedText },
+              {
+                action: 'key',
+                key: 'v',
+                code: 'KeyV',
+                keyCode: 86,
+                modifiers: ['ctrl'],
+              },
+            ],
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`phase: editor paste probe skipped: ${String(error)}`);
+    } finally {
+      if (typeof previousClipboardText === 'string') {
+        await cdp.send('Runtime.evaluate', {
+          expression: `navigator.clipboard.writeText(
+            ${JSON.stringify(previousClipboardText)}
+          ).catch(() => undefined)`,
+          awaitPromise: true,
+          returnByValue: true,
+        }).catch((error) => {
+          console.error(`phase: clipboard restore failed: ${String(error)}`);
+        });
+      }
+      const origin = (
+        await cdp.send('Runtime.evaluate', {
+          expression: 'location.origin',
+          returnByValue: true,
+        }).catch(() => ({ result: { value: undefined } }))
+      ).result.value;
+      if (origin) {
+        for (const name of ['clipboard-read', 'clipboard-write']) {
+          await cdp.send('Browser.setPermission', {
+            permission: { name },
+            setting: 'prompt',
+            origin,
+          }).catch((error) => {
+            console.error(`phase: clipboard permission restore failed: ${String(error)}`);
+          });
+        }
+      }
+    }
+  }
 }
 
 async function navigateAndCaptureAllPages(targetUrl) {
@@ -1749,6 +2400,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       visit(document);
       return elements
         .filter(el => el.matches('a[href], [role="link"], [role="button"], button, input:not([type="hidden"]), textarea, select, [data-href], [data-url], [tabindex]:not([tabindex="-1"])'))
+        .filter(el => !el.isContentEditable)
         .filter(el => {
           const rect = el.getBoundingClientRect();
           if (!(rect.width > 4 && rect.height > 4)) {
@@ -1778,8 +2430,23 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
           text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 500).trim(),
           role: el.getAttribute('role') || '',
+          ariaHaspopup: el.getAttribute('aria-haspopup') || '',
           testId: el.getAttribute('data-testid') || '',
           inputType: el instanceof HTMLInputElement ? el.type : '',
+          buttonType: el instanceof HTMLButtonElement ? el.type : '',
+          hasFormSubmit: Boolean(
+            el.closest('form')?.querySelector(
+              'button[type="submit"],input[type="submit"],button:not([type])'
+            )
+          ),
+          formArea: (() => {
+            const rect = el.closest('form')?.getBoundingClientRect();
+            return rect ? rect.width * rect.height : 0;
+          })(),
+          formRequiredCount:
+            el.closest('form')?.querySelectorAll(
+              '[required],[aria-required="true"]'
+            ).length || 0,
           placeholder: el.getAttribute('placeholder') || '',
           y: Math.round(el.getBoundingClientRect().top),
           topBar: el.getBoundingClientRect().top < 80,
@@ -1824,11 +2491,27 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   let candidates = [];
   try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
   const candidatePriority = (candidate) => {
+    if (candidate.inputType === 'submit' || candidate.buttonType === 'submit') {
+      return candidate.formRequiredCount
+        ? 110 + Math.min(20, Math.log10(Math.max(1, candidate.formArea)))
+        : 60;
+    }
+    if (
+      candidate.ariaHaspopup === 'true' ||
+      /(?:menu|listbox|tree|dialog)/i.test(candidate.ariaHaspopup)
+    ) {
+      return candidate.topBar ? 85 : 105;
+    }
+    if (
+      (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') &&
+      candidate.hasFormSubmit
+    ) return 20;
     if (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') return 95;
     if (candidate.href) return 100;
     if (candidate.testId === 'notebook-card') return 90;
     if (candidate.role === 'link' || candidate.tag === 'A') return 80;
     if (candidate.inputType === 'checkbox' || candidate.inputType === 'radio') return 70;
+    if (candidate.tag === 'BUTTON') return 60;
     if (candidate.topBar) return 1;
     if (candidate.role === 'button') return 50;
     return 10;
@@ -2247,6 +2930,14 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       expression: `JSON.stringify({
         n: document.querySelectorAll('*').length,
         u: location.href,
+        overlayCount: Array.from(document.querySelectorAll(
+          '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
+        )).filter(element => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return rect.width > 0 && rect.height > 0 &&
+            style.display !== 'none' && style.visibility !== 'hidden';
+        }).length,
         fingerprint: JSON.stringify({
           text: (document.body?.innerText || '').slice(0, 10000),
           controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
@@ -2260,7 +2951,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       })`,
       returnByValue: true,
     }).catch(() => ({ result: { value: '{}' } }))).result.value;
-    const { n: preClickN, fingerprint: beforeFingerprint } =
+    const {
+      n: preClickN,
+      overlayCount: preOverlayCount = 0,
+      fingerprint: beforeFingerprint,
+    } =
       JSON.parse(preClickState);
     console.error(`phase: route crawl pre-click url: ${currentUrl.split('/').slice(-2).join('/')} nodes:${preClickN}`);
 
@@ -2279,6 +2974,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     const beforeUrl = (await cdp.send('Runtime.evaluate', {
       expression: 'location.href', returnByValue: true,
     }).catch(() => ({ result: { value: '' } }))).result.value;
+    const networkStartIndex = networkTimeline.length;
 
     if (targetRoute) {
       // Direct navigation
@@ -2368,6 +3064,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     let afterUrl = beforeUrl;
     let nodeCount = 0;
     let modalAppeared = false;
+    let overlayAppeared = false;
     let afterFingerprint = beforeFingerprint;
     const clickDeadline = Date.now() + 3000;
     while (Date.now() < clickDeadline) {
@@ -2379,6 +3076,18 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             n: document.querySelectorAll('*').length,
             modal: !!document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
             modalText: (document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200),
+            overlays: Array.from(document.querySelectorAll(
+              '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
+            )).filter(element => {
+              const rect = element.getBoundingClientRect();
+              const style = getComputedStyle(element);
+              return rect.width > 0 && rect.height > 0 &&
+                style.display !== 'none' && style.visibility !== 'hidden';
+            }).map(element => ({
+              role: element.getAttribute('role') || 'popover',
+              text: (element.innerText || element.getAttribute('aria-label') || '')
+                .trim().slice(0, 200)
+            })),
             fingerprint: JSON.stringify({
               text: (document.body?.innerText || '').slice(0, 10000),
               controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
@@ -2397,10 +3106,14 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         nodeCount = d.n || nodeCount;
         afterFingerprint = d.fingerprint || afterFingerprint;
         modalAppeared = d.modal && d.modalText?.trim().length > 0;
+        overlayAppeared =
+          (d.overlays || []).length > preOverlayCount &&
+          d.overlays.some((overlay) => overlay.text);
         // Stop on URL change, modal, or significant DOM growth (panel/drawer opened)
         if (
           afterUrl !== beforeUrl ||
           modalAppeared ||
+          overlayAppeared ||
           afterFingerprint !== beforeFingerprint ||
           (nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15)
         ) break;
@@ -2436,6 +3149,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         visitedUrls.add(modalKey);
         // Let it fully render
         await new Promise((r) => setTimeout(r, 400));
+        await waitForNetworkQuiet(networkStartIndex);
         console.error(`phase: route crawl capture ${multiPageStates.length} modal triggered by "${candidate.text}"`);
         const state = await captureResponsivePageSnapshot(multiPageStates.length);
         // Tag it as a modal state
@@ -2445,6 +3159,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.probe = clickedVal.startsWith('entered')
           ? { action: 'enter', value: 'site-spec probe', submit: true }
           : { action: 'click' };
+        state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
         // Dismiss modal
         await cdp.send('Runtime.evaluate', {
@@ -2456,12 +3171,30 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       continue;
     }
 
+    if (!urlChanged && overlayAppeared) {
+      const overlayKey = `overlay:${candidate.path}`;
+      if (!visitedUrls.has(overlayKey)) {
+        visitedUrls.add(overlayKey);
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        await waitForNetworkQuiet(networkStartIndex);
+        const state = await captureResponsivePageSnapshot(multiPageStates.length);
+        state.type = 'overlay';
+        state.trigger = candidate.text || candidate.placeholder;
+        state.triggerElement = triggerElementFor(candidate);
+        state.probe = { action: 'click' };
+        state.network = networkEvidenceSince(networkStartIndex);
+        multiPageStates.push(state);
+      }
+      continue;
+    }
+
     // Capture panel/drawer state if DOM grew significantly without URL change
     if (panelOpened) {
       const panelKey = `panel:${candidate.path}`;
       if (!visitedUrls.has(panelKey)) {
         visitedUrls.add(panelKey);
         await new Promise((r) => setTimeout(r, 400));
+        await waitForNetworkQuiet(networkStartIndex);
         console.error('phase: route crawl capture ' + multiPageStates.length + ' panel by "' + candidate.text + '" nodes:' + preClickN + '->' + nodeCount);
         const state = await captureResponsivePageSnapshot(multiPageStates.length);
         state.type = 'panel';
@@ -2470,6 +3203,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.probe = clickedVal.startsWith('entered')
           ? { action: 'enter', value: 'site-spec probe', submit: true }
           : { action: 'click' };
+        state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
         // Return to home to reset state
         await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
@@ -2483,6 +3217,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       if (!visitedUrls.has(stateKey)) {
         visitedUrls.add(stateKey);
         await new Promise((r) => setTimeout(r, 250));
+        await waitForNetworkQuiet(networkStartIndex);
         const label = candidate.text || candidate.placeholder;
         console.error(
           `phase: route crawl capture ${multiPageStates.length} state by "${label}"`,
@@ -2499,6 +3234,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.probe = clickedVal.startsWith('entered')
           ? { action: 'enter', value: 'site-spec probe', submit: true }
           : { action: 'click' };
+        state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
         if (state.type === 'input') {
           await captureDerivedInputStates(candidate);
@@ -2538,12 +3274,14 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     }
 
     console.error(`phase: route crawl capture ${multiPageStates.length} url=${afterUrl} nodes=${nodeCount} text="${candidate.text}"`);
+    await waitForNetworkQuiet(networkStartIndex);
     const state = await captureResponsivePageSnapshot(multiPageStates.length);
     state.trigger = candidate.text || candidate.placeholder;
     state.triggerElement = triggerElementFor(candidate);
     state.probe = clickedVal.startsWith('entered')
       ? { action: 'enter', value: 'site-spec probe', submit: true }
       : { action: 'click' };
+    state.network = networkEvidenceSince(networkStartIndex);
     multiPageStates.push(state);
 
     // Navigate back to home
@@ -3026,6 +3764,22 @@ async function extractViewport(viewport, captureIndex) {
     lifecycleAnimation,
     initialDocument,
   };
+  const nodeByAssetPath = new Map(decoded.nodes.map((node) => [node.path, node]));
+  for (const asset of extracted.exactAssets.filter((entry) => entry.webgl)) {
+    const rect = nodeByAssetPath.get(asset.path)?.rect;
+    if (!rect || rect.width * rect.height < 10_000) continue;
+    const startedAt = performance.now();
+    asset.compositorSamples = [];
+    for (const delayMs of [0, 250]) {
+      if (delayMs) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+      asset.compositorSamples.push({
+        elapsedMs: Math.round(performance.now() - startedAt),
+        ...(await compositorSignatureFor(rect)),
+      });
+    }
+  }
   timings.supplementMs = Date.now() - phaseStart;
 
   phaseStart = Date.now();
@@ -3250,6 +4004,7 @@ async function inlineSnapshotImages(snapshots) {
       .filter(([, value]) => value),
   );
   const resourceSources = new Map();
+  const targetHost = new URL(requestedUrl).hostname;
   const addResourceSource = (resolved, raw = resolved) => {
     const sources = resourceSources.get(resolved) || new Set();
     sources.add(raw);
@@ -3273,9 +4028,27 @@ async function inlineSnapshotImages(snapshots) {
       } catch {}
     }
   }
+  for (const value of jsonByFile.values()) {
+    for (const resource of value.resources || []) {
+      if (
+        /^https?:\/\//i.test(resource?.url || '') &&
+        /\.(?:glb|gltf|bin|hdr|ktx2|basis)(?:[?#]|$)/i.test(resource.url)
+      ) {
+        try {
+          const resourceHost = new URL(resource.url).hostname;
+          if (
+            resourceHost === targetHost ||
+            resourceHost.endsWith(`.${targetHost}`) ||
+            targetHost.endsWith(`.${resourceHost}`)
+          ) {
+            addResourceSource(resource.url);
+          }
+        } catch {}
+      }
+    }
+  }
   const replacements = new Map();
   const assetDir = path.join(outDir, 'snapshot-assets');
-  const targetHost = new URL(requestedUrl).hostname;
   const extensionByType = {
     'font/otf': '.otf',
     'font/ttf': '.ttf',
@@ -3287,11 +4060,25 @@ async function inlineSnapshotImages(snapshots) {
     'image/png': '.png',
     'image/svg+xml': '.svg',
     'image/webp': '.webp',
+    'model/gltf+json': '.gltf',
+    'model/gltf-binary': '.glb',
   };
   const storeAsset = (source, contentType, bytes) => {
-    if (!bytes.length || bytes.length > 5 * 1024 * 1024) return;
+    const sourceExtension = (() => {
+      try {
+        const extension = path.extname(new URL(source).pathname).toLowerCase();
+        return ['.basis', '.bin', '.glb', '.gltf', '.hdr', '.ktx2'].includes(extension)
+          ? extension
+          : '';
+      } catch {
+        return '';
+      }
+    })();
+    const limit = sourceExtension ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (!bytes.length || bytes.length > limit) return;
     fs.mkdirSync(assetDir, { recursive: true });
-    const extension = extensionByType[contentType.split(';')[0]] || '.bin';
+    const extension =
+      sourceExtension || extensionByType[contentType.split(';')[0]] || '.bin';
     const filename =
       `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
     const assetPath = path.join(assetDir, filename);
@@ -3364,6 +4151,7 @@ async function inlineSnapshotImages(snapshots) {
           if (
             !contentType.startsWith('image/') &&
             !contentType.startsWith('font/') &&
+            !/\.(?:glb|gltf|bin|hdr|ktx2|basis)(?:[?#]|$)/i.test(resourceUrl) &&
             !/(?:font|woff|opentype|truetype)/i.test(contentType)
           ) {
             continue;
@@ -3422,6 +4210,9 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureEditorProbes) {
+    await captureEditorStates(maxRoutes);
+  }
   await crawlRoutes(requestedUrl, maxRoutes);
 }
 console.error(
@@ -4167,6 +4958,9 @@ for (const [captureIndex, capture] of captures.entries()) {
   if (!capture.readiness?.ready) {
     validationErrors.push(`capture ${captureIndex}: application readiness timed out`);
   }
+  if (capture.readiness?.state?.hasFatalError) {
+    validationErrors.push(`capture ${captureIndex}: captured a fatal error shell`);
+  }
   if (
     fullProfile &&
     (
@@ -4431,6 +5225,11 @@ if (!fullProfile) {
       readiness: capture.readiness,
     };
   });
+  console.error(
+    `phase: localized ${await inlineSnapshotImages(
+      captureEvidenceFiles.map((evidence) => ({ evidence })),
+    )} capture resources`,
+  );
 }
 
 let responsiveEvidenceFile;
@@ -4490,9 +5289,11 @@ const implementationBlueprint = {
     title: state.title,
     viewport: state.viewport,
     focus: state.focus,
+    selection: state.selection,
     trigger: state.trigger,
     triggerElement: state.triggerElement,
     probe: state.probe,
+    network: state.network,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,
