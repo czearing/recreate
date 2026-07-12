@@ -162,6 +162,15 @@ The hover state includes authored matching `:hover` rules, pseudo-element
 keyframes and timing, forced settled geometry/styles, reduced-motion identity,
 and verified pointer-leave restoration.
 
+To prioritize one bounded control during generic crawl:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --interaction-match "Add and manage sources" --max-routes 1 --out site-spec-output
+```
+
+Exact semantic labels outrank substring matches and the normal generic
+interaction ranking.
+
 Virtualized listboxes using `aria-activedescendant` can be probed explicitly:
 
 ```powershell

@@ -37,6 +37,7 @@ const captureWebglInteractionProbes = Boolean(args['webgl-probes']);
 const captureIframeProbes = Boolean(args['iframe-probes']);
 const captureHoverProbes = Boolean(args['hover-probes']);
 const hoverMatch = String(args['hover-match'] || '');
+const interactionMatch = String(args['interaction-match'] || '').trim().toLowerCase();
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -2848,7 +2849,16 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     if (candidate.role === 'button') return 50;
     return 10;
   };
-  candidates.sort((left, right) => candidatePriority(right) - candidatePriority(left));
+  const matchPriority = (candidate) => {
+    if (!interactionMatch) return 0;
+    const label = `${candidate.text} ${candidate.placeholder}`.trim().toLowerCase();
+    if (label === interactionMatch) return 2;
+    return label.includes(interactionMatch) ? 1 : 0;
+  };
+  candidates.sort((left, right) =>
+    matchPriority(right) - matchPriority(left) ||
+    candidatePriority(right) - candidatePriority(left)
+  );
   console.error(`phase: route crawl found ${candidates.length} candidates`);
   const triggerElementFor = (candidate) => ({
     path: candidate.snapshotPath,
@@ -2859,18 +2869,8 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     inputType: candidate.inputType || undefined,
     popoverTarget: candidate.popoverTarget || undefined,
   });
-  const dismissTopLayer = async (selector) => {
-    for (const type of ['keyDown', 'keyUp']) {
-      await cdp.send('Input.dispatchKeyEvent', {
-        type,
-        key: 'Escape',
-        code: 'Escape',
-        keyCode: 27,
-        windowsVirtualKeyCode: 27,
-      });
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    return (
+  const inspectTopLayer = async (selector) =>
+    (
       await cdp.send('Runtime.evaluate', {
         expression: `(() => {
           const elements = [];
@@ -2885,7 +2885,9 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             const rect = element.getBoundingClientRect();
             const style = getComputedStyle(element);
             return rect.width > 0 && rect.height > 0 &&
-              style.display !== 'none' && style.visibility !== 'hidden';
+              style.display !== 'none' && style.visibility !== 'hidden' &&
+              Number.parseFloat(style.opacity) > 0 &&
+              element.getAttribute('aria-hidden') !== 'true';
           });
           let focus = document.activeElement;
           while (focus?.shadowRoot?.activeElement) {
@@ -2905,6 +2907,84 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         returnByValue: true,
       })
     ).result.value;
+  const waitForTopLayerClosed = async (selector, maxMs = 2000) => {
+    const started = Date.now();
+    let result;
+    while (Date.now() - started < maxMs) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      result = await inspectTopLayer(selector);
+      if (result.closed) break;
+    }
+    return { ...result, settleMs: Date.now() - started };
+  };
+  const dismissTopLayer = async (selector) => {
+    for (const type of ['keyDown', 'keyUp']) {
+      await cdp.send('Input.dispatchKeyEvent', {
+        type,
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        windowsVirtualKeyCode: 27,
+      });
+    }
+    return waitForTopLayerClosed(selector);
+  };
+  const toggleCandidate = async (candidate) => {
+    const point = (
+      await cdp.send('Runtime.evaluate', {
+      expression: `(() => {
+        const elements = [];
+        const visit = root => {
+          for (const element of root.querySelectorAll('*')) {
+            elements.push(element);
+            if (element.shadowRoot) visit(element.shadowRoot);
+          }
+        };
+        visit(document);
+        const label = ${JSON.stringify(candidate.text || candidate.placeholder)};
+        const labelPrefix = label.slice(0, 20);
+        const element = elements.find(entry =>
+          entry.tagName === ${JSON.stringify(candidate.tag)} &&
+          (entry.getAttribute('role') || '') === ${JSON.stringify(candidate.role)} &&
+          (entry.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)} &&
+          (entry.getAttribute('aria-label') || entry.innerText || '')
+            .trim().startsWith(labelPrefix) &&
+          (() => {
+            const rect = entry.getBoundingClientRect();
+            const style = getComputedStyle(entry);
+            return rect.width > 4 && rect.height > 4 &&
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              Number.parseFloat(style.opacity) > 0;
+          })()
+        );
+        if (!element) return null;
+        element.scrollIntoView({
+          block: 'center',
+          inline: 'center',
+          behavior: 'instant'
+        });
+        const rect = element.getBoundingClientRect();
+        element.focus({ preventScroll: true });
+        return {
+          x: rect.x + rect.width / 2,
+          y: rect.y + rect.height / 2
+        };
+      })()`,
+      returnByValue: true,
+      })
+    ).result.value;
+    if (!point) return false;
+    for (const type of ['mousePressed', 'mouseReleased']) {
+      await cdp.send('Input.dispatchMouseEvent', {
+        type,
+        x: point.x,
+        y: point.y,
+        button: 'left',
+        clickCount: 1,
+      });
+    }
+    return true;
   };
 
   const replayInputProbe = async (candidate) => {
@@ -3310,7 +3390,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       expression: `JSON.stringify({
         n: document.querySelectorAll('*').length,
         u: location.href,
-        overlayCount: (() => {
+        overlayIdentities: (() => {
           const elements = [];
           const visit = root => {
             elements.push(...root.querySelectorAll(
@@ -3325,8 +3405,18 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             const rect = element.getBoundingClientRect();
             const style = getComputedStyle(element);
             return rect.width > 0 && rect.height > 0 &&
-              style.display !== 'none' && style.visibility !== 'hidden';
-          }).length;
+              style.display !== 'none' && style.visibility !== 'hidden' &&
+              Number.parseFloat(style.opacity) > 0 &&
+              element.getAttribute('aria-hidden') !== 'true';
+          }).map(element => {
+            const role = element.getAttribute('role') || 'popover';
+            const text = (
+              element.innerText ||
+              element.getAttribute('aria-label') ||
+              ''
+            ).trim().slice(0, 200);
+            return role + '\\n' + text;
+          });
         })(),
         fingerprint: JSON.stringify({
           text: (document.body?.innerText || '').slice(0, 10000),
@@ -3355,7 +3445,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     }).catch(() => ({ result: { value: '{}' } }))).result.value;
     const {
       n: preClickN,
-      overlayCount: preOverlayCount = 0,
+      overlayIdentities: preOverlayIdentities = [],
       fingerprint: beforeFingerprint,
     } =
       JSON.parse(preClickState);
@@ -3449,13 +3539,34 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           return 'entered:' + value;
         }
         el.focus({ preventScroll: true });
-        el.click();
-        return 'clicked:' + (el.getAttribute('aria-label') || el.innerText || '').trim().substring(0, 30);
+        const rect = el.getBoundingClientRect();
+        return JSON.stringify({
+          action: 'pointer',
+          label: (el.getAttribute('aria-label') || el.innerText || '')
+            .trim().substring(0, 30),
+          x: rect.x + rect.width / 2,
+          y: rect.y + rect.height / 2
+        });
       })()`,
       returnByValue: true,
     }).catch(() => ({ result: { value: 'error' } }));
 
-    const clickedVal = clicked.result?.value || 'error';
+    let clickedVal = clicked.result?.value || 'error';
+    try {
+      const pointer = JSON.parse(clickedVal);
+      if (pointer.action === 'pointer') {
+        for (const type of ['mousePressed', 'mouseReleased']) {
+          await cdp.send('Input.dispatchMouseEvent', {
+            type,
+            x: pointer.x,
+            y: pointer.y,
+            button: 'left',
+            clickCount: 1,
+          });
+        }
+        clickedVal = `clicked:${pointer.label}`;
+      }
+    } catch {}
     console.error(`phase: route crawl try "${candidate.text.substring(0,30)}" → ${clickedVal}`);
 
     if (
@@ -3516,8 +3627,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     let nodeCount = 0;
     let modalAppeared = false;
     let overlayAppeared = false;
+    let appearedOverlayRoles = [];
     let afterFingerprint = beforeFingerprint;
     const clickDeadline = Date.now() + 3000;
+    const stateSettleDeadline =
+      Date.now() + (matchPriority(candidate) ? 1200 : 600);
     while (Date.now() < clickDeadline) {
       await new Promise((r) => setTimeout(r, 300));
       try {
@@ -3540,7 +3654,9 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
                 const rect = element.getBoundingClientRect();
                 const style = getComputedStyle(element);
                 return rect.width > 0 && rect.height > 0 &&
-                  style.display !== 'none' && style.visibility !== 'hidden';
+                  style.display !== 'none' && style.visibility !== 'hidden' &&
+                  Number.parseFloat(style.opacity) > 0 &&
+                  element.getAttribute('aria-hidden') !== 'true';
               }).map(element => ({
                 text: (element.innerText || element.getAttribute('aria-label') || '')
                   .trim().slice(0, 200)
@@ -3561,7 +3677,9 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
                 const rect = element.getBoundingClientRect();
                 const style = getComputedStyle(element);
                 return rect.width > 0 && rect.height > 0 &&
-                  style.display !== 'none' && style.visibility !== 'hidden';
+                  style.display !== 'none' && style.visibility !== 'hidden' &&
+                  Number.parseFloat(style.opacity) > 0 &&
+                  element.getAttribute('aria-hidden') !== 'true';
               }).map(element => ({
                 role: element.getAttribute('role') || 'popover',
                 text: (element.innerText || element.getAttribute('aria-label') || '')
@@ -3598,18 +3716,80 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         nodeCount = d.n || nodeCount;
         afterFingerprint = d.fingerprint || afterFingerprint;
         modalAppeared = (d.modals || []).some((modal) => modal.text);
-        overlayAppeared =
-          (d.overlays || []).length > preOverlayCount &&
-          d.overlays.some((overlay) => overlay.text);
+        appearedOverlayRoles = [
+          ...new Set(
+            (d.overlays || [])
+              .filter((overlay) => overlay.text)
+              .filter((overlay) =>
+                !preOverlayIdentities.includes(`${overlay.role}\n${overlay.text}`)
+              )
+              .map((overlay) => overlay.role)
+          ),
+        ];
+        overlayAppeared = appearedOverlayRoles.length > 0;
         // Stop on URL change, modal, or significant DOM growth (panel/drawer opened)
         if (
           afterUrl !== beforeUrl ||
           modalAppeared ||
           overlayAppeared ||
-          afterFingerprint !== beforeFingerprint ||
+          (
+            afterFingerprint !== beforeFingerprint &&
+            Date.now() >= stateSettleDeadline
+          ) ||
           (nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15)
         ) break;
       } catch (_) { break; }
+    }
+    if (
+      !modalAppeared &&
+      !overlayAppeared &&
+      afterFingerprint !== beforeFingerprint
+    ) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, matchPriority(candidate) ? 800 : 250)
+      );
+      const settledOverlayIdentities = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `(() => {
+            const elements = [];
+            const visit = root => {
+              elements.push(...root.querySelectorAll(
+                '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
+              ));
+              for (const element of root.querySelectorAll('*')) {
+                if (element.shadowRoot) visit(element.shadowRoot);
+              }
+            };
+            visit(document);
+            return elements.filter(element => {
+              const rect = element.getBoundingClientRect();
+              const style = getComputedStyle(element);
+              return rect.width > 0 && rect.height > 0 &&
+                style.display !== 'none' && style.visibility !== 'hidden' &&
+                Number.parseFloat(style.opacity) > 0 &&
+                element.getAttribute('aria-hidden') !== 'true' &&
+                Boolean((element.innerText || element.getAttribute('aria-label') || '').trim());
+            }).map(element => {
+              const role = element.getAttribute('role') || 'popover';
+              const text = (
+                element.innerText ||
+                element.getAttribute('aria-label') ||
+                ''
+              ).trim().slice(0, 200);
+              return role + '\\n' + text;
+            });
+          })()`,
+          returnByValue: true,
+        })
+      ).result.value;
+      appearedOverlayRoles = [
+        ...new Set(
+          settledOverlayIdentities
+            .filter((identity) => !preOverlayIdentities.includes(identity))
+            .map((identity) => identity.slice(0, identity.indexOf('\n')))
+        ),
+      ];
+      overlayAppeared = appearedOverlayRoles.length > 0;
     }
 
     const urlChanged = afterUrl !== beforeUrl;
@@ -3676,11 +3856,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.probe = { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
+        const overlaySelector = appearedOverlayRoles
+          .filter((role) =>
+            ['menu', 'listbox', 'tree', 'tooltip', 'popover'].includes(role)
+          )
+          .map((role) =>
+            role === 'popover' ? '[popover]:popover-open' : `[role="${role}"]`
+          )
+          .join(',') ||
+          '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open';
+        let dismissed = await dismissTopLayer(overlaySelector);
+        let action = 'Escape';
+        if (!dismissed.closed && await toggleCandidate(candidate)) {
+          action = 'Escape then trigger click';
+          dismissed = await waitForTopLayerClosed(overlaySelector);
+        }
         state.dismissal = {
-          action: 'Escape',
-          ...(await dismissTopLayer(
-            '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open',
-          )),
+          action,
+          ...dismissed,
         };
       }
       continue;
