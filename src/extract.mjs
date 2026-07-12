@@ -12,6 +12,7 @@ import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
 import { captureFigmaSpec } from './figma-capture.mjs';
 import { parseFigmaSource } from './figma-url.mjs';
+import { authenticationShellRuntimeSource } from './shell-detection.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
@@ -47,6 +48,7 @@ const captureIframeProbes = Boolean(args['iframe-probes']);
 const captureHoverProbes = Boolean(args['hover-probes']);
 const hoverMatch = String(args['hover-match'] || '');
 const interactionMatch = String(args['interaction-match'] || '').trim().toLowerCase();
+const rejectAuthShell = Boolean(args['reject-auth-shell']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -1444,6 +1446,7 @@ async function waitForApplicationReady() {
                 )
               );
             })(),
+            hasAuthenticationShell: ${authenticationShellRuntimeSource},
             hasBlockingVisual: Array.from(new Set([
               ...Array.from(document.body?.children || []),
               ...document.querySelectorAll([
@@ -1504,6 +1507,17 @@ async function waitForApplicationReady() {
           returnByValue: true,
         })
       ).result.value;
+
+      if (
+        state.hasFatalError ||
+        (rejectAuthShell && state.hasAuthenticationShell)
+      ) {
+        return {
+          ready: true,
+          waitMs: Date.now() - startedAt,
+          state,
+        };
+      }
 
       const baseReady =
         state.readyState === 'complete' &&
@@ -2694,7 +2708,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   }).catch(() => ({ result: { value: '' } }))).result.value;
   if (baseUrl && currentUrl !== baseUrl) {
     await cdp.send('Page.navigate', { url: baseUrl });
-    await waitForApplicationReady();
+    const initialReadiness = await waitForApplicationReady();
+    if (
+      rejectAuthShell &&
+      initialReadiness.state?.hasAuthenticationShell
+    ) {
+      await rejectAuthenticationShell(url || page.url);
+    }
   }
 
   // Inject pushState intercept on the live page so clicks are trackable
@@ -4220,6 +4240,12 @@ async function extractViewport(viewport, captureIndex) {
   console.error('phase: wait ready');
   const readiness = await waitForApplicationReady();
   console.error('phase: ready done', JSON.stringify(readiness));
+  if (
+    rejectAuthShell &&
+    readiness.state?.hasAuthenticationShell
+  ) {
+    await rejectAuthenticationShell(url || page.url);
+  }
   let initialDocument = {
     url: latestDocumentResponse?.response?.url,
     status: latestDocumentResponse?.response?.status,
@@ -4943,6 +4969,24 @@ async function inlineSnapshotImages(snapshots) {
 }
 
 const captures = [];
+
+async function rejectAuthenticationShell(location) {
+  try {
+    await cdp.close();
+  } catch {}
+  try {
+    if (created && targetId) {
+      await browser?.send('Target.closeTarget', { targetId });
+    }
+  } catch {}
+  try {
+    await browser?.close();
+  } catch {}
+  throw new Error(
+    `Rejected authentication shell at ${location}. ` +
+    'Use an authenticated tab or omit --reject-auth-shell to capture it.',
+  );
+}
 
 if (created) {
   if (figmaSource) {
@@ -5813,6 +5857,14 @@ for (const [captureIndex, capture] of captures.entries()) {
   }
   if (capture.readiness?.state?.hasFatalError) {
     validationErrors.push(`capture ${captureIndex}: captured a fatal error shell`);
+  }
+  if (
+    rejectAuthShell &&
+    capture.readiness?.state?.hasAuthenticationShell
+  ) {
+    validationErrors.push(
+      `capture ${captureIndex}: captured an authentication shell`,
+    );
   }
   if (
     fullProfile &&
