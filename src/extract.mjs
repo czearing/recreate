@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import {
   compactCapture,
 } from './capture-compaction.mjs';
+import { captureDragStates } from './drag-probe.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 
 const args = Object.fromEntries(
@@ -27,6 +28,7 @@ const captureEditorProbes = Boolean(args['editor-probes']);
 const captureClipboardProbe = Boolean(args['clipboard-probe']);
 const captureTooltipProbes = Boolean(args['tooltip-probes']);
 const captureVirtualListProbes = Boolean(args['virtual-list-probes']);
+const captureDragProbes = Boolean(args['drag-probes']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -1707,6 +1709,7 @@ async function capturePageSnapshot(
                     'open', 'popover', 'popovertarget', 'popovertargetaction',
                     'aria-activedescendant', 'aria-posinset', 'aria-setsize',
                     'aria-rowcount',
+                    'data-draggable', 'data-dragging', 'data-drop-target',
                     'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
                     'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
                     'checked', 'selected'
@@ -4694,6 +4697,15 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureDragProbes) {
+    await captureDragStates({
+      cdp,
+      maxStates: maxRoutes,
+      states: multiPageStates,
+      viewports,
+      capturePageSnapshot,
+    });
+  }
   if (captureVirtualListProbes) {
     await captureVirtualListState({
       cdp,
@@ -5793,6 +5805,7 @@ const implementationBlueprint = {
     dismissal: state.dismissal,
     timing: state.timing,
     virtualization: state.virtualization,
+    drag: state.drag,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,

@@ -162,6 +162,16 @@ The resulting state records logical item count, mounted rows before and after
 keyboard navigation, active-descendant identity, scroll-window replacement,
 focus, and exact visible option geometry without inventing unmounted DOM.
 
+Pointer-driven reorder surfaces can be probed explicitly:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --drag-probes --max-routes 2 --out site-spec-output
+```
+
+The probe records source and target rectangles, pointer trajectory, dragging
+and drop-target attributes, intermediate geometry, final order, and verified
+reverse-drag restoration.
+
 Interaction states include sanitized Document, Fetch, and XHR timing from the
 trigger until the network becomes quiet. Query keys are retained while query
 values and encoded data/blob resources are excluded.
