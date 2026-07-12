@@ -34,6 +34,7 @@ const decoded = {
           actions: [{
             transitionNodeID: { sessionID: 2, localID: 3 },
             navigationType: 'NAVIGATE',
+            connectionType: 'INTERNAL_NODE',
             transitionType: 'SMART_ANIMATE',
           }],
         }, {
@@ -45,7 +46,11 @@ const decoded = {
           actions: [{
             transitionNodeID: { sessionID: 2, localID: 3 },
             navigationType: 'OVERLAY',
+            connectionType: 'INTERNAL_NODE',
             transitionType: 'MOVE_FROM_RIGHT',
+          }, {
+            connectionType: 'URL',
+            url: 'https://example.com',
           }],
         }],
       }),
@@ -111,10 +116,16 @@ test('writes semantic indexes and omits hidden pages by default', () => {
   assert.deepEqual(interactionSearch.facets.navigationTypes, {
     NAVIGATE: [0],
     OVERLAY: [0],
+    NONE: [0],
+  });
+  assert.deepEqual(interactionSearch.facets.connectionTypes, {
+    INTERNAL_NODE: [0],
+    URL: [0],
   });
   assert.deepEqual(interactionSearch.facets.transitionTypes, {
     SMART_ANIMATE: [0],
     MOVE_FROM_RIGHT: [0],
+    NONE: [0],
   });
   assert.deepEqual(interactionSearch.facets.timeoutSeconds, {
     0: [0.5],

@@ -64,6 +64,7 @@ export function writeFigmaInteractions({
   const shards = {};
   const facets = {
     values: 'flow indexes',
+    connectionTypes: {},
     navigationTypes: {},
     transitionTypes: {},
     timeoutSeconds: {},
@@ -75,6 +76,9 @@ export function writeFigmaInteractions({
     for (const type of new Set(
       actions.map((action) => action.navigationType || 'NONE'),
     )) (facets.navigationTypes[type] ||= []).push(flowIndex);
+    for (const type of new Set(
+      actions.map((action) => action.connectionType || 'NONE'),
+    )) (facets.connectionTypes[type] ||= []).push(flowIndex);
     for (const type of new Set(
       actions.map((action) => action.transitionType || 'NONE'),
     )) (facets.transitionTypes[type] ||= []).push(flowIndex);
