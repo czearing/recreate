@@ -136,6 +136,9 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     reference,
     compact,
     children,
+    visiblePageIds: new Set(
+      pages.filter((page) => page.visible !== false).map((page) => guid(page.guid)),
+    ),
   });
   const interactionIndex = writeFigmaInteractions({
     outDir,

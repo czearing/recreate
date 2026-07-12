@@ -10,6 +10,7 @@ export function writeFigmaComponents({
   reference,
   compact,
   children,
+  visiblePageIds,
 }) {
   const usage = new Map();
   for (const node of nodes) {
@@ -38,26 +39,31 @@ export function writeFigmaComponents({
     .filter((node) => node.type === 'SYMBOL')
     .map((node) => {
       const id = guid(node.guid);
+      const pageId = pageForNode.get(id);
       const instances = usage.get(id);
-      const queue = [...(children.get(id) || [])];
+      const includeChildren = !visiblePageIds.has(pageId);
+      const queue = includeChildren ? [...(children.get(id) || [])] : [];
       const descendants = [];
       for (let cursor = 0; cursor < queue.length; cursor += 1) {
         const child = queue[cursor];
         descendants.push(compact(child));
-        queue.push(...(children.get(guid(child.guid)) || []));
+        if (child.type !== 'INSTANCE') {
+          queue.push(...(children.get(guid(child.guid)) || []));
+        }
       }
       return {
         id,
         name: node.name,
         parentId: guid(node.parentIndex?.guid),
-        pageId: pageForNode.get(id),
+        pageId,
         size: node.size,
         publishable: node.isSymbolPublishable,
         description: node.symbolDescription,
         variantProperties: reference(node.variantPropSpecs),
         propertyDefinitions: reference(node.componentPropDefs),
         master: compact(node),
-        masterChildren: reference(descendants),
+        masterChildren: includeChildren ? reference(descendants) : undefined,
+        masterSource: includeChildren ? 'component-detail' : 'page-evidence',
         instanceUsage: instances
           ? {
               count: instances.count,
