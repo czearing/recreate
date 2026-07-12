@@ -152,6 +152,16 @@ Tooltip probing is opt-in so it does not consume route-state budgets:
 node src/extract.mjs --reuse --target <target-id> --crawl --tooltip-probes --out site-spec-output
 ```
 
+Virtualized listboxes using `aria-activedescendant` can be probed explicitly:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --virtual-list-probes --out site-spec-output
+```
+
+The resulting state records logical item count, mounted rows before and after
+keyboard navigation, active-descendant identity, scroll-window replacement,
+focus, and exact visible option geometry without inventing unmounted DOM.
+
 Interaction states include sanitized Document, Fetch, and XHR timing from the
 trigger until the network becomes quiet. Query keys are retained while query
 values and encoded data/blob resources are excluded.

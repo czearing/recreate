@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import {
   compactCapture,
 } from './capture-compaction.mjs';
+import { captureVirtualListState } from './virtual-list-probe.mjs';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -25,6 +26,7 @@ const crawl = Boolean(args.crawl);
 const captureEditorProbes = Boolean(args['editor-probes']);
 const captureClipboardProbe = Boolean(args['clipboard-probe']);
 const captureTooltipProbes = Boolean(args['tooltip-probes']);
+const captureVirtualListProbes = Boolean(args['virtual-list-probes']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -1703,6 +1705,8 @@ async function capturePageSnapshot(
                     'id', 'class', 'role', 'title', 'href', 'src', 'srcset',
                     'alt', 'type', 'name', 'contenteditable', 'spellcheck',
                     'open', 'popover', 'popovertarget', 'popovertargetaction',
+                    'aria-activedescendant', 'aria-posinset', 'aria-setsize',
+                    'aria-rowcount',
                     'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
                     'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
                     'checked', 'selected'
@@ -4690,6 +4694,15 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureVirtualListProbes) {
+    await captureVirtualListState({
+      cdp,
+      maxStates: maxRoutes,
+      states: multiPageStates,
+      viewports,
+      capturePageSnapshot,
+    });
+  }
   if (captureTooltipProbes) {
     await captureTooltipStates(maxRoutes);
   }
@@ -5779,6 +5792,7 @@ const implementationBlueprint = {
     network: state.network,
     dismissal: state.dismissal,
     timing: state.timing,
+    virtualization: state.virtualization,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,
