@@ -136,6 +136,11 @@ are captured as modal or overlay states even when a portal places them outside
 the trigger subtree. Form crawls prioritize the primary validation submit over
 individual required fields and nested utility forms.
 
+Native top-layer evidence includes reflected `open`, `popover`, and
+`popovertarget` attributes, top-layer membership, computed `::backdrop` color,
+filter, and opacity, focused content, plus trusted Escape dismissal and focus
+return to the trigger.
+
 Interaction states include sanitized Document, Fetch, and XHR timing from the
 trigger until the network becomes quiet. Query keys are retained while query
 values and encoded data/blob resources are excluded.

@@ -1690,6 +1690,7 @@ async function capturePageSnapshot(
                   for (const name of [
                     'id', 'class', 'role', 'title', 'href', 'src', 'srcset',
                     'alt', 'type', 'name', 'contenteditable', 'spellcheck',
+                    'open', 'popover', 'popovertarget', 'popovertargetaction',
                     'placeholder', 'data-testid', 'aria-label', 'aria-expanded',
                     'aria-pressed', 'aria-selected', 'aria-haspopup', 'disabled',
                     'checked', 'selected'
@@ -1699,6 +1700,16 @@ async function capturePageSnapshot(
                       attrs[name] = value.slice(0, 10000);
                     }
                   }
+                  const topLayer = (() => {
+                    try {
+                      return element.matches('dialog[open],:popover-open');
+                    } catch {
+                      return element.matches('dialog[open]');
+                    }
+                  })();
+                  const backdrop = topLayer
+                    ? getComputedStyle(element, '::backdrop')
+                    : null;
                   return {
                     path: pathFor(element),
                     parentPath: element.parentElement
@@ -1708,6 +1719,14 @@ async function capturePageSnapshot(
                         : null,
                     tag: element.tagName.toLowerCase(),
                     attrs,
+                    topLayer,
+                    backdropStyle: backdrop
+                      ? {
+                          backgroundColor: backdrop.backgroundColor,
+                          backdropFilter: backdrop.backdropFilter,
+                          opacity: backdrop.opacity
+                        }
+                      : undefined,
                     text: (element.getAttribute('aria-label') || element.innerText || '')
                       .replace(/\\s+/g, ' ').trim().slice(0, 500),
                     rect: {
@@ -2454,6 +2473,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 500).trim(),
           role: el.getAttribute('role') || '',
           ariaHaspopup: el.getAttribute('aria-haspopup') || '',
+          popoverTarget: el.getAttribute('popovertarget') || '',
           testId: el.getAttribute('data-testid') || '',
           inputType: el instanceof HTMLInputElement ? el.type : '',
           buttonType: el instanceof HTMLButtonElement ? el.type : '',
@@ -2525,6 +2545,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     ) {
       return candidate.topBar ? 85 : 105;
     }
+    if (candidate.popoverTarget) return 105;
     if (
       (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') &&
       candidate.hasFormSubmit
@@ -2548,7 +2569,46 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     role: candidate.role || undefined,
     testId: candidate.testId || undefined,
     inputType: candidate.inputType || undefined,
+    popoverTarget: candidate.popoverTarget || undefined,
   });
+  const dismissTopLayer = async (selector) => {
+    for (const type of ['keyDown', 'keyUp']) {
+      await cdp.send('Input.dispatchKeyEvent', {
+        type,
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        windowsVirtualKeyCode: 27,
+      });
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    return (
+      await cdp.send('Runtime.evaluate', {
+        expression: `(() => {
+          const visible = Array.from(document.querySelectorAll(
+            ${JSON.stringify(selector)}
+          )).some(element => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0 && rect.height > 0 &&
+              style.display !== 'none' && style.visibility !== 'hidden';
+          });
+          const focus = document.activeElement;
+          return {
+            closed: !visible,
+            focus: focus && focus !== document.body
+              ? {
+                  tag: focus.tagName.toLowerCase(),
+                  id: focus.id || null,
+                  ariaLabel: focus.getAttribute('aria-label')
+                }
+              : null
+          };
+        })()`,
+        returnByValue: true,
+      })
+    ).result.value;
+  };
 
   const replayInputProbe = async (candidate) => {
     await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
@@ -3069,6 +3129,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           }));
           return 'entered:' + value;
         }
+        el.focus({ preventScroll: true });
         el.click();
         return 'clicked:' + (el.getAttribute('aria-label') || el.innerText || '').trim().substring(0, 30);
       })()`,
@@ -3222,12 +3283,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           : { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
-        // Dismiss modal
-        await cdp.send('Runtime.evaluate', {
-          expression: `document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`,
-          returnByValue: true,
-        }).catch(() => {});
-        await new Promise((r) => setTimeout(r, 250));
+        state.dismissal = {
+          action: 'Escape',
+          ...(await dismissTopLayer(
+            'dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]',
+          )),
+        };
       }
       continue;
     }
@@ -3245,6 +3306,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.probe = { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
+        state.dismissal = {
+          action: 'Escape',
+          ...(await dismissTopLayer(
+            '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open',
+          )),
+        };
       }
       continue;
     }
@@ -5355,6 +5422,7 @@ const implementationBlueprint = {
     triggerElement: state.triggerElement,
     probe: state.probe,
     network: state.network,
+    dismissal: state.dismissal,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,
