@@ -10,6 +10,8 @@ import {
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
+import { captureFigmaSpec } from './figma-capture.mjs';
+import { parseFigmaSource } from './figma-url.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
@@ -22,8 +24,16 @@ const args = Object.fromEntries(
   }),
 );
 
-const url = String(args.url || '');
-const match = String(args.match || url);
+const sourceUrl = String(args.url || '');
+const figmaSource = parseFigmaSource(sourceUrl);
+if (figmaSource && figmaSource.kind !== 'figma-community') {
+  throw new Error(
+    'This Figma URL requires the authenticated cloud-file adapter; ' +
+    'public Community files are supported in this build.',
+  );
+}
+const url = figmaSource?.captureUrl || sourceUrl;
+const match = String(args.match || sourceUrl);
 const requestedTargetId = String(args.target || '');
 const outDir = path.resolve(String(args.out || 'site-spec'));
 const reuse = Boolean(args.reuse);
@@ -180,7 +190,7 @@ async function findOrOpenTarget() {
 }
 
 const { page, created, browser, targetId } = await findOrOpenTarget();
-const requestedUrl = url || page.url;
+const requestedUrl = sourceUrl || page.url;
 let cdp = await connect(page.webSocketDebuggerUrl);
 const styleSheets = new Map();
 const scripts = new Map();
@@ -271,16 +281,18 @@ async function waitForNetworkQuiet(index, maxWaitMs = 3000) {
   }
 }
 
-const cdpDomains = [
-  'Page.enable',
-  'Runtime.enable',
-  'DOM.enable',
-  'CSS.enable',
-  'DOMSnapshot.enable',
-  'Network.enable',
-  'Accessibility.enable',
-  'Debugger.enable',
-];
+const cdpDomains = figmaSource
+  ? ['Page.enable', 'Runtime.enable', 'Network.enable']
+  : [
+      'Page.enable',
+      'Runtime.enable',
+      'DOM.enable',
+      'CSS.enable',
+      'DOMSnapshot.enable',
+      'Network.enable',
+      'Accessibility.enable',
+      'Debugger.enable',
+    ];
 
 async function initializeCdp(client) {
   client.on('CSS.styleSheetAdded', ({ header }) => styleSheets.set(header.styleSheetId, header));
@@ -4895,7 +4907,11 @@ async function inlineSnapshotImages(snapshots) {
 const captures = [];
 
 if (created) {
-  await navigateAndCaptureAllPages(url);
+  if (figmaSource) {
+    await cdp.send('Page.navigate', { url });
+  } else {
+    await navigateAndCaptureAllPages(url);
+  }
 }
 let webglRafScriptIdentifier;
 if (captureWebglInteractionProbes) {
@@ -4907,6 +4923,39 @@ if (captureWebglInteractionProbes) {
   await cdp.send('Page.reload');
 }
 await waitForApplicationReady();
+if (figmaSource) {
+  let implementation;
+  try {
+    implementation = await captureFigmaSpec({
+      cdp,
+      frameId: mainFrameId,
+      outDir,
+      source: figmaSource,
+      requestedUrl,
+      profile,
+    });
+    if (!implementation.validation.passed) {
+      throw new Error(
+        `Figma capture validation failed: ` +
+        JSON.stringify(implementation.validation.errors),
+      );
+    }
+  } finally {
+    try {
+      await cdp.close();
+    } catch {}
+    try {
+      if (created && targetId) {
+        await browser?.send('Target.closeTarget', { targetId });
+      }
+    } catch {}
+    try {
+      await browser?.close();
+    } catch {}
+  }
+  console.log(JSON.stringify(implementation, null, 2));
+  process.exit(0);
+}
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {

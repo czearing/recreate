@@ -171,6 +171,21 @@ node src/extract.mjs --reuse --target <target-id> --crawl --interaction-match "A
 Exact semantic labels outrank substring matches and the normal generic
 interaction ranking.
 
+Public Figma Community URLs are detected automatically:
+
+```powershell
+node src/extract.mjs --url "https://www.figma.com/community/file/<id>/<name>" --out figma-spec
+```
+
+The extractor streams and decodes Figma's `fig-kiwi` scene graph rather than
+describing the editor canvas. `implementation.json` indexes visible pages,
+top-level component sections, variables, exact vector geometry, styles, and
+prototype interactions. Original raster paint hashes are localized into
+`snapshot-assets/`; signed Figma URLs are excluded from text artifacts.
+`--profile full` also preserves the hidden backing canvas and raw
+`canvas.fig`. Authenticated `/design`, `/file`, and `/proto` links are
+classified but currently rejected until the cloud-file adapter is available.
+
 Virtualized listboxes using `aria-activedescendant` can be probed explicitly:
 
 ```powershell
