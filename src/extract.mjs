@@ -8,6 +8,7 @@ import {
   compactCapture,
 } from './capture-compaction.mjs';
 import { captureDragStates } from './drag-probe.mjs';
+import { captureIframeState } from './iframe-probe.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
@@ -32,6 +33,7 @@ const captureTooltipProbes = Boolean(args['tooltip-probes']);
 const captureVirtualListProbes = Boolean(args['virtual-list-probes']);
 const captureDragProbes = Boolean(args['drag-probes']);
 const captureWebglInteractionProbes = Boolean(args['webgl-probes']);
+const captureIframeProbes = Boolean(args['iframe-probes']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -4712,6 +4714,19 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureIframeProbes) {
+    await captureIframeState({
+      cdp,
+      maxStates: maxRoutes,
+      states: multiPageStates,
+      viewports,
+      capturePageSnapshot,
+      cleanupPage: async () => {
+        await cdp.send('Page.reload');
+        await waitForApplicationReady();
+      },
+    });
+  }
   if (captureWebglInteractionProbes) {
     await captureWebglInteractionState({
       cdp,
@@ -5818,6 +5833,50 @@ for (const state of multiPageStates.filter((entry) => entry.webglInteraction)) {
     restorationExact: full.restorationExact,
   };
 }
+for (const state of multiPageStates.filter((entry) => entry.iframeInteraction)) {
+  const evidenceDir = path.join(outDir, 'evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  const filename = `iframe-interaction-${String(state.index).padStart(3, '0')}.json`;
+  const relativeFile = `evidence/${filename}`;
+  const full = state.iframeInteraction;
+  full.boundaries = full.boundaries.map((boundary) => ({
+    ...boundary,
+    src: sanitizedNetworkUrl(boundary.src),
+  }));
+  for (const value of [full.before, full.after, full.restored]) {
+    value.url = sanitizedNetworkUrl(value.url);
+    if (value.declaredSrc) {
+      value.declaredSrc = sanitizedNetworkUrl(value.declaredSrc);
+    }
+  }
+  full.protocolFrames = {
+    before: full.protocolFrames.before.map(sanitizedNetworkUrl),
+    after: full.protocolFrames.after.map(sanitizedNetworkUrl),
+  };
+  fs.writeFileSync(
+    path.join(evidenceDir, filename),
+    JSON.stringify(full, null, 2),
+  );
+  const compactFrameState = (value) => ({
+    url: value.url,
+    declaredSrc: value.declaredSrc,
+    title: value.title,
+    unavailable: value.unavailable,
+    text: (value.text || '').slice(0, 1000),
+    parentStatus: value.parentStatus?.slice(0, 500) || null,
+    focus: value.focus,
+    nodeCount: value.nodes?.length || 0,
+    reloaded: value.reloaded,
+  });
+  state.iframeInteraction = {
+    evidence: relativeFile,
+    boundaries: full.boundaries,
+    protocolFrames: full.protocolFrames,
+    before: compactFrameState(full.before),
+    after: compactFrameState(full.after),
+    restored: compactFrameState(full.restored),
+  };
+}
 
 const implementationBlueprint = {
   schemaVersion: 2,
@@ -5875,6 +5934,7 @@ const implementationBlueprint = {
     virtualization: state.virtualization,
     drag: state.drag,
     webglInteraction: state.webglInteraction,
+    iframeInteraction: state.iframeInteraction,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,

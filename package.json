@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build:static": "node build-static.mjs",
-    "check": "node --check src/extract.mjs && node --check src/capture-compaction.mjs && node --check src/drag-probe.mjs && node --check src/drag-runtime.mjs && node --check src/evidence-filter.mjs && node --check src/lifecycle-recorder.js && node --check src/virtual-list-probe.mjs && node --check src/webgl-probe.mjs && node --check src/webgl-runtime.mjs && node --check build-static.mjs",
+    "check": "node --check src/extract.mjs && node --check src/capture-compaction.mjs && node --check src/drag-probe.mjs && node --check src/drag-runtime.mjs && node --check src/evidence-filter.mjs && node --check src/iframe-probe.mjs && node --check src/iframe-runtime.mjs && node --check src/lifecycle-recorder.js && node --check src/virtual-list-probe.mjs && node --check src/webgl-probe.mjs && node --check src/webgl-runtime.mjs && node --check build-static.mjs",
     "test": "node --test"
   },
   "engines": {

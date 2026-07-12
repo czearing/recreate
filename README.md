@@ -215,6 +215,17 @@ not change or the interaction has no effect. Reverse-drag restoration is
 reported as a distance and exactness flag, then the page is reloaded cleanly;
 nonlinear camera controls are not falsely required to invert exactly.
 
+Same-origin iframe interactions can be probed explicitly:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --iframe-probes --max-routes 1 --out site-spec-output
+```
+
+The probe records every frame boundary, but reads child DOM only for a
+same-origin frame. It captures child text, focus, global rectangles, computed
+styles, parent `postMessage` effects, and restored child state. Cross-origin
+frames retain only their URL, title, sandbox, accessibility boundary, and rect.
+
 Stable DOM is not sufficient acceptance by itself. Prominent 404 and
 access-denied shells fail validation even when readiness and geometry succeed.
 
