@@ -183,8 +183,9 @@ top-level component sections, variables, exact vector geometry, styles, and
 prototype interactions. Original raster paint hashes are localized into
 `snapshot-assets/`; signed Figma URLs are excluded from text artifacts.
 `--profile full` also preserves the hidden backing canvas and raw
-`canvas.fig`. Authenticated `/design`, `/file`, and `/proto` links are
-classified but currently rejected until the cloud-file adapter is available.
+`canvas.fig`. Authenticated `/design`, `/file`, and `/proto` links discover
+their binary canvas and image endpoints from CDP network events; open the file
+in the remote-debug browser and pass `--reuse --match <file-key>`.
 
 Virtualized listboxes using `aria-activedescendant` can be probed explicitly:
 

@@ -3,7 +3,7 @@ export const figmaGuid = (value) =>
 
 const keep = (value) => value == null ? undefined : value;
 
-export function compactFigmaNode(node, reference) {
+export function compactFigmaNode(node, reference, geometry) {
   return {
     id: figmaGuid(node.guid),
     parentId: figmaGuid(node.parentIndex?.guid),
@@ -84,8 +84,8 @@ export function compactFigmaNode(node, reference) {
     textCase: keep(node.textCase),
     textDecoration: keep(node.textDecoration),
     hyperlink: keep(node.hyperlink),
-    fillGeometry: reference(node.fillGeometry),
-    strokeGeometry: reference(node.strokeGeometry),
+    fillGeometry: reference(geometry(node.fillGeometry)),
+    strokeGeometry: reference(geometry(node.strokeGeometry)),
     vectorData: reference(node.vectorData),
     layoutGrids: reference(node.layoutGrids),
     gridRows: reference(node.gridRows),

@@ -90,6 +90,9 @@ export async function localizeFigmaImages({
   const errors = [];
   let urls = {};
   try {
+    if (hashes.length && !source.imageBatchUrl) {
+      throw new Error('No Figma image-batch endpoint was observed.');
+    }
     urls = await resolveImageUrls(cdp, source, hashes);
   } catch (error) {
     errors.push({ stage: 'resolve', error: String(error) });

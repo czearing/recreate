@@ -26,10 +26,9 @@ const args = Object.fromEntries(
 
 const sourceUrl = String(args.url || '');
 const figmaSource = parseFigmaSource(sourceUrl);
-if (figmaSource && figmaSource.kind !== 'figma-community') {
+if (figmaSource?.kind === 'figma-unknown') {
   throw new Error(
-    'This Figma URL requires the authenticated cloud-file adapter; ' +
-    'public Community files are supported in this build.',
+    'Unsupported Figma URL. Pass a Community, design, file, or proto URL.',
   );
 }
 const url = figmaSource?.captureUrl || sourceUrl;
@@ -199,6 +198,7 @@ let latestDocumentBody;
 let mainFrameId;
 const networkTimeline = [];
 const networkRequestById = new Map();
+const figmaCanvasCandidates = [];
 
 function sanitizedNetworkUrl(rawUrl) {
   try {
@@ -299,6 +299,9 @@ async function initializeCdp(client) {
   client.on('CSS.styleSheetRemoved', ({ styleSheetId }) => styleSheets.delete(styleSheetId));
   client.on('Debugger.scriptParsed', (script) => scripts.set(script.scriptId, script));
   client.on('Network.requestWillBeSent', (event) => {
+    if (figmaSource && event.request.url.includes('/image/batch')) {
+      figmaSource.imageBatchUrl = event.request.url;
+    }
     const previous = networkRequestById.get(event.requestId);
     if (previous && event.redirectResponse) {
       previous.endTimestamp = event.timestamp;
@@ -318,6 +321,13 @@ async function initializeCdp(client) {
     networkRequestById.set(event.requestId, request);
   });
   client.on('Network.responseReceived', (event) => {
+    if (
+      figmaSource &&
+      /octet-stream/i.test(event.response.mimeType) &&
+      !/webpack|\.wasm|\/font|\/uploads\//i.test(event.response.url)
+    ) {
+      figmaCanvasCandidates.push(event.response.url);
+    }
     const request = networkRequestById.get(event.requestId);
     if (request) {
       Object.assign(request, {
@@ -357,6 +367,9 @@ async function initializeCdp(client) {
 }
 
 await initializeCdp(cdp);
+if (figmaSource) {
+  await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+}
 
 const computedProperties = [
   'display',
@@ -4912,6 +4925,8 @@ if (created) {
   } else {
     await navigateAndCaptureAllPages(url);
   }
+} else if (figmaSource) {
+  await cdp.send('Page.reload');
 }
 let webglRafScriptIdentifier;
 if (captureWebglInteractionProbes) {
@@ -4931,8 +4946,9 @@ if (figmaSource) {
       frameId: mainFrameId,
       outDir,
       source: figmaSource,
-      requestedUrl,
+      requestedUrl: figmaSource.publicUrl,
       profile,
+      canvasCandidates: figmaCanvasCandidates,
     });
     if (!implementation.validation.passed) {
       throw new Error(

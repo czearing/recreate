@@ -23,8 +23,17 @@ test('classifies Figma URLs without treating normal sites as Figma', () => {
   assert.equal(community.kind, 'figma-community');
   assert.equal(community.fileId, '12345');
   assert.match(community.captureUrl, /embed\.figma\.com\/file\/12345/);
+  const cloud = parseFigmaSource(
+    'https://www.figma.com/design/abc123/Test?node-id=1-2&t=secret',
+  );
+  assert.equal(cloud.kind, 'figma-cloud');
+  assert.equal(cloud.fileKey, 'abc123');
+  assert.equal(cloud.nodeId, '1-2');
+  assert.equal(cloud.captureUrl, cloud.sourceUrl);
+  assert.match(cloud.publicUrl, /node-id=1-2/);
+  assert.doesNotMatch(cloud.publicUrl, /secret/);
   assert.equal(
-    parseFigmaSource('https://www.figma.com/design/abc123/Test?node-id=1-2').kind,
+    parseFigmaSource('https://www.figma.com/proto/proto123/Test').kind,
     'figma-cloud',
   );
   assert.equal(parseFigmaSource('https://example.com/spec'), null);

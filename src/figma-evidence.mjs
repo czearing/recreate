@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { compactFigmaNode, figmaGuid as guid } from './figma-node.mjs';
 import { writeFigmaSection } from './figma-sections.mjs';
+import { resolveFigmaGeometry } from './figma-vectors.mjs';
 
 const slug = (value) =>
   String(value || 'page')
@@ -15,6 +16,11 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
   const evidenceDir = path.join(outDir, 'evidence', 'figma');
   fs.mkdirSync(evidenceDir, { recursive: true });
   const nodes = decoded.message.nodeChanges;
+  const blobs = (decoded.message.blobs || []).map((blob) =>
+    blob.bytes instanceof Uint8Array
+      ? blob.bytes
+      : Uint8Array.from(Object.values(blob.bytes || {}))
+  );
   const values = {};
   const valueKeys = new Map();
   const reference = (value) => {
@@ -28,6 +34,25 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
       values[key] = value;
     }
     return { $ref: key };
+  };
+  const geometryStats = { total: 0, decoded: 0, errors: 0 };
+  const geometry = (paths) => {
+    const resolved = resolveFigmaGeometry(paths, blobs);
+    for (const item of resolved || []) {
+      geometryStats.total += 1;
+      if (item.d) geometryStats.decoded += 1;
+      if (item.error) geometryStats.errors += 1;
+    }
+    return resolved;
+  };
+  const compactCache = new WeakMap();
+  const compact = (node) => {
+    let result = compactCache.get(node);
+    if (!result) {
+      result = compactFigmaNode(node, reference, geometry);
+      compactCache.set(node, result);
+    }
+    return result;
   };
   const children = new Map();
   for (const node of nodes) {
@@ -72,7 +97,6 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     fs.mkdirSync(sectionDir, { recursive: true });
     const relativeSectionDir =
       `evidence/figma/${String(index).padStart(2, '0')}-${slug(page.name)}`;
-    const compact = (node) => compactFigmaNode(node, reference);
     const sections = (children.get(pageId) || []).map((root, sectionIndex) =>
       writeFigmaSection({
         root,
@@ -102,7 +126,22 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
   }
   const variables = nodes
     .filter((node) => node.type === 'VARIABLE' || node.type === 'VARIABLE_SET')
-    .map((node) => compactFigmaNode(node, reference));
+    .map(compact);
+  const fontUsage = new Map();
+  for (const node of nodes) {
+    if (!node.fontName) continue;
+    const key = JSON.stringify(node.fontName);
+    const entry = fontUsage.get(key) || {
+      ...node.fontName,
+      usageCount: 0,
+      localized: false,
+    };
+    entry.usageCount += 1;
+    fontUsage.set(key, entry);
+  }
+  const fonts = [...fontUsage.values()].sort((left, right) =>
+    `${left.family} ${left.style}`.localeCompare(`${right.family} ${right.style}`)
+  );
   fs.writeFileSync(
     path.join(evidenceDir, 'variables.json'),
     JSON.stringify({ variables }),
@@ -135,6 +174,9 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     componentCount: nodes.filter((node) => node.type === 'SYMBOL').length,
     instanceCount: nodes.filter((node) => node.type === 'INSTANCE').length,
     variableCount: variables.length,
+    fontCount: fonts.length,
+    fonts,
+    geometry: geometryStats,
     pages: pageIndex,
     variables: 'evidence/figma/variables.json',
     values: {

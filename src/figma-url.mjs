@@ -7,6 +7,12 @@ export function parseFigmaSource(rawUrl) {
     return null;
   }
   if (!/(?:^|\.)figma\.com$/i.test(url.hostname)) return null;
+  const publicUrl = new URL(url);
+  for (const key of publicUrl.searchParams.keys()) {
+    if (!['node-id', 'page-id'].includes(key)) {
+      publicUrl.searchParams.set(key, ':value');
+    }
+  }
   const community = url.pathname.match(/^\/community\/file\/(\d+)(?:\/([^/?#]+))?/i);
   if (community) {
     const fileId = community[1];
@@ -14,6 +20,7 @@ export function parseFigmaSource(rawUrl) {
       kind: 'figma-community',
       fileId,
       sourceUrl: url.href,
+      publicUrl: publicUrl.href,
       captureUrl:
         `https://embed.figma.com/file/${fileId}/hf_embed` +
         '?community_viewer=true&embed_host=site-spec&kind=file&page-selector=0&viewer=1',
@@ -29,7 +36,15 @@ export function parseFigmaSource(rawUrl) {
       fileKey: cloud[1],
       nodeId: url.searchParams.get('node-id'),
       sourceUrl: url.href,
+      publicUrl: publicUrl.href,
+      captureUrl: url.href,
+      canvasUrl: null,
+      imageBatchUrl: null,
     };
   }
-  return { kind: 'figma-unknown', sourceUrl: url.href };
+  return {
+    kind: 'figma-unknown',
+    sourceUrl: url.href,
+    publicUrl: publicUrl.href,
+  };
 }
