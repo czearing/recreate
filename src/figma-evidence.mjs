@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { compactFigmaNode, figmaGuid as guid } from './figma-node.mjs';
 import { writeFigmaSection } from './figma-sections.mjs';
 import { resolveFigmaGeometry } from './figma-vectors.mjs';
+import { writeFigmaComponents } from './figma-components.mjs';
 
 const slug = (value) =>
   String(value || 'page')
@@ -127,6 +128,12 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
   const variables = nodes
     .filter((node) => node.type === 'VARIABLE' || node.type === 'VARIABLE_SET')
     .map(compact);
+  const componentIndex = writeFigmaComponents({
+    outDir,
+    nodes,
+    pageForNode,
+    reference,
+  });
   const fontUsage = new Map();
   for (const node of nodes) {
     if (!node.fontName) continue;
@@ -172,6 +179,7 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     schemaDefinitionCount: decoded.schemaDefinitionCount,
     nodeCount: nodes.length,
     componentCount: nodes.filter((node) => node.type === 'SYMBOL').length,
+    components: componentIndex,
     instanceCount: nodes.filter((node) => node.type === 'INSTANCE').length,
     variableCount: variables.length,
     fontCount: fonts.length,

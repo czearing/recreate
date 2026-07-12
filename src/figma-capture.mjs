@@ -82,6 +82,7 @@ export async function captureFigmaSpec({
       'figma.json',
       'the active evidence/figma/<page>.json',
       'evidence/figma/variables.json',
+      'evidence/figma/component-search.json, then the matching component detail shard',
       'the matching evidence/figma/values/<prefix>.json for each {$ref}',
     ],
     rules: [

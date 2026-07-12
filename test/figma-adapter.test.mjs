@@ -166,6 +166,9 @@ test('writes page sections and omits hidden backing pages by default', () => {
   );
   assert.equal(section.nodes[1].text, 'Hello');
   assert.equal(index.variableCount, 2);
+  assert.equal(index.components.count, 1);
+  assert.ok(fs.existsSync(path.join(outDir, index.components.search)));
+  assert.ok(index.components.details.shards.length > 0);
   assert.ok(index.values.shards.length > 0);
   assert.ok(fs.existsSync(path.join(outDir, index.values.shards[0])));
 
