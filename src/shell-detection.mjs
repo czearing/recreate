@@ -8,12 +8,23 @@ export function isAuthenticationShell({
   const authActions = authActionTexts.filter((text) =>
     /^sign in(?:\s+(?:to|with)\b.*)?$/i.test(text.replace(/\s+/g, ' ').trim())
   );
+  let residualBody = compactBody.toLowerCase();
+  for (const text of [compactHeading, ...authActions]) {
+    const token = text.toLowerCase();
+    if (token.length >= 3) residualBody = residualBody.split(token).join(' ');
+  }
+  residualBody = residualBody.replace(/[^a-z0-9]+/g, ' ').trim();
   return (
     compactBody.length > 0 &&
     compactBody.length < 2000 &&
     (
       /^sign in(?:\s+to\b.*)?$/i.test(compactHeading) ||
-      authActions.length >= 2
+      authActions.length >= 2 ||
+      (
+        compactBody.length < 300 &&
+        authActions.length >= 1 &&
+        residualBody.length < 40
+      )
     )
   );
 }

@@ -14,6 +14,14 @@ test('detects bounded provider sign-in shells', () => {
   }), true);
 });
 
+test('detects tiny single-action authentication fallbacks', () => {
+  assert.equal(isAuthenticationShell({
+    heading: 'Notebooks',
+    bodyText: 'Notebooks\nSign in',
+    authActionTexts: ['Sign in'],
+  }), true);
+});
+
 test('does not reject applications with incidental sign-in controls', () => {
   assert.equal(isAuthenticationShell({
     heading: 'Microsoft Learn',
