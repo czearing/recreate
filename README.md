@@ -201,6 +201,20 @@ timing, localized model assets, and two compositor-derived numeric samples.
 The temporary compositor pixels are reduced to a small RGBA grid and hash; no
 screenshot is written or supplied as implementation input.
 
+Disposable WebGL targets can opt into controlled animation and input probing:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --webgl-probes --max-routes 1 --out site-spec-output
+```
+
+The page is reloaded with a temporary requestAnimationFrame controller, paused,
+stepped by a fixed phase, pointer-dragged, reverse-dragged, numerically sampled,
+then reloaded without instrumentation. Phase, interaction, and restoration
+hashes and RGBA-grid distances are retained; the probe fails if the phase does
+not change or the interaction has no effect. Reverse-drag restoration is
+reported as a distance and exactness flag, then the page is reloaded cleanly;
+nonlinear camera controls are not falsely required to invert exactly.
+
 Stable DOM is not sufficient acceptance by itself. Prominent 404 and
 access-denied shells fail validation even when readiness and geometry succeed.
 

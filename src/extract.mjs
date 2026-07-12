@@ -9,6 +9,8 @@ import {
 } from './capture-compaction.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
+import { captureWebglInteractionState } from './webgl-probe.mjs';
+import { rafControlSource } from './webgl-runtime.mjs';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -29,6 +31,7 @@ const captureClipboardProbe = Boolean(args['clipboard-probe']);
 const captureTooltipProbes = Boolean(args['tooltip-probes']);
 const captureVirtualListProbes = Boolean(args['virtual-list-probes']);
 const captureDragProbes = Boolean(args['drag-probes']);
+const captureWebglInteractionProbes = Boolean(args['webgl-probes']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -124,13 +127,14 @@ class Cdp {
   async close() {
     if (this.ws.readyState === WebSocket.CLOSED) return;
     await new Promise((resolve) => {
-      const timeout = setTimeout(resolve, 1000);
+      const timeout = setTimeout(resolve, 5000);
       this.ws.addEventListener('close', () => {
         clearTimeout(timeout);
         resolve();
       }, { once: true });
       this.ws.close();
     });
+    await new Promise((resolve) => setTimeout(resolve, 250));
   }
 }
 
@@ -1926,10 +1930,20 @@ async function compositorSignatureFor(rect) {
         const context = canvas.getContext('2d', { willReadFrequently: true });
         context.drawImage(bitmap, 0, 0);
         const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
-        const size = 16;
+        const size = 32;
         const grid = [];
         let hash = 2166136261;
         let red = 0, green = 0, blue = 0, alpha = 0;
+        for (let offset = 0; offset < pixels.length; offset += 4) {
+          for (let channel = 0; channel < 4; channel++) {
+            hash ^= pixels[offset + channel];
+            hash = Math.imul(hash, 16777619);
+          }
+          red += pixels[offset];
+          green += pixels[offset + 1];
+          blue += pixels[offset + 2];
+          alpha += pixels[offset + 3];
+        }
         for (let gy = 0; gy < size; gy++) {
           for (let gx = 0; gx < size; gx++) {
             const x = Math.min(
@@ -1948,17 +1962,9 @@ async function compositorSignatureFor(rect) {
               pixels[offset + 3]
             ];
             grid.push(sample);
-            for (const value of sample) {
-              hash ^= value;
-              hash = Math.imul(hash, 16777619);
-            }
-            red += sample[0];
-            green += sample[1];
-            blue += sample[2];
-            alpha += sample[3];
           }
         }
-        const count = grid.length;
+        const count = pixels.length / 4;
         return {
           width: bitmap.width,
           height: bitmap.height,
@@ -4693,10 +4699,38 @@ const captures = [];
 if (created) {
   await navigateAndCaptureAllPages(url);
 }
+let webglRafScriptIdentifier;
+if (captureWebglInteractionProbes) {
+  webglRafScriptIdentifier = (
+    await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+      source: rafControlSource,
+    })
+  ).identifier;
+  await cdp.send('Page.reload');
+}
 await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureWebglInteractionProbes) {
+    await captureWebglInteractionState({
+      cdp,
+      maxStates: maxRoutes,
+      states: multiPageStates,
+      viewports,
+      capturePageSnapshot,
+      cleanupPage: async () => {
+        if (webglRafScriptIdentifier) {
+          await cdp.send('Page.removeScriptToEvaluateOnNewDocument', {
+            identifier: webglRafScriptIdentifier,
+          });
+          webglRafScriptIdentifier = undefined;
+        }
+        await cdp.send('Page.reload');
+        await waitForApplicationReady();
+      },
+    });
+  }
   if (captureDragProbes) {
     await captureDragStates({
       cdp,
@@ -5751,6 +5785,40 @@ if (!fullProfile && responsive.length) {
   );
 }
 
+for (const state of multiPageStates.filter((entry) => entry.webglInteraction)) {
+  const evidenceDir = path.join(outDir, 'evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  const filename = `webgl-interaction-${String(state.index).padStart(3, '0')}.json`;
+  const relativeFile = `evidence/${filename}`;
+  const full = state.webglInteraction;
+  fs.writeFileSync(
+    path.join(evidenceDir, filename),
+    JSON.stringify(full, null, 2),
+  );
+  state.webglInteraction = {
+    evidence: relativeFile,
+    hashes: {
+      initial: full.initial.sampleHash,
+      phase: full.phase.sampleHash,
+      control: full.control.sampleHash,
+      interacted: full.interacted.sampleHash,
+      restored: full.restored.sampleHash,
+    },
+    callbacks: {
+      initial: full.initial.callbacks,
+      phase: full.phase.callbacks,
+      control: full.control.callbacks,
+      interacted: full.interacted.callbacks,
+      restored: full.restored.callbacks,
+    },
+    phaseDistance: full.phaseDistance,
+    controlDistance: full.controlDistance,
+    interactionDistance: full.interactionDistance,
+    restorationDistance: full.restorationDistance,
+    restorationExact: full.restorationExact,
+  };
+}
+
 const implementationBlueprint = {
   schemaVersion: 2,
   purpose:
@@ -5806,6 +5874,7 @@ const implementationBlueprint = {
     timing: state.timing,
     virtualization: state.virtualization,
     drag: state.drag,
+    webglInteraction: state.webglInteraction,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,
