@@ -116,8 +116,16 @@ class Cdp {
     this.handlers.set(method, handlers);
   }
 
-  close() {
-    this.ws.close();
+  async close() {
+    if (this.ws.readyState === WebSocket.CLOSED) return;
+    await new Promise((resolve) => {
+      const timeout = setTimeout(resolve, 1000);
+      this.ws.addEventListener('close', () => {
+        clearTimeout(timeout);
+        resolve();
+      }, { once: true });
+      this.ws.close();
+    });
   }
 }
 
@@ -1589,7 +1597,10 @@ async function capturePageSnapshot(
             bodyHeight: document.body ? document.body.scrollHeight : 0,
             html: '<!DOCTYPE html>\\n' + document.documentElement.outerHTML,
             focus: (() => {
-              const element = document.activeElement;
+              let element = document.activeElement;
+              while (element?.shadowRoot?.activeElement) {
+                element = element.shadowRoot.activeElement;
+              }
               if (!element || element === document.body) return null;
               return {
                 tag: element.tagName.toLowerCase(),
@@ -2585,15 +2596,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     return (
       await cdp.send('Runtime.evaluate', {
         expression: `(() => {
-          const visible = Array.from(document.querySelectorAll(
-            ${JSON.stringify(selector)}
-          )).some(element => {
+          const elements = [];
+          const visit = root => {
+            elements.push(...root.querySelectorAll(${JSON.stringify(selector)}));
+            for (const element of root.querySelectorAll('*')) {
+              if (element.shadowRoot) visit(element.shadowRoot);
+            }
+          };
+          visit(document);
+          const visible = elements.some(element => {
             const rect = element.getBoundingClientRect();
             const style = getComputedStyle(element);
             return rect.width > 0 && rect.height > 0 &&
               style.display !== 'none' && style.visibility !== 'hidden';
           });
-          const focus = document.activeElement;
+          let focus = document.activeElement;
+          while (focus?.shadowRoot?.activeElement) {
+            focus = focus.shadowRoot.activeElement;
+          }
           return {
             closed: !visible,
             focus: focus && focus !== document.body
@@ -3013,23 +3033,45 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       expression: `JSON.stringify({
         n: document.querySelectorAll('*').length,
         u: location.href,
-        overlayCount: Array.from(document.querySelectorAll(
-          '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
-        )).filter(element => {
-          const rect = element.getBoundingClientRect();
-          const style = getComputedStyle(element);
-          return rect.width > 0 && rect.height > 0 &&
-            style.display !== 'none' && style.visibility !== 'hidden';
-        }).length,
+        overlayCount: (() => {
+          const elements = [];
+          const visit = root => {
+            elements.push(...root.querySelectorAll(
+              '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
+            ));
+            for (const element of root.querySelectorAll('*')) {
+              if (element.shadowRoot) visit(element.shadowRoot);
+            }
+          };
+          visit(document);
+          return elements.filter(element => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0 && rect.height > 0 &&
+              style.display !== 'none' && style.visibility !== 'hidden';
+          }).length;
+        })(),
         fingerprint: JSON.stringify({
           text: (document.body?.innerText || '').slice(0, 10000),
-          controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
-            value: element.value,
-            checked: element.checked,
-            expanded: element.getAttribute('aria-expanded'),
-            pressed: element.getAttribute('aria-pressed'),
-            selected: element.getAttribute('aria-selected')
-          }))
+          controls: (() => {
+            const elements = [];
+            const visit = root => {
+              elements.push(...root.querySelectorAll(
+                'input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]'
+              ));
+              for (const element of root.querySelectorAll('*')) {
+                if (element.shadowRoot) visit(element.shadowRoot);
+              }
+            };
+            visit(document);
+            return elements.map(element => ({
+              value: element.value,
+              checked: element.checked,
+              expanded: element.getAttribute('aria-expanded'),
+              pressed: element.getAttribute('aria-pressed'),
+              selected: element.getAttribute('aria-selected')
+            }));
+          })()
         })
       })`,
       returnByValue: true,
@@ -3150,15 +3192,25 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         await cdp.send('Runtime.evaluate', {
           expression: `JSON.stringify({
             text: (document.body?.innerText || '').slice(0, 10000),
-            controls: Array.from(document.querySelectorAll(
-              'input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]'
-            )).map(element => ({
-              value: element.value,
-              checked: element.checked,
-              expanded: element.getAttribute('aria-expanded'),
-              pressed: element.getAttribute('aria-pressed'),
-              selected: element.getAttribute('aria-selected')
-            }))
+            controls: (() => {
+              const elements = [];
+              const visit = root => {
+                elements.push(...root.querySelectorAll(
+                  'input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]'
+                ));
+                for (const element of root.querySelectorAll('*')) {
+                  if (element.shadowRoot) visit(element.shadowRoot);
+                }
+              };
+              visit(document);
+              return elements.map(element => ({
+                value: element.value,
+                checked: element.checked,
+                expanded: element.getAttribute('aria-expanded'),
+                pressed: element.getAttribute('aria-pressed'),
+                selected: element.getAttribute('aria-selected')
+              }));
+            })()
           })`,
           returnByValue: true,
         }).catch(() => ({ result: { value: beforeFingerprint } }))
@@ -3196,29 +3248,70 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           expression: `JSON.stringify({
             u: location.href,
             n: document.querySelectorAll('*').length,
-            modal: !!document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'),
-            modalText: (document.querySelector('dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"]')?.innerText||'').substring(0,200),
-            overlays: Array.from(document.querySelectorAll(
-              '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
-            )).filter(element => {
-              const rect = element.getBoundingClientRect();
-              const style = getComputedStyle(element);
-              return rect.width > 0 && rect.height > 0 &&
-                style.display !== 'none' && style.visibility !== 'hidden';
-            }).map(element => ({
-              role: element.getAttribute('role') || 'popover',
-              text: (element.innerText || element.getAttribute('aria-label') || '')
-                .trim().slice(0, 200)
-            })),
+            modals: (() => {
+              const elements = [];
+              const visit = root => {
+                elements.push(...root.querySelectorAll(
+                  'dialog[open],[role="dialog"],[role="alertdialog"],[aria-modal="true"],.modal,[data-modal]'
+                ));
+                for (const element of root.querySelectorAll('*')) {
+                  if (element.shadowRoot) visit(element.shadowRoot);
+                }
+              };
+              visit(document);
+              return elements.filter(element => {
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                return rect.width > 0 && rect.height > 0 &&
+                  style.display !== 'none' && style.visibility !== 'hidden';
+              }).map(element => ({
+                text: (element.innerText || element.getAttribute('aria-label') || '')
+                  .trim().slice(0, 200)
+              }));
+            })(),
+            overlays: (() => {
+              const elements = [];
+              const visit = root => {
+                elements.push(...root.querySelectorAll(
+                  '[role="menu"],[role="listbox"],[role="tree"],[role="tooltip"],[popover]:popover-open'
+                ));
+                for (const element of root.querySelectorAll('*')) {
+                  if (element.shadowRoot) visit(element.shadowRoot);
+                }
+              };
+              visit(document);
+              return elements.filter(element => {
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                return rect.width > 0 && rect.height > 0 &&
+                  style.display !== 'none' && style.visibility !== 'hidden';
+              }).map(element => ({
+                role: element.getAttribute('role') || 'popover',
+                text: (element.innerText || element.getAttribute('aria-label') || '')
+                  .trim().slice(0, 200)
+              }));
+            })(),
             fingerprint: JSON.stringify({
               text: (document.body?.innerText || '').slice(0, 10000),
-              controls: Array.from(document.querySelectorAll('input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]')).map(element => ({
-                value: element.value,
-                checked: element.checked,
-                expanded: element.getAttribute('aria-expanded'),
-                pressed: element.getAttribute('aria-pressed'),
-                selected: element.getAttribute('aria-selected')
-              }))
+              controls: (() => {
+                const elements = [];
+                const visit = root => {
+                  elements.push(...root.querySelectorAll(
+                    'input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]'
+                  ));
+                  for (const element of root.querySelectorAll('*')) {
+                    if (element.shadowRoot) visit(element.shadowRoot);
+                  }
+                };
+                visit(document);
+                return elements.map(element => ({
+                  value: element.value,
+                  checked: element.checked,
+                  expanded: element.getAttribute('aria-expanded'),
+                  pressed: element.getAttribute('aria-pressed'),
+                  selected: element.getAttribute('aria-selected')
+                }));
+              })()
             })
           })`,
           returnByValue: true,
@@ -3227,7 +3320,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         afterUrl = d.u || beforeUrl;
         nodeCount = d.n || nodeCount;
         afterFingerprint = d.fingerprint || afterFingerprint;
-        modalAppeared = d.modal && d.modalText?.trim().length > 0;
+        modalAppeared = (d.modals || []).some((modal) => modal.text);
         overlayAppeared =
           (d.overlays || []).length > preOverlayCount &&
           d.overlays.some((overlay) => overlay.text);
@@ -4352,7 +4445,7 @@ console.error(
 
 for (let captureIndex = 0; captureIndex < viewports.length; captureIndex++) {
   if (captureIndex > 0) {
-    cdp.close();
+    await cdp.close();
     const refreshedPage = (await getJson('/json/list')).find(
       (item) => item.id === page.id,
     );
@@ -5577,10 +5670,10 @@ fs.writeFileSync(
 );
 
 try {
-  cdp.close();
+  await cdp.close();
 } catch {}
 try {
-  browser?.close();
+  await browser?.close();
 } catch {}
 
 console.log(fs.readFileSync(path.join(outDir, 'summary.json'), 'utf8'));

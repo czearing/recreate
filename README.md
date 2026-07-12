@@ -151,7 +151,9 @@ preserves loading, optimistic, and pending UI without letting the normal visual
 settling delay erase it. Transient evidence is recorded at the primary viewport;
 the final settled state retains the normal responsive evidence contract.
 
-Open shadow roots are included in state evidence and interaction discovery.
+Open shadow roots are included in state evidence, interaction discovery,
+post-click control fingerprints, modal/overlay detection, deep focus identity,
+and trusted Escape dismissal. Closed roots remain explicitly unavailable.
 Keyboard-driven games are probed from a clean state when page controls and copy
 identify a bounded arrow-key or WASD interaction.
 
