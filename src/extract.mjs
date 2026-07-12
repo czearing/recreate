@@ -206,6 +206,16 @@ function networkEvidenceSince(index) {
   }));
 }
 
+function hasInFlightNetworkSince(index) {
+  return networkTimeline.slice(index).some(
+    (request) =>
+      ['Document', 'Fetch', 'XHR'].includes(request.type) &&
+      !/^(?:data|blob):/i.test(request.url) &&
+      request.endTimestamp == null &&
+      !request.failed,
+  );
+}
+
 async function waitForNetworkQuiet(index, maxWaitMs = 3000) {
   const startedAt = Date.now();
   let previous = '';
@@ -1508,6 +1518,7 @@ async function capturePageSnapshot(
   slug = String(index).padStart(3, '0'),
   viewport = viewports[0],
   writePageArtifacts = true,
+  settleVisuals = true,
 ) {
   const pageDir = path.join(outDir, 'pages');
   fs.mkdirSync(pageDir, { recursive: true });
@@ -1517,8 +1528,9 @@ async function capturePageSnapshot(
     deviceScaleFactor: viewport.dpr,
     mobile: viewport.width < 600,
   }).catch(() => {});
-  await cdp.send('Runtime.evaluate', {
-    expression: `(async () => {
+  if (settleVisuals) {
+    await cdp.send('Runtime.evaluate', {
+      expression: `(async () => {
       const waitForFrame = () => new Promise(resolve =>
         requestAnimationFrame(() => requestAnimationFrame(resolve))
       );
@@ -1556,8 +1568,9 @@ async function capturePageSnapshot(
       return false;
     })()`,
     awaitPromise: true,
-    returnByValue: true,
-  }).catch(() => {});
+      returnByValue: true,
+    }).catch(() => {});
+  }
 
   let pageData = {};
   let screenshot;
@@ -1838,6 +1851,16 @@ async function captureResponsivePageSnapshot(
     deviceScaleFactor: primaryViewport.dpr,
     mobile: primaryViewport.width < 600,
   }).catch(() => {});
+  return state;
+}
+
+async function captureTransientPageSnapshot(index) {
+  const viewport = viewports[0];
+  const slug = `${String(index).padStart(3, '0')}-transient`;
+  const state = await capturePageSnapshot(index, slug, viewport, true, false);
+  state.evidenceByViewport = {
+    [`${viewport.width}x${viewport.height}`]: state.evidence,
+  };
   return state;
 }
 
@@ -3059,6 +3082,44 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       !clickedVal.startsWith('clicked') &&
       !clickedVal.startsWith('entered')
     ) continue;
+
+    if (multiPageStates.length + 1 < maxRoutes) {
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      const transientFingerprint = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `JSON.stringify({
+            text: (document.body?.innerText || '').slice(0, 10000),
+            controls: Array.from(document.querySelectorAll(
+              'input,textarea,select,[aria-expanded],[aria-pressed],[aria-selected]'
+            )).map(element => ({
+              value: element.value,
+              checked: element.checked,
+              expanded: element.getAttribute('aria-expanded'),
+              pressed: element.getAttribute('aria-pressed'),
+              selected: element.getAttribute('aria-selected')
+            }))
+          })`,
+          returnByValue: true,
+        }).catch(() => ({ result: { value: beforeFingerprint } }))
+      ).result.value;
+      if (
+        transientFingerprint !== beforeFingerprint &&
+        hasInFlightNetworkSince(networkStartIndex)
+      ) {
+        const transient = await captureTransientPageSnapshot(
+          multiPageStates.length,
+        );
+        transient.type = 'transient';
+        transient.trigger = candidate.text || candidate.placeholder;
+        transient.triggerElement = triggerElementFor(candidate);
+        transient.probe = {
+          action: clickedVal.startsWith('entered') ? 'enter' : 'click',
+          checkpoint: 'network-in-flight',
+        };
+        transient.network = networkEvidenceSince(networkStartIndex);
+        multiPageStates.push(transient);
+      }
+    }
 
     // Poll for URL change, modal, or DOM shift — up to 3 seconds
     let afterUrl = beforeUrl;

@@ -140,6 +140,12 @@ Interaction states include sanitized Document, Fetch, and XHR timing from the
 trigger until the network becomes quiet. Query keys are retained while query
 values and encoded data/blob resources are excluded.
 
+When a trigger changes the DOM while a request is still in flight, the crawler
+captures a fast `transient` checkpoint before waiting for the final state. This
+preserves loading, optimistic, and pending UI without letting the normal visual
+settling delay erase it. Transient evidence is recorded at the primary viewport;
+the final settled state retains the normal responsive evidence contract.
+
 Open shadow roots are included in state evidence and interaction discovery.
 Keyboard-driven games are probed from a clean state when page controls and copy
 identify a bounded arrow-key or WASD interaction.
