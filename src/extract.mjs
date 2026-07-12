@@ -8,6 +8,7 @@ import {
   compactCapture,
 } from './capture-compaction.mjs';
 import { captureDragStates } from './drag-probe.mjs';
+import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
@@ -34,6 +35,8 @@ const captureVirtualListProbes = Boolean(args['virtual-list-probes']);
 const captureDragProbes = Boolean(args['drag-probes']);
 const captureWebglInteractionProbes = Boolean(args['webgl-probes']);
 const captureIframeProbes = Boolean(args['iframe-probes']);
+const captureHoverProbes = Boolean(args['hover-probes']);
+const hoverMatch = String(args['hover-match'] || '');
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -4714,6 +4717,16 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureHoverProbes) {
+    await captureHoverState({
+      cdp,
+      match: hoverMatch,
+      maxStates: maxRoutes,
+      states: multiPageStates,
+      viewports,
+      capturePageSnapshot,
+    });
+  }
   if (captureIframeProbes) {
     await captureIframeState({
       cdp,
@@ -5877,6 +5890,34 @@ for (const state of multiPageStates.filter((entry) => entry.iframeInteraction)) 
     restored: compactFrameState(full.restored),
   };
 }
+for (const state of multiPageStates.filter((entry) => entry.hoverInteraction)) {
+  const evidenceDir = path.join(outDir, 'evidence');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  const filename = `hover-interaction-${String(state.index).padStart(3, '0')}.json`;
+  const relativeFile = `evidence/${filename}`;
+  const full = state.hoverInteraction;
+  fs.writeFileSync(
+    path.join(evidenceDir, filename),
+    JSON.stringify(full, null, 2),
+  );
+  state.hoverInteraction = {
+    evidence: relativeFile,
+    before: full.before,
+    after: full.after,
+    restored: full.restored,
+    authoredRuleCount: full.authoredRules.length,
+    animations: full.animations.map((animation) => ({
+      pseudoElement: animation.pseudoElement,
+      targetTag: animation.targetTag,
+      duration: animation.timing.duration,
+      easing: animation.timing.easing,
+      keyframes: animation.keyframes.map((keyframe) => ({
+        opacity: keyframe.opacity,
+        transform: keyframe.transform,
+      })),
+    })),
+  };
+}
 
 const implementationBlueprint = {
   schemaVersion: 2,
@@ -5935,6 +5976,7 @@ const implementationBlueprint = {
     drag: state.drag,
     webglInteraction: state.webglInteraction,
     iframeInteraction: state.iframeInteraction,
+    hoverInteraction: state.hoverInteraction,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,

@@ -152,6 +152,16 @@ Tooltip probing is opt-in so it does not consume route-state budgets:
 node src/extract.mjs --reuse --target <target-id> --crawl --tooltip-probes --out site-spec-output
 ```
 
+General hover motion can be captured by semantic label:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --hover-probes --hover-match "My Notebook" --max-routes 1 --out site-spec-output
+```
+
+The hover state includes authored matching `:hover` rules, pseudo-element
+keyframes and timing, forced settled geometry/styles, reduced-motion identity,
+and verified pointer-leave restoration.
+
 Virtualized listboxes using `aria-activedescendant` can be probed explicitly:
 
 ```powershell
