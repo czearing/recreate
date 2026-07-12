@@ -7,6 +7,7 @@ import { writeFigmaComponents } from './figma-components.mjs';
 import { writeFigmaInteractions } from './figma-interactions.mjs';
 import { writeFigmaStyles } from './figma-styles.mjs';
 import { createFigmaValueStore } from './figma-values.mjs';
+import { resolveVectorNetwork } from './figma-vector-network.mjs';
 
 const slug = (value) =>
   String(value || 'page')
@@ -27,6 +28,7 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
   const valueStore = createFigmaValueStore(evidenceDir);
   const { reference } = valueStore;
   const geometryStats = { total: 0, decoded: 0, errors: 0 };
+  const vectorStats = { total: 0, decoded: 0, errors: 0, paths: 0 };
   const geometry = (paths) => {
     const resolved = resolveFigmaGeometry(paths, blobs);
     for (const item of resolved || []) {
@@ -36,11 +38,20 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     }
     return resolved;
   };
+  const vectorNetwork = (node) => {
+    const resolved = resolveVectorNetwork(node, blobs);
+    if (!resolved) return undefined;
+    vectorStats.total += 1;
+    vectorStats.paths += resolved.paths.length;
+    if (resolved.error) vectorStats.errors += 1;
+    else vectorStats.decoded += 1;
+    return resolved;
+  };
   const compactCache = new WeakMap();
   const compact = (node) => {
     let result = compactCache.get(node);
     if (!result) {
-      result = compactFigmaNode(node, reference, geometry);
+      result = compactFigmaNode(node, reference, geometry, vectorNetwork);
       compactCache.set(node, result);
     }
     return result;
@@ -175,6 +186,7 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     fontCount: fonts.length,
     fonts,
     geometry: geometryStats,
+    vectorNetworks: vectorStats,
     pages: pageIndex,
     variables: 'evidence/figma/variables.json',
     values: valueIndex,
