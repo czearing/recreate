@@ -3013,7 +3013,17 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   };
 
   const replayInputProbe = async (candidate) => {
-    await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    const currentUrl = (
+      await cdp.send('Runtime.evaluate', {
+        expression: 'location.href',
+        returnByValue: true,
+      })
+    ).result.value;
+    if (currentUrl === homeUrl) {
+      await cdp.send('Page.reload', { ignoreCache: false }).catch(() => {});
+    } else {
+      await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    }
     await waitForApplicationReady();
     return (
       await cdp.send('Runtime.evaluate', {
@@ -3348,6 +3358,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     }
   };
 
+  let attemptedCandidate = false;
   for (const candidate of candidates) {
     if (multiPageStates.length >= maxRoutes) break;
 
@@ -3358,7 +3369,10 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     if (currentUrl !== homeUrl) {
       await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+    } else if (attemptedCandidate) {
+      await cdp.send('Page.reload', { ignoreCache: false }).catch(() => {});
     }
+    attemptedCandidate = true;
 
     // Wait for home page to stabilize
     let homeN = 0, homeStab = 0;
@@ -4002,6 +4016,17 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     // Navigate back to home
     await cdp.send('Page.navigate', { url: homeUrl }).catch(() => {});
+  }
+
+  const finalUrl = (
+    await cdp.send('Runtime.evaluate', {
+      expression: 'location.href',
+      returnByValue: true,
+    }).catch(() => ({ result: { value: '' } }))
+  ).result.value;
+  if (finalUrl === homeUrl && attemptedCandidate) {
+    await cdp.send('Page.reload', { ignoreCache: false }).catch(() => {});
+    await waitForApplicationReady();
   }
 
   if (multiPageStates.length < maxRoutes) {
