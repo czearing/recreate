@@ -1,10 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { compactFigmaNode, figmaGuid as guid } from './figma-node.mjs';
 import { writeFigmaSection } from './figma-sections.mjs';
 import { resolveFigmaGeometry } from './figma-vectors.mjs';
 import { writeFigmaComponents } from './figma-components.mjs';
+import { writeFigmaInteractions } from './figma-interactions.mjs';
+import { writeFigmaStyles } from './figma-styles.mjs';
+import { createFigmaValueStore } from './figma-values.mjs';
 
 const slug = (value) =>
   String(value || 'page')
@@ -22,20 +24,8 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
       ? blob.bytes
       : Uint8Array.from(Object.values(blob.bytes || {}))
   );
-  const values = {};
-  const valueKeys = new Map();
-  const reference = (value) => {
-    if (value == null) return undefined;
-    const json = JSON.stringify(value);
-    if (json.length < 80) return value;
-    let key = valueKeys.get(json);
-    if (!key) {
-      key = createHash('sha256').update(json).digest('hex').slice(0, 20);
-      valueKeys.set(json, key);
-      values[key] = value;
-    }
-    return { $ref: key };
-  };
+  const valueStore = createFigmaValueStore(evidenceDir);
+  const { reference } = valueStore;
   const geometryStats = { total: 0, decoded: 0, errors: 0 };
   const geometry = (paths) => {
     const resolved = resolveFigmaGeometry(paths, blobs);
@@ -133,6 +123,20 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     nodes,
     pageForNode,
     reference,
+    compact,
+    children,
+  });
+  const interactionIndex = writeFigmaInteractions({
+    outDir,
+    nodes,
+    pageForNode,
+    reference,
+  });
+  const styleIndex = writeFigmaStyles({
+    outDir,
+    nodes,
+    pageForNode,
+    compact,
   });
   const fontUsage = new Map();
   for (const node of nodes) {
@@ -153,23 +157,7 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     path.join(evidenceDir, 'variables.json'),
     JSON.stringify({ variables }),
   );
-  const valuesDir = path.join(evidenceDir, 'values');
-  fs.mkdirSync(valuesDir, { recursive: true });
-  const valueShards = {};
-  for (const [key, value] of Object.entries(values)) {
-    const prefix = key[0];
-    valueShards[prefix] ||= {};
-    valueShards[prefix][key] = value;
-  }
-  const shardFiles = [];
-  for (const [prefix, shardValues] of Object.entries(valueShards)) {
-    const filename = `${prefix}.json`;
-    fs.writeFileSync(
-      path.join(valuesDir, filename),
-      JSON.stringify({ values: shardValues }),
-    );
-    shardFiles.push(`evidence/figma/values/${filename}`);
-  }
+  const valueIndex = valueStore.write();
   const index = {
     sourceType: source.kind,
     fileId: source.fileId,
@@ -180,6 +168,8 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     nodeCount: nodes.length,
     componentCount: nodes.filter((node) => node.type === 'SYMBOL').length,
     components: componentIndex,
+    interactions: interactionIndex,
+    styles: styleIndex,
     instanceCount: nodes.filter((node) => node.type === 'INSTANCE').length,
     variableCount: variables.length,
     fontCount: fonts.length,
@@ -187,11 +177,7 @@ export function writeFigmaEvidence({ outDir, source, decoded, byteLength, profil
     geometry: geometryStats,
     pages: pageIndex,
     variables: 'evidence/figma/variables.json',
-    values: {
-      shardPrefixLength: 1,
-      pattern: 'evidence/figma/values/<first-hash-character>.json',
-      shards: shardFiles.sort(),
-    },
+    values: valueIndex,
   };
   fs.writeFileSync(path.join(outDir, 'figma.json'), JSON.stringify(index, null, 2));
   return index;

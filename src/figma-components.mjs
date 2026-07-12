@@ -8,6 +8,8 @@ export function writeFigmaComponents({
   nodes,
   pageForNode,
   reference,
+  compact,
+  children,
 }) {
   const usage = new Map();
   for (const node of nodes) {
@@ -37,6 +39,13 @@ export function writeFigmaComponents({
     .map((node) => {
       const id = guid(node.guid);
       const instances = usage.get(id);
+      const queue = [...(children.get(id) || [])];
+      const descendants = [];
+      for (let cursor = 0; cursor < queue.length; cursor += 1) {
+        const child = queue[cursor];
+        descendants.push(compact(child));
+        queue.push(...(children.get(guid(child.guid)) || []));
+      }
       return {
         id,
         name: node.name,
@@ -47,6 +56,8 @@ export function writeFigmaComponents({
         description: node.symbolDescription,
         variantProperties: reference(node.variantPropSpecs),
         propertyDefinitions: reference(node.componentPropDefs),
+        master: compact(node),
+        masterChildren: reference(descendants),
         instanceUsage: instances
           ? {
               count: instances.count,
