@@ -36,6 +36,17 @@ const decoded = {
             navigationType: 'NAVIGATE',
             transitionType: 'SMART_ANIMATE',
           }],
+        }, {
+          id: { sessionID: 9, localID: 2 },
+          event: {
+            interactionType: 'AFTER_TIMEOUT',
+            transitionTimeout: 0.5,
+          },
+          actions: [{
+            transitionNodeID: { sessionID: 2, localID: 3 },
+            navigationType: 'OVERLAY',
+            transitionType: 'MOVE_FROM_RIGHT',
+          }],
         }],
       }),
       node(2, 3, 'TEXT', 'Title', [2, 2], {
@@ -74,7 +85,7 @@ test('writes semantic indexes and omits hidden pages by default', () => {
   assert.equal(section.nodes[1].text, 'Hello');
   assert.equal(index.variableCount, 2);
   assert.equal(index.components.count, 1);
-  assert.equal(index.interactions.interactionCount, 1);
+  assert.equal(index.interactions.interactionCount, 2);
   assert.equal(index.styles.count, 1);
   assert.equal(index.styles.missingCount, 0);
   assert.ok(index.values.shards.length > 0);
@@ -90,6 +101,25 @@ test('writes semantic indexes and omits hidden pages by default', () => {
   const component = Object.values(componentShard.components)[0];
   assert.equal(component.master.type, 'SYMBOL');
   assert.ok(component.masterChildren);
+  const interactionSearch = JSON.parse(
+    fs.readFileSync(path.join(outDir, index.interactions.search), 'utf8'),
+  );
+  assert.deepEqual(interactionSearch.flows[0].eventTypes, [
+    'ON_PRESS',
+    'AFTER_TIMEOUT',
+  ]);
+  assert.deepEqual(interactionSearch.facets.navigationTypes, {
+    NAVIGATE: [0],
+    OVERLAY: [0],
+  });
+  assert.deepEqual(interactionSearch.facets.transitionTypes, {
+    SMART_ANIMATE: [0],
+    MOVE_FROM_RIGHT: [0],
+  });
+  assert.deepEqual(interactionSearch.facets.timeoutSeconds, {
+    0: [0.5],
+  });
+  assert.equal(interactionSearch.facets.values, 'flow indexes');
 });
 
 test('retains hidden backing pages in full profile', () => {

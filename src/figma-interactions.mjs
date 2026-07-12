@@ -62,7 +62,28 @@ export function writeFigmaInteractions({
   const shardDirectory = path.join(outDir, 'evidence', 'figma', 'interactions');
   fs.mkdirSync(shardDirectory, { recursive: true });
   const shards = {};
-  const search = flows.map((flow) => {
+  const facets = {
+    values: 'flow indexes',
+    navigationTypes: {},
+    transitionTypes: {},
+    timeoutSeconds: {},
+  };
+  const search = flows.map((flow, flowIndex) => {
+    const actions = flow.interactions.flatMap(
+      (interaction) => interaction.actions,
+    );
+    for (const type of new Set(
+      actions.map((action) => action.navigationType || 'NONE'),
+    )) (facets.navigationTypes[type] ||= []).push(flowIndex);
+    for (const type of new Set(
+      actions.map((action) => action.transitionType || 'NONE'),
+    )) (facets.transitionTypes[type] ||= []).push(flowIndex);
+    const timeoutSeconds = [...new Set(
+      flow.interactions
+        .map((interaction) => interaction.event?.transitionTimeout)
+        .filter((value) => Number.isFinite(value)),
+    )];
+    if (timeoutSeconds.length) facets.timeoutSeconds[flowIndex] = timeoutSeconds;
     const prefix = createHash('sha256')
       .update(flow.nodeId)
       .digest('hex')[0];
@@ -81,7 +102,10 @@ export function writeFigmaInteractions({
     };
   });
   const searchFile = 'evidence/figma/interaction-search.json';
-  fs.writeFileSync(path.join(outDir, searchFile), JSON.stringify({ flows: search }));
+  fs.writeFileSync(
+    path.join(outDir, searchFile),
+    JSON.stringify({ flows: search, facets }),
+  );
   const shardFiles = [];
   for (const [prefix, shardFlows] of Object.entries(shards)) {
     const file = `evidence/figma/interactions/${prefix}.json`;
