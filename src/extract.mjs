@@ -24,6 +24,7 @@ const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const captureEditorProbes = Boolean(args['editor-probes']);
 const captureClipboardProbe = Boolean(args['clipboard-probe']);
+const captureTooltipProbes = Boolean(args['tooltip-probes']);
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -1966,6 +1967,7 @@ async function compositorSignatureFor(rect) {
 }
 
 async function captureEditorStates(maxStates) {
+  if (multiPageStates.length >= maxStates) return;
   const editorDescriptor = (
     await cdp.send('Runtime.evaluate', {
       expression: `(() => {
@@ -2295,6 +2297,263 @@ async function captureEditorStates(maxStates) {
       }
     }
   }
+}
+
+async function captureTooltipStates(maxStates) {
+  if (multiPageStates.length >= maxStates) return;
+  const descriptor = (
+    await cdp.send('Runtime.evaluate', {
+      expression: `(() => {
+        const roots = [document];
+        const elements = [];
+        while (roots.length) {
+          const root = roots.shift();
+          elements.push(...root.querySelectorAll('[aria-describedby]'));
+          for (const element of root.querySelectorAll('*')) {
+            if (element.shadowRoot) roots.push(element.shadowRoot);
+          }
+        }
+        for (const trigger of elements) {
+          const ids = (trigger.getAttribute('aria-describedby') || '')
+            .split(/\\s+/)
+            .filter(Boolean);
+          const root = trigger.getRootNode();
+          const id = ids.find(candidate => {
+            const described =
+              root.getElementById?.(candidate) || document.getElementById(candidate);
+            return described?.getAttribute('role') === 'tooltip';
+          });
+          const tooltip =
+            root.getElementById?.(id) || document.getElementById(id);
+          if (tooltip?.getAttribute('role') !== 'tooltip') continue;
+          const rect = trigger.getBoundingClientRect();
+          if (rect.width <= 4 || rect.height <= 4) continue;
+          window.__siteSpecTooltipTrigger = trigger;
+          window.__siteSpecTooltip = tooltip;
+          const timing = {};
+          const onEnter = () => {
+            timing.startedAt = performance.now();
+          };
+          const onLeave = () => {
+            timing.dismissalStartedAt = performance.now();
+          };
+          const onTransitionStart = event => {
+            if (
+              event.propertyName === 'opacity' &&
+              timing.startedAt != null &&
+              timing.appearanceMs == null
+            ) {
+              timing.appearanceMs = performance.now() - timing.startedAt;
+            }
+          };
+          const onTransitionEnd = event => {
+            if (event.propertyName !== 'opacity') return;
+            const opacity = Number(getComputedStyle(tooltip).opacity);
+            if (opacity >= 0.99 && timing.startedAt != null) {
+              timing.opacitySettledMs = performance.now() - timing.startedAt;
+            } else if (timing.dismissalStartedAt != null) {
+              timing.dismissalMs = performance.now() - timing.dismissalStartedAt;
+            }
+          };
+          const observer = new MutationObserver(() => {
+            const style = getComputedStyle(tooltip);
+            const rect = tooltip.getBoundingClientRect();
+            if (
+              timing.startedAt != null &&
+              timing.appearanceMs == null &&
+              !tooltip.hidden &&
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              Number(style.opacity) > 0 &&
+              rect.width > 0 &&
+              rect.height > 0
+            ) {
+              timing.appearanceMs = performance.now() - timing.startedAt;
+            }
+            if (
+              timing.dismissalStartedAt != null &&
+              timing.dismissalMs == null &&
+              (tooltip.hidden || style.display === 'none')
+            ) {
+              timing.dismissalMs = performance.now() - timing.dismissalStartedAt;
+            }
+          });
+          trigger.addEventListener('pointerenter', onEnter, { capture: true });
+          trigger.addEventListener('pointerleave', onLeave, { capture: true });
+          tooltip.addEventListener('transitionstart', onTransitionStart);
+          tooltip.addEventListener('transitionend', onTransitionEnd);
+          observer.observe(tooltip, { attributes: true });
+          window.__siteSpecTooltipTiming = timing;
+          window.__siteSpecTooltipCleanup = () => {
+            observer.disconnect();
+            trigger.removeEventListener('pointerenter', onEnter, { capture: true });
+            trigger.removeEventListener('pointerleave', onLeave, { capture: true });
+            tooltip.removeEventListener('transitionstart', onTransitionStart);
+            tooltip.removeEventListener('transitionend', onTransitionEnd);
+          };
+          return {
+            label: (
+              trigger.getAttribute('aria-label') ||
+              trigger.innerText ||
+              trigger.textContent ||
+              ''
+            ).trim(),
+            tag: trigger.tagName.toLowerCase(),
+            tooltipId: id,
+            x: rect.x + rect.width / 2,
+            y: rect.y + rect.height / 2
+          };
+        }
+        return null;
+      })()`,
+      returnByValue: true,
+    })
+  ).result.value;
+  if (!descriptor) return;
+
+  const tooltipState = async () =>
+    (
+      await cdp.send('Runtime.evaluate', {
+        expression: `(() => {
+          const element = window.__siteSpecTooltip;
+          if (!element) return null;
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return {
+            hidden: element.hidden,
+            display: style.display,
+            visibility: style.visibility,
+            opacity: Number(style.opacity),
+            width: rect.width,
+            height: rect.height,
+            now: performance.now(),
+            startedAt: window.__siteSpecTooltipTiming?.startedAt,
+            timing: window.__siteSpecTooltipTiming
+          };
+        })()`,
+        returnByValue: true,
+      })
+    ).result.value;
+
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: 0,
+    y: 0,
+  });
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: descriptor.x,
+    y: descriptor.y,
+  });
+  let appearanceMs;
+  let opacitySettledMs;
+  const deadline = performance.now() + 1500;
+  while (performance.now() < deadline) {
+    const current = await tooltipState();
+    const elapsed =
+      current?.startedAt == null ? undefined : Math.round(current.now - current.startedAt);
+    if (appearanceMs == null && current?.timing?.appearanceMs != null) {
+      appearanceMs = Math.round(current.timing.appearanceMs);
+    }
+    if (current?.timing?.opacitySettledMs != null) {
+      opacitySettledMs = Math.round(current.timing.opacitySettledMs);
+      break;
+    }
+    if (
+      appearanceMs == null &&
+      elapsed != null &&
+      current &&
+      !current.hidden &&
+      current.display !== 'none' &&
+      current.visibility !== 'hidden' &&
+      current.width > 0 &&
+      current.height > 0 &&
+      current.opacity > 0
+    ) {
+      appearanceMs = elapsed;
+    }
+    if (appearanceMs != null && current?.opacity >= 0.99) {
+      opacitySettledMs = elapsed;
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  if (appearanceMs == null) {
+    await cdp.send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x: 0,
+      y: 0,
+    });
+    await cdp.send('Runtime.evaluate', {
+      expression: `window.__siteSpecTooltipCleanup?.();
+        delete window.__siteSpecTooltipTrigger;
+        delete window.__siteSpecTooltip;
+        delete window.__siteSpecTooltipTiming;
+        delete window.__siteSpecTooltipCleanup`,
+    });
+    return;
+  }
+
+  const viewport = viewports[0];
+  const state = await capturePageSnapshot(
+    multiPageStates.length,
+    `${String(multiPageStates.length).padStart(3, '0')}-tooltip`,
+    viewport,
+    true,
+  );
+  state.type = 'tooltip';
+  state.trigger = descriptor.label;
+  state.triggerElement = {
+    label: descriptor.label,
+    tag: descriptor.tag,
+    ariaDescribedby: descriptor.tooltipId,
+  };
+  state.probe = {
+    action: 'hover',
+    pointer: { x: descriptor.x, y: descriptor.y },
+  };
+  state.timing = { appearanceMs, opacitySettledMs };
+  state.evidenceByViewport = {
+    [`${viewport.width}x${viewport.height}`]: state.evidence,
+  };
+  multiPageStates.push(state);
+
+  const dismissalStartedAt = performance.now();
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: 0,
+    y: 0,
+  });
+  const dismissalDeadline = performance.now() + 1500;
+  while (performance.now() < dismissalDeadline) {
+    const current = await tooltipState();
+    const measuredDismissal = current?.timing?.dismissalMs;
+    if (
+      !current ||
+      current.hidden ||
+      current.display === 'none' ||
+      current.opacity <= 0
+    ) {
+      state.dismissal = {
+        action: 'pointerleave',
+        closed: true,
+        durationMs:
+          measuredDismissal == null
+            ? Math.round(performance.now() - dismissalStartedAt)
+            : Math.round(measuredDismissal),
+      };
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  state.dismissal ||= { action: 'pointerleave', closed: false };
+  await cdp.send('Runtime.evaluate', {
+    expression: `window.__siteSpecTooltipCleanup?.();
+      delete window.__siteSpecTooltipTrigger;
+      delete window.__siteSpecTooltip;
+      delete window.__siteSpecTooltipTiming;
+      delete window.__siteSpecTooltipCleanup`,
+  });
 }
 
 async function navigateAndCaptureAllPages(targetUrl) {
@@ -4431,6 +4690,9 @@ await waitForApplicationReady();
 homePageState = await captureResponsivePageSnapshot(-1, 'home');
 homePageState.type = 'home';
 if (crawl) {
+  if (captureTooltipProbes) {
+    await captureTooltipStates(maxRoutes);
+  }
   if (captureEditorProbes) {
     await captureEditorStates(maxRoutes);
   }
@@ -5516,6 +5778,7 @@ const implementationBlueprint = {
     probe: state.probe,
     network: state.network,
     dismissal: state.dismissal,
+    timing: state.timing,
     html: state.html,
     stylesheet: state.stylesheet,
     evidence: state.evidence,

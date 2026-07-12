@@ -141,6 +141,17 @@ Native top-layer evidence includes reflected `open`, `popover`, and
 filter, and opacity, focused content, plus trusted Escape dismissal and focus
 return to the trigger.
 
+Controls whose `aria-describedby` target has `role="tooltip"` receive a trusted
+pointer-hover probe. The tooltip state records first-visible time,
+fully-opaque time, exact geometry/styles, and pointer-leave dismissal duration
+without turning the hover into a click or focus interaction.
+
+Tooltip probing is opt-in so it does not consume route-state budgets:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl --tooltip-probes --out site-spec-output
+```
+
 Interaction states include sanitized Document, Fetch, and XHR timing from the
 trigger until the network becomes quiet. Query keys are retained while query
 values and encoded data/blob resources are excluded.
