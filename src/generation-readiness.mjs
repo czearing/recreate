@@ -73,6 +73,11 @@ export function buildGenerationReadiness({
     type: asset.type,
     src: clean(asset.currentSrc || asset.src || asset.file),
   }));
+  const unresolvedAssets = assets.filter((asset) =>
+    Object.values(asset).some((value) =>
+      typeof value === 'string' && /^\[unresolved /.test(value),
+    ),
+  );
   const animationCoverage = coverage(animations, componentRoots, (animation) => ({
     path: animation.path,
     type: clean(animation.type || animation.tag || 'animation'),
@@ -84,6 +89,7 @@ export function buildGenerationReadiness({
     text.missing.length && `${text.missing.length} visible text node(s) lack component ownership`,
     controlCoverage.missing.length && `${controlCoverage.missing.length} control(s) lack component ownership`,
     assetCoverage.missing.length && `${assetCoverage.missing.length} asset(s) lack component ownership`,
+    unresolvedAssets.length && `${unresolvedAssets.length} asset(s) lack exact identity`,
     animationCoverage.missing.length && `${animationCoverage.missing.length} animation track(s) lack component ownership`,
     crawlRequested && interactionCount === 0 && 'crawl requested but no interaction states were captured',
     viewports.length < 2 && 'fewer than two responsive viewports were captured',
@@ -114,6 +120,10 @@ export function buildGenerationReadiness({
       text,
       controls: controlCoverage,
       assets: assetCoverage,
+      unresolvedAssets: unresolvedAssets.map((asset) => ({
+        path: asset.path,
+        type: asset.type,
+      })),
       animations: animationCoverage,
     },
   };

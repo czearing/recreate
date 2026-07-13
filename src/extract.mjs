@@ -4858,6 +4858,7 @@ async function extractViewport(viewport, captureIndex) {
   phaseStart = Date.now();
   extracted.accessibility = { skipped: true };
   timings.accessibilityMs = Date.now() - phaseStart;
+  await localizeLiveBlobAssets(extracted.exactAssets);
   timings.totalMs = Object.values(timings).reduce(
     (total, duration) => total + duration,
     0,
@@ -4877,6 +4878,86 @@ try {
     authCookieHeader = (relevant.length ? relevant : cookies).map(c => `${c.name}=${c.value}`).join('; ');
   }
 } catch (_) {}
+
+const localizedAssetReplacements = new Map();
+const snapshotExtensionByType = {
+  'font/otf': '.otf',
+  'font/ttf': '.ttf',
+  'font/woff': '.woff',
+  'font/woff2': '.woff2',
+  'image/avif': '.avif',
+  'image/gif': '.gif',
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/svg+xml': '.svg',
+  'image/webp': '.webp',
+  'model/gltf+json': '.gltf',
+  'model/gltf-binary': '.glb',
+};
+function storeSnapshotAsset(source, contentType, bytes) {
+  const sourceExtension = (() => {
+    try {
+      const extension = path.extname(new URL(source).pathname).toLowerCase();
+      return ['.basis', '.bin', '.glb', '.gltf', '.hdr', '.ktx2'].includes(extension)
+        ? extension
+        : '';
+    } catch {
+      return '';
+    }
+  })();
+  const limit = sourceExtension ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
+  if (!bytes.length || bytes.length > limit) return null;
+  const assetDir = path.join(outDir, 'snapshot-assets');
+  fs.mkdirSync(assetDir, { recursive: true });
+  const extension =
+    sourceExtension || snapshotExtensionByType[contentType.split(';')[0]] || '.bin';
+  const filename =
+    `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
+  const assetPath = path.join(assetDir, filename);
+  if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
+  const replacement = `/snapshot-assets/${filename}`;
+  localizedAssetReplacements.set(source, replacement);
+  return replacement;
+}
+async function localizeLiveBlobAssets(assets) {
+  const blobUrls = [
+    ...new Set(
+      assets.flatMap((asset) => [asset.src, asset.currentSrc, asset.dataUrl])
+        .filter((value) => typeof value === 'string' && value.startsWith('blob:')),
+    ),
+  ];
+  if (!blobUrls.length) return;
+  const results = (
+    await cdp.send('Runtime.evaluate', {
+      expression: `(async () => Promise.all(${JSON.stringify(blobUrls)}.map(async url => {
+        try {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          const bytes = new Uint8Array(await blob.arrayBuffer());
+          let binary = '';
+          for (let index = 0; index < bytes.length; index += 0x8000) {
+            binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+          }
+          return { url, type: blob.type || 'application/octet-stream', base64: btoa(binary) };
+        } catch {
+          return null;
+        }
+      })))()`,
+      awaitPromise: true,
+      returnByValue: true,
+    }).catch(() => ({ result: { value: [] } }))
+  ).result.value || [];
+  for (const result of results.filter(Boolean)) {
+    storeSnapshotAsset(result.url, result.type, Buffer.from(result.base64, 'base64'));
+  }
+  for (const asset of assets) {
+    for (const key of ['src', 'currentSrc', 'dataUrl']) {
+      if (localizedAssetReplacements.has(asset[key])) {
+        asset[key] = localizedAssetReplacements.get(asset[key]);
+      }
+    }
+  }
+}
 
 async function inlineSnapshotImages(snapshots) {
   const files = snapshots
@@ -4957,48 +5038,17 @@ async function inlineSnapshotImages(snapshots) {
     }
   }
   const replacements = new Map();
-  const assetDir = path.join(outDir, 'snapshot-assets');
-  const extensionByType = {
-    'font/otf': '.otf',
-    'font/ttf': '.ttf',
-    'font/woff': '.woff',
-    'font/woff2': '.woff2',
-    'image/avif': '.avif',
-    'image/gif': '.gif',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/svg+xml': '.svg',
-    'image/webp': '.webp',
-    'model/gltf+json': '.gltf',
-    'model/gltf-binary': '.glb',
-  };
   const storeAsset = (source, contentType, bytes) => {
-    const sourceExtension = (() => {
-      try {
-        const extension = path.extname(new URL(source).pathname).toLowerCase();
-        return ['.basis', '.bin', '.glb', '.gltf', '.hdr', '.ktx2'].includes(extension)
-          ? extension
-          : '';
-      } catch {
-        return '';
-      }
-    })();
-    const limit = sourceExtension ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
-    if (!bytes.length || bytes.length > limit) return;
-    fs.mkdirSync(assetDir, { recursive: true });
-    const extension =
-      sourceExtension || extensionByType[contentType.split(';')[0]] || '.bin';
-    const filename =
-      `${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
-    const assetPath = path.join(assetDir, filename);
-    if (!fs.existsSync(assetPath)) fs.writeFileSync(assetPath, bytes);
-    replacements.set(source, `/snapshot-assets/${filename}`);
+    const replacement = storeSnapshotAsset(source, contentType, bytes);
+    if (replacement) replacements.set(source, replacement);
   };
   if (!fullProfile) {
     const dataUrlSet = new Set();
+    const blobUrlSet = new Set();
     const collectJsonDataUrls = (value) => {
       if (typeof value === 'string') {
         if (value.startsWith('data:')) dataUrlSet.add(value);
+        if (value.startsWith('blob:')) blobUrlSet.add(value);
         return;
       }
       if (Array.isArray(value)) {
@@ -5015,8 +5065,12 @@ async function inlineSnapshotImages(snapshots) {
       for (const pattern of [
         /\b(?:src|href)=(["'])(data:[\s\S]*?)\1/gi,
         /url\(\s*(["'])(data:[\s\S]*?)\1\s*\)/gi,
+        /\b(?:src|href)=(["'])(blob:[^"']+)\1/gi,
       ]) {
-        for (const match of text.matchAll(pattern)) dataUrlSet.add(match[2]);
+        for (const match of text.matchAll(pattern)) {
+          if (match[2].startsWith('blob:')) blobUrlSet.add(match[2]);
+          else dataUrlSet.add(match[2]);
+        }
       }
     }
     const dataUrls = [
@@ -5024,15 +5078,39 @@ async function inlineSnapshotImages(snapshots) {
     ];
     for (const dataUrl of dataUrls) {
       try {
-        const match = dataUrl.match(
-          /^data:([a-z0-9.+-]+\/[a-z0-9.+-]+)(?:;charset=[^;,]+)?(;base64)?,([\s\S]+)$/i,
-        );
+        const match = dataUrl.match(/^data:([^,]+),([\s\S]+)$/i);
         if (!match) continue;
-        const bytes = match[2]
-          ? Buffer.from(match[3], 'base64')
-          : Buffer.from(decodeURIComponent(match[3]));
-        storeAsset(dataUrl, match[1], bytes);
+        const [contentType, ...metadata] = match[1].split(';');
+        const bytes = metadata.includes('base64')
+          ? Buffer.from(match[2], 'base64')
+          : Buffer.from(decodeURIComponent(match[2]));
+        storeAsset(dataUrl, contentType, bytes);
       } catch {}
+    }
+    if (blobUrlSet.size) {
+      const blobResults = (
+        await cdp.send('Runtime.evaluate', {
+          expression: `(async () => Promise.all(${JSON.stringify([...blobUrlSet])}.map(async url => {
+            try {
+              const response = await fetch(url);
+              const blob = await response.blob();
+              const bytes = new Uint8Array(await blob.arrayBuffer());
+              let binary = '';
+              for (let index = 0; index < bytes.length; index += 0x8000) {
+                binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+              }
+              return { url, type: blob.type || 'application/octet-stream', base64: btoa(binary) };
+            } catch {
+              return null;
+            }
+          })))()`,
+          awaitPromise: true,
+          returnByValue: true,
+        }).catch(() => ({ result: { value: [] } }))
+      ).result.value || [];
+      for (const result of blobResults.filter(Boolean)) {
+        storeAsset(result.url, result.type, Buffer.from(result.base64, 'base64'));
+      }
     }
   }
   let nextIndex = 0;
@@ -6270,7 +6348,27 @@ const implementationCaptures = [];
 if (!fullProfile) {
   const evidenceDir = path.join(outDir, 'evidence');
   fs.mkdirSync(evidenceDir, { recursive: true });
+  for (const [index, capture] of captures.entries()) {
+    const relativeFile = `evidence/raw-assets-${index}.json`;
+    const absoluteFile = path.join(outDir, relativeFile);
+    fs.writeFileSync(
+      absoluteFile,
+      JSON.stringify({ exactAssets: capture.exactAssets }, null, 2),
+    );
+    await inlineSnapshotImages([{ evidence: relativeFile }]);
+    capture.exactAssets = JSON.parse(
+      fs.readFileSync(absoluteFile, 'utf8'),
+    ).exactAssets;
+    fs.unlinkSync(absoluteFile);
+  }
   output.captures = captures.map((capture) => {
+    for (const asset of capture.exactAssets || []) {
+      for (const key of ['src', 'currentSrc', 'dataUrl']) {
+        if (localizedAssetReplacements.has(asset[key])) {
+          asset[key] = localizedAssetReplacements.get(asset[key]);
+        }
+      }
+    }
     const compact = compactCapture(capture);
     implementationCaptures.push(compact);
     const viewport = capture.document.viewport;

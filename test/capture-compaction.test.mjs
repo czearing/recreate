@@ -45,7 +45,8 @@ test('removes encoded assets and downsamples exact evidence', () => {
     horizontalTracks: [],
     exactAssets: [{
       type: 'canvas',
-      path: 'canvas',
+      path: 'doc(0)>html:nth-of-type(1)>body:nth-of-type(1)>img:nth-of-type(1)',
+      src: 'data:image/svg+xml;utf8,%3Csvg%2F%3E',
       dataUrl: 'data:image/png;base64,encoded',
       value: '<svg>encoded</svg>',
     }],
@@ -73,10 +74,8 @@ test('removes encoded assets and downsamples exact evidence', () => {
   const serialized = JSON.stringify(compact);
 
   assert.doesNotMatch(serialized, /base64|dataUrl|<svg>/);
-  assert.equal(
-    compact.nodes[0].attrs.src,
-    '[asset stored in captured state HTML]',
-  );
+  assert.equal(compact.nodes[0].attrs.src, '[asset stored in captured state HTML]');
+  assert.match(compact.exactAssets[0].src, /^\/snapshot-assets\/[a-f0-9]{20}\.svg$/);
   assert.equal(compact.lifecycleAnimation.tracks[0].samples.length, 5);
   assert.deepEqual(compact.resources, [{
     url: 'https://example.test/api/items?account=%3Avalue&limit=%3Avalue',

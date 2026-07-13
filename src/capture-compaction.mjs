@@ -89,13 +89,31 @@ const compactAnimation = (animation) => ({
   timeline: animation.timeline,
   timing: animation.timing,
 });
+const extensionByMime = {
+  'image/gif': '.gif',
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/svg+xml': '.svg',
+  'image/webp': '.webp',
+};
+const dataUrlAssetPath = (value) => {
+  const match = String(value).match(/^data:([^,]*),(.*)$/s);
+  if (!match) return null;
+  const [mimeType, ...metadata] = match[1].split(';');
+  const bytes = metadata.includes('base64')
+    ? Buffer.from(match[2], 'base64')
+    : Buffer.from(decodeURIComponent(match[2]));
+  const extension = extensionByMime[mimeType] || '.bin';
+  return `/snapshot-assets/${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}${extension}`;
+};
 const compactAsset = ({ value: _value, dataUrl: _dataUrl, ...asset }) =>
-  Object.fromEntries(Object.entries(asset).map(([key, rawValue]) => [
-    key,
-    typeof rawValue === 'string' && /^(?:data|blob):/i.test(rawValue)
-      ? '[asset stored in captured state HTML]'
-      : rawValue,
-  ]));
+  Object.fromEntries(Object.entries(asset).map(([key, rawValue]) => {
+    if (typeof rawValue !== 'string') return [key, rawValue];
+    if (rawValue.startsWith('data:')) {
+      return [key, dataUrlAssetPath(rawValue) || '[unresolved data asset]'];
+    }
+    return [key, rawValue.startsWith('blob:') ? '[unresolved blob asset]' : rawValue];
+  }));
 const compactTrack = (track) => {
   const samples = track.samples || [];
   const indexes = [0, 0.25, 0.5, 0.75, 1].map((position) =>
@@ -216,3 +234,4 @@ import {
   compactListeners,
   implementationNodes,
 } from './evidence-filter.mjs';
+import { createHash } from 'node:crypto';
