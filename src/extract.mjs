@@ -68,6 +68,26 @@ const isOverlayTreeRuntimeSource = `(element => {
   }
   return false;
 })`;
+const associatedLabelRuntimeSource = `(element => {
+  const ariaLabel = element.getAttribute('aria-label');
+  if (ariaLabel) return ariaLabel;
+  const labels = Array.from(element.labels || [])
+    .map(label => label.innerText || '')
+    .filter(Boolean)
+    .join(' ');
+  if (labels) return labels;
+  const wrappingLabel = element.closest('label')?.innerText;
+  if (wrappingLabel) return wrappingLabel;
+  const parent = element.parentElement;
+  if (
+    parent &&
+    parent.querySelectorAll('input,textarea,select,button').length === 1
+  ) {
+    const siblingLabel = parent.querySelector(':scope > label')?.innerText;
+    if (siblingLabel) return siblingLabel;
+  }
+  return element.innerText || '';
+})`;
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -1811,6 +1831,28 @@ async function capturePageSnapshot(
                         : null,
                     tag: element.tagName.toLowerCase(),
                     attrs,
+                    control:
+                      element instanceof HTMLInputElement
+                        ? {
+                            value:
+                              element.type === 'password'
+                                ? undefined
+                                : element.value,
+                            checked: element.checked,
+                            indeterminate: element.indeterminate
+                          }
+                        : element instanceof HTMLTextAreaElement
+                          ? { value: element.value }
+                          : element instanceof HTMLSelectElement
+                            ? {
+                                value: element.value,
+                                selectedIndex: element.selectedIndex,
+                                selectedValues: Array.from(
+                                  element.selectedOptions,
+                                  option => option.value
+                                )
+                              }
+                            : undefined,
                     topLayer,
                     backdropStyle: backdrop
                       ? {
@@ -2828,7 +2870,8 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           i,
           tag: el.tagName,
           href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url') || '',
-          text: (el.getAttribute('aria-label') || el.innerText || '').substring(0, 500).trim(),
+          text: (${associatedLabelRuntimeSource})(el)
+            .substring(0, 500).trim(),
           role: el.getAttribute('role') || '',
           ariaHaspopup: el.getAttribute('aria-haspopup') || '',
           popoverTarget: el.getAttribute('popovertarget') || '',
@@ -3019,7 +3062,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           entry.tagName === ${JSON.stringify(candidate.tag)} &&
           (entry.getAttribute('role') || '') === ${JSON.stringify(candidate.role)} &&
           (entry.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)} &&
-          (entry.getAttribute('aria-label') || entry.innerText || '')
+          (${associatedLabelRuntimeSource})(entry)
             .trim().startsWith(labelPrefix) &&
           (() => {
             const rect = entry.getBoundingClientRect();
@@ -3595,7 +3638,8 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           e.tagName === ${JSON.stringify(candidate.tag)} &&
           (e.getAttribute('role') || '') === ${JSON.stringify(candidate.role)} &&
           (e.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)} &&
-          (e.getAttribute('aria-label') || e.innerText || '').trim().startsWith(searchText);
+          (${associatedLabelRuntimeSource})(e)
+            .trim().startsWith(searchText);
         if (!matchesCandidate(el)) {
           el = rendered.find(matchesCandidate);
         }
