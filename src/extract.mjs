@@ -17,6 +17,10 @@ import {
   interactionMatchPriority,
 } from './interaction-targeting.mjs';
 import { authenticationShellRuntimeSource } from './shell-detection.mjs';
+import {
+  buildPrimitiveInventory,
+  destinationContract,
+} from './destination-contract.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
@@ -6358,6 +6362,10 @@ const implementationBlueprint = {
     'Validate from structured DOM, geometry, styles, assets, and state transitions.',
     'Screenshots are optional diagnostics only; a mismatch must be resolved by improving structured evidence.',
   ],
+  destination: {
+    contract: destinationContract(),
+    primitiveInventory: buildPrimitiveInventory(captures[0]?.nodes || []),
+  },
   validationContract: {
     authority: 'structured-browser-state',
     requiredMatches: [
