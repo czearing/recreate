@@ -304,6 +304,19 @@ Each proof has an isolated Storybook state and structured geometry/style
 comparison. Failures were treated as extractor or translation defects rather
 than masked with screenshot interpretation.
 
+## Agent implementation artifacts
+
+`implementation.json` is the small entrypoint. It links to:
+
+- `acceptance-matrix.json` for every required state, viewport, interaction, and component
+- `component-map.json` for searchable component identities
+- `components/*.json` for readable hierarchy, text, geometry, styles, controls, assets, and responsive evidence
+- `pages/`, `stylesheets/`, and `evidence/` only when exact lower-level facts are needed
+
+These files are evidence, not shipping code. Native delivery cannot pass
+`validate-native-implementation.mjs` without a structured acceptance report
+covering all required states and interactions.
+
 ## Build an interactive static mock
 
 ```powershell
@@ -313,7 +326,9 @@ node site-spec-build/server.mjs 4317
 
 The generated build maps captured controls to local route and panel states,
 preserves browser back navigation, loads captured per-state CSS, and excludes
-captured application scripts.
+captured application scripts. It is an **oracle only**. Never copy it into the
+destination repository, link or redirect the destination app to it, or present
+it as a native implementation.
 
 Captured output can contain source code and user-visible data. Keep it out of version control unless you have permission to publish it.
 

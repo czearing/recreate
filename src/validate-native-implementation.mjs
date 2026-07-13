@@ -42,18 +42,73 @@ for (const dependency of required) {
 const forbidden = [
   { pattern: /<iframe\b/i, label: 'iframe embedding' },
   { pattern: /site-spec-runtime\.js/i, label: 'site-spec runtime shipping' },
-  { pattern: /new-office-spec\/index\.html/i, label: 'reconstruction redirect' },
+  { pattern: /site-spec-manifest\.json/i, label: 'reconstruction manifest shipping' },
+  { pattern: /ORACLE_ONLY\.txt/i, label: 'oracle output shipping' },
+  { pattern: /__site-spec[\\/]/i, label: 'reconstruction route shipping' },
   { pattern: /dangerouslySetInnerHTML/i, label: 'captured HTML embedding' },
 ];
 for (const { pattern, label } of forbidden) {
   const match = sources.find(({ text }) => pattern.test(text));
   if (match) errors.push(`${label}: ${path.relative(root, match.file)}`);
 }
+let acceptanceReport = null;
+let acceptanceMatrix = null;
+if (!args.matrix) {
+  errors.push('missing acceptance matrix: pass --matrix <acceptance-matrix.json>');
+} else {
+  try {
+    acceptanceMatrix = JSON.parse(
+      fs.readFileSync(path.resolve(String(args.matrix)), 'utf8'),
+    );
+  } catch (error) {
+    errors.push(`invalid acceptance matrix: ${error.message}`);
+  }
+}
+if (!args.report) {
+  errors.push('missing structured acceptance report: pass --report <report.json>');
+} else {
+  const reportPath = path.resolve(root, String(args.report));
+  try {
+    acceptanceReport = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+    if (acceptanceReport.passed !== true) {
+      errors.push('structured acceptance report did not pass');
+    }
+    if (acceptanceReport.reconstructionDetected !== false) {
+      errors.push('structured acceptance report did not exclude reconstruction delivery');
+    }
+    if ((acceptanceReport.states?.failed ?? 1) !== 0) {
+      errors.push('structured acceptance report has failed states');
+    }
+    if ((acceptanceReport.interactions?.failed ?? 1) !== 0) {
+      errors.push('structured acceptance report has failed interactions');
+    }
+    if ((acceptanceReport.geometry?.maxDeltaPx ?? Infinity) >
+      (acceptanceReport.geometry?.tolerancePx ?? 1)) {
+      errors.push('structured acceptance report exceeds geometry tolerance');
+    }
+    const coverage = [
+      ['states', acceptanceMatrix?.stateCells?.length],
+      ['interactions', acceptanceMatrix?.interactionCells?.length],
+      ['components', acceptanceMatrix?.componentCells?.length],
+    ];
+    for (const [key, required] of coverage) {
+      if (required == null) continue;
+      if (acceptanceReport[key]?.required !== required ||
+          acceptanceReport[key]?.passed !== required) {
+        errors.push(`structured acceptance report has incomplete ${key} coverage`);
+      }
+    }
+  } catch (error) {
+    errors.push(`invalid structured acceptance report: ${error.message}`);
+  }
+}
 const result = {
   passed: errors.length === 0,
   fileCount: files.length,
   required,
   sourceRoots: sourceRoots.map((value) => path.relative(root, value) || '.'),
+  acceptanceReport: acceptanceReport ? String(args.report) : null,
+  acceptanceMatrix: acceptanceMatrix ? String(args.matrix) : null,
   errors,
 };
 console.log(JSON.stringify(result, null, 2));

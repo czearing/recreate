@@ -7,6 +7,13 @@ import { createHash } from 'node:crypto';
 import {
   compactCapture,
 } from './capture-compaction.mjs';
+import {
+  buildAgentComponent,
+  dedupeComponentCandidates,
+  inferComponentIdentity,
+  isUsefulAgentComponent,
+} from './agent-components.mjs';
+import { buildAcceptanceMatrix } from './acceptance-matrix.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
@@ -1369,7 +1376,7 @@ function decodeSnapshot(snapshot) {
       'form',
       'dialog',
     ]);
-    const componentCandidates = decodedNodes
+    const scoredComponentCandidates = decodedNodes
       .map((node) => {
         const occurrences = groups.get(node.fingerprint) || [];
         const area = node.rect.width * node.rect.height;
@@ -1410,7 +1417,8 @@ function decodeSnapshot(snapshot) {
           node.childCount > 0 &&
           score >= 4 &&
           !['html', 'body', 'svg', 'g', 'defs'].includes(node.tag),
-      )
+      );
+    const componentCandidates = dedupeComponentCandidates(scoredComponentCandidates)
       .sort((left, right) => right.score - left.score)
       .slice(0, 120)
       .map(({ node, occurrences, reasons, score }) => ({
@@ -5839,7 +5847,7 @@ const output = {
 const isWithin = (pathValue, rootPath) =>
   pathValue === rootPath || pathValue?.startsWith(`${rootPath}>`);
 const componentDir = path.join(outDir, 'components');
-if (fullProfile) fs.mkdirSync(componentDir, { recursive: true });
+fs.mkdirSync(componentDir, { recursive: true });
 const componentPackages = (captures[0]?.componentCandidates || []).map(
   (candidate, index) => {
     const filename = `component-${String(index + 1).padStart(3, '0')}.json`;
@@ -5849,31 +5857,11 @@ const componentPackages = (captures[0]?.componentCandidates || []).map(
     const root = desktopNodes.find(
       (node) => node.path === candidate.representativePath,
     );
-    const heading = desktopNodes.find(
-      (node) => /^h[1-6]$/.test(node.tag) && node.text?.trim(),
-    )?.text;
-    const classHint = String(root?.attrs?.class || '')
-      .split(/\s+/)
-      .find((value) => value && value.length < 80 && !/^[a-z0-9_-]{12,}$/i.test(value));
-    const label =
-      root?.ariaLabel ||
-      heading?.trim() ||
-      root?.attrs?.id ||
-      root?.role ||
-      (['header', 'nav', 'main', 'section', 'article', 'aside', 'footer', 'form', 'dialog'].includes(root?.tag)
-        ? root.tag
-        : classHint) ||
-      root?.tag ||
-      `component-${index + 1}`;
-    const identity = {
-      label: String(label).replace(/\s+/g, ' ').trim().slice(0, 120),
-      tag: root?.tag,
-      role: root?.role,
-      ariaLabel: root?.ariaLabel,
-      heading: heading?.trim().slice(0, 200),
-      id: root?.attrs?.id,
-      classHint,
-    };
+    const identity = inferComponentIdentity(
+      root,
+      desktopNodes,
+      `component-${index + 1}`,
+    );
     const component = {
       id: `component-${String(index + 1).padStart(3, '0')}`,
       identity,
@@ -5924,15 +5912,21 @@ const componentPackages = (captures[0]?.componentCandidates || []).map(
       (implementation) =>
         componentAnimationTypes.includes(implementation.type),
     );
+    const usefulForAgents = isUsefulAgentComponent(component);
     if (fullProfile) {
       fs.writeFileSync(
         path.join(componentDir, filename),
         JSON.stringify(component, null, 2),
       );
+    } else if (usefulForAgents) {
+      fs.writeFileSync(
+        path.join(componentDir, filename),
+        JSON.stringify(buildAgentComponent(component), null, 2),
+      );
     }
     return {
       id: component.id,
-      file: fullProfile ? `components/${filename}` : undefined,
+      file: fullProfile || usefulForAgents ? `components/${filename}` : undefined,
       identity,
       path: candidate.representativePath,
       score: candidate.score,
@@ -5954,6 +5948,19 @@ for (const component of componentPackages) {
 for (const component of componentPackages) {
   component.childIds = componentPackages
     .filter((candidate) => candidate.parentId === component.id)
+    .map((candidate) => candidate.id);
+}
+const componentById = new Map(
+  componentPackages.map((component) => [component.id, component]),
+);
+for (const component of componentPackages.filter((candidate) => candidate.file)) {
+  let parent = componentById.get(component.parentId);
+  while (parent && !parent.file) parent = componentById.get(parent.parentId);
+  component.deliveryParentId = parent?.id;
+}
+for (const component of componentPackages.filter((candidate) => candidate.file)) {
+  component.deliveryChildIds = componentPackages
+    .filter((candidate) => candidate.deliveryParentId === component.id)
     .map((candidate) => candidate.id);
 }
 fs.writeFileSync(
@@ -6367,6 +6374,49 @@ for (const state of multiPageStates.filter((entry) => entry.hoverInteraction)) {
   };
 }
 
+const implementationStates = [
+  homePageState,
+  ...multiPageStates,
+].filter(Boolean).map((state) => ({
+  index: state.index,
+  type: state.type,
+  url: state.url,
+  title: state.title,
+  viewport: state.viewport,
+  focus: state.focus,
+  selection: state.selection,
+  trigger: state.trigger,
+  triggerElement: state.triggerElement,
+  probe: state.probe,
+  network: state.network?.length ? {
+    requestCount: state.network.length,
+    methods: [...new Set(state.network.map((request) => request.method))],
+    types: [...new Set(state.network.map((request) => request.type))],
+    statuses: [...new Set(state.network.map((request) => request.status))],
+  } : undefined,
+  dismissal: state.dismissal,
+  timing: state.timing,
+  virtualization: state.virtualization,
+  drag: state.drag,
+  webglInteraction: state.webglInteraction,
+  iframeInteraction: state.iframeInteraction,
+  hoverInteraction: state.hoverInteraction,
+  html: state.html,
+  stylesheet: state.stylesheet,
+  evidence: state.evidence,
+  evidenceByViewport: state.evidenceByViewport,
+  screenshot: state.screenshot,
+}));
+const acceptanceMatrix = buildAcceptanceMatrix({
+  states: implementationStates,
+  viewports,
+  components: componentPackages,
+});
+fs.writeFileSync(
+  path.join(outDir, 'acceptance-matrix.json'),
+  JSON.stringify(acceptanceMatrix, null, 2),
+);
+
 const implementationBlueprint = {
   schemaVersion: 2,
   purpose:
@@ -6375,7 +6425,9 @@ const implementationBlueprint = {
   profile,
   readOrder: [
     'implementation.json',
+    'acceptance-matrix.json',
     'component-map.json',
+    'the matching components/*.json shard for each component being built',
     'pages/*.html and pages/*.css for the state being implemented',
     'stylesheets/*.css for authored rules and design tokens',
     'the matching evidence/state-*.json for dynamic-state geometry and styles',
@@ -6383,6 +6435,7 @@ const implementationBlueprint = {
   ],
   rules: [
     'Implement native components in the destination stack; do not copy captured application scripts.',
+    'The generated static reconstruction is an oracle only. Never copy, embed, redirect to, or ship it.',
     'Use words, routes, control identities, authored CSS, rects, and responsive deltas as build inputs.',
     'Validate from structured DOM, geometry, styles, assets, and state transitions.',
     'Screenshots are optional diagnostics only; a mismatch must be resolved by improving structured evidence.',
@@ -6390,6 +6443,25 @@ const implementationBlueprint = {
   destination: {
     contract: destinationContract(),
     primitiveInventory: buildPrimitiveInventory(captures[0]?.nodes || []),
+  },
+  artifactPolicy: {
+    deliverable: 'destination-native source code',
+    evidenceOnly: [
+      'implementation.json',
+      'component-map.json',
+      'components/*.json',
+      'pages/*.html',
+      'pages/*.css',
+      'evidence/*.json',
+      'stylesheets/*.css',
+    ],
+    oracleOnly: ['output from build-static.mjs'],
+    forbiddenAsDeliverable: [
+      'captured HTML',
+      'generated static reconstruction',
+      'site-spec-runtime.js',
+      'redirects or links to reconstruction routes',
+    ],
   },
   validationContract: {
     authority: 'structured-browser-state',
@@ -6407,52 +6479,30 @@ const implementationBlueprint = {
       'Never required for generation or acceptance; diagnostics require --screenshots.',
   },
   viewports,
-  states: [
-    homePageState,
-    ...multiPageStates,
-  ].filter(Boolean).map((state) => ({
-    index: state.index,
-    type: state.type,
-    url: state.url,
-    title: state.title,
-    viewport: state.viewport,
-    focus: state.focus,
-    selection: state.selection,
-    trigger: state.trigger,
-    triggerElement: state.triggerElement,
-    probe: state.probe,
-    network: state.network,
-    dismissal: state.dismissal,
-    timing: state.timing,
-    virtualization: state.virtualization,
-    drag: state.drag,
-    webglInteraction: state.webglInteraction,
-    iframeInteraction: state.iframeInteraction,
-    hoverInteraction: state.hoverInteraction,
-    html: state.html,
-    stylesheet: state.stylesheet,
-    evidence: state.evidence,
-    evidenceByViewport: state.evidenceByViewport,
-    screenshot: state.screenshot,
-  })),
+  states: implementationStates,
   interactions: {
     count: multiPageStates.length,
     states: multiPageStates.map((state) => ({
       stateIndex: state.index,
       type: state.type,
+      trigger: state.trigger,
+      action: state.probe?.action,
       destination: state.url,
+      evidence: state.evidence,
+      evidenceByViewport: state.evidenceByViewport,
     })),
   },
   components: {
-    count: componentPackages.length,
+    count: componentPackages.filter((component) => component.file).length,
+    candidateCount: componentPackages.length,
     index: 'component-map.json',
     roots: componentPackages
-      .filter((component) => !component.parentId)
+      .filter((component) => !component.deliveryParentId && component.file)
       .map((component) => ({
         id: component.id,
         identity: component.identity,
         path: component.path,
-        childIds: component.childIds,
+        childIds: component.deliveryChildIds,
       })),
   },
   responsive: {
@@ -6468,6 +6518,7 @@ const implementationBlueprint = {
   },
   evidence: {
     exactSpec: 'spec.json',
+    acceptanceMatrix: 'acceptance-matrix.json',
     componentMap: 'component-map.json',
     summary: 'summary.json',
     captures: captureEvidenceFiles,

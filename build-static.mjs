@@ -612,6 +612,9 @@ ${body}
 
   const manifest = {
     schemaVersion: 1,
+    oracleOnly: true,
+    deliveryPolicy:
+      'Diagnostic reconstruction only. Never ship, embed, redirect to, or copy into a destination implementation.',
     source: sourceUrl,
     generatedAt: new Date().toISOString(),
     home: spec.home
@@ -638,6 +641,10 @@ ${body}
   fs.writeFileSync(
     path.join(resolvedBuildDir, 'site-spec-runtime.js'),
     runtimeSource(manifest),
+  );
+  fs.writeFileSync(
+    path.join(resolvedBuildDir, 'ORACLE_ONLY.txt'),
+    `${manifest.deliveryPolicy}\n`,
   );
   const queryRoutes = Object.fromEntries(
     (spec.pages || [])

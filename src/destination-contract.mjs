@@ -32,16 +32,21 @@ export function destinationContract() {
       'iframe embedding',
       'redirect to generated reconstruction',
       'site-spec-runtime.js in shipping source',
+      '__site-spec reconstruction routes in shipping source',
+      'site-spec-manifest.json or ORACLE_ONLY.txt in shipping source',
       'captured application scripts',
     ],
     acceptance: [
       'Every visible control maps to a destination-native primitive or documented native exception.',
       'Structured desktop/mobile geometry stays within one pixel.',
       'Every captured interaction and restoration path passes.',
+      'A structured acceptance report proves every required state and viewport before delivery.',
     ],
     validator:
       'node src/validate-native-implementation.mjs --root <implementation-root> ' +
       '--paths <destination-source-roots> ' +
-      '--require @1js/bebop-icons,@1js/fluentui-modern',
+      '--require @1js/bebop-icons,@1js/fluentui-modern ' +
+      '--matrix <site-spec-output/acceptance-matrix.json> ' +
+      '--report <structured-acceptance-report.json>',
   };
 }

@@ -152,6 +152,11 @@ test('builds local state routes and wires distinct interactive controls', () => 
   const manifest = JSON.parse(
     fs.readFileSync(path.join(buildDir, 'site-spec-manifest.json'), 'utf8'),
   );
+  assert.equal(manifest.oracleOnly, true);
+  assert.match(
+    fs.readFileSync(path.join(buildDir, 'ORACLE_ONLY.txt'), 'utf8'),
+    /Never ship/,
+  );
   const routeTrigger = manifest.triggers.find(
     (trigger) => trigger.target === '/app/notebook/my-notebook',
   );
