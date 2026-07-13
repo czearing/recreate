@@ -1,13 +1,4 @@
-const STYLE_KEYS = [
-  'display', 'position', 'width', 'height', 'minWidth', 'maxWidth',
-  'minHeight', 'maxHeight', 'margin', 'padding', 'gap', 'rowGap',
-  'columnGap', 'flex', 'flexDirection', 'flexWrap', 'justifyContent',
-  'alignItems', 'gridTemplateColumns', 'gridTemplateRows', 'overflow',
-  'overflowX', 'overflowY', 'boxSizing', 'color', 'backgroundColor',
-  'backgroundImage', 'border', 'borderRadius', 'boxShadow', 'opacity',
-  'transform', 'fontFamily', 'fontSize', 'fontWeight', 'lineHeight',
-  'letterSpacing', 'textAlign', 'whiteSpace',
-];
+import { styleDelta } from './agent-style.mjs';
 
 const ATTR_KEYS = [
   'id', 'role', 'aria-label', 'aria-expanded', 'aria-pressed',
@@ -37,6 +28,7 @@ function nodeLabel(node, childPaths) {
   const explicit = node?.ariaLabel || attrs['aria-label'] || attrs.alt ||
     attrs.placeholder || attrs.title;
   if (explicit) return clean(explicit);
+  if (node.tag === '#text') return clean(node.text);
   const isLeaf = !childPaths.has(node.path);
   if (isLeaf || /^h[1-6]$/.test(node.tag) || node.role || node.tag === 'button') {
     return clean(node.text);
@@ -88,11 +80,11 @@ export function dedupeComponentCandidates(candidates) {
   });
 }
 
-function compactNodeIdentity(node, rootPath, childPaths) {
+function compactNodeIdentity(node, key, rootPath, childPaths) {
   const attrs = pick(node.attrs, ATTR_KEYS);
   const label = nodeLabel(node, childPaths);
   return {
-    path: relativePath(node.path, rootPath),
+    path: key,
     parent: node.parentPath && within(node.parentPath, rootPath)
       ? relativePath(node.parentPath, rootPath)
       : null,
@@ -103,15 +95,11 @@ function compactNodeIdentity(node, rootPath, childPaths) {
   };
 }
 
-function compactNodeGeometry(node, rootPath, parentStyle) {
-  const style = pick(node.style, STYLE_KEYS);
-  const styleDelta = Object.fromEntries(
-    Object.entries(style).filter(([key, value]) => parentStyle?.[key] !== value),
-  );
+function compactNodeGeometry(node, key, parentStyle) {
   return {
-    path: relativePath(node.path, rootPath),
+    path: key,
     rect: node.rect,
-    style: styleDelta,
+    style: styleDelta(node.style, parentStyle, node.tag === '#text'),
   };
 }
 
@@ -119,17 +107,26 @@ function compactCapture(capture, rootPath) {
   const nodes = capture.nodes.filter((node) => within(node.path, rootPath));
   const childPaths = new Set(nodes.map((node) => node.parentPath).filter(Boolean));
   const byPath = new Map(nodes.map((node) => [node.path, node]));
-  const selected = nodes.slice(0, 48);
-  return {
-    structure: selected.map((node) =>
-      compactNodeIdentity(node, rootPath, childPaths)),
-    viewport: capture.viewport,
-    nodes: selected.map((node) => compactNodeGeometry(
+  const pathCounts = new Map();
+  const selected = nodes.map((node) => {
+    const base = relativePath(node.path, rootPath);
+    const count = pathCounts.get(base) || 0;
+    pathCounts.set(base, count + 1);
+    return {
       node,
-      rootPath,
+      key: node.tag === '#text' ? `${base}::text(${count})` : base,
+    };
+  });
+  return {
+    structure: selected.map(({ node, key }) =>
+      compactNodeIdentity(node, key, rootPath, childPaths)),
+    viewport: capture.viewport,
+    nodes: selected.map(({ node, key }) => compactNodeGeometry(
+      node,
+      key,
       byPath.get(node.parentPath)?.style,
     )),
-    truncatedNodeCount: Math.max(0, nodes.length - 48),
+    truncatedNodeCount: 0,
     controls: (capture.behaviors || []).map((behavior) => ({
       path: relativePath(behavior.path, rootPath),
       tag: behavior.tag,
@@ -171,6 +168,13 @@ export function buildAgentComponent(component) {
     viewports: captures.map(({ structure: _structure, ...capture }) => capture),
     responsive: component.responsive,
     animationImplementations: component.animationImplementations,
+    nativeHints: captures[0]?.controls.map((control) => ({
+      path: control.path,
+      label: control.label,
+      primitive: control.role === 'menuitem' ? 'Fluent MenuItem' :
+        control.role === 'menu' ? 'Fluent Menu' :
+        control.tag === 'button' ? 'Fluent Button' : 'destination-native control',
+    })) || [],
   };
 }
 

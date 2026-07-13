@@ -21,7 +21,11 @@ import { captureFigmaSpec } from './figma-capture.mjs';
 import { parseFigmaSource } from './figma-url.mjs';
 import {
   candidateUsesTextEntry,
+  interactionCandidatePriority,
   interactionMatchPriority,
+  interactionSettleTimeout,
+  interactionStateSettleDelay,
+  selectInteractionIdentityRuntimeSource,
 } from './interaction-targeting.mjs';
 import { authenticationShellRuntimeSource } from './shell-detection.mjs';
 import {
@@ -2819,6 +2823,16 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       await rejectAuthenticationShell(url || page.url);
     }
   }
+  const crawlViewport = viewports[0];
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: crawlViewport.width,
+    height: crawlViewport.height,
+    deviceScaleFactor: crawlViewport.dpr,
+    mobile: crawlViewport.width < 600,
+  });
+  await cdp.send('Page.reload', { ignoreCache: false });
+  await waitForApplicationReady();
+  await settlePage();
 
   // Inject pushState intercept on the live page so clicks are trackable
   await cdp.send('Runtime.evaluate', {
@@ -2971,39 +2985,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
   let candidates = [];
   try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
-  const candidatePriority = (candidate) => {
-    if (candidate.inputType === 'submit' || candidate.buttonType === 'submit') {
-      return candidate.formRequiredCount
-        ? 110 + Math.min(20, Math.log10(Math.max(1, candidate.formArea)))
-        : 60;
-    }
-    if (
-      candidate.ariaHaspopup === 'true' ||
-      /(?:menu|listbox|tree|dialog)/i.test(candidate.ariaHaspopup)
-    ) {
-      return candidate.topBar ? 85 : 105;
-    }
-    if (candidate.popoverTarget) return 105;
-    if (
-      (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') &&
-      candidate.hasFormSubmit
-    ) return 20;
-    if (candidate.inputType === 'text' || candidate.tag === 'TEXTAREA') return 95;
-    if (candidate.href) return 100;
-    if (candidate.testId === 'notebook-card') return 90;
-    if (candidate.role === 'link' || candidate.tag === 'A') return 80;
-    if (candidate.inputType === 'checkbox' || candidate.inputType === 'radio') return 70;
-    if (candidate.tag === 'BUTTON') return 60;
-    if (candidate.topBar) return 1;
-    if (candidate.role === 'button') return 50;
-    return 10;
-  };
   const matchPriority = (candidate) => {
     return interactionMatchPriority(candidate, interactionMatch);
   };
   candidates.sort((left, right) =>
     matchPriority(right) - matchPriority(left) ||
-    candidatePriority(right) - candidatePriority(left)
+    interactionCandidatePriority(right) - interactionCandidatePriority(left)
   );
   if (interactionMatch && candidates.some((candidate) => matchPriority(candidate))) {
     candidates = candidates.filter((candidate) => matchPriority(candidate));
@@ -3490,6 +3477,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     if (multiPageStates.length >= maxRoutes) break;
 
     // Always navigate back to home before each candidate to ensure clean state
+    const resetNetworkIndex = networkTimeline.length;
     const currentUrl = (await cdp.send('Runtime.evaluate', {
       expression: 'location.href', returnByValue: true,
     }).catch(() => ({ result: { value: '' } }))).result.value;
@@ -3519,6 +3507,11 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         homeN = d2.n;
       } catch (_) {}
     }
+    // Stable markup can precede framework hydration. Wait for fonts/images and a
+    // bounded post-paint window so delegated click handlers are attached before
+    // probing the next candidate.
+    await settlePage();
+    await waitForNetworkQuiet(resetNetworkIndex, 6000);
 
     // If node count is far from expected, an overlay is open — dismiss and re-navigate
     if (Math.abs(homeN - initialNodeCount) > initialNodeCount * 0.3) {
@@ -3669,18 +3662,24 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         let el = path.length
           ? path.reduce((node, index) => node?.children?.[index], document.body)
           : null;
-        const searchText = ${JSON.stringify(candidate.text.substring(0, 20))};
-        const matchesCandidate = e =>
+        const expectedLabel = ${JSON.stringify(candidate.text)};
+        const basicMatch = e =>
           rendered.includes(e) &&
           e.tagName === ${JSON.stringify(candidate.tag)} &&
           (e.getAttribute('role') || '') === ${JSON.stringify(candidate.role)} &&
-          (e.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)} &&
-          (${associatedLabelRuntimeSource})(e)
-            .trim().startsWith(searchText);
-        if (!matchesCandidate(el)) {
-          el = rendered.find(matchesCandidate);
+          (e.getAttribute('data-testid') || '') === ${JSON.stringify(candidate.testId)};
+        const labelFor = e => (${associatedLabelRuntimeSource})(e)
+          .replace(/\\s+/g, ' ')
+          .trim();
+        if (!basicMatch(el) || labelFor(el) !== expectedLabel.replace(/\\s+/g, ' ').trim()) {
+          const matching = rendered.filter(basicMatch);
+          const index = (${selectInteractionIdentityRuntimeSource})(
+           expectedLabel,
+           matching.map(labelFor)
+          );
+          el = index >= 0 ? matching[index] : null;
         }
-        if (!el) return 'not-found:' + searchText;
+        if (!el) return 'not-found:' + expectedLabel.slice(0, 20);
         el.scrollIntoView({ block: 'center', behavior: 'instant' });
         if (${JSON.stringify(candidateUsesTextEntry(candidate))}) {
           const value = 'site-spec probe';
@@ -3795,9 +3794,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     let overlayAppeared = false;
     let appearedOverlayRoles = [];
     let afterFingerprint = beforeFingerprint;
-    const clickDeadline = Date.now() + 3000;
+    const clickDeadline = Date.now() + interactionSettleTimeout(candidate);
     const stateSettleDeadline =
-      Date.now() + (matchPriority(candidate) ? 1200 : 600);
+      Date.now() + interactionStateSettleDelay(
+        candidate,
+        Boolean(matchPriority(candidate)),
+      );
     while (Date.now() < clickDeadline) {
       await new Promise((r) => setTimeout(r, 300));
       try {
