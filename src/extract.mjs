@@ -53,6 +53,21 @@ const captureHoverProbes = Boolean(args['hover-probes']);
 const hoverMatch = String(args['hover-match'] || '');
 const interactionMatch = String(args['interaction-match'] || '').trim().toLowerCase();
 const rejectAuthShell = Boolean(args['reject-auth-shell']);
+const isOverlayTreeRuntimeSource = `(element => {
+  if (element.getAttribute('role') !== 'tree') return true;
+  for (
+    let node = element;
+    node && node !== document.documentElement;
+    node = node.parentElement
+  ) {
+    const style = getComputedStyle(node);
+    if (
+      ['absolute', 'fixed'].includes(style.position) ||
+      node.matches('[popover]:popover-open')
+    ) return true;
+  }
+  return false;
+})`;
 const maxRoutes = parseInt(String(args['max-routes'] || '30'), 10);
 const allowCrossScope = Boolean(args['allow-cross-scope']);
 const profile = String(args.profile || 'implementation').toLowerCase();
@@ -2938,10 +2953,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           const visible = elements.some(element => {
             const rect = element.getBoundingClientRect();
             const style = getComputedStyle(element);
+            const inlineTree =
+              !(${isOverlayTreeRuntimeSource})(element);
             return rect.width > 0 && rect.height > 0 &&
               style.display !== 'none' && style.visibility !== 'hidden' &&
               Number.parseFloat(style.opacity) > 0 &&
-              element.getAttribute('aria-hidden') !== 'true';
+              element.getAttribute('aria-hidden') !== 'true' &&
+              !inlineTree;
           });
           let focus = document.activeElement;
           while (focus?.shadowRoot?.activeElement) {
@@ -3472,10 +3490,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           return elements.filter(element => {
             const rect = element.getBoundingClientRect();
             const style = getComputedStyle(element);
+            const inlineTree =
+              !(${isOverlayTreeRuntimeSource})(element);
             return rect.width > 0 && rect.height > 0 &&
               style.display !== 'none' && style.visibility !== 'hidden' &&
               Number.parseFloat(style.opacity) > 0 &&
-              element.getAttribute('aria-hidden') !== 'true';
+              element.getAttribute('aria-hidden') !== 'true' &&
+              !inlineTree;
           }).map(element => {
             const role = element.getAttribute('role') || 'popover';
             const text = (
@@ -3717,10 +3738,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
               return elements.filter(element => {
                 const rect = element.getBoundingClientRect();
                 const style = getComputedStyle(element);
+                const inlineTree =
+                  !(${isOverlayTreeRuntimeSource})(element);
                 return rect.width > 0 && rect.height > 0 &&
                   style.display !== 'none' && style.visibility !== 'hidden' &&
                   Number.parseFloat(style.opacity) > 0 &&
-                  element.getAttribute('aria-hidden') !== 'true';
+                  element.getAttribute('aria-hidden') !== 'true' &&
+                  !inlineTree;
               }).map(element => ({
                 text: (element.innerText || element.getAttribute('aria-label') || '')
                   .trim().slice(0, 200)
@@ -3740,10 +3764,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
               return elements.filter(element => {
                 const rect = element.getBoundingClientRect();
                 const style = getComputedStyle(element);
+                const inlineTree =
+                  !(${isOverlayTreeRuntimeSource})(element);
                 return rect.width > 0 && rect.height > 0 &&
                   style.display !== 'none' && style.visibility !== 'hidden' &&
                   Number.parseFloat(style.opacity) > 0 &&
-                  element.getAttribute('aria-hidden') !== 'true';
+                  element.getAttribute('aria-hidden') !== 'true' &&
+                  !inlineTree;
               }).map(element => ({
                 role: element.getAttribute('role') || 'popover',
                 text: (element.innerText || element.getAttribute('aria-label') || '')
@@ -3828,10 +3855,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             return elements.filter(element => {
               const rect = element.getBoundingClientRect();
               const style = getComputedStyle(element);
+              const inlineTree =
+                !(${isOverlayTreeRuntimeSource})(element);
               return rect.width > 0 && rect.height > 0 &&
                 style.display !== 'none' && style.visibility !== 'hidden' &&
                 Number.parseFloat(style.opacity) > 0 &&
                 element.getAttribute('aria-hidden') !== 'true' &&
+                !inlineTree &&
                 Boolean((element.innerText || element.getAttribute('aria-label') || '').trim());
             }).map(element => {
               const role = element.getAttribute('role') || 'popover';
@@ -3872,7 +3902,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         return false;
       }
     })();
-    const panelOpened = !urlChanged && !modalAppeared && nodeCount > preClickN * 1.05 && nodeCount - preClickN > 15;
+    const panelOpened =
+      candidate.role !== 'treeitem' &&
+      !urlChanged &&
+      !modalAppeared &&
+      nodeCount > preClickN * 1.05 &&
+      nodeCount - preClickN > 15;
     const stateChanged =
       !urlChanged &&
       !modalAppeared &&
