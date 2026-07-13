@@ -14,6 +14,7 @@ import {
   isUsefulAgentComponent,
 } from './agent-components.mjs';
 import { buildAcceptanceMatrix } from './acceptance-matrix.mjs';
+import { buildGenerationReadiness } from './generation-readiness.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
@@ -6414,9 +6415,20 @@ const acceptanceMatrix = buildAcceptanceMatrix({
   viewports,
   components: componentPackages,
 });
+const generationReadiness = buildGenerationReadiness({
+  capture: captures[0],
+  components: componentPackages,
+  states: implementationStates,
+  viewports,
+  crawlRequested: crawl,
+});
 fs.writeFileSync(
   path.join(outDir, 'acceptance-matrix.json'),
   JSON.stringify(acceptanceMatrix, null, 2),
+);
+fs.writeFileSync(
+  path.join(outDir, 'generation-readiness.json'),
+  JSON.stringify(generationReadiness, null, 2),
 );
 
 const implementationBlueprint = {
@@ -6428,6 +6440,7 @@ const implementationBlueprint = {
   readOrder: [
     'implementation.json',
     'acceptance-matrix.json',
+    'generation-readiness.json',
     'component-map.json',
     'the matching components/*.json shard for each component being built',
     'pages/*.html and pages/*.css for the state being implemented',
@@ -6464,6 +6477,11 @@ const implementationBlueprint = {
       'site-spec-runtime.js',
       'redirects or links to reconstruction routes',
     ],
+  },
+  generationReadiness: {
+    ready: generationReadiness.ready,
+    failures: generationReadiness.failures,
+    file: 'generation-readiness.json',
   },
   validationContract: {
     authority: 'structured-browser-state',
@@ -6521,6 +6539,7 @@ const implementationBlueprint = {
   evidence: {
     exactSpec: 'spec.json',
     acceptanceMatrix: 'acceptance-matrix.json',
+    generationReadiness: 'generation-readiness.json',
     componentMap: 'component-map.json',
     summary: 'summary.json',
     captures: captureEvidenceFiles,
