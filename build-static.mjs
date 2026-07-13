@@ -39,6 +39,50 @@ function styleToString(style) {
     .join(';');
 }
 
+const RESPONSIVE_STYLE_PROPERTIES = [
+  'display', 'position', 'inset', 'insetBlock', 'insetInline',
+  'width', 'height', 'minWidth', 'maxWidth', 'minHeight', 'maxHeight',
+  'margin', 'padding', 'gap', 'rowGap', 'columnGap', 'flex',
+  'flexDirection', 'flexWrap', 'justifyContent', 'alignItems', 'alignSelf',
+  'order', 'gridTemplateColumns', 'gridTemplateRows', 'gridAutoFlow',
+  'overflow', 'overflowX', 'overflowY', 'boxSizing',
+];
+
+function cssPropertyName(value) {
+  return value.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+function responsiveStylesForState(state, specDir) {
+  const entries = Object.entries(state?.evidenceByViewport || {});
+  if (entries.length < 2) return [];
+  const primaryFile = state.evidence && path.join(specDir, state.evidence);
+  const primary = primaryFile && fs.existsSync(primaryFile)
+    ? JSON.parse(fs.readFileSync(primaryFile, 'utf8'))
+    : null;
+  const primaryByPath = new Map(
+    (primary?.nodes || []).map((node) => [node.path, node]),
+  );
+  return entries
+    .filter(([, file]) => file !== state.evidence)
+    .map(([, file]) => JSON.parse(
+      fs.readFileSync(path.join(specDir, file), 'utf8'),
+    ))
+    .map((evidence) => ({
+      maxWidth: evidence.viewport?.width,
+      entries: (evidence.nodes || []).map((node) => {
+        const desktop = primaryByPath.get(node.path);
+        const style = {};
+        for (const property of RESPONSIVE_STYLE_PROPERTIES) {
+          const value = node.style?.[property];
+          if (value == null || value === desktop?.style?.[property]) continue;
+          style[cssPropertyName(property)] = value;
+        }
+        return Object.keys(style).length ? { path: node.path, style } : null;
+      }).filter(Boolean),
+    }))
+    .filter((item) => item.maxWidth && item.entries.length);
+}
+
 function localPathForState(state, sourceUrl) {
   if (state.type === 'route') {
     try {
@@ -286,6 +330,17 @@ function runtimeSource(manifest) {
       return null;
     }
   };
+  const responsive = manifest.responsiveByPath?.[location.pathname] || [];
+  for (const viewport of responsive) {
+    if (innerWidth > viewport.maxWidth) continue;
+    for (const entry of viewport.entries) {
+      const element = elementForPath(entry.path);
+      if (!element) continue;
+      for (const [property, value] of Object.entries(entry.style)) {
+        element.style.setProperty(property, value, 'important');
+      }
+    }
+  }
   const normalized = value => String(value || '')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/[^a-z0-9]+/gi, ' ')
@@ -446,6 +501,14 @@ export function buildStatic({ specDir, buildDir }) {
     ))
     .filter(Boolean);
   const sourceUrl = spec.source?.capturedUrl || spec.source?.requestedUrl;
+  const responsiveByPath = {
+    '/': responsiveStylesForState(spec.home, resolvedSpecDir),
+  };
+  for (const state of spec.pages || []) {
+    const localPath = localPathForState(state, sourceUrl).split('?')[0];
+    responsiveByPath[localPath] =
+      responsiveStylesForState(state, resolvedSpecDir);
+  }
   const { childrenOf, renderNode } = createRenderer(
     capture.nodes,
     triggers,
@@ -558,6 +621,7 @@ ${body}
         }
       : undefined,
     triggers,
+    responsiveByPath,
     states: (spec.pages || []).map((state) => ({
       index: state.index,
       type: state.type,

@@ -188,6 +188,79 @@ test('builds local state routes and wires distinct interactive controls', () => 
   );
 });
 
+test('emits viewport-specific layout overrides from state evidence', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-responsive-'));
+  const specDir = path.join(temp, 'spec');
+  const buildDir = path.join(temp, 'build');
+  fs.mkdirSync(path.join(specDir, 'evidence'), { recursive: true });
+  fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
+  fs.writeFileSync(
+    path.join(specDir, 'pages', 'home.html'),
+    '<!doctype html><html><head></head><body><div id="root"></div></body></html>',
+  );
+  const pathValue = 'doc(0)>html:nth-of-type(1)>body:nth-of-type(1)>div:nth-of-type(1)';
+  fs.writeFileSync(
+    path.join(specDir, 'evidence', 'capture.json'),
+    JSON.stringify({
+      document: { title: 'Responsive' },
+      behaviors: [],
+      nodes: [
+        node(htmlPath, 'doc(0)', 'html'),
+        node(bodyPath, htmlPath, 'body'),
+        node(pathValue, bodyPath, 'div', { id: 'root' }),
+      ],
+    }),
+  );
+  fs.writeFileSync(
+    path.join(specDir, 'evidence', 'home-desktop.json'),
+    JSON.stringify({
+      viewport: { width: 1440, height: 900 },
+      nodes: [{ path: pathValue, style: { display: 'flex', flexDirection: 'row' } }],
+    }),
+  );
+  fs.writeFileSync(
+    path.join(specDir, 'evidence', 'home-mobile.json'),
+    JSON.stringify({
+      viewport: { width: 390, height: 844 },
+      nodes: [{ path: pathValue, style: { display: 'flex', flexDirection: 'column' } }],
+    }),
+  );
+  fs.writeFileSync(
+    path.join(specDir, 'spec.json'),
+    JSON.stringify({
+      source: { capturedUrl: 'https://example.test/' },
+      captures: [{ file: 'evidence/capture.json' }],
+      home: {
+        url: 'https://example.test/',
+        html: 'pages/home.html',
+        evidence: 'evidence/home-desktop.json',
+        evidenceByViewport: {
+          '1440x900': 'evidence/home-desktop.json',
+          '390x844': 'evidence/home-mobile.json',
+        },
+      },
+      pages: [],
+    }),
+  );
+
+  buildStatic({ specDir, buildDir });
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(buildDir, 'site-spec-manifest.json'), 'utf8'),
+  );
+  assert.deepEqual(manifest.responsiveByPath['/'], [{
+    maxWidth: 390,
+    entries: [{
+      path: pathValue,
+      style: { 'flex-direction': 'column' },
+    }],
+  }]);
+  const runtime = fs.readFileSync(
+    path.join(buildDir, 'site-spec-runtime.js'),
+    'utf8',
+  );
+  assert.match(runtime, /style\.setProperty\(property, value, 'important'\)/);
+});
+
 test('uses the settled captured home document when available', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-home-'));
   const specDir = path.join(temp, 'spec');
