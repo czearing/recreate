@@ -12,6 +12,10 @@ import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
 import { captureFigmaSpec } from './figma-capture.mjs';
 import { parseFigmaSource } from './figma-url.mjs';
+import {
+  candidateUsesTextEntry,
+  interactionMatchPriority,
+} from './interaction-targeting.mjs';
 import { authenticationShellRuntimeSource } from './shell-detection.mjs';
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
@@ -256,7 +260,9 @@ async function waitForNetworkQuiet(index, maxWaitMs = 3000) {
   let previous = '';
   let stableSince = startedAt;
   while (Date.now() - startedAt < maxWaitMs) {
-    const requests = networkTimeline.slice(index);
+    const requests = networkTimeline.slice(index).filter((request) =>
+      ['Document', 'Fetch', 'XHR'].includes(request.type)
+    );
     const signature = requests
       .map((request) => [
         request.requestId,
@@ -1593,9 +1599,12 @@ async function capturePageSnapshot(
   if (settleVisuals) {
     await cdp.send('Runtime.evaluate', {
       expression: `(async () => {
-      const waitForFrame = () => new Promise(resolve =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve))
-      );
+      const waitForFrame = () => Promise.race([
+        new Promise(resolve =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve))
+        ),
+        new Promise(resolve => setTimeout(resolve, 100))
+      ]);
       const signature = () => JSON.stringify(
         Array.from(document.querySelectorAll('body *'))
           .slice(0, 1000)
@@ -2895,15 +2904,15 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     return 10;
   };
   const matchPriority = (candidate) => {
-    if (!interactionMatch) return 0;
-    const label = `${candidate.text} ${candidate.placeholder}`.trim().toLowerCase();
-    if (label === interactionMatch) return 2;
-    return label.includes(interactionMatch) ? 1 : 0;
+    return interactionMatchPriority(candidate, interactionMatch);
   };
   candidates.sort((left, right) =>
     matchPriority(right) - matchPriority(left) ||
     candidatePriority(right) - candidatePriority(left)
   );
+  if (interactionMatch && candidates.some((candidate) => matchPriority(candidate))) {
+    candidates = candidates.filter((candidate) => matchPriority(candidate));
+  }
   console.error(`phase: route crawl found ${candidates.length} candidates`);
   const triggerElementFor = (candidate) => ({
     path: candidate.snapshotPath,
@@ -3571,11 +3580,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         }
         if (!el) return 'not-found:' + searchText;
         el.scrollIntoView({ block: 'center', behavior: 'instant' });
-        if (
-          (el instanceof HTMLInputElement &&
-            ['text', 'search', 'email', 'url', 'tel'].includes(el.type)) ||
-          el instanceof HTMLTextAreaElement
-        ) {
+        if (${JSON.stringify(candidateUsesTextEntry(candidate))}) {
           const value = 'site-spec probe';
           const prototype = el instanceof HTMLTextAreaElement
             ? HTMLTextAreaElement.prototype
