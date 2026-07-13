@@ -103,8 +103,11 @@ function compactNodeGeometry(node, key, parentStyle) {
   };
 }
 
-function compactCapture(capture, rootPath) {
-  const nodes = capture.nodes.filter((node) => within(node.path, rootPath));
+function compactCapture(capture, rootPath, excludeRoots) {
+  const included = (pathValue) =>
+    within(pathValue, rootPath) &&
+    !excludeRoots.some((excluded) => within(pathValue, excluded));
+  const nodes = capture.nodes.filter((node) => included(node.path));
   const childPaths = new Set(nodes.map((node) => node.parentPath).filter(Boolean));
   const byPath = new Map(nodes.map((node) => [node.path, node]));
   const pathCounts = new Map();
@@ -127,7 +130,7 @@ function compactCapture(capture, rootPath) {
       byPath.get(node.parentPath)?.style,
     )),
     truncatedNodeCount: 0,
-    controls: (capture.behaviors || []).map((behavior) => ({
+    controls: (capture.behaviors || []).filter((behavior) => included(behavior.path)).map((behavior) => ({
       path: relativePath(behavior.path, rootPath),
       tag: behavior.tag,
       role: behavior.role,
@@ -138,7 +141,7 @@ function compactCapture(capture, rootPath) {
       ]),
       events: [...new Set((behavior.listeners || []).map((listener) => listener.type))],
     })),
-    assets: (capture.exactAssets || []).map((asset) => ({
+    assets: (capture.exactAssets || []).filter((asset) => included(asset.path)).map((asset) => ({
       path: relativePath(asset.path, rootPath),
       type: asset.type,
       src: asset.currentSrc || asset.src || asset.file,
@@ -148,9 +151,9 @@ function compactCapture(capture, rootPath) {
   };
 }
 
-export function buildAgentComponent(component) {
+export function buildAgentComponent(component, { excludeRoots = [] } = {}) {
   const captures = component.captures.map((capture) =>
-    compactCapture(capture, component.candidate.representativePath));
+    compactCapture(capture, component.candidate.representativePath, excludeRoots));
   return {
     schemaVersion: 1,
     purpose: 'Readable native-component build evidence. Never ship this artifact.',

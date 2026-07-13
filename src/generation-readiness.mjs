@@ -34,14 +34,22 @@ export function buildGenerationReadiness({
     node.visible && node.tag === '#text' && clean(node.text),
   );
   const controls = (capture?.behaviors || []).filter((behavior) =>
-    clean(behavior.label || behavior.href || behavior.path),
+    clean(behavior.label || behavior.href) ||
+    ['button', 'input', 'textarea', 'select', 'a'].includes(
+      String(behavior.tag || '').toLowerCase(),
+    ) ||
+    ['button', 'link', 'menuitem', 'option', 'switch', 'tab'].includes(
+      String(behavior.role || '').toLowerCase(),
+    ),
   );
   const assets = (capture?.exactAssets || []).filter((asset) => asset.path);
   const animations = [
     ...(capture?.animationElements || []),
     ...(capture?.lifecycleAnimation?.tracks || []),
   ].filter((animation) => animation.path);
-  const regions = components.filter((component) => !component.file);
+  const regions = components.filter((component) =>
+    !componentRoots.some((root) => within(component.path, root)),
+  );
   const text = coverage(visibleText, componentRoots, (node) => ({
     path: node.path,
     text: clean(node.text),
@@ -69,6 +77,8 @@ export function buildGenerationReadiness({
     controlCoverage.missing.length && `${controlCoverage.missing.length} control(s) lack component ownership`,
     assetCoverage.missing.length && `${assetCoverage.missing.length} asset(s) lack component ownership`,
     animationCoverage.missing.length && `${animationCoverage.missing.length} animation track(s) lack component ownership`,
+    (capture?.animations || []).length > 0 && animations.length === 0 &&
+      `${capture.animations.length} animation definition(s) have no element or lifecycle tracks`,
     crawlRequested && interactionCount === 0 && 'crawl requested but no interaction states were captured',
     viewports.length < 2 && 'fewer than two responsive viewports were captured',
   ].filter(Boolean);
@@ -87,7 +97,7 @@ export function buildGenerationReadiness({
     coverage: {
       regions: {
         required: components.length,
-        covered: componentRoots.length,
+        covered: components.length - regions.length,
         missing: regions.map((component) => ({
           id: component.id,
           path: component.path,

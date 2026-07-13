@@ -12,6 +12,7 @@ test('fails whole-site readiness when visible regions are not readable', () => {
       nodes: [{ path: textPath, tag: '#text', text: 'Missing hero', visible: true }],
       behaviors: [{ path: `${root}>button:nth-of-type(1)`, label: 'Search', tag: 'button' }],
       exactAssets: [],
+      animations: [{}],
       animationElements: [],
       lifecycleAnimation: { tracks: [] },
     },
@@ -28,6 +29,7 @@ test('fails whole-site readiness when visible regions are not readable', () => {
   assert.equal(readiness.ready, false);
   assert.match(readiness.failures.join(' '), /lack readable shards/);
   assert.match(readiness.failures.join(' '), /no interaction states/);
+  assert.match(readiness.failures.join(' '), /animation definition/);
 });
 
 test('passes only when complete evidence is owned by readable components', () => {
@@ -36,6 +38,7 @@ test('passes only when complete evidence is owned by readable components', () =>
       nodes: [{ path: textPath, tag: '#text', text: 'Hero', visible: true }],
       behaviors: [{ path: `${root}>button:nth-of-type(1)`, label: 'Search' }],
       exactAssets: [{ path: `${root}>img:nth-of-type(1)`, type: 'image' }],
+      animations: [{}],
       animationElements: [{ path: `${root}>div:nth-of-type(1)`, type: 'hover' }],
       lifecycleAnimation: { tracks: [] },
     },

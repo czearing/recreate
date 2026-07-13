@@ -5851,6 +5851,7 @@ const isWithin = (pathValue, rootPath) =>
   pathValue === rootPath || pathValue?.startsWith(`${rootPath}>`);
 const componentDir = path.join(outDir, 'components');
 fs.mkdirSync(componentDir, { recursive: true });
+const componentDetails = new Map();
 const componentPackages = (captures[0]?.componentCandidates || []).map(
   (candidate, index) => {
     const filename = `component-${String(index + 1).padStart(3, '0')}.json`;
@@ -5915,21 +5916,17 @@ const componentPackages = (captures[0]?.componentCandidates || []).map(
       (implementation) =>
         componentAnimationTypes.includes(implementation.type),
     );
-    const usefulForAgents = isUsefulAgentComponent(component);
+    componentDetails.set(component.id, component);
     if (fullProfile) {
       fs.writeFileSync(
         path.join(componentDir, filename),
         JSON.stringify(component, null, 2),
       );
-    } else if (usefulForAgents) {
-      fs.writeFileSync(
-        path.join(componentDir, filename),
-        JSON.stringify(buildAgentComponent(component), null, 2),
-      );
     }
     return {
       id: component.id,
-      file: fullProfile || usefulForAgents ? `components/${filename}` : undefined,
+      file: fullProfile ? `components/${filename}` : undefined,
+      filename,
       identity,
       path: candidate.representativePath,
       score: candidate.score,
@@ -5952,6 +5949,28 @@ for (const component of componentPackages) {
   component.childIds = componentPackages
     .filter((candidate) => candidate.parentId === component.id)
     .map((candidate) => candidate.id);
+}
+if (!fullProfile) {
+  const selected = componentPackages.filter((component) =>
+    !component.parentId ||
+    isUsefulAgentComponent(componentDetails.get(component.id)),
+  );
+  for (const component of selected) {
+    component.file = `components/${component.filename}`;
+  }
+  for (const component of selected) {
+    const details = componentDetails.get(component.id);
+    const excludeRoots = selected
+      .filter((candidate) =>
+        candidate.id !== component.id &&
+        isWithin(candidate.path, component.path),
+      )
+      .map((candidate) => candidate.path);
+    fs.writeFileSync(
+      path.join(componentDir, component.filename),
+      JSON.stringify(buildAgentComponent(details, { excludeRoots }), null, 2),
+    );
+  }
 }
 const componentById = new Map(
   componentPackages.map((component) => [component.id, component]),
