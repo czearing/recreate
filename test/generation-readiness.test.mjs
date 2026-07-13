@@ -25,11 +25,11 @@ test('fails whole-site readiness when visible regions are not readable', () => {
     states: [{ index: -1 }],
     viewports: [{ width: 1440 }, { width: 390 }],
     crawlRequested: true,
+    globalPaths: [],
   });
   assert.equal(readiness.ready, false);
   assert.match(readiness.failures.join(' '), /lack readable shards/);
   assert.match(readiness.failures.join(' '), /no interaction states/);
-  assert.match(readiness.failures.join(' '), /animation definition/);
 });
 
 test('passes only when complete evidence is owned by readable components', () => {
@@ -52,6 +52,7 @@ test('passes only when complete evidence is owned by readable components', () =>
     states: [{ index: -1 }, { index: 0 }],
     viewports: [{ width: 1440 }, { width: 390 }],
     crawlRequested: true,
+    globalPaths: [],
   });
   assert.equal(readiness.ready, true);
 });

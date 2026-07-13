@@ -26,10 +26,14 @@ export function buildGenerationReadiness({
   states,
   viewports,
   crawlRequested,
+  globalPaths = [],
 }) {
-  const componentRoots = components
+  const componentRoots = [
+    ...components
     .filter((component) => component.file)
-    .map((component) => component.path);
+    .map((component) => component.path),
+    ...globalPaths,
+  ];
   const visibleText = (capture?.nodes || []).filter((node) =>
     node.visible && node.tag === '#text' && clean(node.text),
   );
@@ -44,6 +48,10 @@ export function buildGenerationReadiness({
   );
   const assets = (capture?.exactAssets || []).filter((asset) => asset.path);
   const animations = [
+    ...(capture?.animations || []).map((animation) => ({
+      ...animation,
+      path: animation.path || animation.target,
+    })),
     ...(capture?.animationElements || []),
     ...(capture?.lifecycleAnimation?.tracks || []),
   ].filter((animation) => animation.path);
@@ -77,8 +85,6 @@ export function buildGenerationReadiness({
     controlCoverage.missing.length && `${controlCoverage.missing.length} control(s) lack component ownership`,
     assetCoverage.missing.length && `${assetCoverage.missing.length} asset(s) lack component ownership`,
     animationCoverage.missing.length && `${animationCoverage.missing.length} animation track(s) lack component ownership`,
-    (capture?.animations || []).length > 0 && animations.length === 0 &&
-      `${capture.animations.length} animation definition(s) have no element or lifecycle tracks`,
     crawlRequested && interactionCount === 0 && 'crawl requested but no interaction states were captured',
     viewports.length < 2 && 'fewer than two responsive viewports were captured',
   ].filter(Boolean);

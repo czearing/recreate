@@ -29,6 +29,7 @@ test('does not mistake card focus state for completed navigation', () => {
 
 test('allows data-backed navigation cards more time to settle', () => {
   assert.equal(interactionSettleTimeout({ testId: 'notebook-card' }), 8000);
+  assert.equal(interactionSettleTimeout({ text: "Build a deck. Adds to Notes. You'll get Deck." }), 25000);
   assert.equal(interactionSettleTimeout({ tag: 'BUTTON' }), 3000);
 });
 

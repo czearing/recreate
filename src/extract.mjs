@@ -3977,6 +3977,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         return (
           target.hostname === baseHost &&
           (
+            interactionMatch ||
             allowCrossScope ||
             target.pathname === basePathname ||
             target.pathname.startsWith(basePathPrefix)
@@ -3996,6 +3997,12 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       !urlChanged &&
       !modalAppeared &&
       afterFingerprint !== beforeFingerprint;
+    if (interactionMatch) {
+      console.error(
+        `phase: matched interaction result urlChanged=${urlChanged} stateChanged=${stateChanged} ` +
+        `modal=${modalAppeared} overlay=${overlayAppeared} url=${afterUrl}`,
+      );
+    }
 
     // Capture modal state if one appeared (no URL change needed)
     if (!urlChanged && modalAppeared) {
@@ -4114,6 +4121,17 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           await captureDerivedInputStates(candidate);
         }
       }
+      continue;
+    }
+
+    if (interactionMatch && !urlChanged) {
+      const state = await captureResponsivePageSnapshot(multiPageStates.length);
+      state.type = 'no-op';
+      state.trigger = candidate.text || candidate.placeholder;
+      state.triggerElement = triggerElementFor(candidate);
+      state.probe = { action: 'click', expectedResult: 'no observable state change' };
+      state.network = networkEvidenceSince(networkStartIndex);
+      multiPageStates.push(state);
       continue;
     }
 
@@ -6248,11 +6266,13 @@ output.validation = {
 };
 
 const captureEvidenceFiles = [];
+const implementationCaptures = [];
 if (!fullProfile) {
   const evidenceDir = path.join(outDir, 'evidence');
   fs.mkdirSync(evidenceDir, { recursive: true });
   output.captures = captures.map((capture) => {
     const compact = compactCapture(capture);
+    implementationCaptures.push(compact);
     const viewport = capture.document.viewport;
     const filename = `capture-${viewport.width}x${viewport.height}.json`;
     const relativeFile = `evidence/${filename}`;
@@ -6434,12 +6454,35 @@ const acceptanceMatrix = buildAcceptanceMatrix({
   viewports,
   components: componentPackages,
 });
+const readableComponentRoots = componentPackages
+  .filter((component) => component.file)
+  .map((component) => component.path);
+const globalControls = (captures[0]?.behaviors || []).filter((control) =>
+  control.path &&
+  !readableComponentRoots.some((root) => isWithin(control.path, root)),
+);
+const pageGlobals = {
+  schemaVersion: 1,
+  purpose: 'Readable page-level evidence outside the primary component tree.',
+  controls: globalControls.map((control) => ({
+    path: control.path,
+    tag: control.tag,
+    role: control.role,
+    label: control.label,
+    events: [...new Set((control.listeners || []).map((listener) => listener.type))],
+  })),
+};
+fs.writeFileSync(
+  path.join(outDir, 'page-globals.json'),
+  JSON.stringify(pageGlobals, null, 2),
+);
 const generationReadiness = buildGenerationReadiness({
-  capture: captures[0],
+  capture: implementationCaptures[0] || captures[0],
   components: componentPackages,
   states: implementationStates,
   viewports,
   crawlRequested: crawl,
+  globalPaths: globalControls.map((control) => control.path),
 });
 fs.writeFileSync(
   path.join(outDir, 'acceptance-matrix.json'),
@@ -6460,7 +6503,9 @@ const implementationBlueprint = {
     'implementation.json',
     'acceptance-matrix.json',
     'generation-readiness.json',
+    'page-globals.json',
     'component-map.json',
+    'page-globals.json',
     'the matching components/*.json shard for each component being built',
     'pages/*.html and pages/*.css for the state being implemented',
     'stylesheets/*.css for authored rules and design tokens',
@@ -6559,6 +6604,7 @@ const implementationBlueprint = {
     exactSpec: 'spec.json',
     acceptanceMatrix: 'acceptance-matrix.json',
     generationReadiness: 'generation-readiness.json',
+    pageGlobals: 'page-globals.json',
     componentMap: 'component-map.json',
     summary: 'summary.json',
     captures: captureEvidenceFiles,

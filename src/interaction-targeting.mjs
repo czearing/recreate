@@ -58,10 +58,12 @@ export function interactionCandidatePriority(candidate) {
 }
 
 export function interactionSettleTimeout(candidate) {
+  if (/adds to|you'll get/i.test(candidate.text || '')) return 25000;
   return candidate.testId === 'notebook-card' ? 8000 : 3000;
 }
 
 export function interactionStateSettleDelay(candidate, explicitlyMatched = false) {
+  if (/adds to|you'll get/i.test(candidate.text || '')) return 22000;
   if (candidate.testId === 'notebook-card') return 5000;
   return explicitlyMatched ? 1200 : 600;
 }
