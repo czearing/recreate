@@ -1,4 +1,5 @@
-import { parse } from 'parse5';
+import { createHash } from 'node:crypto';
+import { parse, serializeOuter } from 'parse5';
 import { jsxText, renderAttributes, VOID_TAGS } from './jsx-format.mjs';
 import { fieldMaps, findRepeatedComponents } from './repeated-components.mjs';
 
@@ -50,13 +51,15 @@ function isComponentBoundary(node) {
   );
 }
 
-export function generateReactComponents(html, { maxNodes = 20 } = {}) {
+export function generateReactComponents(html, { maxNodes = 20, resolveColor } = {}) {
   const body = bodyNode(parse(html));
   if (!body) throw new Error('Captured HTML has no body.');
   const definitions = [];
   const usedNames = new Map();
   const componentBySignature = new Map();
   const repeatedByNode = findRepeatedComponents(body);
+  const assets = [];
+  const assetBySource = new Map();
 
   const uniqueName = (node) => {
     const label = node.attrs?.find(({ name }) =>
@@ -70,14 +73,8 @@ export function generateReactComponents(html, { maxNodes = 20 } = {}) {
   const repeatedInvocation = (group, node, depth, definition) => {
     if (!group.name) emitRepeated(group);
     const index = group.nodes.indexOf(node);
-    const props = group.fields.map((field) => {
-      if (field.kind !== 'node') {
-        return `${field.name}=${JSON.stringify(field.values[index])}`;
-      }
-      const childName = emit(field.values[index]);
-      definition.imports.push(childName);
-      return `${field.name}={<${childName} />}`;
-    })
+    const props = group.fields
+      .map((field) => `${field.name}=${JSON.stringify(field.values[index])}`)
       .join(' ');
     return `${'  '.repeat(depth)}<${group.name}${props ? ` ${props}` : ''} />`;
   };
@@ -87,12 +84,17 @@ export function generateReactComponents(html, { maxNodes = 20 } = {}) {
     group.name = `${uniqueName(group.nodes[0])}Item`;
     const definition = {
       name: group.name,
-      kind: group.nodes[0].tagName === 'svg' ? 'icon' : 'component',
+      kind: 'component',
       imports: [],
-      props: group.fields.map(({ kind, name }) => ({
+      props: group.fields.map(({ name }) => ({
         name,
-        type: kind === 'node' ? 'ReactNode' : 'string',
+        type: 'string',
       })),
+      classes: new Set(group.fields
+        .filter(({ kind, attr }) => kind === 'attr' && attr === 'class')
+        .flatMap(({ values }) => values)
+        .flatMap((value) => String(value).split(/\s+/))
+        .filter(Boolean)),
       jsx: '',
     };
     definitions.push(definition);
@@ -111,9 +113,10 @@ export function generateReactComponents(html, { maxNodes = 20 } = {}) {
     componentBySignature.set(signature, name);
     const definition = {
       name,
-      kind: node.tagName === 'svg' ? 'icon' : 'component',
+      kind: 'component',
       imports: [],
       props: [],
+      classes: new Set(),
       jsx: '',
     };
     definitions.push(definition);
@@ -135,9 +138,31 @@ export function generateReactComponents(html, { maxNodes = 20 } = {}) {
       return `${'  '.repeat(depth)}${prop ? `{${prop}}` : jsxText(node.value)}`;
     }
     if (node.nodeName === '#comment' || !node.tagName) return '';
-    const nodeProp = template?.maps.nodes.get(pathKey);
-    if (nodeProp) return `${'  '.repeat(depth)}{${nodeProp}}`;
     if (['script', 'style', 'link', 'meta', 'base', 'noscript'].includes(node.tagName)) return '';
+    const classValue = node.attrs?.find(({ name }) => name === 'class')?.value;
+    for (const token of String(classValue || '').split(/\s+/).filter(Boolean)) {
+      definition.classes.add(token);
+    }
+    if (node.tagName === 'svg') {
+      const source = serializeOuter(node).replace(
+        /currentColor/g,
+        resolveColor?.(node) || '#5d5d5d',
+      );
+      let file = assetBySource.get(source);
+      if (!file) {
+        file = `${createHash('sha256').update(source).digest('hex').slice(0, 16)}.svg`;
+        assetBySource.set(source, file);
+        assets.push({ file, source });
+      }
+      const kept = (node.attrs || []).filter(({ name }) =>
+        ['aria-hidden', 'class', 'height', 'role', 'style', 'title', 'width'].includes(name));
+      const attrs = renderAttributes([
+        { name: 'src', value: `/assets/${file}` },
+        { name: 'alt', value: '' },
+        ...kept,
+      ]);
+      return `${'  '.repeat(depth)}<img ${attrs} />`;
+    }
     const repeated = repeatedByNode.get(node);
     if (node !== root && repeated && repeated !== template?.group) {
       const name = emitRepeated(repeated);
@@ -172,5 +197,5 @@ export function generateReactComponents(html, { maxNodes = 20 } = {}) {
     appImports.push(name);
     return `      <${name} />`;
   });
-  return { definitions, appImports, appChildren };
+  return { definitions, appImports, appChildren, assets };
 }

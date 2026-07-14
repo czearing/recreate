@@ -15,21 +15,41 @@ test('emits readable React source without reconstruction runtime', () => {
     home: { html: 'pages/home.html', stylesheet: 'pages/home.css', title: 'Fixture' },
   }));
   fs.writeFileSync(path.join(specDir, 'pages', 'home.html'),
-    '<html><body><main><h1>Hello</h1><button disabled>Go</button></main></body></html>');
-  fs.writeFileSync(path.join(specDir, 'pages', 'home.css'), 'h1{color:red}');
-  fs.writeFileSync(path.join(specDir, 'stylesheets', '0000.css'), 'body{margin:0}');
+    '<html><body><main><h1 class="hero">Hello</h1><button class="action" disabled>Go' +
+    '<svg width="16" height="16" fill="currentColor"><path d="M0 0h1v1z" fill="currentColor"/></svg>' +
+    '</button></main></body></html>');
+  fs.writeFileSync(path.join(specDir, 'pages', 'home.css'),
+    '.hero{color:red}.action{color:#123456}.action svg{width:16px}.unused{display:none}');
+  fs.writeFileSync(path.join(specDir, 'stylesheets', '0000.css'),
+    'body{margin:0}.hero{color:red}');
 
   const result = buildReactProject({ specDir, outDir, maxNodes: 4 });
   const source = fs.readdirSync(path.join(outDir, 'src', 'components'))
+    .filter((file) => file.endsWith('.tsx'))
     .map((file) => fs.readFileSync(path.join(outDir, 'src', 'components', file), 'utf8'))
     .join('\n');
   assert.ok(result.componentCount >= 1);
   assert.ok(result.maxComponentLines < 200);
-  assert.match(source, /<h1>/);
+  assert.match(source, /<h1 className="hero">/);
   assert.match(source, /disabled/);
   assert.doesNotMatch(source, /dangerouslySetInnerHTML|site-spec-runtime|application\/json/);
-  assert.match(fs.readFileSync(path.join(outDir, 'src', 'styles', '00-0000.css'), 'utf8'),
-    /body \{\n  margin:0/);
+  assert.doesNotMatch(source, /<svg/);
+  const assetFiles = fs.readdirSync(path.join(outDir, 'public', 'assets'));
+  assert.equal(assetFiles.length, 1);
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(outDir, 'public', 'assets', assetFiles[0]), 'utf8'),
+    /currentColor/,
+  );
+  const css = [
+    fs.readFileSync(path.join(outDir, 'src', 'styles', 'shared.css'), 'utf8'),
+    ...fs.readdirSync(path.join(outDir, 'src', 'components'))
+      .filter((file) => file.endsWith('.css'))
+      .map((file) => fs.readFileSync(path.join(outDir, 'src', 'components', file), 'utf8')),
+  ].join('\n');
+  assert.match(css, /body \{\n\s+margin:0/);
+  assert.doesNotMatch(css, /\.unused/);
+  assert.equal((css.match(/\.hero/g) || []).length, 1);
+  assert.match(css, /\.action img/);
 });
 
 test('deduplicates repeated structures into one typed component', () => {
@@ -50,6 +70,7 @@ test('deduplicates repeated structures into one typed component', () => {
 
   buildReactProject({ specDir, outDir });
   const sources = fs.readdirSync(path.join(outDir, 'src', 'components'))
+    .filter((file) => file.endsWith('.tsx'))
     .map((file) => fs.readFileSync(path.join(outDir, 'src', 'components', file), 'utf8'));
   const item = sources.find((source) => /interface \w+ItemProps/.test(source));
   const parent = sources.find((source) => /text="First" text2="Alpha"/.test(source));

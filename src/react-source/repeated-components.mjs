@@ -4,10 +4,20 @@ const normalizedAttributes = (node) => (node.attrs || [])
   .sort()
   .join('|');
 
+function exactSignature(node) {
+  if (node.nodeName === '#text') return `#text:${node.value || ''}`;
+  if (!node.tagName) return node.nodeName;
+  const attrs = (node.attrs || [])
+    .map(({ name, value }) => `${name}=${value}`)
+    .sort()
+    .join('|');
+  return `${node.tagName}[${attrs}](${(node.childNodes || []).map(exactSignature).join(',')})`;
+}
+
 export function structuralSignature(node) {
   if (node.nodeName === '#text') return '#text';
   if (!node.tagName) return node.nodeName;
-  if (node.tagName === 'svg') return `svg[${normalizedAttributes(node)}](*)`;
+  if (node.tagName === 'svg') return exactSignature(node);
   return `${node.tagName}[${normalizedAttributes(node)}](` +
     `${(node.childNodes || []).map(structuralSignature).join(',')})`;
 }
@@ -39,11 +49,6 @@ function propName(base, used) {
 function collectFields(nodes, path = [], fields = [], used = new Map()) {
   const first = valueAt(nodes[0], path);
   if (!first) return fields;
-  if (first.tagName === 'svg') {
-    fields.push({ kind: 'node', path, name: propName('icon', used), values: nodes
-      .map((node) => valueAt(node, path)) });
-    return fields;
-  }
   if (first.nodeName === '#text') {
     const values = nodes.map((node) => valueAt(node, path)?.value || '');
     if (new Set(values).size > 1) {
@@ -101,16 +106,14 @@ export function findRepeatedComponents(root, { minNodes = 4, maxNodes = 120 } = 
 export function fieldMaps(group) {
   const text = new Map();
   const attrs = new Map();
-  const nodes = new Map();
   for (const field of group?.fields || []) {
     const key = field.path.join('.');
     if (field.kind === 'text') text.set(key, field.name);
-    else if (field.kind === 'node') nodes.set(key, field.name);
     else {
       const values = attrs.get(key) || new Map();
       values.set(field.attr, field.name);
       attrs.set(key, values);
     }
   }
-  return { text, attrs, nodes };
+  return { text, attrs };
 }

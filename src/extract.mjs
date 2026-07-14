@@ -6840,8 +6840,10 @@ const reactSource = buildReactProject({
 implementationBlueprint.reactSource = {
   ...implementationBlueprint.reactSource,
   componentCount: reactSource.componentCount,
-  iconCount: reactSource.iconCount,
+  assetCount: reactSource.assetCount,
   maxComponentLines: reactSource.maxComponentLines,
+  keptCssRuleCount: reactSource.keptCssRuleCount,
+  totalCssRuleCount: reactSource.totalCssRuleCount,
 };
 const initialImplementationText = JSON.stringify(implementationBlueprint);
 const agentReadiness = buildAgentReadiness({

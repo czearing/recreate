@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { formatCss } from './css-format.mjs';
+import { buildColorResolver } from './color-evidence.mjs';
+import { splitCssByComponent } from './css-split.mjs';
 import { generateReactComponents } from './html-to-jsx.mjs';
 
 const write = (file, content) => {
@@ -8,19 +9,11 @@ const write = (file, content) => {
   fs.writeFileSync(file, content);
 };
 
-function componentSource(definition, kindByName) {
+function componentSource(definition) {
   const props = (definition.props || []).map((prop) =>
     typeof prop === 'string' ? { name: prop, type: 'string' } : prop);
-  const reactImport = props.some(({ type }) => type === 'ReactNode')
-    ? "import type { ReactNode } from 'react';\n"
-    : '';
   const imports = [...new Set(definition.imports)]
-    .map((name) => {
-      const sameKind = kindByName.get(name) === definition.kind;
-      const folder = kindByName.get(name) === 'icon' ? 'icons' : 'components';
-      const source = sameKind ? `./${name}` : `../${folder}/${name}`;
-      return `import { ${name} } from '${source}';`;
-    })
+    .map((name) => `import { ${name} } from './${name}';`)
     .join('\n');
   const type = props.length
     ? `export interface ${definition.name}Props {\n${props
@@ -30,7 +23,8 @@ function componentSource(definition, kindByName) {
   const parameters = props.length
     ? `{ ${propNames.join(', ')} }: ${definition.name}Props`
     : '';
-  return `${reactImport}${imports}${reactImport || imports ? '\n' : ''}${type}export function ${definition.name}(${parameters}) {
+  const cssImport = definition.cssFile ? `import './${definition.name}.css';\n` : '';
+  return `${cssImport}${imports}${cssImport || imports ? '\n' : ''}${type}export function ${definition.name}(${parameters}) {
   return (
 ${definition.jsx}
   );
@@ -54,15 +48,16 @@ export function buildReactProject({ specDir, outDir, maxNodes = 20 }) {
   const homeFile = path.join(specDir, spec.home?.html || '');
   if (!fs.existsSync(homeFile)) throw new Error('The specification has no captured home HTML.');
   fs.rmSync(outDir, { recursive: true, force: true });
-  const generated = generateReactComponents(fs.readFileSync(homeFile, 'utf8'), { maxNodes });
-  const kindByName = new Map(generated.definitions.map(({ name, kind }) => [name, kind]));
-  for (const definition of generated.definitions) {
-    const folder = definition.kind === 'icon' ? 'icons' : 'components';
-    write(
-      path.join(outDir, 'src', folder, `${definition.name}.tsx`),
-      componentSource(definition, kindByName),
-    );
-  }
+  const cssFiles = [
+    ...fs.readdirSync(path.join(specDir, 'stylesheets')).filter((file) => file.endsWith('.css'))
+      .map((file) => path.join(specDir, 'stylesheets', file)),
+    spec.home?.stylesheet ? path.join(specDir, spec.home.stylesheet) : '',
+  ].filter((file) => file && fs.existsSync(file));
+  const cssSources = cssFiles.map((file) => fs.readFileSync(file, 'utf8'));
+  const generated = generateReactComponents(
+    fs.readFileSync(homeFile, 'utf8'),
+    { maxNodes, resolveColor: buildColorResolver(cssSources) },
+  );
   write(path.join(outDir, 'src', 'App.tsx'), `${generated.appImports
     .map((name) => `import { ${name} } from './components/${name}';`).join('\n')}
 
@@ -74,20 +69,29 @@ ${generated.appChildren.join('\n')}
   );
 }
 `);
-  const cssFiles = [
-    ...fs.readdirSync(path.join(specDir, 'stylesheets')).filter((file) => file.endsWith('.css'))
-      .map((file) => path.join(specDir, 'stylesheets', file)),
-    spec.home?.stylesheet ? path.join(specDir, spec.home.stylesheet) : '',
-  ].filter((file) => file && fs.existsSync(file));
-  const cssImports = cssFiles.map((file, index) => {
-    const name = `${String(index).padStart(2, '0')}-${path.basename(file)}`;
-    write(path.join(outDir, 'src', 'styles', name), formatCss(fs.readFileSync(file, 'utf8')));
-    return `import './styles/${name}';`;
-  });
+  const css = splitCssByComponent(
+    cssSources,
+    generated.definitions,
+  );
+  write(path.join(outDir, 'src', 'styles', 'shared.css'), css.sharedCss);
+  for (const definition of generated.definitions) {
+    const componentCss = css.componentCss.get(definition.name);
+    definition.cssFile = Boolean(componentCss);
+    write(
+      path.join(outDir, 'src', 'components', `${definition.name}.tsx`),
+      componentSource(definition),
+    );
+    if (componentCss) {
+      write(path.join(outDir, 'src', 'components', `${definition.name}.css`), componentCss);
+    }
+  }
+  for (const asset of generated.assets) {
+    write(path.join(outDir, 'public', 'assets', asset.file), asset.source);
+  }
   write(path.join(outDir, 'src', 'main.tsx'), `import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import './styles/shared.css';
 import { App } from './App';
-${cssImports.join('\n')}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -145,10 +149,11 @@ createRoot(document.getElementById('root')!).render(
   copyDirectory(path.join(specDir, 'snapshot-assets'), path.join(outDir, 'public', 'snapshot-assets'));
   return {
     outDir,
-    componentCount: generated.definitions.filter(({ kind }) => kind === 'component').length,
-    iconCount: generated.definitions.filter(({ kind }) => kind === 'icon').length,
+    componentCount: generated.definitions.length,
+    assetCount: generated.assets.length,
     maxComponentLines: Math.max(...generated.definitions.map((definition) =>
-      componentSource(definition, kindByName).split('\n').length)),
-    stylesheetCount: cssFiles.length,
+      componentSource(definition).split('\n').length)),
+    totalCssRuleCount: css.totalRuleCount,
+    keptCssRuleCount: css.keptRuleCount,
   };
 }

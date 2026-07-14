@@ -395,11 +395,14 @@ npm install
 npm run build
 ```
 
-The generator emits small typed TSX components, separates icons, formats
-captured CSS, localizes snapshot assets, and converts repeated structures into
-shared components with props. It never emits captured application scripts,
-`dangerouslySetInnerHTML`, the static reconstruction runtime, or JSON blobs in
-the React source tree. Structured JSON remains internal validation evidence.
+The generator emits small typed TSX components, extracts inline SVGs into
+content-addressed assets, localizes snapshot assets, and converts repeated
+structures into shared components with props. CSS is deduplicated, pruned to
+used selectors, and split into component-owned files plus one shared global
+file while preserving source cascade order. It never emits captured
+application scripts, `dangerouslySetInnerHTML`, the static reconstruction
+runtime, or JSON blobs in the React source tree. Structured JSON remains
+internal validation evidence.
 
 ## Measured fixture
 
