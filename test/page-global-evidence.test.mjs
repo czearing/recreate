@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildPageGlobalContent,
   buildPageGlobalLayout,
+  buildPageOutline,
 } from '../src/page-global-evidence.mjs';
 
 test('emits readable leaf text outside component roots', () => {
@@ -34,4 +35,7 @@ test('emits readable leaf text outside component roots', () => {
   assert.equal(content[0].style.fontSize, '40px');
   const layout = buildPageGlobalLayout(nodes, ['doc(0)>section'], content);
   assert.deepEqual(layout.map(({ path }) => path), ['doc(0)>main']);
+  const outline = buildPageOutline(content);
+  assert.equal(outline[0].text, 'Hero');
+  assert.equal(outline[0].typography.fontSize, '40px');
 });

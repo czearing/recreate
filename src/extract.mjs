@@ -25,6 +25,7 @@ import { mergeSpecStates } from './merge-spec-states.mjs';
 import {
   buildPageGlobalContent,
   buildPageGlobalLayout,
+  buildPageOutline,
 } from './page-global-evidence.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
@@ -6656,6 +6657,11 @@ fs.writeFileSync(
   path.join(outDir, 'page-globals.json'),
   JSON.stringify(pageGlobals, null, 2),
 );
+const pageOutline = buildPageOutline(globalContentByViewport[0]?.content || []);
+fs.writeFileSync(
+  path.join(outDir, 'page-outline.json'),
+  JSON.stringify(pageOutline, null, 2),
+);
 const generationReadiness = buildGenerationReadiness({
   capture: implementationCaptures[0] || captures[0],
   components: componentPackages,
@@ -6694,6 +6700,7 @@ const implementationBlueprint = {
     'implementation.json',
     'acceptance-matrix.json',
     'generation-readiness.json',
+    'page-outline.json',
     'state-index.json',
     'page-globals.json',
     'component-map.json',
@@ -6719,6 +6726,7 @@ const implementationBlueprint = {
     evidenceOnly: [
       'implementation.json',
       'state-index.json',
+      'page-outline.json',
       'component-map.json',
       'components/*.json',
       'pages/*.html',
@@ -6755,6 +6763,10 @@ const implementationBlueprint = {
       'Never required for generation or acceptance; diagnostics require --screenshots.',
   },
   viewports,
+  pageOutline: {
+    count: pageOutline.length,
+    index: 'page-outline.json',
+  },
   states: {
     count: implementationStateIndex.length,
     interactions: implementationStateIndex.filter((state) => state.index >= 0).length,
@@ -6798,6 +6810,7 @@ const implementationBlueprint = {
     acceptanceMatrix: 'acceptance-matrix.json',
     generationReadiness: 'generation-readiness.json',
     pageGlobals: 'page-globals.json',
+    pageOutline: 'page-outline.json',
     componentMap: 'component-map.json',
     summary: 'summary.json',
     captures: captureEvidenceFiles,

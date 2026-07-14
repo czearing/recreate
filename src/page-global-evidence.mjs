@@ -51,3 +51,29 @@ export function buildPageGlobalLayout(nodes, componentRoots, content) {
   }
   return [...selected.values()];
 }
+
+export function buildPageOutline(content, limit = 12) {
+  const unique = new Map();
+  for (const node of content) {
+    const fontSize = Number.parseFloat(node.style?.fontSize || '0');
+    if (fontSize < 20 && (node.rect?.y ?? Infinity) >= 250) continue;
+    if (!unique.has(node.text)) {
+      unique.set(node.text, {
+        text: node.text,
+        rect: node.rect,
+        typography: {
+          fontFamily: node.style?.fontFamily,
+          fontSize: node.style?.fontSize,
+          fontWeight: node.style?.fontWeight,
+          lineHeight: node.style?.lineHeight,
+          color: node.style?.color,
+        },
+      });
+    }
+  }
+  return [...unique.values()]
+    .sort((left, right) =>
+      (left.rect?.y ?? Infinity) - (right.rect?.y ?? Infinity) ||
+      (left.rect?.x ?? Infinity) - (right.rect?.x ?? Infinity))
+    .slice(0, limit);
+}
