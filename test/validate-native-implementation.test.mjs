@@ -42,11 +42,27 @@ test('native source cannot pass without structured fidelity evidence', () => {
     interactions: { required: 1, passed: 1, failed: 0 },
     components: { required: 1, passed: 1, failed: 0 },
     geometry: { tolerancePx: 1, maxDeltaPx: 0.5 },
+    nativeComparison: {
+      required: 3,
+      matched: 3,
+      missing: [],
+      paint: { compared: 3, mismatched: 0 },
+    },
   }));
   const evidence = ['--matrix', path.join(root, 'matrix.json'), '--report', 'report.json'];
   const passed = invoke(evidence);
   assert.equal(passed.status, 0);
   assert.equal(JSON.parse(passed.stdout).passed, true);
+
+  const reportPath = path.join(root, 'report.json');
+  const failedPaint = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  failedPaint.nativeComparison.paint.mismatched = 1;
+  fs.writeFileSync(reportPath, JSON.stringify(failedPaint));
+  const paintMismatch = invoke(evidence);
+  assert.equal(paintMismatch.status, 1);
+  assert.match(paintMismatch.stdout, /native paint mismatches/);
+  failedPaint.nativeComparison.paint.mismatched = 0;
+  fs.writeFileSync(reportPath, JSON.stringify(failedPaint));
 
   fs.appendFileSync(
     path.join(root, 'src', 'app.tsx'),

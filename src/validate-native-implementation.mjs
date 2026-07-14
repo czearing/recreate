@@ -86,6 +86,23 @@ if (!args.report) {
       (acceptanceReport.geometry?.tolerancePx ?? 1)) {
       errors.push('structured acceptance report exceeds geometry tolerance');
     }
+    const nativeComparison = acceptanceReport.nativeComparison;
+    if (!nativeComparison) {
+      errors.push('structured acceptance report is missing native comparison');
+    } else {
+      if (
+        nativeComparison.required !== nativeComparison.matched ||
+        (nativeComparison.missing?.length ?? 1) !== 0
+      ) {
+        errors.push('structured acceptance report has incomplete native identity coverage');
+      }
+      if ((nativeComparison.paint?.compared ?? 0) === 0) {
+        errors.push('structured acceptance report did not compare native paint');
+      }
+      if ((nativeComparison.paint?.mismatched ?? 1) !== 0) {
+        errors.push('structured acceptance report has native paint mismatches');
+      }
+    }
     const coverage = [
       ['states', acceptanceMatrix?.stateCells?.length],
       ['interactions', acceptanceMatrix?.interactionCells?.length],
