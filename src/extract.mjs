@@ -6567,6 +6567,7 @@ const acceptanceMatrix = buildAcceptanceMatrix({
   states: implementationStates,
   viewports,
   components: componentPackages,
+  controls: captures[0]?.behaviors || [],
 });
 const readableComponentRoots = componentPackages
   .filter((component) => component.file)

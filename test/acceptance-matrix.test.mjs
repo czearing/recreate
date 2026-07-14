@@ -12,6 +12,7 @@ test('expands every captured state and interaction across each viewport', () => 
         type: 'panel',
         url: '/app',
         trigger: 'Open',
+        triggerElement: { path: 'doc(0)>button:nth-of-type(1)', label: 'Open', tag: 'button' },
         probe: { action: 'click' },
         evidenceByViewport: { '390x844': 'panel-mobile.json' },
       },
@@ -25,10 +26,16 @@ test('expands every captured state and interaction across each viewport', () => 
       file: 'components/component-001.json',
       identity: { label: 'Notebook card' },
     }],
+    controls: [
+      { path: 'doc(0)>button:nth-of-type(1)', label: 'Open', tag: 'button' },
+      { path: 'doc(0)>button:nth-of-type(2)', label: 'Search', tag: 'button' },
+    ],
   });
 
   assert.equal(matrix.stateCells.length, 4);
-  assert.equal(matrix.interactionCells.length, 2);
+  assert.equal(matrix.interactionCells.length, 4);
+  assert.equal(matrix.interactionCells.filter((cell) => cell.captured).length, 2);
+  assert.equal(matrix.interactionCells.filter((cell) => !cell.captured).length, 2);
   assert.equal(matrix.componentCells[0].label, 'Notebook card');
   assert.equal(matrix.stateCells[3].evidence, 'panel-mobile.json');
   assert.match(matrix.purpose, /before PR/);
