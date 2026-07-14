@@ -27,3 +27,73 @@ test('reports hidden controls separately from painted geometry', () => {
   assert.equal(result.maxDeltaPx, 70);
   assert.equal(result.painted.maxDeltaPx, 1);
 });
+
+test('matches visible leaf text across different native tags', () => {
+  const result = compareNativeState(
+    {
+      nodes: [{
+        tag: 'div',
+        path: 'reference-title',
+        text: 'From ideas to progress',
+        rect: { x: 10, y: 20, width: 100, height: 40 },
+        style: { display: 'block', opacity: '1' },
+      }],
+    },
+    {
+      nodes: [{
+        tag: 'h1',
+        path: 'candidate-title',
+        text: 'From ideas to progress',
+        rect: { x: 12, y: 20, width: 100, height: 40 },
+        style: { display: 'block', opacity: '1' },
+      }],
+    },
+  );
+  assert.equal(result.required, 1);
+  assert.equal(result.matched, 1);
+  assert.equal(result.maxDeltaPx, 2);
+});
+
+test('does not count wrapper innerText when a child owns the text', () => {
+  const state = {
+    nodes: [
+      {
+        tag: 'div',
+        path: 'wrapper',
+        text: 'Hello',
+        rect: { x: 0, y: 0, width: 100, height: 20 },
+        style: { display: 'block', opacity: '1' },
+      },
+      {
+        tag: 'span',
+        path: 'leaf',
+        parentPath: 'wrapper',
+        text: 'Hello',
+        rect: { x: 0, y: 0, width: 40, height: 20 },
+        style: { display: 'block', opacity: '1' },
+      },
+    ],
+  };
+  const result = compareNativeState(state, state);
+  assert.equal(result.required, 1);
+});
+
+test('reports exact paint property differences', () => {
+  const reference = node('Open', 10);
+  reference.style.backgroundColor = 'rgb(255, 255, 255)';
+  const candidate = node('Open', 10);
+  candidate.style.backgroundColor = 'rgb(245, 245, 245)';
+  const result = compareNativeState({ nodes: [reference] }, { nodes: [candidate] });
+  assert.equal(result.paint.mismatched, 1);
+  assert.deepEqual(result.paint.properties, { backgroundColor: 1 });
+});
+
+test('leaves the distant duplicate unmatched instead of shifting every pair', () => {
+  const result = compareNativeState(
+    { nodes: [node('Same', 0), node('Same', 100), node('Same', 200)] },
+    { nodes: [node('Same', 100), node('Same', 200)] },
+  );
+  assert.equal(result.matched, 2);
+  assert.equal(result.missing.length, 1);
+  assert.equal(result.maxDeltaPx, 0);
+});

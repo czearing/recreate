@@ -2,11 +2,36 @@
 import fs from 'node:fs';
 
 const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
-const identity = (node) => {
+const PAINT_PROPERTIES = [
+  'color',
+  'backgroundColor',
+  'backgroundImage',
+  'border',
+  'borderRadius',
+  'boxShadow',
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'lineHeight',
+  'letterSpacing',
+  'opacity',
+  'textAlign',
+  'transform',
+];
+const identity = (node, childCounts) => {
   const attrs = node.attrs || {};
-  const label = node.ariaLabel || attrs['aria-label'] || attrs['data-testid'] ||
-    (/^(?:button|textarea|h[1-6])$/.test(node.tag) ? node.text : '');
-  return clean(label) ? `${node.tag}|${clean(label)}` : '';
+  const label = clean(node.ariaLabel || attrs['aria-label']);
+  if (label) return `aria|${label}`;
+  const testId = clean(attrs['data-testid']);
+  if (testId) return `testid|${testId}`;
+  const text = clean(node.text);
+  if (/^(?:button|textarea|input|select)$/.test(node.tag) && text) {
+    return `control|${text}`;
+  }
+  if (!childCounts.get(node.path) && text && text.length <= 300) {
+    return `text|${text}`;
+  }
+  return '';
 };
 const delta = (left, right) => Math.max(
   ...['x', 'y', 'width', 'height'].map((key) =>
@@ -20,14 +45,85 @@ const isPainted = (node) =>
   isRendered(node) && Number.parseFloat(node.style?.opacity ?? '1') > 0;
 
 function group(nodes) {
+  const childCounts = new Map();
+  for (const node of nodes) {
+    if (node.parentPath) {
+      childCounts.set(node.parentPath, (childCounts.get(node.parentPath) || 0) + 1);
+    }
+  }
   const groups = new Map();
-  for (const node of nodes.filter((item) => isRendered(item) && identity(item))) {
-    const key = identity(node);
+  for (const node of nodes.filter((item) => isRendered(item))) {
+    const key = identity(node, childCounts);
+    if (!key) continue;
     const values = groups.get(key) || [];
     values.push(node);
     groups.set(key, values);
   }
   return groups;
+}
+
+function comparePaint(reference, candidate) {
+  return PAINT_PROPERTIES.flatMap((property) => {
+    const expected = String(reference.style?.[property] ?? '');
+    const actual = String(candidate.style?.[property] ?? '');
+    return expected === actual ? [] : [{ property, reference: expected, candidate: actual }];
+  });
+}
+
+function matchGroup(expected, actual) {
+  if (!expected.length || !actual.length) return new Map();
+  const expectedIsSmaller = expected.length <= actual.length;
+  const smaller = expectedIsSmaller ? expected : actual;
+  const larger = expectedIsSmaller ? actual : expected;
+  if (larger.length > 15) {
+    const pairs = [];
+    for (const [expectedIndex, referenceNode] of expected.entries()) {
+      for (const [candidateIndex, candidateNode] of actual.entries()) {
+        pairs.push({
+          expectedIndex,
+          candidateIndex,
+          cost: delta(referenceNode, candidateNode),
+        });
+      }
+    }
+    const matchedExpected = new Set();
+    const matchedActual = new Set();
+    const result = new Map();
+    for (const pair of pairs.sort((left, right) => left.cost - right.cost)) {
+      if (matchedExpected.has(pair.expectedIndex) || matchedActual.has(pair.candidateIndex)) continue;
+      matchedExpected.add(pair.expectedIndex);
+      matchedActual.add(pair.candidateIndex);
+      result.set(pair.expectedIndex, pair.candidateIndex);
+    }
+    return result;
+  }
+  const memo = new Map();
+  const visit = (index, used) => {
+    if (index === smaller.length) return { cost: 0, choices: [] };
+    const key = `${index}:${used}`;
+    if (memo.has(key)) return memo.get(key);
+    let best;
+    for (let largerIndex = 0; largerIndex < larger.length; largerIndex += 1) {
+      const bit = 1 << largerIndex;
+      if (used & bit) continue;
+      const smallerNode = smaller[index];
+      const largerNode = larger[largerIndex];
+      const tail = visit(index + 1, used | bit);
+      const cost = delta(smallerNode, largerNode) + tail.cost;
+      if (!best || cost < best.cost) {
+        best = { cost, choices: [largerIndex, ...tail.choices] };
+      }
+    }
+    memo.set(key, best);
+    return best;
+  };
+  const result = new Map();
+  for (const [smallerIndex, largerIndex] of visit(0, 0).choices.entries()) {
+    const expectedIndex = expectedIsSmaller ? smallerIndex : largerIndex;
+    const candidateIndex = expectedIsSmaller ? largerIndex : smallerIndex;
+    result.set(expectedIndex, candidateIndex);
+  }
+  return result;
 }
 
 export function compareNativeState(reference, candidate) {
@@ -36,28 +132,33 @@ export function compareNativeState(reference, candidate) {
   const rows = [];
   for (const [key, expected] of referenceGroups) {
     const actual = candidateGroups.get(key) || [];
-    const used = new Set();
-    for (const referenceNode of expected) {
-      let best;
-      for (const [index, candidateNode] of actual.entries()) {
-        if (used.has(index)) continue;
-        const value = delta(referenceNode, candidateNode);
-        if (!best || value < best.delta) best = { index, node: candidateNode, delta: value };
-      }
-      if (best) used.add(best.index);
+    const matches = matchGroup(expected, actual);
+    for (const [expectedIndex, referenceNode] of expected.entries()) {
+      const candidateIndex = matches.get(expectedIndex);
+      const candidateNode = candidateIndex === undefined ? undefined : actual[candidateIndex];
+      const value = candidateNode ? delta(referenceNode, candidateNode) : undefined;
+      const paintDiffs = candidateNode ? comparePaint(referenceNode, candidateNode) : [];
       rows.push({
         identity: key,
-        matched: Boolean(best),
+        matched: Boolean(candidateNode),
         painted: isPainted(referenceNode),
-        deltaPx: best?.delta,
+        deltaPx: value,
+        paintDiffs,
         reference: referenceNode.rect,
-        candidate: best?.node.rect,
+        candidate: candidateNode?.rect,
       });
     }
   }
   const paintedRows = rows.filter((row) => row.painted);
   const matched = rows.filter((row) => row.matched);
   const paintedMatched = paintedRows.filter((row) => row.matched);
+  const paintRows = paintedMatched.filter((row) => row.paintDiffs.length);
+  const paintProperties = {};
+  for (const row of paintRows) {
+    for (const difference of row.paintDiffs) {
+      paintProperties[difference.property] = (paintProperties[difference.property] || 0) + 1;
+    }
+  }
   return {
     required: rows.length,
     matched: matched.length,
@@ -69,6 +170,15 @@ export function compareNativeState(reference, candidate) {
       maxDeltaPx: paintedMatched.length
         ? Math.max(...paintedMatched.map((row) => row.deltaPx))
         : null,
+    },
+    paint: {
+      compared: paintedMatched.length,
+      mismatched: paintRows.length,
+      properties: paintProperties,
+      worst: paintRows
+        .sort((left, right) => right.paintDiffs.length - left.paintDiffs.length)
+        .slice(0, 20)
+        .map(({ identity: key, paintDiffs }) => ({ identity: key, differences: paintDiffs })),
     },
     worst: matched.sort((left, right) => right.deltaPx - left.deltaPx).slice(0, 20),
   };
