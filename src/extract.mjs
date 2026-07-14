@@ -2962,6 +2962,15 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
               '[required],[aria-required="true"]'
             ).length || 0,
           placeholder: el.getAttribute('placeholder') || '',
+          rect: (() => {
+            const rect = el.getBoundingClientRect();
+            return {
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height
+            };
+          })(),
           y: Math.round(el.getBoundingClientRect().top),
           topBar: el.getBoundingClientRect().top < 80,
           snapshotPath: (() => {
@@ -3011,7 +3020,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     matchPriority(right) - matchPriority(left) ||
     interactionCandidatePriority(right) - interactionCandidatePriority(left)
   );
-  if (hasInteractionMatch && candidates.some((candidate) => matchPriority(candidate))) {
+  if (hasInteractionMatch) {
     candidates = candidates.filter((candidate) => matchPriority(candidate));
   }
   console.error(`phase: route crawl found ${candidates.length} candidates`);
@@ -5239,7 +5248,7 @@ if (created) {
   } else {
     await navigateAndCaptureAllPages(url);
   }
-} else if (figmaSource) {
+} else if (figmaSource || reuse) {
   await cdp.send('Page.reload');
 }
 let webglRafScriptIdentifier;
@@ -6588,6 +6597,7 @@ const acceptanceMatrix = buildAcceptanceMatrix({
   viewports,
   components: componentPackages,
   controls: captures[0]?.behaviors || [],
+  nodes: captures[0]?.nodes || [],
   animations: [
     ...(captures[0]?.animations || []),
     ...(captures[0]?.animationElements || []),

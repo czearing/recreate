@@ -7,11 +7,43 @@ export function interactionMatchPriority(candidate, match) {
   return label.includes(match) ? 1 : 0;
 }
 
+export function interactionIdentity(value) {
+  const label = String(
+    value?.label || value?.text || value?.placeholder || value?.href || '',
+  ).replace(/\s+/g, ' ').trim().toLowerCase();
+  return [
+    label,
+    String(value?.tag || '').toLowerCase(),
+    String(value?.role || '').toLowerCase(),
+    String(value?.inputType || '').toLowerCase(),
+  ].join('|');
+}
+
 export function interactionTargetPriority(candidate, targets = [], fallback = '') {
   let priority = interactionMatchPriority(candidate, fallback);
+  const labelCounts = new Map();
+  for (const target of targets) {
+    const label = String(target.label || '').trim().toLowerCase();
+    if (label) labelCounts.set(label, (labelCounts.get(label) || 0) + 1);
+  }
   for (const target of targets) {
     if (target.path) {
       if (target.path === candidate.snapshotPath) return 3;
+      const label = String(target.label || '').trim().toLowerCase();
+      if (label && labelCounts.get(label) === 1) {
+        priority = Math.max(priority, interactionMatchPriority(candidate, label));
+      } else if (
+        label &&
+        interactionMatchPriority(candidate, label) === 2 &&
+        target.rect &&
+        candidate.rect
+      ) {
+        const rectDelta = Math.max(
+          ...['x', 'y', 'width', 'height'].map((key) =>
+            Math.abs((target.rect[key] || 0) - (candidate.rect[key] || 0))),
+        );
+        if (rectDelta <= 4) return 3;
+      }
       continue;
     }
     priority = Math.max(

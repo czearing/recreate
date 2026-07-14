@@ -29,7 +29,13 @@ test('expands every captured state and interaction across each viewport', () => 
     controls: [
       { path: 'doc(0)>button:nth-of-type(1)', label: 'Open', tag: 'button' },
       { path: 'doc(0)>button:nth-of-type(2)', label: 'Search', tag: 'button' },
+      { path: 'doc(0)>button:nth-of-type(3)', label: 'Clipped', tag: 'button' },
     ],
+    nodes: [{
+      path: 'doc(0)>button:nth-of-type(3)',
+      visible: true,
+      rect: { width: 2, height: 32 },
+    }],
     animations: [{ path: 'doc(0)>article:nth-of-type(1)', type: 'hover' }],
   });
 

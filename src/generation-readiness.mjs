@@ -1,3 +1,5 @@
+import { interactionIdentity } from './interaction-targeting.mjs';
+
 const clean = (value, limit = 160) =>
   String(value || '').replace(/\s+/g, ' ').trim().slice(0, limit);
 
@@ -38,14 +40,18 @@ export function buildGenerationReadiness({
     node.visible && node.tag === '#text' && clean(node.text),
   );
   const controls = (capture?.behaviors || []).filter((behavior) =>
-    clean(behavior.label || behavior.href) ||
     ['button', 'input', 'textarea', 'select', 'a'].includes(
       String(behavior.tag || '').toLowerCase(),
     ) ||
     ['button', 'link', 'menuitem', 'option', 'switch', 'tab'].includes(
       String(behavior.role || '').toLowerCase(),
-    ),
+    ) ||
+    behavior.href,
   );
+  const nodesByPath = new Map();
+  for (const node of capture?.nodes || []) {
+    if (!nodesByPath.has(node.path)) nodesByPath.set(node.path, node);
+  }
   const interactiveControls = controls.filter((control) =>
     !control.disabled && (
       ['button', 'input', 'textarea', 'select', 'a'].includes(
@@ -55,7 +61,14 @@ export function buildGenerationReadiness({
         String(control.role || '').toLowerCase(),
       ) ||
       control.href
-    ),
+    ) && (() => {
+      const node = nodesByPath.get(control.path);
+      return !node || (
+        node.visible &&
+        (node.rect?.width ?? 0) >= 8 &&
+        (node.rect?.height ?? 0) >= 8
+      );
+    })(),
   );
   const assets = (capture?.exactAssets || []).filter((asset) => asset.path);
   const animations = [
@@ -98,14 +111,20 @@ export function buildGenerationReadiness({
     .filter((state) => state.index >= 0)
     .map((state) => state.triggerElement?.path)
     .filter(Boolean));
-  const requiredInteractions = unique(interactiveControls, (control) => control.path);
+  const capturedInteractionIdentities = new Set(states
+    .filter((state) => state.index >= 0 && state.triggerElement)
+    .map((state) => interactionIdentity(state.triggerElement)));
+  const requiredInteractions = unique(interactiveControls, interactionIdentity);
   const missingInteractions = requiredInteractions
-    .filter((control) => !capturedInteractionPaths.has(control.path))
+    .filter((control) =>
+      !capturedInteractionPaths.has(control.path) &&
+      !capturedInteractionIdentities.has(interactionIdentity(control)))
     .map((control) => ({
       path: control.path,
       label: clean(control.label || control.href),
       tag: control.tag,
       role: control.role,
+      rect: nodesByPath.get(control.path)?.rect,
     }));
   const interactionCoverage = {
     required: requiredInteractions.length,

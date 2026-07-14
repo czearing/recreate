@@ -1,3 +1,5 @@
+import { interactionIdentity } from './interaction-targeting.mjs';
+
 const viewportKey = (viewport) =>
   `${viewport.width}x${viewport.height}@${viewport.dpr || 1}`;
 
@@ -18,6 +20,7 @@ export function buildAcceptanceMatrix({
   components,
   controls = [],
   animations = [],
+  nodes = [],
 }) {
   const stateCells = states.flatMap((state) => {
     const evidence = state.evidenceByViewport || {};
@@ -40,13 +43,28 @@ export function buildAcceptanceMatrix({
       };
     });
   });
+  const nodesByPath = new Map();
+  for (const node of nodes) {
+    if (!nodesByPath.has(node.path)) nodesByPath.set(node.path, node);
+  }
   const requiredControls = [
-    ...new Map(controls.filter(interactive).map((control) => [control.path, control])).values(),
+    ...new Map(controls.filter((control) => {
+      if (!interactive(control)) return false;
+      const node = nodesByPath.get(control.path);
+      return !node || (
+        node.visible &&
+        (node.rect?.width ?? 0) >= 8 &&
+        (node.rect?.height ?? 0) >= 8
+      );
+    }).map((control) => [interactionIdentity(control), control])).values(),
   ];
   const interactionCells = (requiredControls.length
     ? requiredControls.map((control, index) => {
       const state = states.find((candidate) =>
-        candidate.index >= 0 && candidate.triggerElement?.path === control.path);
+        candidate.index >= 0 && (
+          candidate.triggerElement?.path === control.path ||
+          interactionIdentity(candidate.triggerElement) === interactionIdentity(control)
+        ));
       return { control, index, state };
     })
     : states.filter((state) => state.index >= 0).map((state, index) => ({
@@ -62,6 +80,7 @@ export function buildAcceptanceMatrix({
     trigger: control.label || state?.trigger,
     tag: control.tag,
     role: control.role,
+    rect: nodesByPath.get(control.path)?.rect,
     action: state?.probe?.action,
     destination: state?.url,
     captured: Boolean(state),

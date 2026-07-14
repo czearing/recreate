@@ -36,7 +36,7 @@ test('passes only when complete evidence is owned by readable components', () =>
   const readiness = buildGenerationReadiness({
     capture: {
       nodes: [{ path: textPath, tag: '#text', text: 'Hero', visible: true }],
-      behaviors: [{ path: `${root}>button:nth-of-type(1)`, label: 'Search' }],
+      behaviors: [{ path: `${root}>button:nth-of-type(1)`, label: 'Search', tag: 'button' }],
       exactAssets: [{ path: `${root}>img:nth-of-type(1)`, type: 'image' }],
       animations: [{}],
       animationElements: [{ path: `${root}>div:nth-of-type(1)`, type: 'hover' }],
@@ -89,4 +89,35 @@ test('fails readiness when an enabled control has no captured behavior', () => {
   assert.equal(readiness.coverage.interactions.required, 1);
   assert.equal(readiness.coverage.interactions.covered, 0);
   assert.match(readiness.failures.join(' '), /lack captured behavior/);
+});
+
+test('does not require behavior for hidden or clipped controls', () => {
+  const buttonPath = `${root}>button:nth-of-type(1)`;
+  const readiness = buildGenerationReadiness({
+    capture: {
+      nodes: [{
+        path: buttonPath,
+        visible: true,
+        rect: { width: 2, height: 32 },
+      }],
+      behaviors: [{ path: buttonPath, label: 'Clipped', tag: 'button' }],
+      exactAssets: [],
+      animations: [],
+      animationElements: [],
+      lifecycleAnimation: { tracks: [] },
+    },
+    components: [{
+      id: 'component-001',
+      path: root,
+      file: 'components/component-001.json',
+      identity: { label: 'main' },
+      nodeCounts: [1],
+    }],
+    states: [{ index: -1 }],
+    viewports: [{ width: 1440 }, { width: 390 }],
+    crawlRequested: false,
+    globalPaths: [],
+  });
+  assert.equal(readiness.ready, true);
+  assert.equal(readiness.coverage.interactions.required, 0);
 });

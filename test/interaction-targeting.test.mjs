@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   candidateUsesTextEntry,
   interactionCandidatePriority,
+  interactionIdentity,
   interactionMatchPriority,
   interactionTargetPriority,
   interactionSettleTimeout,
@@ -20,6 +21,13 @@ test('matches exact interaction labels before partial labels', () => {
   }, 'animal'), 1);
 });
 
+test('normalizes repeated controls to one component interaction identity', () => {
+  assert.equal(
+    interactionIdentity({ label: ' More   options ', tag: 'BUTTON' }),
+    interactionIdentity({ text: 'More options', tag: 'button' }),
+  );
+});
+
 test('targets duplicate controls by exact captured path', () => {
   assert.equal(interactionTargetPriority({
     text: 'More options',
@@ -34,7 +42,26 @@ test('targets duplicate controls by exact captured path', () => {
   }, [{
     path: 'doc(0)>button:nth-of-type(2)',
     label: 'More options',
+  }, {
+    path: 'doc(0)>button:nth-of-type(3)',
+    label: 'More options',
   }]), 0);
+});
+
+test('targets duplicate controls by captured geometry when paths drift', () => {
+  assert.equal(interactionTargetPriority({
+    text: 'Create',
+    snapshotPath: 'new-path',
+    rect: { x: 100, y: 200, width: 56, height: 26 },
+  }, [{
+    path: 'old-path-1',
+    label: 'Create',
+    rect: { x: 20, y: 200, width: 56, height: 26 },
+  }, {
+    path: 'old-path-2',
+    label: 'Create',
+    rect: { x: 100, y: 200, width: 56, height: 26 },
+  }]), 3);
 });
 
 test('does not mistake card focus state for completed navigation', () => {
