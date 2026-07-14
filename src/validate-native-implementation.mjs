@@ -19,6 +19,45 @@ const required = String(args.require || '')
 if (!args.root) throw new Error('Pass --root <implementation-root>.');
 if (!sourceRoots.length) throw new Error('No implementation source roots exist.');
 
+const compareStateFiles = (referencePath, candidatePath) => compareNativeState(
+  JSON.parse(fs.readFileSync(referencePath, 'utf8')),
+  JSON.parse(fs.readFileSync(candidatePath, 'utf8')),
+);
+const aggregateComparisons = (comparisons) => {
+  const stateResults = comparisons.map(({ id, tolerancePx, result }) => ({
+    id,
+    passed:
+      result.missing.length === 0 &&
+      result.paint.mismatched === 0 &&
+      result.painted.maxDeltaPx <= tolerancePx,
+    required: result.required,
+    matched: result.matched,
+    missing: result.missing,
+    maxDeltaPx: result.painted.maxDeltaPx,
+    paintCompared: result.paint.compared,
+    paintMismatched: result.paint.mismatched,
+  }));
+  return {
+    stateCount: stateResults.length,
+    stateIds: stateResults.map(({ id }) => id),
+    statesFailed: stateResults.filter(({ passed }) => !passed).length,
+    states: stateResults,
+    required: stateResults.reduce((total, state) => total + state.required, 0),
+    matched: stateResults.reduce((total, state) => total + state.matched, 0),
+    missing: stateResults.flatMap((state) =>
+      state.missing.map((identity) => `${state.id}:${identity}`)),
+    painted: {
+      maxDeltaPx: stateResults.length
+        ? Math.max(...stateResults.map(({ maxDeltaPx }) => maxDeltaPx ?? Infinity))
+        : null,
+    },
+    paint: {
+      compared: stateResults.reduce((total, state) => total + state.paintCompared, 0),
+      mismatched: stateResults.reduce((total, state) => total + state.paintMismatched, 0),
+    },
+  };
+};
+
 const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs']);
 const files = [];
 const visit = (directory) => {
@@ -71,20 +110,46 @@ if (!args.report) {
   const reportPath = path.resolve(root, String(args.report));
   try {
     acceptanceReport = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-    if (args.reference || args.candidate) {
+    const comparisons = [];
+    if (args.comparisons) {
+      const manifestPath = path.resolve(String(args.comparisons));
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const entries = Array.isArray(manifest) ? manifest : manifest.states;
+      if (!Array.isArray(entries) || entries.length === 0) {
+        errors.push('native comparison manifest has no states');
+      } else {
+        for (const entry of entries) {
+          const base = path.dirname(manifestPath);
+          comparisons.push({
+            id: String(entry.id || ''),
+            tolerancePx: Number(entry.tolerancePx || args.tolerance || 1),
+            result: compareStateFiles(
+              path.resolve(base, String(entry.reference || '')),
+              path.resolve(base, String(entry.candidate || '')),
+            ),
+          });
+        }
+      }
+    } else if (args.reference || args.candidate) {
       if (!args.reference || !args.candidate) {
         errors.push('native comparison requires both --reference and --candidate');
       } else {
-        const nativeComparison = compareNativeState(
-          JSON.parse(fs.readFileSync(path.resolve(String(args.reference)), 'utf8')),
-          JSON.parse(fs.readFileSync(path.resolve(String(args.candidate)), 'utf8')),
-        );
-        acceptanceReport.nativeComparison = nativeComparison;
-        acceptanceReport.geometry = {
+        comparisons.push({
+          id: String(args['state-id'] || acceptanceMatrix?.stateCells?.[0]?.id || 'state-0'),
           tolerancePx: Number(args.tolerance || acceptanceReport.geometry?.tolerancePx || 1),
-          maxDeltaPx: nativeComparison.painted.maxDeltaPx,
-        };
+          result: compareStateFiles(
+            path.resolve(String(args.reference)),
+            path.resolve(String(args.candidate)),
+          ),
+        });
       }
+    }
+    if (comparisons.length) {
+      acceptanceReport.nativeComparison = aggregateComparisons(comparisons);
+      acceptanceReport.geometry = {
+        tolerancePx: Number(args.tolerance || acceptanceReport.geometry?.tolerancePx || 1),
+        maxDeltaPx: acceptanceReport.nativeComparison.painted.maxDeltaPx,
+      };
     }
     if (acceptanceReport.passed !== true) {
       errors.push('structured acceptance report did not pass');
@@ -117,6 +182,19 @@ if (!args.report) {
       }
       if ((nativeComparison.paint?.mismatched ?? 1) !== 0) {
         errors.push('structured acceptance report has native paint mismatches');
+      }
+      const requiredStateIds = (acceptanceMatrix?.stateCells || [])
+        .map(({ id }) => String(id))
+        .sort();
+      const comparedStateIds = (nativeComparison.stateIds || []).map(String).sort();
+      if (
+        requiredStateIds.length !== comparedStateIds.length ||
+        requiredStateIds.some((id, index) => id !== comparedStateIds[index])
+      ) {
+        errors.push('structured acceptance report has incomplete native state comparison');
+      }
+      if ((nativeComparison.statesFailed ?? 0) !== 0) {
+        errors.push('structured acceptance report has failed native state comparisons');
       }
     }
     const coverage = [

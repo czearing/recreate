@@ -43,6 +43,9 @@ test('native source cannot pass without structured fidelity evidence', () => {
     components: { required: 1, passed: 1, failed: 0 },
     geometry: { tolerancePx: 1, maxDeltaPx: 0.5 },
     nativeComparison: {
+      stateCount: 1,
+      stateIds: ['state-home'],
+      statesFailed: 0,
       required: 3,
       matched: 3,
       missing: [],
@@ -79,7 +82,37 @@ test('native source cannot pass without structured fidelity evidence', () => {
   assert.equal(directComparison.status, 0);
   assert.equal(JSON.parse(directComparison.stdout).nativeComparison.matched, 1);
 
+  const expandedMatrix = JSON.parse(fs.readFileSync(path.join(root, 'matrix.json'), 'utf8'));
+  expandedMatrix.stateCells.push({ id: 'state-mobile' });
+  fs.writeFileSync(path.join(root, 'matrix.json'), JSON.stringify(expandedMatrix));
+  reportWithoutComparison.states = { required: 2, passed: 2, failed: 0 };
+  fs.writeFileSync(reportPath, JSON.stringify(reportWithoutComparison));
+  const incompleteStates = invoke([
+    ...evidence,
+    '--reference', referencePath,
+    '--candidate', candidatePath,
+  ]);
+  assert.equal(incompleteStates.status, 1);
+  assert.match(incompleteStates.stdout, /incomplete native state comparison/);
+
+  const comparisonsPath = path.join(root, 'comparisons.json');
+  fs.writeFileSync(comparisonsPath, JSON.stringify({
+    states: [
+      { id: 'state-home', reference: 'reference.json', candidate: 'candidate.json' },
+      { id: 'state-mobile', reference: 'reference.json', candidate: 'candidate.json' },
+    ],
+  }));
+  const completeStates = invoke([...evidence, '--comparisons', comparisonsPath]);
+  assert.equal(completeStates.status, 0);
+  assert.equal(JSON.parse(completeStates.stdout).nativeComparison.required, 2);
+
+  expandedMatrix.stateCells.pop();
+  fs.writeFileSync(path.join(root, 'matrix.json'), JSON.stringify(expandedMatrix));
+  reportWithoutComparison.states = { required: 1, passed: 1, failed: 0 };
   reportWithoutComparison.nativeComparison = {
+    stateCount: 1,
+    stateIds: ['state-home'],
+    statesFailed: 0,
     required: 3,
     matched: 3,
     missing: [],

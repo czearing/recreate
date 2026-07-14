@@ -48,6 +48,6 @@ export function destinationContract() {
       '--require @1js/bebop-icons,@1js/fluentui-modern ' +
       '--matrix <site-spec-output/acceptance-matrix.json> ' +
       '--report <structured-acceptance-report.json> ' +
-      '--reference <reference-state.json> --candidate <native-state.json>',
+      '--comparisons <native-comparisons.json>',
   };
 }

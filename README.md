@@ -326,8 +326,29 @@ node src/validate-native-implementation.mjs `
   --require @1js/bebop-icons,@1js/fluentui-modern `
   --matrix <site-spec-output\acceptance-matrix.json> `
   --report <structured-acceptance-report.json> `
-  --reference <site-spec-output\evidence\state-home.json> `
-  --candidate <native-capture\evidence\state-home.json>
+  --comparisons <native-comparisons.json>
+```
+
+The comparison manifest must contain one entry for every state ID in the
+acceptance matrix:
+
+```json
+{
+  "states": [
+    {
+      "id": "state--1-1440x900@1",
+      "reference": "site-spec-output/evidence/state-home.json",
+      "candidate": "native-capture/evidence/state-home.json",
+      "tolerancePx": 1
+    },
+    {
+      "id": "state--1-390x844@1",
+      "reference": "site-spec-output/evidence/state-home-390x844.json",
+      "candidate": "native-capture/evidence/state-home-390x844.json",
+      "tolerancePx": 1
+    }
+  ]
+}
 ```
 
 ## Build an interactive static mock
