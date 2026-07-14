@@ -25,6 +25,7 @@ import {
   candidateUsesTextEntry,
   interactionCandidatePriority,
   interactionMatchPriority,
+  interactionTargetPriority,
   interactionSettleTimeout,
   interactionStateSettleDelay,
   selectInteractionIdentityRuntimeSource,
@@ -69,6 +70,13 @@ const captureIframeProbes = Boolean(args['iframe-probes']);
 const captureHoverProbes = Boolean(args['hover-probes']);
 const hoverMatch = String(args['hover-match'] || '');
 const interactionMatch = String(args['interaction-match'] || '').trim().toLowerCase();
+const interactionTargets = args['interaction-manifest']
+  ? JSON.parse(fs.readFileSync(path.resolve(String(args['interaction-manifest'])), 'utf8'))
+  : [];
+if (!Array.isArray(interactionTargets)) {
+  throw new Error('Interaction manifest must be a JSON array of { path, label } targets.');
+}
+const hasInteractionMatch = Boolean(interactionMatch || interactionTargets.length);
 const rejectAuthShell = Boolean(args['reject-auth-shell']);
 const isOverlayTreeRuntimeSource = `(element => {
   if (element.getAttribute('role') !== 'tree') return true;
@@ -2997,13 +3005,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   let candidates = [];
   try { candidates = JSON.parse(candidatesResult.result?.value || '[]'); } catch (_) {}
   const matchPriority = (candidate) => {
-    return interactionMatchPriority(candidate, interactionMatch);
+    return interactionTargetPriority(candidate, interactionTargets, interactionMatch);
   };
   candidates.sort((left, right) =>
     matchPriority(right) - matchPriority(left) ||
     interactionCandidatePriority(right) - interactionCandidatePriority(left)
   );
-  if (interactionMatch && candidates.some((candidate) => matchPriority(candidate))) {
+  if (hasInteractionMatch && candidates.some((candidate) => matchPriority(candidate))) {
     candidates = candidates.filter((candidate) => matchPriority(candidate));
   }
   console.error(`phase: route crawl found ${candidates.length} candidates`);
@@ -3987,7 +3995,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         return (
           target.hostname === baseHost &&
           (
-            interactionMatch ||
+            hasInteractionMatch ||
             allowCrossScope ||
             target.pathname === basePathname ||
             target.pathname.startsWith(basePathPrefix)
@@ -4007,7 +4015,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       !urlChanged &&
       !modalAppeared &&
       afterFingerprint !== beforeFingerprint;
-    if (interactionMatch) {
+    if (hasInteractionMatch) {
       console.error(
         `phase: matched interaction result urlChanged=${urlChanged} stateChanged=${stateChanged} ` +
         `modal=${modalAppeared} overlay=${overlayAppeared} url=${afterUrl}`,
@@ -4134,7 +4142,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       continue;
     }
 
-    if (interactionMatch && !urlChanged) {
+    if (hasInteractionMatch && !urlChanged) {
       const state = await captureResponsivePageSnapshot(multiPageStates.length);
       state.type = 'no-op';
       state.trigger = candidate.text || candidate.placeholder;

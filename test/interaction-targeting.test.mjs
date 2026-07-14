@@ -4,6 +4,7 @@ import {
   candidateUsesTextEntry,
   interactionCandidatePriority,
   interactionMatchPriority,
+  interactionTargetPriority,
   interactionSettleTimeout,
   interactionStateSettleDelay,
   selectInteractionIdentity,
@@ -17,6 +18,23 @@ test('matches exact interaction labels before partial labels', () => {
   assert.equal(interactionMatchPriority({
     text: 'Open animal picker',
   }, 'animal'), 1);
+});
+
+test('targets duplicate controls by exact captured path', () => {
+  assert.equal(interactionTargetPriority({
+    text: 'More options',
+    snapshotPath: 'doc(0)>button:nth-of-type(2)',
+  }, [{
+    path: 'doc(0)>button:nth-of-type(2)',
+    label: 'More options',
+  }]), 3);
+  assert.equal(interactionTargetPriority({
+    text: 'More options',
+    snapshotPath: 'doc(0)>button:nth-of-type(1)',
+  }, [{
+    path: 'doc(0)>button:nth-of-type(2)',
+    label: 'More options',
+  }]), 0);
 });
 
 test('does not mistake card focus state for completed navigation', () => {

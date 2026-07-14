@@ -7,6 +7,21 @@ export function interactionMatchPriority(candidate, match) {
   return label.includes(match) ? 1 : 0;
 }
 
+export function interactionTargetPriority(candidate, targets = [], fallback = '') {
+  let priority = interactionMatchPriority(candidate, fallback);
+  for (const target of targets) {
+    if (target.path) {
+      if (target.path === candidate.snapshotPath) return 3;
+      continue;
+    }
+    priority = Math.max(
+      priority,
+      interactionMatchPriority(candidate, String(target.label || '').toLowerCase()),
+    );
+  }
+  return priority;
+}
+
 export function candidateUsesTextEntry(candidate) {
   const textInput =
     candidate.inputType === 'text' ||
