@@ -14,11 +14,13 @@ import {
   inferComponentIdentity,
   isUsefulAgentComponent,
 } from './agent-components.mjs';
+import { buildAgentReadiness } from './agent-readiness.mjs';
 import {
   buildAcceptanceMatrix,
   buildImplementationStateIndex,
 } from './acceptance-matrix.mjs';
 import { buildGenerationReadiness } from './generation-readiness.mjs';
+import { normalizeSnapshotGeometry } from './geometry-normalization.mjs';
 import { mergeSpecStates } from './merge-spec-states.mjs';
 import {
   buildPageGlobalContent,
@@ -4698,6 +4700,10 @@ async function extractViewport(viewport, captureIndex) {
     awaitPromise: true,
     returnByValue: true,
   });
+  const geometryScale = normalizeSnapshotGeometry(
+    decoded,
+    result.result.value?.document,
+  );
   const extracted = {
     ...result.result.value,
     scrollStates,
@@ -4707,6 +4713,7 @@ async function extractViewport(viewport, captureIndex) {
     readiness,
     lifecycleAnimation,
     initialDocument,
+    geometryScale,
   };
   const nodeByAssetPath = new Map(decoded.nodes.map((node) => [node.path, node]));
   for (const asset of extracted.exactAssets.filter((entry) => entry.webgl)) {
@@ -6768,8 +6775,7 @@ const implementationBlueprint = {
         return {
         id: component.id,
         file: component.file,
-        identity: component.identity,
-        path: component.path,
+        label: component.identity.label,
         childIds: component.deliveryChildIds,
         desktopRect: details?.captures?.[0]?.root?.rect,
         mobileRect: details?.captures?.[1]?.root?.rect,
@@ -6800,11 +6806,32 @@ const implementationBlueprint = {
   validation: output.validation,
   confidence: output.confidence,
 };
+const initialImplementationText = JSON.stringify(implementationBlueprint);
+const agentReadiness = buildAgentReadiness({
+  implementationBytes: Buffer.byteLength(initialImplementationText),
+  generationReady: generationReadiness.ready,
+  maxComponentNodeCount: Math.max(
+    0,
+    ...componentPackages
+      .filter((component) => component.file)
+      .map((component) => component.nodeCounts?.[0] || 0),
+  ),
+  stateIndexExternal: implementationBlueprint.states.index === 'state-index.json',
+});
+implementationBlueprint.agentReadiness = {
+  ready: agentReadiness.ready,
+  failures: agentReadiness.failures,
+  file: 'agent-readiness.json',
+};
 
 fs.writeFileSync(path.join(outDir, 'spec.json'), JSON.stringify(output, null, 2));
 fs.writeFileSync(
   path.join(outDir, 'implementation.json'),
   JSON.stringify(implementationBlueprint, null, 2),
+);
+fs.writeFileSync(
+  path.join(outDir, 'agent-readiness.json'),
+  JSON.stringify(agentReadiness, null, 2),
 );
 fs.writeFileSync(
   path.join(outDir, 'summary.json'),
