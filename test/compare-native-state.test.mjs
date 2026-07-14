@@ -171,6 +171,15 @@ test('reports exact paint property differences', () => {
   assert.deepEqual(result.paint.properties, { backgroundColor: 1 });
 });
 
+test('treats equivalent subpixel and one-pixel borders as thin borders', () => {
+  const reference = node('Open', 10);
+  reference.style.border = '0.666667px solid rgb(224, 224, 224)';
+  const candidate = node('Open', 10);
+  candidate.style.border = '1px solid rgb(224, 224, 224)';
+  const result = compareNativeState({ nodes: [reference] }, { nodes: [candidate] });
+  assert.equal(result.paint.mismatched, 0);
+});
+
 test('leaves the distant duplicate unmatched instead of shifting every pair', () => {
   const result = compareNativeState(
     { nodes: [node('Same', 0), node('Same', 100), node('Same', 200)] },

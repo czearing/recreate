@@ -122,6 +122,12 @@ const canonicalPaint = (property, value, node) => {
   if ((property === 'backgroundColor' || property === 'border') && transparent(value)) {
     return 'transparent';
   }
+  if (property === 'border') {
+    const match = value.match(/^([\d.]+)px\s+(\S+)\s+(.+)$/);
+    if (match && Number.parseFloat(match[1]) <= 1) {
+      return `thin ${match[2]} ${match[3]}`;
+    }
+  }
   return value;
 };
 
