@@ -523,11 +523,20 @@ const supplementFunction = String.raw`async ({ computedProperties, includeForens
   };
   const assetFor = (element) => {
     const tag = element.tagName.toLowerCase();
-    if (tag === 'svg') return {
-      type: 'inline-svg',
-      path: pathFor(element),
-      value: includeForensics ? element.outerHTML : undefined,
-    };
+    if (tag === 'svg') {
+      const clone = element.cloneNode(true);
+      clone.querySelectorAll('script').forEach((script) => script.remove());
+      clone.querySelectorAll('*').forEach((node) => {
+        [...node.attributes].forEach((attribute) => {
+          if (/^on/i.test(attribute.name)) node.removeAttribute(attribute.name);
+        });
+      });
+      return {
+        type: 'inline-svg',
+        path: pathFor(element),
+        value: clone.outerHTML,
+      };
+    }
     if (tag === 'img') return {
       type: 'image',
       path: pathFor(element),
@@ -4920,6 +4929,13 @@ function storeSnapshotAsset(source, contentType, bytes) {
   return replacement;
 }
 async function localizeLiveBlobAssets(assets) {
+  for (const asset of assets.filter((item) => item.type === 'inline-svg' && item.value)) {
+    asset.file = storeSnapshotAsset(
+      `inline-svg:${asset.path}`,
+      'image/svg+xml',
+      Buffer.from(asset.value),
+    );
+  }
   const blobUrls = [
     ...new Set(
       assets.flatMap((asset) => [asset.src, asset.currentSrc, asset.dataUrl])

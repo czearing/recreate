@@ -74,6 +74,7 @@ export function buildGenerationReadiness({
     src: clean(asset.currentSrc || asset.src || asset.file),
   }));
   const unresolvedAssets = assets.filter((asset) =>
+    (asset.type === 'inline-svg' && !asset.file && !asset.src) ||
     Object.values(asset).some((value) =>
       typeof value === 'string' && /^\[unresolved /.test(value),
     ),
