@@ -188,3 +188,11 @@ export function isUsefulAgentComponent(component) {
     count >= 2 &&
     count <= 120;
 }
+
+export function buildComponentBuildOrder(components) {
+  return [...components]
+    .sort((left, right) =>
+      (left.desktopRect?.y ?? Infinity) - (right.desktopRect?.y ?? Infinity) ||
+      (left.desktopRect?.x ?? Infinity) - (right.desktopRect?.x ?? Infinity))
+    .map((component, index) => ({ order: index + 1, ...component }));
+}

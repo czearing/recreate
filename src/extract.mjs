@@ -9,6 +9,7 @@ import {
 } from './capture-compaction.mjs';
 import {
   buildAgentComponent,
+  buildComponentBuildOrder,
   dedupeComponentCandidates,
   inferComponentIdentity,
   isUsefulAgentComponent,
@@ -6761,13 +6762,19 @@ const implementationBlueprint = {
     count: componentPackages.filter((component) => component.file).length,
     candidateCount: componentPackages.length,
     index: 'component-map.json',
-    roots: componentPackages
+    roots: buildComponentBuildOrder(componentPackages
       .filter((component) => !component.deliveryParentId && component.file)
-      .map((component) => ({
+      .map((component) => {
+        const details = componentDetails.get(component.id);
+        return {
         id: component.id,
+        file: component.file,
         identity: component.identity,
         path: component.path,
         childIds: component.deliveryChildIds,
+        desktopRect: details?.captures?.[0]?.root?.rect,
+        mobileRect: details?.captures?.[1]?.root?.rect,
+        };
       })),
   },
   responsive: {

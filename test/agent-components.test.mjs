@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   buildAgentComponent,
+  buildComponentBuildOrder,
   dedupeComponentCandidates,
   inferComponentIdentity,
   isUsefulAgentComponent,
@@ -89,4 +90,13 @@ test('emits one component definition per repeated structural fingerprint', () =>
     'card-1',
     'toolbar',
   ]);
+});
+
+test('orders native component work by desktop position', () => {
+  const ordered = buildComponentBuildOrder([
+    { id: 'bottom', desktopRect: { x: 0, y: 400 } },
+    { id: 'top-right', desktopRect: { x: 400, y: 20 } },
+    { id: 'top-left', desktopRect: { x: 20, y: 20 } },
+  ]);
+  assert.deepEqual(ordered.map(({ id }) => id), ['top-left', 'top-right', 'bottom']);
 });
