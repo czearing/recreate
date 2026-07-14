@@ -1,6 +1,7 @@
 export function buildAgentReadiness({
   implementationBytes,
   generationReady,
+  maxGeneratedSourceLines = 0,
   maxComponentNodeCount,
   stateIndexExternal,
 }) {
@@ -10,6 +11,8 @@ export function buildAgentReadiness({
     estimatedTokens > 2500 && `implementation entrypoint exceeds 2500 tokens (${estimatedTokens})`,
     maxComponentNodeCount > 120 &&
       `readable component shard exceeds 120 nodes (${maxComponentNodeCount})`,
+    maxGeneratedSourceLines > 200 &&
+      `generated React source exceeds 200 lines (${maxGeneratedSourceLines})`,
     !stateIndexExternal && 'interaction states are embedded instead of externally indexed',
   ].filter(Boolean);
   return {
@@ -19,6 +22,7 @@ export function buildAgentReadiness({
     failures,
     implementationBytes,
     estimatedTokens,
+    maxGeneratedSourceLines,
     maxComponentNodeCount,
     stateIndexExternal,
   };

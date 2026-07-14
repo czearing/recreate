@@ -27,6 +27,7 @@ import {
   buildPageGlobalLayout,
   buildPageOutline,
 } from './page-global-evidence.mjs';
+import { buildReactProject } from './react-source/project.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
@@ -6697,7 +6698,10 @@ const implementationBlueprint = {
   source: output.source,
   profile,
   readOrder: [
-    'implementation.json',
+    'react/src/App.tsx',
+    'the matching react/src/components/*.tsx file for the section being changed',
+    'react/src/styles/*.css',
+    'implementation.json for validation rules and evidence indexes',
     'acceptance-matrix.json',
     'generation-readiness.json',
     'page-outline.json',
@@ -6818,13 +6822,32 @@ const implementationBlueprint = {
     captures: captureEvidenceFiles,
     initialDocuments: captures.map((capture) => capture.initialDocument?.file).filter(Boolean),
   },
+  reactSource: {
+    root: 'react',
+    entrypoint: 'react/src/App.tsx',
+    components: 'react/src/components',
+    icons: 'react/src/icons',
+    styles: 'react/src/styles',
+  },
   validation: output.validation,
   confidence: output.confidence,
+};
+fs.writeFileSync(path.join(outDir, 'spec.json'), JSON.stringify(output, null, 2));
+const reactSource = buildReactProject({
+  specDir: outDir,
+  outDir: path.join(outDir, 'react'),
+});
+implementationBlueprint.reactSource = {
+  ...implementationBlueprint.reactSource,
+  componentCount: reactSource.componentCount,
+  iconCount: reactSource.iconCount,
+  maxComponentLines: reactSource.maxComponentLines,
 };
 const initialImplementationText = JSON.stringify(implementationBlueprint);
 const agentReadiness = buildAgentReadiness({
   implementationBytes: Buffer.byteLength(initialImplementationText),
   generationReady: generationReadiness.ready,
+  maxGeneratedSourceLines: reactSource.maxComponentLines,
   maxComponentNodeCount: Math.max(
     0,
     ...componentPackages
@@ -6839,7 +6862,6 @@ implementationBlueprint.agentReadiness = {
   file: 'agent-readiness.json',
 };
 
-fs.writeFileSync(path.join(outDir, 'spec.json'), JSON.stringify(output, null, 2));
 fs.writeFileSync(
   path.join(outDir, 'implementation.json'),
   JSON.stringify(implementationBlueprint, null, 2),
@@ -6855,7 +6877,7 @@ fs.writeFileSync(
       source: output.source,
       profile,
       agentContext: {
-        entrypoint: 'implementation.json',
+        entrypoint: 'react/src/App.tsx',
         implementationBytes: Buffer.byteLength(
           JSON.stringify(implementationBlueprint, null, 2),
         ),
@@ -6864,7 +6886,7 @@ fs.writeFileSync(
         ),
         specBytes: fs.statSync(path.join(outDir, 'spec.json')).size,
         guidance:
-          'Load implementation.json first and open exact evidence only for the active component or state.',
+          'Start with readable React source. Open JSON evidence only for validation or an unresolved exact detail.',
       },
       viewports,
       captures: captures.map((capture) => ({

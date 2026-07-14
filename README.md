@@ -384,6 +384,23 @@ it as a native implementation.
 
 Captured output can contain source code and user-visible data. Keep it out of version control unless you have permission to publish it.
 
+## Generate readable React source
+
+Generate a standalone React/TypeScript project for implementation agents:
+
+```powershell
+node build-react.mjs --spec site-spec-output --out generated-react
+cd generated-react
+npm install
+npm run build
+```
+
+The generator emits small typed TSX components, separates icons, formats
+captured CSS, localizes snapshot assets, and converts repeated structures into
+shared components with props. It never emits captured application scripts,
+`dangerouslySetInnerHTML`, the static reconstruction runtime, or JSON blobs in
+the React source tree. Structured JSON remains internal validation evidence.
+
 ## Measured fixture
 
 | Metric | Result |

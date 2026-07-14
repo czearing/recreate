@@ -7,6 +7,7 @@ test('passes only bounded complete externally indexed evidence', () => {
   const ready = buildAgentReadiness({
     implementationBytes: 7000,
     generationReady: true,
+    maxGeneratedSourceLines: 120,
     maxComponentNodeCount: 80,
     stateIndexExternal: true,
   });
@@ -15,9 +16,10 @@ test('passes only bounded complete externally indexed evidence', () => {
   const oversized = buildAgentReadiness({
     implementationBytes: 20000,
     generationReady: true,
+    maxGeneratedSourceLines: 300,
     maxComponentNodeCount: 200,
     stateIndexExternal: false,
   });
   assert.equal(oversized.ready, false);
-  assert.equal(oversized.failures.length, 3);
+  assert.equal(oversized.failures.length, 4);
 });
