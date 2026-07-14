@@ -41,7 +41,9 @@ const identities = (node, { childCounts, nodesByPath }) => {
     (!interactiveNode || Boolean(label))
   ) {
     let parentPath = node.parentPath;
-    while (parentPath) {
+    const visited = new Set();
+    while (parentPath && !visited.has(parentPath)) {
+      visited.add(parentPath);
       const parent = nodesByPath.get(parentPath);
       if (!parent) break;
       const parentText = clean(parent.text);
@@ -155,7 +157,7 @@ function matchGroup(expected, actual) {
   const expectedIsSmaller = expected.length <= actual.length;
   const smaller = expectedIsSmaller ? expected : actual;
   const larger = expectedIsSmaller ? actual : expected;
-  if (larger.length > 15) {
+  if (larger.length > 8) {
     const pairs = [];
     for (const [expectedIndex, referenceNode] of expected.entries()) {
       for (const [candidateIndex, candidateNode] of actual.entries()) {

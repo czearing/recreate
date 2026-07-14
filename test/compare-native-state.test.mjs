@@ -86,6 +86,21 @@ test('does not count wrapper innerText when a child owns the text', () => {
   assert.equal(result.required, 1);
 });
 
+test('does not loop on malformed cyclic parent paths', () => {
+  const state = {
+    nodes: [{
+      tag: 'span',
+      path: 'cycle',
+      parentPath: 'cycle',
+      text: 'Cyclic text',
+      rect: { x: 0, y: 0, width: 80, height: 20 },
+      style: { display: 'block', opacity: '1' },
+    }],
+  };
+  const result = compareNativeState(state, state);
+  assert.equal(result.required, 0);
+});
+
 test('does not double count text owned by an interactive parent', () => {
   const state = {
     nodes: [
@@ -188,4 +203,14 @@ test('leaves the distant duplicate unmatched instead of shifting every pair', ()
   assert.equal(result.matched, 2);
   assert.equal(result.missing.length, 1);
   assert.equal(result.maxDeltaPx, 0);
+});
+
+test('compares large repeated groups without exponential assignment', () => {
+  const reference = Array.from({ length: 20 }, (_, index) => node('Repeated', index * 20));
+  const candidate = [...reference].reverse();
+  const started = performance.now();
+  const result = compareNativeState({ nodes: reference }, { nodes: candidate });
+  assert.equal(result.matched, 20);
+  assert.equal(result.maxDeltaPx, 0);
+  assert.ok(performance.now() - started < 100);
 });
