@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildAcceptanceMatrix } from '../src/acceptance-matrix.mjs';
+import {
+  buildAcceptanceMatrix,
+  buildImplementationStateIndex,
+} from '../src/acceptance-matrix.mjs';
 
 test('expands every captured state and interaction across each viewport', () => {
   const matrix = buildAcceptanceMatrix({
@@ -47,4 +50,22 @@ test('expands every captured state and interaction across each viewport', () => 
   assert.equal(matrix.componentCells[0].label, 'Notebook card');
   assert.equal(matrix.stateCells[3].evidence, 'panel-mobile.json');
   assert.match(matrix.purpose, /before PR/);
+});
+
+test('keeps the implementation state index small and links heavy evidence', () => {
+  const [state] = buildImplementationStateIndex([{
+    index: 2,
+    type: 'panel',
+    trigger: 'Search',
+    probe: { action: 'click' },
+    url: '/app',
+    evidence: 'evidence/state-002.json',
+    evidenceByViewport: { '390x844': 'evidence/state-002-390x844.json' },
+    network: Array.from({ length: 100 }, () => ({ url: '/large' })),
+    dismissal: { samples: Array.from({ length: 100 }, () => 'large') },
+  }]);
+  assert.equal(state.action, 'click');
+  assert.equal(state.evidence, 'evidence/state-002.json');
+  assert.equal('network' in state, false);
+  assert.equal('dismissal' in state, false);
 });

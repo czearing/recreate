@@ -13,7 +13,10 @@ import {
   inferComponentIdentity,
   isUsefulAgentComponent,
 } from './agent-components.mjs';
-import { buildAcceptanceMatrix } from './acceptance-matrix.mjs';
+import {
+  buildAcceptanceMatrix,
+  buildImplementationStateIndex,
+} from './acceptance-matrix.mjs';
 import { buildGenerationReadiness } from './generation-readiness.mjs';
 import { mergeSpecStates } from './merge-spec-states.mjs';
 import { captureDragStates } from './drag-probe.mjs';
@@ -6642,6 +6645,11 @@ fs.writeFileSync(
   path.join(outDir, 'generation-readiness.json'),
   JSON.stringify(generationReadiness, null, 2),
 );
+const implementationStateIndex = buildImplementationStateIndex(implementationStates);
+fs.writeFileSync(
+  path.join(outDir, 'state-index.json'),
+  JSON.stringify(implementationStateIndex, null, 2),
+);
 
 const implementationBlueprint = {
   schemaVersion: 2,
@@ -6653,6 +6661,7 @@ const implementationBlueprint = {
     'implementation.json',
     'acceptance-matrix.json',
     'generation-readiness.json',
+    'state-index.json',
     'page-globals.json',
     'component-map.json',
     'page-globals.json',
@@ -6677,6 +6686,7 @@ const implementationBlueprint = {
     deliverable: 'destination-native source code',
     evidenceOnly: [
       'implementation.json',
+      'state-index.json',
       'component-map.json',
       'components/*.json',
       'pages/*.html',
@@ -6713,18 +6723,14 @@ const implementationBlueprint = {
       'Never required for generation or acceptance; diagnostics require --screenshots.',
   },
   viewports,
-  states: implementationStates,
+  states: {
+    count: implementationStateIndex.length,
+    interactions: implementationStateIndex.filter((state) => state.index >= 0).length,
+    index: 'state-index.json',
+  },
   interactions: {
-    count: multiPageStates.length,
-    states: multiPageStates.map((state) => ({
-      stateIndex: state.index,
-      type: state.type,
-      trigger: state.trigger,
-      action: state.probe?.action,
-      destination: state.url,
-      evidence: state.evidence,
-      evidenceByViewport: state.evidenceByViewport,
-    })),
+    count: implementationStates.filter((state) => state.index >= 0).length,
+    matrix: 'acceptance-matrix.json',
   },
   components: {
     count: componentPackages.filter((component) => component.file).length,

@@ -3,6 +3,18 @@ import { interactionIdentity } from './interaction-targeting.mjs';
 const viewportKey = (viewport) =>
   `${viewport.width}x${viewport.height}@${viewport.dpr || 1}`;
 
+export function buildImplementationStateIndex(states) {
+  return states.map((state) => ({
+    index: state.index,
+    type: state.type,
+    trigger: state.trigger,
+    action: state.probe?.action,
+    destination: state.url,
+    evidence: state.evidence,
+    evidenceByViewport: state.evidenceByViewport,
+  }));
+}
+
 const interactive = (control) =>
   !control.disabled && (
     ['button', 'input', 'textarea', 'select', 'a'].includes(
