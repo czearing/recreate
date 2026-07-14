@@ -12,7 +12,13 @@ const interactive = (control) =>
     control.href
   );
 
-export function buildAcceptanceMatrix({ states, viewports, components, controls = [] }) {
+export function buildAcceptanceMatrix({
+  states,
+  viewports,
+  components,
+  controls = [],
+  animations = [],
+}) {
   const stateCells = states.flatMap((state) => {
     const evidence = state.evidenceByViewport || {};
     return viewports.map((viewport) => {
@@ -63,11 +69,26 @@ export function buildAcceptanceMatrix({ states, viewports, components, controls 
       state?.evidence,
     required: ['activation', 'resulting state', 'focus', 'dismissal or restoration'],
   })));
+  const animationTargets = [
+    ...new Map(animations
+      .filter((animation) => animation.path || animation.target)
+      .map((animation) => [animation.path || animation.target, animation]))
+      .values(),
+  ];
+  const animationCells = animationTargets.flatMap((animation, index) =>
+    viewports.map((viewport) => ({
+      id: `animation-${String(index).padStart(3, '0')}-${viewportKey(viewport)}`,
+      viewport,
+      path: animation.path || animation.target,
+      type: animation.type || animation.tag || 'animation',
+      required: ['target', 'property', 'duration', 'easing', 'keyframes or trajectory'],
+    })));
   return {
     schemaVersion: 1,
     purpose: 'Required native-delivery cells. Every cell must pass before PR or delivery.',
     stateCells,
     interactionCells,
+    animationCells,
     componentCells: components.filter((component) => component.file).map((component) => ({
       id: component.id,
       label: component.identity.label,

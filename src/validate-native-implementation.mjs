@@ -200,6 +200,7 @@ if (!args.report) {
     const coverage = [
       ['states', acceptanceMatrix?.stateCells?.length],
       ['interactions', acceptanceMatrix?.interactionCells?.length],
+      ['animations', acceptanceMatrix?.animationCells?.length],
       ['components', acceptanceMatrix?.componentCells?.length],
     ];
     for (const [key, required] of coverage) {
