@@ -2,36 +2,60 @@
 import fs from 'node:fs';
 
 const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
-const PAINT_PROPERTIES = [
+const TEXT_PAINT_PROPERTIES = [
   'color',
-  'backgroundColor',
-  'backgroundImage',
-  'border',
-  'borderRadius',
-  'boxShadow',
   'fontFamily',
   'fontSize',
   'fontWeight',
   'lineHeight',
   'letterSpacing',
-  'opacity',
   'textAlign',
+  'opacity',
   'transform',
 ];
-const identity = (node, childCounts) => {
+const CONTAINER_PAINT_PROPERTIES = [
+  'backgroundColor',
+  'backgroundImage',
+  'border',
+  'borderRadius',
+  'boxShadow',
+  'opacity',
+  'transform',
+];
+const identities = (node, { childCounts, nodesByPath }) => {
+  const result = [];
   const attrs = node.attrs || {};
   const label = clean(node.ariaLabel || attrs['aria-label']);
-  if (label) return `aria|${label}`;
+  if (label) result.push(`aria|${label}`);
   const testId = clean(attrs['data-testid']);
-  if (testId) return `testid|${testId}`;
+  if (testId) result.push(`testid|${testId}`);
   const text = clean(node.text);
-  if (/^(?:button|textarea|input|select)$/.test(node.tag) && text) {
-    return `control|${text}`;
+  const interactiveNode = /^(?:button|textarea|input|select)$/.test(node.tag);
+  if (!label && interactiveNode && text) {
+    result.push(`control|${text}`);
   }
-  if (!childCounts.get(node.path) && text && text.length <= 300) {
-    return `text|${text}`;
+  if (
+    !childCounts.get(node.path) &&
+    text &&
+    text.length <= 300 &&
+    (!interactiveNode || Boolean(label))
+  ) {
+    let parentPath = node.parentPath;
+    while (parentPath) {
+      const parent = nodesByPath.get(parentPath);
+      if (!parent) break;
+      const parentText = clean(parent.text);
+      if (
+        /^(?:button|textarea|input|select)$/.test(parent.tag) &&
+        parentText === text
+      ) {
+        return result;
+      }
+      parentPath = parent.parentPath;
+    }
+    if (text !== label) result.push(`text|${text}`);
   }
-  return '';
+  return result;
 };
 const delta = (left, right) => Math.max(
   ...['x', 'y', 'width', 'height'].map((key) =>
@@ -43,29 +67,79 @@ const isRendered = (node) =>
   node.style?.visibility !== 'hidden';
 const isPainted = (node) =>
   isRendered(node) && Number.parseFloat(node.style?.opacity ?? '1') > 0;
+const isComparable = (node) => {
+  if (!isRendered(node)) return false;
+  const interactive =
+    /^(?:button|input|textarea|select|a)$/.test(node.tag) ||
+    ['button', 'link', 'menuitem', 'option', 'switch', 'tab'].includes(
+      String(node.role || node.attrs?.role || '').toLowerCase(),
+    );
+  return !interactive || (node.rect.width >= 8 && node.rect.height >= 8);
+};
 
 function group(nodes) {
   const childCounts = new Map();
+  const nodesByPath = new Map(nodes.map((node) => [node.path, node]));
   for (const node of nodes) {
     if (node.parentPath) {
       childCounts.set(node.parentPath, (childCounts.get(node.parentPath) || 0) + 1);
     }
   }
   const groups = new Map();
-  for (const node of nodes.filter((item) => isRendered(item))) {
-    const key = identity(node, childCounts);
-    if (!key) continue;
-    const values = groups.get(key) || [];
-    values.push(node);
-    groups.set(key, values);
+  for (const node of nodes.filter(isComparable)) {
+    node.__siteSpecHasChildren = Boolean(childCounts.get(node.path));
+    for (const key of identities(node, { childCounts, nodesByPath })) {
+      const values = groups.get(key) || [];
+      values.push(node);
+      groups.set(key, values);
+    }
   }
   return groups;
 }
 
+const transparent = (value) =>
+  !value ||
+  value === 'transparent' ||
+  /^rgba?\([^)]*,\s*0(?:\.0+)?\)$/.test(value);
+const hasOwnPaint = (node) => {
+  const style = node.style || {};
+  return (
+    !transparent(style.backgroundColor) ||
+    (style.backgroundImage && style.backgroundImage !== 'none') ||
+    (style.border && !style.border.startsWith('0px')) ||
+    (style.boxShadow && style.boxShadow !== 'none')
+  );
+};
+const canonicalPaint = (property, value, node) => {
+  if (property === 'textAlign' && value === 'start') return 'left';
+  if (property === 'borderRadius') {
+    const radius = Number.parseFloat(value);
+    if (
+      value === '50%' ||
+      radius >= Math.min(node.rect?.width || Infinity, node.rect?.height || Infinity) / 2
+    ) return 'circular';
+  }
+  if ((property === 'backgroundColor' || property === 'border') && transparent(value)) {
+    return 'transparent';
+  }
+  return value;
+};
+
 function comparePaint(reference, candidate) {
-  return PAINT_PROPERTIES.flatMap((property) => {
-    const expected = String(reference.style?.[property] ?? '');
-    const actual = String(candidate.style?.[property] ?? '');
+  const ownPaint = hasOwnPaint(reference);
+  if (reference.__siteSpecHasChildren && !ownPaint) return [];
+  const properties = ownPaint ? CONTAINER_PAINT_PROPERTIES : TEXT_PAINT_PROPERTIES;
+  return properties.flatMap((property) => {
+    const expected = canonicalPaint(
+      property,
+      String(reference.style?.[property] ?? ''),
+      reference,
+    );
+    const actual = canonicalPaint(
+      property,
+      String(candidate.style?.[property] ?? ''),
+      candidate,
+    );
     return expected === actual ? [] : [{ property, reference: expected, candidate: actual }];
   });
 }
@@ -137,11 +211,14 @@ export function compareNativeState(reference, candidate) {
       const candidateIndex = matches.get(expectedIndex);
       const candidateNode = candidateIndex === undefined ? undefined : actual[candidateIndex];
       const value = candidateNode ? delta(referenceNode, candidateNode) : undefined;
+      const paintCompared = Boolean(candidateNode) &&
+        (!referenceNode.__siteSpecHasChildren || hasOwnPaint(referenceNode));
       const paintDiffs = candidateNode ? comparePaint(referenceNode, candidateNode) : [];
       rows.push({
         identity: key,
         matched: Boolean(candidateNode),
         painted: isPainted(referenceNode),
+        paintCompared,
         deltaPx: value,
         paintDiffs,
         reference: referenceNode.rect,
@@ -152,7 +229,8 @@ export function compareNativeState(reference, candidate) {
   const paintedRows = rows.filter((row) => row.painted);
   const matched = rows.filter((row) => row.matched);
   const paintedMatched = paintedRows.filter((row) => row.matched);
-  const paintRows = paintedMatched.filter((row) => row.paintDiffs.length);
+  const paintComparedRows = paintedMatched.filter((row) => row.paintCompared);
+  const paintRows = paintComparedRows.filter((row) => row.paintDiffs.length);
   const paintProperties = {};
   for (const row of paintRows) {
     for (const difference of row.paintDiffs) {
@@ -172,7 +250,7 @@ export function compareNativeState(reference, candidate) {
         : null,
     },
     paint: {
-      compared: paintedMatched.length,
+      compared: paintComparedRows.length,
       mismatched: paintRows.length,
       properties: paintProperties,
       worst: paintRows

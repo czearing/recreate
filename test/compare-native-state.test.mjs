@@ -28,6 +28,14 @@ test('reports hidden controls separately from painted geometry', () => {
   assert.equal(result.painted.maxDeltaPx, 1);
 });
 
+test('ignores clipped controls that are not operable', () => {
+  const clipped = node('Create', 10);
+  clipped.rect.width = 2;
+  const result = compareNativeState({ nodes: [clipped] }, { nodes: [] });
+  assert.equal(result.required, 0);
+  assert.equal(result.missing.length, 0);
+});
+
 test('matches visible leaf text across different native tags', () => {
   const result = compareNativeState(
     {
@@ -76,6 +84,81 @@ test('does not count wrapper innerText when a child owns the text', () => {
   };
   const result = compareNativeState(state, state);
   assert.equal(result.required, 1);
+});
+
+test('does not double count text owned by an interactive parent', () => {
+  const state = {
+    nodes: [
+      {
+        tag: 'button',
+        path: 'button',
+        text: 'Notebooks',
+        rect: { x: 0, y: 0, width: 100, height: 32 },
+        style: { display: 'block', opacity: '1' },
+      },
+      {
+        tag: 'span',
+        path: 'label',
+        parentPath: 'button',
+        text: 'Notebooks',
+        rect: { x: 10, y: 6, width: 80, height: 20 },
+        style: { display: 'block', opacity: '1' },
+      },
+    ],
+  };
+  const result = compareNativeState(state, state);
+  assert.equal(result.required, 1);
+  assert.equal(result.missing.length, 0);
+});
+
+test('compares semantic and visible text identities on one leaf element', () => {
+  const state = {
+    nodes: [{
+      tag: 'span',
+      path: 'avatar',
+      ariaLabel: 'Ed Maurer',
+      text: 'EM',
+      rect: { x: 0, y: 0, width: 28, height: 28 },
+      style: { display: 'block', opacity: '1' },
+    }],
+  };
+  const result = compareNativeState(state, state);
+  assert.equal(result.required, 2);
+  assert.equal(result.matched, 2);
+});
+
+test('ignores paint on transparent semantic wrappers with child content', () => {
+  const reference = {
+    nodes: [
+      {
+        tag: 'span',
+        path: 'avatar',
+        ariaLabel: 'Ed Maurer',
+        text: 'Ed Maurer',
+        rect: { x: 0, y: 0, width: 28, height: 28 },
+        style: {
+          display: 'block',
+          opacity: '1',
+          backgroundColor: 'rgba(0, 0, 0, 0)',
+          border: '0px none rgb(0, 0, 0)',
+          boxShadow: 'none',
+        },
+      },
+      {
+        tag: 'span',
+        path: 'initials',
+        parentPath: 'avatar',
+        text: 'EM',
+        rect: { x: 0, y: 0, width: 28, height: 28 },
+        style: { display: 'block', opacity: '1' },
+      },
+    ],
+  };
+  const candidate = structuredClone(reference);
+  candidate.nodes[0].style.backgroundColor = 'rgb(255, 255, 255)';
+  candidate.nodes[0].style.border = '2px solid rgb(0, 0, 0)';
+  const result = compareNativeState(reference, candidate);
+  assert.equal(result.paint.mismatched, 0);
 });
 
 test('reports exact paint property differences', () => {
