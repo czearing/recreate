@@ -35,7 +35,7 @@ export function buildAcceptanceMatrix({
   nodes = [],
   assets = [],
 }) {
-  const stateCells = states.flatMap((state) => {
+  const stateCells = states.filter((state) => state.index < 0).flatMap((state) => {
     const evidence = state.evidenceByViewport || {};
     return viewports.map((viewport) => {
       const key = `${viewport.width}x${viewport.height}`;

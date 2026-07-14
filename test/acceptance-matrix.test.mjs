@@ -49,14 +49,17 @@ test('expands every captured state and interaction across each viewport', () => 
     }],
   });
 
-  assert.equal(matrix.stateCells.length, 4);
+  assert.equal(matrix.stateCells.length, 2);
   assert.equal(matrix.interactionCells.length, 4);
   assert.equal(matrix.interactionCells.filter((cell) => cell.captured).length, 2);
   assert.equal(matrix.interactionCells.filter((cell) => !cell.captured).length, 2);
   assert.equal(matrix.animationCells.length, 2);
   assert.equal(matrix.assetCells.length, 1);
   assert.equal(matrix.componentCells[0].label, 'Notebook card');
-  assert.equal(matrix.stateCells[3].evidence, 'panel-mobile.json');
+  assert.equal(
+    matrix.interactionCells.find((cell) => cell.captured && cell.viewport.width === 390).evidence,
+    'panel-mobile.json',
+  );
   assert.match(matrix.purpose, /before PR/);
 });
 
