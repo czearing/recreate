@@ -15,6 +15,7 @@ import {
 } from './agent-components.mjs';
 import { buildAcceptanceMatrix } from './acceptance-matrix.mjs';
 import { buildGenerationReadiness } from './generation-readiness.mjs';
+import { mergeSpecStates } from './merge-spec-states.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
@@ -6530,10 +6531,21 @@ for (const state of multiPageStates.filter((entry) => entry.hoverInteraction)) {
   };
 }
 
-const implementationStates = [
+const mergedSpecPaths = String(args['merge-specs'] || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const sourceStates = [
   homePageState,
   ...multiPageStates,
-].filter(Boolean).map((state) => ({
+].filter(Boolean);
+const mergedStates = mergedSpecPaths.length
+  ? mergeSpecStates({ states: sourceStates, specPaths: mergedSpecPaths, outDir })
+  : sourceStates;
+if (mergedSpecPaths.length) {
+  output.pages = mergedStates.filter((state) => state.index >= 0);
+}
+const implementationStates = mergedStates.map((state) => ({
   index: state.index,
   type: state.type,
   url: state.url,
