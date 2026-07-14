@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { compareNativeState } from './compare-native-state.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((arg, index, all) => [
   arg.replace(/^--/, ''),
@@ -70,6 +71,21 @@ if (!args.report) {
   const reportPath = path.resolve(root, String(args.report));
   try {
     acceptanceReport = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+    if (args.reference || args.candidate) {
+      if (!args.reference || !args.candidate) {
+        errors.push('native comparison requires both --reference and --candidate');
+      } else {
+        const nativeComparison = compareNativeState(
+          JSON.parse(fs.readFileSync(path.resolve(String(args.reference)), 'utf8')),
+          JSON.parse(fs.readFileSync(path.resolve(String(args.candidate)), 'utf8')),
+        );
+        acceptanceReport.nativeComparison = nativeComparison;
+        acceptanceReport.geometry = {
+          tolerancePx: Number(args.tolerance || acceptanceReport.geometry?.tolerancePx || 1),
+          maxDeltaPx: nativeComparison.painted.maxDeltaPx,
+        };
+      }
+    }
     if (acceptanceReport.passed !== true) {
       errors.push('structured acceptance report did not pass');
     }
@@ -126,6 +142,13 @@ const result = {
   sourceRoots: sourceRoots.map((value) => path.relative(root, value) || '.'),
   acceptanceReport: acceptanceReport ? String(args.report) : null,
   acceptanceMatrix: acceptanceMatrix ? String(args.matrix) : null,
+  nativeComparison: acceptanceReport?.nativeComparison
+    ? {
+      required: acceptanceReport.nativeComparison.required,
+      matched: acceptanceReport.nativeComparison.matched,
+      paintMismatched: acceptanceReport.nativeComparison.paint?.mismatched,
+    }
+    : null,
   errors,
 };
 console.log(JSON.stringify(result, null, 2));

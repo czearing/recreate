@@ -315,7 +315,20 @@ than masked with screenshot interpretation.
 
 These files are evidence, not shipping code. Native delivery cannot pass
 `validate-native-implementation.mjs` without a structured acceptance report
-covering all required states and interactions.
+covering all required states and interactions. Pass the captured reference and
+native state directly so the validator computes identity, geometry, and paint
+instead of trusting hand-authored comparison totals:
+
+```powershell
+node src/validate-native-implementation.mjs `
+  --root <implementation-root> `
+  --paths <destination-source-roots> `
+  --require @1js/bebop-icons,@1js/fluentui-modern `
+  --matrix <site-spec-output\acceptance-matrix.json> `
+  --report <structured-acceptance-report.json> `
+  --reference <site-spec-output\evidence\state-home.json> `
+  --candidate <native-capture\evidence\state-home.json>
+```
 
 ## Build an interactive static mock
 

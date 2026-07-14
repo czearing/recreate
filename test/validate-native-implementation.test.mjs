@@ -55,6 +55,37 @@ test('native source cannot pass without structured fidelity evidence', () => {
   assert.equal(JSON.parse(passed.stdout).passed, true);
 
   const reportPath = path.join(root, 'report.json');
+  const referencePath = path.join(root, 'reference.json');
+  const candidatePath = path.join(root, 'candidate.json');
+  const comparisonState = {
+    nodes: [{
+      tag: 'button',
+      path: 'open',
+      text: 'Open',
+      rect: { x: 0, y: 0, width: 32, height: 32 },
+      style: { display: 'block', opacity: '1', backgroundColor: 'rgb(255, 255, 255)' },
+    }],
+  };
+  fs.writeFileSync(referencePath, JSON.stringify(comparisonState));
+  fs.writeFileSync(candidatePath, JSON.stringify(comparisonState));
+  const reportWithoutComparison = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  delete reportWithoutComparison.nativeComparison;
+  fs.writeFileSync(reportPath, JSON.stringify(reportWithoutComparison));
+  const directComparison = invoke([
+    ...evidence,
+    '--reference', referencePath,
+    '--candidate', candidatePath,
+  ]);
+  assert.equal(directComparison.status, 0);
+  assert.equal(JSON.parse(directComparison.stdout).nativeComparison.matched, 1);
+
+  reportWithoutComparison.nativeComparison = {
+    required: 3,
+    matched: 3,
+    missing: [],
+    paint: { compared: 3, mismatched: 0 },
+  };
+  fs.writeFileSync(reportPath, JSON.stringify(reportWithoutComparison));
   const failedPaint = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
   failedPaint.nativeComparison.paint.mismatched = 1;
   fs.writeFileSync(reportPath, JSON.stringify(failedPaint));
