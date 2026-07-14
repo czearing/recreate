@@ -6690,7 +6690,6 @@ const implementationBlueprint = {
     'state-index.json',
     'page-globals.json',
     'component-map.json',
-    'page-globals.json',
     'the matching components/*.json shard for each component being built',
     'pages/*.html and pages/*.css for the state being implemented',
     'stylesheets/*.css for authored rules and design tokens',

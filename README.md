@@ -45,6 +45,21 @@ Capture internal routes, panels, and other state-changing controls:
 node src/extract.mjs --reuse --match example.com --crawl --max-routes 30 --out site-spec-output
 ```
 
+Capture a safe isolated batch from exact missing-control paths. Every target is
+reloaded from the home state before activation:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --crawl `
+  --interaction-manifest missing-interactions.json --out isolated-proof
+```
+
+Merge independently captured proofs into one complete specification:
+
+```powershell
+node src/extract.mjs --reuse --target <target-id> --out complete-spec `
+  --merge-specs isolated-proof-1,isolated-proof-2
+```
+
 Run destructive editor probes only against a disposable or explicitly approved
 editor target:
 
@@ -83,6 +98,9 @@ node src/extract.mjs --url https://example.com --out site-spec-output --screensh
 ## Output
 
 - `implementation.json`: concise agent-facing build plan and evidence index
+- `state-index.json`: compact index of captured states and their detailed evidence
+- `page-globals.json`: readable page-level text, geometry, styles, and controls
+- `acceptance-matrix.json`: required desktop/mobile state, interaction, animation, asset, and component cells
 - `spec.json`: machine-readable evidence index and global relationships
 - `evidence/capture-*.json`: exact geometry and behavior for one viewport
 - `evidence/state-*.json`: exact geometry, styles, focus, text, and
