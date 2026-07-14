@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
-const copyArtifact = (sourceRoot, outDir, relativePath, prefix) => {
+const copyArtifact = (sourceRoot, outDir, relativePath) => {
   if (!relativePath) return undefined;
   const source = path.resolve(sourceRoot, relativePath);
   if (!fs.existsSync(source) || !fs.statSync(source).isFile()) return undefined;
   const directory = path.dirname(relativePath);
-  const filename = `${prefix}-${path.basename(relativePath)}`;
+  const hash = createHash('sha256').update(fs.readFileSync(source)).digest('hex').slice(0, 16);
+  const filename = `merged-${hash}${path.extname(relativePath)}`;
   const targetRelative = path.join(directory, filename).replaceAll('\\', '/');
   const target = path.join(outDir, targetRelative);
   fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -47,11 +49,10 @@ export function mergeSpecStates({ states, specPaths, outDir }) {
     for (const [stateIndex, state] of (spec.pages || []).entries()) {
       const triggerPath = state.triggerElement?.path;
       if (!triggerPath || capturedPaths.has(triggerPath)) continue;
-      const prefix = `merged-${specIndex}-${stateIndex}`;
-      const evidence = copyArtifact(sourceRoot, outDir, state.evidence, prefix);
+      const evidence = copyArtifact(sourceRoot, outDir, state.evidence);
       const evidenceByViewport = Object.fromEntries(
         Object.entries(state.evidenceByViewport || {}).flatMap(([viewport, artifact]) => {
-          const copied = copyArtifact(sourceRoot, outDir, artifact, `${prefix}-${viewport}`);
+          const copied = copyArtifact(sourceRoot, outDir, artifact);
           return copied ? [[viewport, copied]] : [];
         }),
       );
@@ -60,9 +61,9 @@ export function mergeSpecStates({ states, specPaths, outDir }) {
         index: nextIndex,
         evidence,
         evidenceByViewport,
-        html: copyArtifact(sourceRoot, outDir, state.html, prefix),
-        stylesheet: copyArtifact(sourceRoot, outDir, state.stylesheet, prefix),
-        screenshot: copyArtifact(sourceRoot, outDir, state.screenshot, prefix),
+        html: copyArtifact(sourceRoot, outDir, state.html),
+        stylesheet: copyArtifact(sourceRoot, outDir, state.stylesheet),
+        screenshot: copyArtifact(sourceRoot, outDir, state.screenshot),
         mergedFrom: file,
       });
       nextIndex += 1;

@@ -32,6 +32,7 @@ test('merges isolated interaction states and copies their evidence', () => {
   assert.equal(states[1].index, 0);
   assert.equal(states[1].trigger, 'Search');
   assert.equal(fs.existsSync(path.join(output, states[1].evidence)), true);
+  assert.match(states[1].evidence, /evidence\/merged-[a-f0-9]{16}\.json/);
 });
 
 test('does not duplicate a trigger path already captured by the base spec', () => {
