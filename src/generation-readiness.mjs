@@ -46,6 +46,17 @@ export function buildGenerationReadiness({
       String(behavior.role || '').toLowerCase(),
     ),
   );
+  const interactiveControls = controls.filter((control) =>
+    !control.disabled && (
+      ['button', 'input', 'textarea', 'select', 'a'].includes(
+        String(control.tag || '').toLowerCase(),
+      ) ||
+      ['button', 'link', 'menuitem', 'option', 'switch', 'tab'].includes(
+        String(control.role || '').toLowerCase(),
+      ) ||
+      control.href
+    ),
+  );
   const assets = (capture?.exactAssets || []).filter((asset) => asset.path);
   const animations = [
     ...(capture?.animations || []).map((animation) => ({
@@ -83,6 +94,24 @@ export function buildGenerationReadiness({
     path: animation.path,
     type: clean(animation.type || animation.tag || 'animation'),
   }));
+  const capturedInteractionPaths = new Set(states
+    .filter((state) => state.index >= 0)
+    .map((state) => state.triggerElement?.path)
+    .filter(Boolean));
+  const requiredInteractions = unique(interactiveControls, (control) => control.path);
+  const missingInteractions = requiredInteractions
+    .filter((control) => !capturedInteractionPaths.has(control.path))
+    .map((control) => ({
+      path: control.path,
+      label: clean(control.label || control.href),
+      tag: control.tag,
+      role: control.role,
+    }));
+  const interactionCoverage = {
+    required: requiredInteractions.length,
+    covered: requiredInteractions.length - missingInteractions.length,
+    missing: missingInteractions,
+  };
   const stateCount = states.length;
   const interactionCount = states.filter((state) => state.index >= 0).length;
   const failures = [
@@ -92,7 +121,8 @@ export function buildGenerationReadiness({
     assetCoverage.missing.length && `${assetCoverage.missing.length} asset(s) lack component ownership`,
     unresolvedAssets.length && `${unresolvedAssets.length} asset(s) lack exact identity`,
     animationCoverage.missing.length && `${animationCoverage.missing.length} animation track(s) lack component ownership`,
-    crawlRequested && interactionCount === 0 && 'crawl requested but no interaction states were captured',
+    interactionCoverage.missing.length &&
+      `${interactionCoverage.missing.length} interactive control(s) lack captured behavior`,
     viewports.length < 2 && 'fewer than two responsive viewports were captured',
   ].filter(Boolean);
   return {
@@ -105,6 +135,7 @@ export function buildGenerationReadiness({
       readableComponents: componentRoots.length,
       states: stateCount,
       interactions: interactionCount,
+      interactiveControls: interactionCoverage.required,
       viewports: viewports.length,
     },
     coverage: {
@@ -126,6 +157,7 @@ export function buildGenerationReadiness({
         type: asset.type,
       })),
       animations: animationCoverage,
+      interactions: interactionCoverage,
     },
   };
 }
