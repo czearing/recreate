@@ -19,6 +19,10 @@ import {
 } from './acceptance-matrix.mjs';
 import { buildGenerationReadiness } from './generation-readiness.mjs';
 import { mergeSpecStates } from './merge-spec-states.mjs';
+import {
+  buildPageGlobalContent,
+  buildPageGlobalLayout,
+} from './page-global-evidence.mjs';
 import { captureDragStates } from './drag-probe.mjs';
 import { captureHoverState } from './hover-probe.mjs';
 import { captureIframeState } from './iframe-probe.mjs';
@@ -6085,7 +6089,6 @@ for (const component of componentPackages) {
 }
 if (!fullProfile) {
   const selected = componentPackages.filter((component) =>
-    !component.parentId ||
     isUsefulAgentComponent(componentDetails.get(component.id)),
   );
   for (const component of selected) {
@@ -6615,9 +6618,24 @@ const globalControls = (captures[0]?.behaviors || []).filter((control) =>
   control.path &&
   !readableComponentRoots.some((root) => isWithin(control.path, root)),
 );
+const globalContentByViewport = Object.entries(homePageState.evidenceByViewport || {})
+  .map(([viewport, evidence]) => {
+    const state = JSON.parse(fs.readFileSync(path.join(outDir, evidence), 'utf8'));
+    const content = buildPageGlobalContent(state.nodes || [], readableComponentRoots);
+    return {
+      viewport,
+      content,
+      layout: buildPageGlobalLayout(
+        state.nodes || [],
+        readableComponentRoots,
+        content,
+      ),
+    };
+  });
 const pageGlobals = {
   schemaVersion: 1,
   purpose: 'Readable page-level evidence outside the primary component tree.',
+  viewports: globalContentByViewport,
   controls: globalControls.map((control) => ({
     path: control.path,
     tag: control.tag,
@@ -6636,7 +6654,13 @@ const generationReadiness = buildGenerationReadiness({
   states: implementationStates,
   viewports,
   crawlRequested: crawl,
-  globalPaths: globalControls.map((control) => control.path),
+  globalPaths: [
+    ...globalControls.map((control) => control.path),
+    ...globalContentByViewport.flatMap(({ content }) =>
+      content.map((node) => node.path)),
+    ...globalContentByViewport.flatMap(({ layout }) =>
+      layout.map((node) => node.path)),
+  ],
 });
 fs.writeFileSync(
   path.join(outDir, 'acceptance-matrix.json'),
