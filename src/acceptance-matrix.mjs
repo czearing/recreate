@@ -33,6 +33,7 @@ export function buildAcceptanceMatrix({
   controls = [],
   animations = [],
   nodes = [],
+  assets = [],
 }) {
   const stateCells = states.flatMap((state) => {
     const evidence = state.evidenceByViewport || {};
@@ -114,12 +115,31 @@ export function buildAcceptanceMatrix({
       type: animation.type || animation.tag || 'animation',
       required: ['target', 'property', 'duration', 'easing', 'keyframes or trajectory'],
     })));
+  const assetCells = [
+    ...new Map(assets
+      .filter((asset) => asset.path)
+      .map((asset) => [
+        `${asset.path}|${asset.file || asset.currentSrc || asset.src || asset.type || ''}`,
+        asset,
+      ]))
+      .values(),
+  ].map((asset, index) => ({
+    id: `asset-${String(index).padStart(3, '0')}`,
+    path: asset.path,
+    type: asset.type,
+    file: asset.file,
+    src: asset.currentSrc || asset.src,
+    intrinsicWidth: asset.naturalWidth || asset.width,
+    intrinsicHeight: asset.naturalHeight || asset.height,
+    required: ['exact asset identity', 'intrinsic dimensions', 'native icon or asset mapping'],
+  }));
   return {
     schemaVersion: 1,
     purpose: 'Required native-delivery cells. Every cell must pass before PR or delivery.',
     stateCells,
     interactionCells,
     animationCells,
+    assetCells,
     componentCells: components.filter((component) => component.file).map((component) => ({
       id: component.id,
       label: component.identity.label,

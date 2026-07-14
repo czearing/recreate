@@ -6601,6 +6601,7 @@ const acceptanceMatrix = buildAcceptanceMatrix({
   components: componentPackages,
   controls: captures[0]?.behaviors || [],
   nodes: captures[0]?.nodes || [],
+  assets: captures[0]?.exactAssets || [],
   animations: [
     ...(captures[0]?.animations || []),
     ...(captures[0]?.animationElements || []),

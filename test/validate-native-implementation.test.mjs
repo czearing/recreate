@@ -34,6 +34,7 @@ test('native source cannot pass without structured fidelity evidence', () => {
     stateCells: [{ id: 'state-home' }],
     interactionCells: [{ id: 'interaction-open' }],
     animationCells: [{ id: 'animation-hover' }],
+    assetCells: [{ id: 'asset-icon' }],
     componentCells: [{ id: 'component-card' }],
   }));
   fs.writeFileSync(path.join(root, 'report.json'), JSON.stringify({
@@ -42,6 +43,7 @@ test('native source cannot pass without structured fidelity evidence', () => {
     states: { required: 1, passed: 1, failed: 0 },
     interactions: { required: 1, passed: 1, failed: 0 },
     animations: { required: 1, passed: 1, failed: 0 },
+    assets: { required: 1, passed: 1, failed: 0 },
     components: { required: 1, passed: 1, failed: 0 },
     geometry: { tolerancePx: 1, maxDeltaPx: 0.5 },
     nativeComparison: {

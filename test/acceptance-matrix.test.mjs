@@ -40,6 +40,13 @@ test('expands every captured state and interaction across each viewport', () => 
       rect: { width: 2, height: 32 },
     }],
     animations: [{ path: 'doc(0)>article:nth-of-type(1)', type: 'hover' }],
+    assets: [{
+      path: 'doc(0)>img:nth-of-type(1)',
+      type: 'image',
+      file: 'snapshot-assets/example.svg',
+      naturalWidth: 64,
+      naturalHeight: 64,
+    }],
   });
 
   assert.equal(matrix.stateCells.length, 4);
@@ -47,6 +54,7 @@ test('expands every captured state and interaction across each viewport', () => 
   assert.equal(matrix.interactionCells.filter((cell) => cell.captured).length, 2);
   assert.equal(matrix.interactionCells.filter((cell) => !cell.captured).length, 2);
   assert.equal(matrix.animationCells.length, 2);
+  assert.equal(matrix.assetCells.length, 1);
   assert.equal(matrix.componentCells[0].label, 'Notebook card');
   assert.equal(matrix.stateCells[3].evidence, 'panel-mobile.json');
   assert.match(matrix.purpose, /before PR/);

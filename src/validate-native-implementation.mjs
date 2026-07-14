@@ -201,6 +201,7 @@ if (!args.report) {
       ['states', acceptanceMatrix?.stateCells?.length],
       ['interactions', acceptanceMatrix?.interactionCells?.length],
       ['animations', acceptanceMatrix?.animationCells?.length],
+      ['assets', acceptanceMatrix?.assetCells?.length],
       ['components', acceptanceMatrix?.componentCells?.length],
     ];
     for (const [key, required] of coverage) {
