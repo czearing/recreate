@@ -6785,14 +6785,16 @@ const implementationBlueprint = {
       .map((component) => {
         const details = componentDetails.get(component.id);
         return {
-        id: component.id,
-        file: component.file,
-        label: component.identity.label,
-        childIds: component.deliveryChildIds,
-        desktopRect: details?.captures?.[0]?.root?.rect,
-        mobileRect: details?.captures?.[1]?.root?.rect,
+          id: component.id,
+          file: component.file,
+          label: component.identity.label,
+          childIds: component.deliveryChildIds,
+          desktopRect: details?.captures?.[0]?.root?.rect,
+          mobileRect: details?.captures?.[1]?.root?.rect,
         };
-      })),
+      }))
+      .map(({ desktopRect: _desktopRect, mobileRect: _mobileRect, ...component }) =>
+        component),
   },
   responsive: {
     count: responsive.length,

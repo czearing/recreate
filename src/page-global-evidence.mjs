@@ -52,7 +52,7 @@ export function buildPageGlobalLayout(nodes, componentRoots, content) {
   return [...selected.values()];
 }
 
-export function buildPageOutline(content, limit = 12) {
+export function buildPageOutline(content, limit = Infinity) {
   const unique = new Map();
   for (const node of content) {
     const fontSize = Number.parseFloat(node.style?.fontSize || '0');
@@ -71,9 +71,9 @@ export function buildPageOutline(content, limit = 12) {
       });
     }
   }
-  return [...unique.values()]
+  const outline = [...unique.values()]
     .sort((left, right) =>
       (left.rect?.y ?? Infinity) - (right.rect?.y ?? Infinity) ||
-      (left.rect?.x ?? Infinity) - (right.rect?.x ?? Infinity))
-    .slice(0, limit);
+      (left.rect?.x ?? Infinity) - (right.rect?.x ?? Infinity));
+  return Number.isFinite(limit) ? outline.slice(0, limit) : outline;
 }

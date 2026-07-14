@@ -92,6 +92,41 @@ test('emits one component definition per repeated structural fingerprint', () =>
   ]);
 });
 
+test('uses snapshot text nodes when their path matches their parent path', () => {
+  const repeatedPath = `${rootPath}>span:nth-of-type(1)`;
+  const identity = inferComponentIdentity(
+    {
+      path: rootPath,
+      tag: 'div',
+      role: 'button',
+      attrs: { role: 'button' },
+    },
+    [
+      {
+        path: rootPath,
+        tag: 'div',
+        role: 'button',
+        attrs: { role: 'button' },
+      },
+      {
+        path: repeatedPath,
+        parentPath: rootPath,
+        tag: 'span',
+      },
+      {
+        path: repeatedPath,
+        parentPath: repeatedPath,
+        tag: '#text',
+        text: 'MSA — Stratus–Meridian Software Delivery (2024).pdf',
+      },
+    ],
+    'component-001',
+  );
+
+  assert.equal(identity.label, 'MSA — Stratus–Meridian Software Delivery (2024).pdf');
+  assert.equal(identity.labelSource, 'leaf-text');
+});
+
 test('orders native component work by desktop position', () => {
   const ordered = buildComponentBuildOrder([
     { id: 'bottom', desktopRect: { x: 0, y: 400 } },

@@ -42,9 +42,10 @@ export function inferComponentIdentity(root, nodes, fallback) {
     clean(node.ariaLabel || node.attrs?.['aria-label'] || node.attrs?.placeholder),
   );
   const parents = new Set(nodes.map((node) => node.parentPath).filter(Boolean));
-  const leaf = nodes.find((node) =>
-    !parents.has(node.path) && clean(node.text) && !['svg', 'path'].includes(node.tag),
-  );
+  const leaf = nodes.find((node) => node.tag === '#text' && clean(node.text)) ||
+    nodes.find((node) =>
+      !parents.has(node.path) && clean(node.text) && !['svg', 'path'].includes(node.tag),
+    );
   const classHint = String(root?.attrs?.class || '').split(/\s+/)
     .find((value) => !isHashClass(value));
   const choices = [
