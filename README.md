@@ -1,8 +1,8 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/recreate-hero-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset=".github/assets/recreate-hero-light.svg">
-    <img alt="Recreate. Capture the interface, keep the details." src=".github/assets/recreate-hero-light.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/czearing/recreate/main/.github/assets/recreate-hero-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/czearing/recreate/main/.github/assets/recreate-hero-light.svg">
+    <img alt="Recreate. Capture the interface, keep the details." src="https://raw.githubusercontent.com/czearing/recreate/main/.github/assets/recreate-hero-light.svg" width="100%">
   </picture>
 </div>
 
