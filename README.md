@@ -1,8 +1,33 @@
-# site-spec
+# Recreate
 
-Extract a buildable website specification from browser ground truth through the Chrome DevTools Protocol.
+Capture a live interface as structured browser ground truth for native reconstruction and validation.
 
 The extractor records the exact initial document response, loaded DOM, authored CSS, assets, computed constraints, listeners, responsive states, startup animation trajectories, scroll checkpoints, and component boundaries. It does not use image interpretation to infer implementation.
+
+## Internal beta
+
+Recreate is published from `main` to the private GitHub Packages beta channel
+after its checks pass. Each beta has an immutable SemVer prerelease version:
+
+```text
+0.1.0-beta.<run>.<attempt>.sha-<commit>
+```
+
+Configure GitHub Packages once with a classic personal access token that has
+`read:packages`, then run the current beta without installing it globally:
+
+```powershell
+npm config set @czearing:registry https://npm.pkg.github.com
+npm login --scope=@czearing --auth-type=legacy --registry=https://npm.pkg.github.com
+npx --yes @czearing/recreate@beta --version
+```
+
+Using the `beta` tag means each new process resolves the latest tested beta.
+Running processes are never replaced underneath an active capture. Stable
+releases use `@latest`, and an exact version can be pinned when reproducibility
+matters.
+
+See [release channels and recovery](docs/release-channels.md).
 
 ## Run
 
@@ -16,6 +41,13 @@ Capture a public site:
 
 ```powershell
 node src/extract.mjs --url https://example.com --out site-spec-output
+```
+
+The installed package exposes both `recreate` and the temporary `site-spec`
+compatibility alias:
+
+```powershell
+npx --yes @czearing/recreate@beta --url https://example.com --out recreate-output
 ```
 
 The default `implementation` profile keeps the evidence needed to rebuild and

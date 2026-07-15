@@ -1,0 +1,43 @@
+name: Stable release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: stable-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
+      - if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@czearing"
+      - if: ${{ steps.release.outputs.release_created }}
+        run: npm ci
+      - if: ${{ steps.release.outputs.release_created }}
+        run: npm run ci
+      - if: ${{ steps.release.outputs.release_created }}
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
