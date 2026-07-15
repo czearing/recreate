@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.1...recreate-cli-v0.4.2) (2026-07-15)
+
+
+### Fixes
+
+* require rendered browser inspection ([0c02277](https://github.com/czearing/recreate/commit/0c022779fb63fe48ac097c4da3c535410c086ee3))
+
 ## [0.4.1](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.0...recreate-cli-v0.4.1) (2026-07-15)
 
 
