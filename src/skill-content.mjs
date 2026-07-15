@@ -26,11 +26,19 @@ export function currentSkillInstructions() {
    this in the terminal instead of asking the user to configure it manually.
 3. Run:
    ${latestRecreateCommand} <url> --out recreate-output
-4. Read recreate-output/implementation.json first. Open detailed evidence only
+4. If Recreate returns RECREATE_ACCESS_REQUIRED:
+   - Tell the user: "Access is required in the browser Recreate opened. Complete
+     it there. Recreate will continue automatically."
+   - Keep credentials and session data inside the browser.
+   - Keep the running command alive and wait for it to continue. Do not open a
+     new tab or start a second capture.
+   - If the command times out, read recreate-output/access-required.json and run
+     its resume.display command against the same browser tab.
+5. Read recreate-output/implementation.json first. Open detailed evidence only
    for the component or state currently being implemented.
-5. Rebuild the interface natively. Preserve captured content, layout, assets,
+6. Rebuild the interface natively. Preserve captured content, layout, assets,
    responsive behavior, motion, and interactions.
-6. Validate the result against recreate-output/acceptance-matrix.json before
+7. Validate the result against recreate-output/acceptance-matrix.json before
    declaring the work complete.
 
 Use --reuse with an exact tab match when the source is already open or requires

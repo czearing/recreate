@@ -38,6 +38,10 @@ Run it from Copilot or Claude:
 
 Each run checks npm for the latest stable release. No reinstall is required.
 
+For restricted pages, Recreate leaves the browser tab open and asks you to
+complete access there. It continues automatically in the same tab. Credentials
+stay in the browser.
+
 Run Recreate directly at any time:
 
 ```bash

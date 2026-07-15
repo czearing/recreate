@@ -42,7 +42,6 @@ import {
   interactionStateSettleDelay,
   selectInteractionIdentityRuntimeSource,
 } from './interaction-targeting.mjs';
-import { authenticationShellRuntimeSource } from './shell-detection.mjs';
 import {
   buildPrimitiveInventory,
   destinationContract,
@@ -51,6 +50,11 @@ import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
 import { getPositionalUrl } from './cli-arguments.mjs';
+import {
+  accessDomRuntimeSource,
+  classifyAccessRequirement,
+} from './access-detection.mjs';
+import { buildAccessMarker } from './access-resume.mjs';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -80,6 +84,9 @@ const url = figmaSource?.captureUrl || sourceUrl;
 const match = String(args.match || sourceUrl);
 const requestedTargetId = String(args.target || '');
 const outDir = path.resolve(String(args.out || 'recreate-output'));
+const cdpEndpoint = String(
+  args['cdp-url'] || 'http://localhost:9222',
+).replace(/\/$/, '');
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const captureEditorProbes = Boolean(args['editor-probes']);
@@ -99,7 +106,6 @@ if (!Array.isArray(interactionTargets)) {
   throw new Error('Interaction manifest must be a JSON array of { path, label } targets.');
 }
 const hasInteractionMatch = Boolean(interactionMatch || interactionTargets.length);
-const rejectAuthShell = Boolean(args['reject-auth-shell']);
 const isOverlayTreeRuntimeSource = `(element => {
   if (element.getAttribute('role') !== 'tree') return true;
   for (
@@ -163,7 +169,7 @@ fs.mkdirSync(outDir, { recursive: true });
 const getJson = (pathname) =>
   new Promise((resolve, reject) => {
     http
-      .get(`http://localhost:9222${pathname}`, (response) => {
+      .get(`${cdpEndpoint}${pathname}`, (response) => {
         let body = '';
         response.on('data', (chunk) => (body += chunk));
         response.on('end', () => resolve(JSON.parse(body)));
@@ -327,6 +333,22 @@ function networkEvidenceSince(index) {
   }));
 }
 
+function networkAccessEvidence(startIndex = 0) {
+  return networkTimeline
+    .slice(startIndex)
+    .filter((request) =>
+      ['Document', 'Fetch', 'XHR'].includes(request.type),
+    )
+    .map((request) => ({
+      hasWwwAuthenticate: request.hasWwwAuthenticate,
+      isMainFrame: request.isMainFrame,
+      redirectToUrl: request.redirectToUrl,
+      status: request.status,
+      type: request.type,
+      url: request.url,
+    }));
+}
+
 function hasInFlightNetworkSince(index) {
   return networkTimeline.slice(index).some(
     (request) =>
@@ -398,6 +420,12 @@ async function initializeCdp(client) {
       previous.status = event.redirectResponse.status;
       previous.mimeType = event.redirectResponse.mimeType;
       previous.protocol = event.redirectResponse.protocol;
+      previous.hasWwwAuthenticate = Object.keys(
+        event.redirectResponse.headers || {},
+      ).some((name) => name.toLowerCase() === 'www-authenticate');
+      previous.redirectToUrl = sanitizedNetworkUrl(event.request.url);
+      previous.isMainFrame =
+        previous.type === 'Document' && event.frameId === mainFrameId;
     }
     const request = {
       requestId: event.requestId,
@@ -426,6 +454,11 @@ async function initializeCdp(client) {
         mimeType: event.response.mimeType,
         protocol: event.response.protocol,
         fromDiskCache: event.response.fromDiskCache,
+        hasWwwAuthenticate: Object.keys(
+          event.response.headers || {},
+        ).some((name) => name.toLowerCase() === 'www-authenticate'),
+        isMainFrame:
+          event.type === 'Document' && event.frameId === mainFrameId,
       });
     }
     if (event.type === 'Document' && event.frameId === mainFrameId) {
@@ -1509,13 +1542,17 @@ async function settlePage() {
   await new Promise((resolve) => setTimeout(resolve, 800));
 }
 
-async function waitForApplicationReady() {
+async function waitForApplicationReady({
+  maxAttempts = 180,
+  networkStartIndex = 0,
+  verifyAccess = false,
+} = {}) {
   const startedAt = Date.now();
   let state = {};
   let lastNodeCount = 0;
   let stableCount = 0;
   // Slow authenticated prototypes can keep a visual splash after DOM readiness.
-  for (let attempt = 0; attempt < 180; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       state = (
         await cdp.send('Runtime.evaluate', {
@@ -1540,11 +1577,11 @@ async function waitForApplicationReady() {
                 /(?:this page couldn.t be found|page not found|404 not found)/i.test(heading) ||
                 (
                   bodyText.length < 1500 &&
-                  /(?:this page couldn.t be found|you may not have access)/i.test(bodyText)
+                  /this page couldn.t be found/i.test(bodyText)
                 )
               );
             })(),
-            hasAuthenticationShell: ${authenticationShellRuntimeSource},
+            access: ${accessDomRuntimeSource},
             hasBlockingVisual: Array.from(new Set([
               ...Array.from(document.body?.children || []),
               ...document.querySelectorAll([
@@ -1606,10 +1643,24 @@ async function waitForApplicationReady() {
         })
       ).result.value;
 
-      if (
-        state.hasFatalError ||
-        (rejectAuthShell && state.hasAuthenticationShell)
-      ) {
+      if (verifyAccess) {
+        const accessRequirement = classifyAccessRequirement({
+          requestedUrl,
+          currentUrl: state.access?.currentUrl,
+          networkRequests: networkAccessEvidence(networkStartIndex),
+          domState: state.access,
+        });
+        if (accessRequirement) {
+          state.accessRequirement = accessRequirement;
+          return {
+            ready: true,
+            waitMs: Date.now() - startedAt,
+            state,
+          };
+        }
+      }
+
+      if (state.hasFatalError) {
         return {
           ready: true,
           waitMs: Date.now() - startedAt,
@@ -1630,6 +1681,15 @@ async function waitForApplicationReady() {
           stableCount++;
           // Require 3 stable polls (~750ms) before declaring ready
           if (stableCount >= 3) {
+            if (verifyAccess) {
+              state.accessRequirement = classifyAccessRequirement({
+                requestedUrl,
+                currentUrl: state.access?.currentUrl,
+                networkRequests: networkAccessEvidence(networkStartIndex),
+                domState: state.access,
+                includeApiChallenges: true,
+              });
+            }
             return {
               ready: true,
               waitMs: Date.now() - startedAt,
@@ -1647,11 +1707,29 @@ async function waitForApplicationReady() {
     } catch {}
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
+  if (verifyAccess) {
+    state.accessRequirement = classifyAccessRequirement({
+      requestedUrl,
+      currentUrl: state.access?.currentUrl,
+      networkRequests: networkAccessEvidence(networkStartIndex),
+      domState: state.access,
+      includeApiChallenges: true,
+    });
+  }
   return {
     ready: false,
     waitMs: Date.now() - startedAt,
     state,
   };
+}
+
+async function waitForVerifiedApplicationReady() {
+  let readiness = await waitForApplicationReady({ verifyAccess: true });
+  if (readiness.state?.accessRequirement) {
+    readiness = await waitForAccess(readiness.state.accessRequirement);
+  }
+  fs.rmSync(path.join(outDir, 'access-required.json'), { force: true });
+  return readiness;
 }
 
 const liveScriptSources = new Map();
@@ -2776,6 +2854,7 @@ async function navigateAndCaptureAllPages(targetUrl) {
   });
 
   await cdp.send('Page.navigate', { url: targetUrl });
+  await waitForVerifiedApplicationReady();
 
   let lastCapturedUrl = '';
   let lastCapturedNodeCount = 0;
@@ -2856,13 +2935,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   }).catch(() => ({ result: { value: '' } }))).result.value;
   if (baseUrl && currentUrl !== baseUrl) {
     await cdp.send('Page.navigate', { url: baseUrl });
-    const initialReadiness = await waitForApplicationReady();
-    if (
-      rejectAuthShell &&
-      initialReadiness.state?.hasAuthenticationShell
-    ) {
-      await rejectAuthenticationShell(url || page.url);
-    }
+    await waitForApplicationReady();
   }
   const crawlViewport = viewports[0];
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -2872,7 +2945,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     mobile: crawlViewport.width < 600,
   });
   await cdp.send('Page.reload', { ignoreCache: false });
-  await waitForApplicationReady();
+  await waitForVerifiedApplicationReady();
   await settlePage();
 
   // Inject pushState intercept on the live page so clicks are trackable
@@ -4431,12 +4504,6 @@ async function extractViewport(viewport, captureIndex) {
   console.error('phase: wait ready');
   const readiness = await waitForApplicationReady();
   console.error('phase: ready done', JSON.stringify(readiness));
-  if (
-    rejectAuthShell &&
-    readiness.state?.hasAuthenticationShell
-  ) {
-    await rejectAuthenticationShell(url || page.url);
-  }
   let initialDocument = {
     url: latestDocumentResponse?.response?.url,
     status: latestDocumentResponse?.response?.status,
@@ -5251,22 +5318,63 @@ async function inlineSnapshotImages(snapshots) {
 
 const captures = [];
 
-async function rejectAuthenticationShell(location) {
-  try {
-    await cdp.close();
-  } catch {}
-  try {
-    if (created && targetId) {
-      await browser?.send('Target.closeTarget', { targetId });
-    }
-  } catch {}
-  try {
-    await browser?.close();
-  } catch {}
-  throw new Error(
-    `Rejected authentication shell at ${location}. ` +
-    'Use an authenticated tab or omit --reject-auth-shell to capture it.',
+async function waitForAccess(requirement) {
+  const activeTargetId = page.id || targetId;
+  const marker = buildAccessMarker({
+    argv: process.argv.slice(2),
+    currentUrl: sanitizedNetworkUrl(
+      (
+        await cdp.send('Runtime.evaluate', {
+          expression: 'location.href',
+          returnByValue: true,
+        }).catch(() => ({ result: { value: page.url } }))
+      ).result.value,
+    ),
+    outDir,
+    requestedUrl: sanitizedNetworkUrl(requestedUrl),
+    requirement,
+    targetId: activeTargetId,
+  });
+  const markerPath = path.join(outDir, 'access-required.json');
+  fs.writeFileSync(markerPath, JSON.stringify(marker, null, 2));
+  const action =
+    requirement.kind === 'authorization'
+      ? 'Use an account with access in the browser tab Recreate left open.'
+      : 'Complete access in the browser tab Recreate left open.';
+  console.error('RECREATE_ACCESS_REQUIRED');
+  console.error(action);
+  console.error('Recreate will continue automatically when access is ready.');
+  console.error(
+    'Credentials stay in the browser.',
   );
+
+  const networkStartIndex = networkTimeline.length;
+  const deadline = Date.now() + 10 * 60_000;
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const readiness = await waitForApplicationReady({
+      maxAttempts: 8,
+      networkStartIndex,
+      verifyAccess: true,
+    });
+    if (readiness.ready && !readiness.state?.accessRequirement) {
+      fs.rmSync(markerPath, { force: true });
+      console.error('RECREATE_ACCESS_CONFIRMED');
+      return readiness;
+    }
+  }
+
+  const error = new Error(
+    [
+      'RECREATE_ACCESS_TIMEOUT',
+      'The browser session did not become ready within 10 minutes.',
+      'Reopen the saved browser tab and run:',
+      marker.resume.display,
+      `State: ${markerPath}`,
+    ].join('\n'),
+  );
+  error.code = 'RECREATE_ACCESS_REQUIRED';
+  throw error;
 }
 
 if (created) {
@@ -5287,7 +5395,7 @@ if (captureWebglInteractionProbes) {
   ).identifier;
   await cdp.send('Page.reload');
 }
-await waitForApplicationReady();
+await waitForVerifiedApplicationReady();
 if (figmaSource) {
   let implementation;
   try {
@@ -6155,14 +6263,6 @@ for (const [captureIndex, capture] of captures.entries()) {
   }
   if (capture.readiness?.state?.hasFatalError) {
     validationErrors.push(`capture ${captureIndex}: captured a fatal error shell`);
-  }
-  if (
-    rejectAuthShell &&
-    capture.readiness?.state?.hasAuthenticationShell
-  ) {
-    validationErrors.push(
-      `capture ${captureIndex}: captured an authentication shell`,
-    );
   }
   if (
     fullProfile &&
