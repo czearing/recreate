@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/czearing/recreate/compare/recreate-cli-v0.3.0...recreate-cli-v0.3.1) (2026-07-15)
+
+
+### Documentation
+
+* explain skill installation ([9fa2953](https://github.com/czearing/recreate/commit/9fa295374dde40fef426408e9beaa9598c2d877b))
+
 ## [0.3.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.2.0...recreate-cli-v0.3.0) (2026-07-15)
 
 
