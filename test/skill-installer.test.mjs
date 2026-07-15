@@ -25,18 +25,16 @@ function withTemporaryHome(callback) {
   }
 }
 
-test('builds a shared skill that resolves the latest npm release', () => {
+test('builds a shared skill that resolves the latest GitHub release', () => {
   const content = installedSkillContent();
   assert.match(content, /^---\nname: recreate\n/);
-  assert.match(
-    content,
-    /--registry=https:\/\/registry\.npmjs\.org\/ recreate-cli@latest skill/,
-  );
+  assert.match(content, /node run\.mjs skill/);
   const instructions = currentSkillInstructions();
   assert.match(instructions, /acceptance-matrix\.json/);
   assert.match(instructions, /page as a whole/);
   assert.match(instructions, /access page itself may be the requested interface/);
   assert.match(instructions, /--reuse --target <target-id>/);
+  assert.match(instructions, /--cdp-url http:\/\/127\.0\.0\.1:9222/);
   assert.match(instructions, /Chrome, Edge, or Chromium/);
   assert.match(instructions, /Do not ask the user to start/);
   assert.match(instructions, /Probe http:\/\/127\.0\.0\.1:9222\/json\/version/);
@@ -81,6 +79,9 @@ test('installs both personal skills idempotently', () =>
         'utf8',
       );
       assert.equal(content, installedSkillContent());
+      assert.ok(
+        fs.existsSync(path.join(home, client, 'skills', 'recreate', 'run.mjs')),
+      );
     }
   }));
 

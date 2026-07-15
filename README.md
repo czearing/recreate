@@ -19,7 +19,7 @@ Recreate captures a live interface and turns it into a complete, portable refere
 ## Get started
 
 ```bash
-npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install
 ```
 
 Recreate detects GitHub Copilot CLI and Claude Code, then installs a personal
@@ -36,7 +36,8 @@ Run it from Copilot or Claude:
 /recreate Capture https://example.com and rebuild it in this project.
 ```
 
-Each run checks npm for the latest stable release. No reinstall is required.
+Each run checks GitHub Releases for the package published by the latest stable
+npm release. No reinstall is required, even when a network blocks public npm.
 
 If the link opens an access page, the skill inspects it before capture. It asks
 whether that page is the intended interface or whether access should be
@@ -45,7 +46,7 @@ completed in the open browser tab, then continues with the same session.
 Run Recreate directly at any time:
 
 ```bash
-npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest https://example.com
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate https://example.com
 ```
 
 ## One capture. The whole interface.

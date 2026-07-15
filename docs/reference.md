@@ -10,19 +10,20 @@ Install the personal Recreate skill for detected GitHub Copilot CLI and Claude
 Code clients:
 
 ```text
-npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install
 ```
 
 Install for an explicit client when auto-detection is not available:
 
 ```text
-npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --copilot
-npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --claude
-npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --all
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install --copilot
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install --claude
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install --all
 ```
 
-The installed skill resolves `recreate-cli@latest` with npm online checks on
-every use, so the skill does not need to be reinstalled after a release.
+The installed skill resolves the newest GitHub Release package on every use.
+Stable GitHub releases contain the same tarball published to npm, so the skill
+does not need to be reinstalled and does not require public npm access.
 
 ### What gets installed
 
@@ -69,15 +70,13 @@ data remain in the browser.
 
 ### Automatic updates
 
-The installed `SKILL.md` is a small launcher. Every invocation runs:
+The installed skill includes a small runner. Every invocation:
 
-```text
-npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest skill
-```
+1. Reads the latest release from GitHub.
+2. Selects its versioned `recreate-cli` tarball.
+3. Executes that package directly with `npm exec`.
 
-`@latest` selects the current stable release. `--prefer-online` forces npm to
-check the registry instead of trusting a cached package version. New releases
-are used on the next invocation. No reinstall is required.
+New stable releases are used on the next invocation. No reinstall is required.
 
 ### Verify the installation
 
@@ -108,10 +107,13 @@ Start Edge with remote debugging enabled:
 msedge.exe --remote-debugging-port=9222 --user-data-dir="$env:TEMP\recreate-edge"
 ```
 
+Recreate uses `http://127.0.0.1:9222` by default. Pass `--cdp-url` when the
+browser uses another host or port.
+
 Capture a public site:
 
 ```powershell
-npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest https://example.com
+npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate https://example.com
 ```
 
 The installed package exposes both `recreate` and the temporary `site-spec`

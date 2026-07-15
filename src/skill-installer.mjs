@@ -77,6 +77,7 @@ export function writeSkill(
     'recreate',
   );
   const skillPath = path.join(skillDirectory, 'SKILL.md');
+  const runnerPath = path.join(skillDirectory, 'run.mjs');
   if (
     fs.existsSync(skillDirectory) &&
     fs.lstatSync(skillDirectory).isSymbolicLink()
@@ -85,6 +86,7 @@ export function writeSkill(
   }
   fs.mkdirSync(skillDirectory, { recursive: true });
   fs.writeFileSync(skillPath, installedSkillContent(), 'utf8');
+  fs.copyFileSync(new URL('./skill-runner.mjs', import.meta.url), runnerPath);
   return { clientName, skillPath, reload: client.reload };
 }
 
@@ -101,7 +103,7 @@ export function installSkill(
   }
   console.log('');
   console.log(
-    'Every use checks npm for recreate-cli@latest before running Recreate.',
+    'Every use checks GitHub Releases for the latest stable Recreate package.',
   );
   for (const result of installed) console.log(`- ${result.clientName}: ${result.reload}`);
   return installed;

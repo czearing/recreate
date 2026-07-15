@@ -78,4 +78,8 @@ jobs:
           test -n "$tarball_url"
           curl --fail --location --retry 3 "$tarball_url" \
             --output "release-assets/recreate-cli-$version.tgz"
-          gh release upload "$RELEASE_TAG" "release-assets/recreate-cli-$version.tgz" --clobber
+          cp "release-assets/recreate-cli-$version.tgz" \
+            "release-assets/recreate-cli.tgz"
+          gh release upload "$RELEASE_TAG" \
+            "release-assets/recreate-cli-$version.tgz" \
+            "release-assets/recreate-cli.tgz" --clobber

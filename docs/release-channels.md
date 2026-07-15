@@ -19,12 +19,12 @@ Automated CLI launches should select a release channel:
 npx --yes --registry=https://registry.npmjs.org/ recreate-cli@beta https://example.com
 ```
 
-The installed Recreate skill runs `recreate-cli@latest` with npm's
-`--prefer-online` option. npm checks the registry for a new stable release every
-time the skill starts. An active capture keeps its current version until it
-finishes, preventing mid-capture changes.
+The installed Recreate skill checks GitHub Releases every time it starts and
+runs the tarball attached to the latest stable release. The release tarball is
+the same package published to npm. An active capture keeps its current version
+until it finishes, preventing mid-capture changes.
 
-Channel-based launches require registry access. Use an installed exact version
+GitHub access is required for automatic updates. Use an installed exact version
 when a machine must work offline.
 
 Use `@latest` for stable updates or an exact version to pin:

@@ -79,6 +79,9 @@ const url = figmaSource?.captureUrl || sourceUrl;
 const match = String(args.match || sourceUrl);
 const requestedTargetId = String(args.target || '');
 const outDir = path.resolve(String(args.out || 'recreate-output'));
+const cdpEndpoint = String(
+  args['cdp-url'] || 'http://127.0.0.1:9222',
+).replace(/\/$/, '');
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const captureEditorProbes = Boolean(args['editor-probes']);
@@ -161,7 +164,7 @@ fs.mkdirSync(outDir, { recursive: true });
 const getJson = (pathname) =>
   new Promise((resolve, reject) => {
     http
-      .get(`http://localhost:9222${pathname}`, (response) => {
+      .get(`${cdpEndpoint}${pathname}`, (response) => {
         let body = '';
         response.on('data', (chunk) => (body += chunk));
         response.on('end', () => resolve(JSON.parse(body)));

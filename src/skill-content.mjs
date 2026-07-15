@@ -1,5 +1,5 @@
 export const latestRecreateCommand =
-  'npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest';
+  'node <recreate-skill-directory>/run.mjs';
 
 export function installedSkillContent() {
   return `---
@@ -8,13 +8,13 @@ description: Capture and recreate a live interface with its structure, styling, 
 license: MIT
 ---
 
-Run this command first every time the skill is used:
+From this skill directory, run this command first every time the skill is used:
 
-\`${latestRecreateCommand} skill\`
+\`node run.mjs skill\`
 
 Follow the current workflow printed by the command. Do not replace structured
-capture with screenshot guessing. The command checks npm for the newest Recreate
-release before loading the workflow.
+capture with screenshot guessing. The runner checks GitHub Releases for the
+newest stable Recreate package before loading the workflow.
 `;
 }
 
@@ -43,8 +43,8 @@ export function currentSkillInstructions() {
    This page-intent question is the only browser setup question permitted.
 5. Keep credentials and session data in the browser. Never ask the user to copy
    them into chat or the terminal.
-6. Capture the inspected tab by exact target ID:
-   ${latestRecreateCommand} --reuse --target <target-id> --out recreate-output
+6. Capture the inspected tab by exact target ID and the same CDP endpoint:
+   ${latestRecreateCommand} --reuse --target <target-id> --cdp-url http://127.0.0.1:9222 --out recreate-output
 7. Read recreate-output/implementation.json first. Open detailed evidence only
    for the component or state currently being implemented.
 8. Rebuild the interface natively. Preserve captured content, layout, assets,
