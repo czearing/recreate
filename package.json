@@ -1,6 +1,6 @@
 {
   "name": "recreate-cli",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": false,
   "description": "Capture any interface. Keep every detail.",
   "type": "module",
