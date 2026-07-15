@@ -24,6 +24,63 @@ npx --yes recreate-cli@latest install --all
 The installed skill resolves `recreate-cli@latest` with npm online checks on
 every use, so the skill does not need to be reinstalled after a release.
 
+### What gets installed
+
+| Client | Personal skill path |
+| --- | --- |
+| GitHub Copilot CLI | `~/.copilot/skills/recreate/SKILL.md` |
+| Claude Code | `~/.claude/skills/recreate/SKILL.md` |
+
+The installer is idempotent. Running it again refreshes the Recreate skill
+without changing other skills or client settings.
+
+### Use the skill
+
+The installed skill is named `recreate`. Invoke it directly:
+
+```text
+/recreate Capture https://example.com and rebuild it in this project.
+```
+
+The skill handles the workflow:
+
+1. Loads the current Recreate instructions from npm.
+2. Starts or reuses a Chromium debugging session.
+3. Captures the source interface.
+4. Guides native implementation from the captured evidence.
+5. Checks the result against the captured acceptance matrix.
+
+### Automatic updates
+
+The installed `SKILL.md` is a small launcher. Every invocation runs:
+
+```text
+npx --yes --prefer-online recreate-cli@latest skill
+```
+
+`@latest` selects the current stable release. `--prefer-online` forces npm to
+check the registry instead of trusting a cached package version. New releases
+are used on the next invocation. No reinstall is required.
+
+### Verify the installation
+
+For GitHub Copilot CLI:
+
+```text
+copilot skill list
+```
+
+The output should include `recreate` under personal skills. In an active
+Copilot session, run `/skills reload` after installing.
+
+For Claude Code, start a new session and type:
+
+```text
+/recreate
+```
+
+Claude Code also detects changes inside an existing personal skills directory.
+
 See [release channels and recovery](release-channels.md).
 
 ## Run

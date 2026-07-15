@@ -25,8 +25,18 @@ npx --yes recreate-cli@latest install
 Recreate detects GitHub Copilot CLI and Claude Code, then installs a personal
 `/recreate` skill for every client it finds.
 
-The skill checks npm for the newest Recreate release every time it runs. Your
-coworkers install it once and receive future updates automatically.
+| Client | Installed skill |
+| --- | --- |
+| GitHub Copilot CLI | `~/.copilot/skills/recreate/SKILL.md` |
+| Claude Code | `~/.claude/skills/recreate/SKILL.md` |
+
+Run it from Copilot or Claude:
+
+```text
+/recreate Capture https://example.com and rebuild it in this project.
+```
+
+Each run checks npm for the latest stable release. No reinstall is required.
 
 Run Recreate directly at any time:
 
