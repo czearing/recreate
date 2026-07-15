@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.2...recreate-cli-v0.4.3) (2026-07-15)
+
+
+### Fixes
+
+* make browser setup autonomous ([2933396](https://github.com/czearing/recreate/commit/2933396c70ed2f947a02a1c47a8e6621ffc237cd))
+
 ## [0.4.2](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.1...recreate-cli-v0.4.2) (2026-07-15)
 
 
