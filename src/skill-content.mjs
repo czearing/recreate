@@ -22,25 +22,30 @@ export function currentSkillInstructions() {
   return `Current Recreate workflow:
 
 1. Get the source URL and the destination repository or output path.
-2. Start or reuse a Chromium browser with remote debugging on port 9222, open
-   the source URL, and briefly inspect the rendered page before capture.
-3. Decide from the page as a whole whether it is the requested interface or an
+2. Reuse a Chromium browser already listening on port 9222. Otherwise locate
+   and start an installed Chrome, Edge, or Chromium browser with remote
+   debugging and a persistent Recreate profile. Open the source URL.
+   Do not substitute HTTP fetches, raw HTML, or response text for browser
+   inspection.
+3. Briefly inspect the rendered page in that browser before capture.
+4. Decide from the page as a whole whether it is the requested interface or an
    access step in front of it. Do not decide from fixed words, selectors, URL
    patterns, or the mere presence of account controls.
    - If it is clearly the requested interface, continue.
    - If it clearly blocks the requested interface, ask the user to complete
      access in the open browser tab. Wait, then inspect the same tab again.
    - If the access page itself may be the requested interface, ask whether to
-     recreate that page or wait for the page behind it.
-4. Keep credentials and session data in the browser. Never ask the user to copy
+     recreate the visible page or wait for the page behind it. Ask this as one
+     short natural question without internal option names.
+5. Keep credentials and session data in the browser. Never ask the user to copy
    them into chat or the terminal.
-5. Capture the inspected tab by exact target ID:
+6. Capture the inspected tab by exact target ID:
    ${latestRecreateCommand} --reuse --target <target-id> --out recreate-output
-6. Read recreate-output/implementation.json first. Open detailed evidence only
+7. Read recreate-output/implementation.json first. Open detailed evidence only
    for the component or state currently being implemented.
-7. Rebuild the interface natively. Preserve captured content, layout, assets,
+8. Rebuild the interface natively. Preserve captured content, layout, assets,
    responsive behavior, motion, and interactions.
-8. Validate the result against recreate-output/acceptance-matrix.json before
+9. Validate the result against recreate-output/acceptance-matrix.json before
    declaring the work complete.
 `;
 }
