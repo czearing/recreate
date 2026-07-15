@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.2.0...recreate-cli-v0.3.0) (2026-07-15)
+
+
+### Features
+
+* install self-updating agent skills ([3d9e17b](https://github.com/czearing/recreate/commit/3d9e17b977ae336320d3f223c248f36ca3ea89d2))
+
+
+### Fixes
+
+* resolve release package version ([ec66819](https://github.com/czearing/recreate/commit/ec6681976b9b8c66a7dcf04bf91d3296f250b7c0))
+
 ## [0.2.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.1.0...recreate-cli-v0.2.0) (2026-07-15)
 
 
