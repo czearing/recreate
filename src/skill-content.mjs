@@ -22,9 +22,12 @@ export function currentSkillInstructions() {
   return `Current Recreate workflow:
 
 1. Get the source URL and the destination repository or output path.
-2. Reuse a Chromium browser already listening on port 9222. Otherwise locate
-   and start an installed Chrome, Edge, or Chromium browser with remote
-   debugging and a persistent Recreate profile. Open the source URL.
+2. Handle the browser setup yourself. Do not ask the user to start, configure,
+   or locate a browser.
+   - Probe http://127.0.0.1:9222/json/version.
+   - If unavailable, locate installed Chrome, Edge, or Chromium and launch it
+     with --remote-debugging-port=9222 and a persistent Recreate profile.
+   - Open the source URL in that browser through CDP and keep the target ID.
    Do not substitute HTTP fetches, raw HTML, or response text for browser
    inspection.
 3. Briefly inspect the rendered page in that browser before capture.
@@ -37,6 +40,7 @@ export function currentSkillInstructions() {
    - If the access page itself may be the requested interface, ask whether to
      recreate the visible page or wait for the page behind it. Ask this as one
      short natural question without internal option names.
+   This page-intent question is the only browser setup question permitted.
 5. Keep credentials and session data in the browser. Never ask the user to copy
    them into chat or the terminal.
 6. Capture the inspected tab by exact target ID:

@@ -38,6 +38,10 @@ test('builds a shared skill that resolves the latest npm release', () => {
   assert.match(instructions, /access page itself may be the requested interface/);
   assert.match(instructions, /--reuse --target <target-id>/);
   assert.match(instructions, /Chrome, Edge, or Chromium/);
+  assert.match(instructions, /Do not ask the user to start/);
+  assert.match(instructions, /Probe http:\/\/127\.0\.0\.1:9222\/json\/version/);
+  assert.match(instructions, /Open the source URL.*through CDP/);
+  assert.match(instructions, /only browser setup question permitted/);
   assert.match(instructions, /Do not substitute HTTP fetches/);
   assert.match(instructions, /without internal option names/);
   assert.doesNotMatch(instructions, /regex|text matching/i);

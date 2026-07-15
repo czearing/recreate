@@ -45,7 +45,8 @@ The installed skill is named `recreate`. Invoke it directly:
 The skill handles the workflow:
 
 1. Loads the current Recreate instructions from npm.
-2. Reuses or starts Chrome, Edge, or Chromium with remote debugging.
+2. Reuses or starts Chrome, Edge, or Chromium with remote debugging without
+   asking the user to configure it.
 3. Briefly inspects the rendered page before capture.
 4. Resolves access-page ambiguity with the user when necessary.
 5. Captures the exact inspected tab and session.
