@@ -77,7 +77,7 @@ test('emits readable compact component evidence instead of captured bundles', ()
   assert.equal(isUsefulAgentComponent(component), true);
   assert.equal(output.structure.nodes[1].label, 'Next up');
   assert.equal(output.viewports[0].controls[0].events[0], 'click');
-  assert.doesNotMatch(serialized, /site-spec-runtime|<script|base64/);
+  assert.doesNotMatch(serialized, /recreate-runtime|<script|base64/);
 });
 
 test('emits one component definition per repeated structural fingerprint', () => {

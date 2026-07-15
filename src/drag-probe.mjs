@@ -53,13 +53,13 @@ async function performDrag(cdp, sourceRect, targetRect, hold = false) {
 
 async function restoreFocus(cdp) {
   return evaluate(cdp, `(() => {
-    const previous = window.__siteSpecDragPreviousFocus;
+    const previous = window.__recreateDragPreviousFocus;
     if (previous && previous !== document.body) previous.focus();
     else document.activeElement?.blur?.();
-    delete window.__siteSpecDragPreviousFocus;
-    delete window.__siteSpecDragSource;
-    delete window.__siteSpecDragTarget;
-    delete window.__siteSpecDragIdentities;
+    delete window.__recreateDragPreviousFocus;
+    delete window.__recreateDragSource;
+    delete window.__recreateDragTarget;
+    delete window.__recreateDragIdentities;
     let focus = document.activeElement;
     while (focus?.shadowRoot?.activeElement) {
       focus = focus.shadowRoot.activeElement;

@@ -13,10 +13,10 @@ test('maps captured controls to destination primitive hints', () => {
     { tag: 'svg' },
     { tag: 'textarea' },
   ]), [
-    { primitive: 'Fluent Button', count: 1 },
-    { primitive: 'Fluent Menu', count: 1 },
-    { primitive: 'Fluent MenuItem', count: 1 },
-    { primitive: 'Bebop icon', count: 1 },
+    { primitive: 'Native design-system button', count: 1 },
+    { primitive: 'Native design-system menu', count: 1 },
+    { primitive: 'Native design-system menu item', count: 1 },
+    { primitive: 'Native design-system icon', count: 1 },
     { primitive: 'Native textarea', count: 1 },
   ]);
 });
@@ -24,9 +24,6 @@ test('maps captured controls to destination primitive hints', () => {
 test('requires native delivery and rejects reconstruction embedding', () => {
   const contract = destinationContract();
   assert.equal(contract.mode, 'native-required');
-  assert.deepEqual(contract.requiredPackages, [
-    '@1js/bebop-icons',
-    '@1js/fluentui-modern',
-  ]);
+  assert.deepEqual(contract.requiredPackages, []);
   assert.ok(contract.forbiddenDelivery.includes('iframe embedding'));
 });

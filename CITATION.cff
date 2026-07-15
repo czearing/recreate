@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: Recreate
+message: If Recreate supports your research, please cite this repository.
+type: software
+authors:
+  - family-names: Zearing
+    given-names: Caleb
+repository-code: https://github.com/czearing/recreate
+license: MIT
+version: 0.1.0

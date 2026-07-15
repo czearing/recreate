@@ -63,12 +63,12 @@ export async function captureWebglInteractionState({
     if (states.length >= maxStates) return;
     const descriptor = await evaluate(cdp, discoverWebglCanvasExpression);
     if (!descriptor) return;
-    await evaluate(cdp, `window.__siteSpecRafControl.pause()`);
+    await evaluate(cdp, `window.__recreateRafControl.pause()`);
     let pauseStatus;
     for (let attempt = 0; attempt < 20; attempt++) {
       pauseStatus = await evaluate(
         cdp,
-        `window.__siteSpecRafControl.status()`,
+        `window.__recreateRafControl.status()`,
       );
       if (pauseStatus.queued) break;
       await delay(20);

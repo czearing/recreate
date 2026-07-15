@@ -94,12 +94,12 @@ function localPathForState(state, sourceUrl) {
       }
     } catch {}
   }
-  return `/__site-spec/state/${String(state.index).padStart(3, '0')}`;
+  return `/__recreate/state/${String(state.index).padStart(3, '0')}`;
 }
 
 function outputPathForState(state, localPath) {
   if (localPath.includes('?')) {
-    return `__site-spec/query/${String(state.index).padStart(3, '0')}`;
+    return `__recreate/query/${String(state.index).padStart(3, '0')}`;
   }
   return localPath.replace(/^\/+|\/+$/g, '');
 }
@@ -246,8 +246,8 @@ function createRenderer(nodes, triggers, sourceUrl) {
     const trigger = triggerByPath.get(node.path);
     const extra = trigger
       ? {
-          'data-site-spec-target': trigger.target,
-          'data-site-spec-state': String(trigger.stateIndex),
+          'data-recreate-target': trigger.target,
+          'data-recreate-state': String(trigger.stateIndex),
         }
       : {};
     const style = styleToString(node.style);
@@ -301,15 +301,15 @@ function sanitizeCapturedHtml(
   }
 
   const additions = [
-    '<meta name="site-spec-static-state" content="true">',
+    '<meta name="recreate-static-state" content="true">',
     ...cssFiles.map(
       (file) =>
-        `<link rel="stylesheet" data-site-spec-href="/stylesheets/${escapeAttribute(file)}">`,
+        `<link rel="stylesheet" data-recreate-href="/stylesheets/${escapeAttribute(file)}">`,
     ),
     stateStylesheet
-      ? `<link rel="stylesheet" data-site-spec-href="${escapeAttribute(stateStylesheet)}">`
+      ? `<link rel="stylesheet" data-recreate-href="${escapeAttribute(stateStylesheet)}">`
       : '',
-    '<script>(()=>{const script=document.createElement("script");script.src=location.origin+"/site-spec-runtime.js";script.defer=true;document.head.appendChild(script)})()</script>',
+    '<script>(()=>{const script=document.createElement("script");script.src=location.origin+"/recreate-runtime.js";script.defer=true;document.head.appendChild(script)})()</script>',
   ].join('');
   output = output.replace(/<\/head>/i, `${additions}</head>`);
   return output;
@@ -318,8 +318,8 @@ function sanitizeCapturedHtml(
 function runtimeSource(manifest) {
   return `(() => {
   const manifest = ${JSON.stringify(manifest)};
-  for (const stylesheet of document.querySelectorAll('link[data-site-spec-href]')) {
-    stylesheet.href = location.origin + stylesheet.dataset.siteSpecHref;
+  for (const stylesheet of document.querySelectorAll('link[data-recreate-href]')) {
+    stylesheet.href = location.origin + stylesheet.dataset.recreateHref;
   }
   const elementForPath = path => {
     const selector = String(path || '').replace(/^doc\\(0\\)>/, '');
@@ -365,7 +365,7 @@ function runtimeSource(manifest) {
     );
   };
   const interactive = element => element?.closest?.(
-    'a[href],button,[role="button"],[role="link"],[data-site-spec-target],[tabindex]:not([tabindex="-1"])'
+    'a[href],button,[role="button"],[role="link"],[data-recreate-target],[tabindex]:not([tabindex="-1"])'
   );
   const interactiveElements = Array.from(document.querySelectorAll(
     'a[href],button,[role="button"],[role="link"],[tabindex]:not([tabindex="-1"])'
@@ -376,8 +376,8 @@ function runtimeSource(manifest) {
       ? []
       : interactiveElements.filter(element => matches(element, trigger));
     for (const element of exact ? [exact] : semantic) {
-      element.dataset.siteSpecTarget = trigger.target;
-      element.dataset.siteSpecState = String(trigger.stateIndex);
+      element.dataset.recreateTarget = trigger.target;
+      element.dataset.recreateState = String(trigger.stateIndex);
     }
   }
   const navigateTo = target => {
@@ -386,7 +386,7 @@ function runtimeSource(manifest) {
     location.assign(localUrl.href);
   };
   const navigate = element => {
-    const direct = element.getAttribute('data-site-spec-target');
+    const direct = element.getAttribute('data-recreate-target');
     const trigger = direct
       ? { target: direct }
       : manifest.triggers.find(candidate => matches(element, candidate));
@@ -461,7 +461,7 @@ http.createServer((request, response) => {
   });
   fs.createReadStream(file).pipe(response);
 }).listen(port, '127.0.0.1', () => {
-  console.log('Serving site-spec build at http://127.0.0.1:' + port + '/');
+  console.log('Serving recreate build at http://127.0.0.1:' + port + '/');
 });
 `;
 }
@@ -570,7 +570,7 @@ export function buildStatic({ specDir, buildDir }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   ${cssLinks}
-  <script src="/site-spec-runtime.js" defer></script>
+  <script src="/recreate-runtime.js" defer></script>
 </head>
 <body>
 ${body}
@@ -635,11 +635,11 @@ ${body}
     })),
   };
   fs.writeFileSync(
-    path.join(resolvedBuildDir, 'site-spec-manifest.json'),
+    path.join(resolvedBuildDir, 'recreate-manifest.json'),
     JSON.stringify(manifest, null, 2),
   );
   fs.writeFileSync(
-    path.join(resolvedBuildDir, 'site-spec-runtime.js'),
+    path.join(resolvedBuildDir, 'recreate-runtime.js'),
     runtimeSource(manifest),
   );
   fs.writeFileSync(

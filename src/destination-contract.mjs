@@ -1,13 +1,13 @@
 const CONTROL_HINTS = [
-  { match: (node) => node.tag === 'button', primitive: 'Fluent Button' },
-  { match: (node) => node.role === 'menu', primitive: 'Fluent Menu' },
-  { match: (node) => node.role === 'menuitem', primitive: 'Fluent MenuItem' },
-  { match: (node) => node.role === 'listbox', primitive: 'Fluent Combobox/Listbox' },
-  { match: (node) => node.role === 'dialog', primitive: 'Fluent Dialog' },
-  { match: (node) => node.role === 'switch', primitive: 'Fluent Switch' },
-  { match: (node) => node.role === 'tab', primitive: 'Fluent Tab' },
+  { match: (node) => node.tag === 'button', primitive: 'Native design-system button' },
+  { match: (node) => node.role === 'menu', primitive: 'Native design-system menu' },
+  { match: (node) => node.role === 'menuitem', primitive: 'Native design-system menu item' },
+  { match: (node) => node.role === 'listbox', primitive: 'Native design-system listbox' },
+  { match: (node) => node.role === 'dialog', primitive: 'Native design-system dialog' },
+  { match: (node) => node.role === 'switch', primitive: 'Native design-system switch' },
+  { match: (node) => node.role === 'tab', primitive: 'Native design-system tab' },
   { match: (node) => node.tag === 'textarea', primitive: 'Native textarea' },
-  { match: (node) => node.tag === 'svg', primitive: 'Bebop icon' },
+  { match: (node) => node.tag === 'svg', primitive: 'Native design-system icon' },
 ];
 
 export function buildPrimitiveInventory(nodes) {
@@ -27,13 +27,13 @@ export function buildPrimitiveInventory(nodes) {
 export function destinationContract() {
   return {
     mode: 'native-required',
-    requiredPackages: ['@1js/bebop-icons', '@1js/fluentui-modern'],
+    requiredPackages: [],
     forbiddenDelivery: [
       'iframe embedding',
       'redirect to generated reconstruction',
-      'site-spec-runtime.js in shipping source',
-      '__site-spec reconstruction routes in shipping source',
-      'site-spec-manifest.json or ORACLE_ONLY.txt in shipping source',
+      'recreate-runtime.js in shipping source',
+      '__recreate reconstruction routes in shipping source',
+      'recreate-manifest.json or ORACLE_ONLY.txt in shipping source',
       'captured application scripts',
     ],
     acceptance: [
@@ -45,8 +45,7 @@ export function destinationContract() {
     validator:
       'node src/validate-native-implementation.mjs --root <implementation-root> ' +
       '--paths <destination-source-roots> ' +
-      '--require @1js/bebop-icons,@1js/fluentui-modern ' +
-      '--matrix <site-spec-output/acceptance-matrix.json> ' +
+      '--matrix <recreate-output/acceptance-matrix.json> ' +
       '--report <structured-acceptance-report.json> ' +
       '--comparisons <native-comparisons.json>',
   };

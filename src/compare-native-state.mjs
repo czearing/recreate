@@ -89,7 +89,7 @@ function group(nodes) {
   }
   const groups = new Map();
   for (const node of nodes.filter(isComparable)) {
-    node.__siteSpecHasChildren = Boolean(childCounts.get(node.path));
+    node.__recreateHasChildren = Boolean(childCounts.get(node.path));
     for (const key of identities(node, { childCounts, nodesByPath })) {
       const values = groups.get(key) || [];
       values.push(node);
@@ -135,7 +135,7 @@ const canonicalPaint = (property, value, node) => {
 
 function comparePaint(reference, candidate) {
   const ownPaint = hasOwnPaint(reference);
-  if (reference.__siteSpecHasChildren && !ownPaint) return [];
+  if (reference.__recreateHasChildren && !ownPaint) return [];
   const properties = ownPaint ? CONTAINER_PAINT_PROPERTIES : TEXT_PAINT_PROPERTIES;
   return properties.flatMap((property) => {
     const expected = canonicalPaint(
@@ -220,7 +220,7 @@ export function compareNativeState(reference, candidate) {
       const candidateNode = candidateIndex === undefined ? undefined : actual[candidateIndex];
       const value = candidateNode ? delta(referenceNode, candidateNode) : undefined;
       const paintCompared = Boolean(candidateNode) &&
-        (!referenceNode.__siteSpecHasChildren || hasOwnPaint(referenceNode));
+        (!referenceNode.__recreateHasChildren || hasOwnPaint(referenceNode));
       const paintDiffs = candidateNode ? comparePaint(referenceNode, candidateNode) : [];
       rows.push({
         identity: key,

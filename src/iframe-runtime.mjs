@@ -31,9 +31,9 @@ export const discoverIframeExpression = `(() => {
   while (previousFocus?.shadowRoot?.activeElement) {
     previousFocus = previousFocus.shadowRoot.activeElement;
   }
-  window.__siteSpecFrame = frame;
-  window.__siteSpecFrameButton = button;
-  window.__siteSpecFramePreviousFocus = previousFocus;
+  window.__recreateFrame = frame;
+  window.__recreateFrameButton = button;
+  window.__recreateFramePreviousFocus = previousFocus;
   const buttonRect = button.getBoundingClientRect();
   return {
     frames,
@@ -54,7 +54,7 @@ export const discoverIframeExpression = `(() => {
 })()`;
 
 export const iframeStateExpression = `(() => {
-  const frame = window.__siteSpecFrame;
+  const frame = window.__recreateFrame;
   const documentRoot = frame?.contentDocument;
   if (!frame) return null;
   if (!documentRoot) {
@@ -143,10 +143,10 @@ export const iframeStateExpression = `(() => {
 })()`;
 
 export const cleanupIframeExpression = `(() => {
-  const previous = window.__siteSpecFramePreviousFocus;
+  const previous = window.__recreateFramePreviousFocus;
   if (previous && previous !== document.body) previous.focus();
   else document.activeElement?.blur?.();
-  delete window.__siteSpecFrame;
-  delete window.__siteSpecFrameButton;
-  delete window.__siteSpecFramePreviousFocus;
+  delete window.__recreateFrame;
+  delete window.__recreateFrameButton;
+  delete window.__recreateFramePreviousFocus;
 })()`;

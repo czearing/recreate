@@ -72,7 +72,7 @@ const decoded = {
 };
 
 test('writes semantic indexes and omits hidden pages by default', () => {
-  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-figma-'));
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-figma-'));
   const index = writeFigmaEvidence({
     outDir,
     source: { kind: 'figma-community', fileId: '123' },
@@ -134,7 +134,7 @@ test('writes semantic indexes and omits hidden pages by default', () => {
 });
 
 test('retains hidden backing pages in full profile', () => {
-  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-figma-full-'));
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-figma-full-'));
   const index = writeFigmaEvidence({
     outDir,
     source: { kind: 'figma-community', fileId: '123' },

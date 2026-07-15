@@ -1,5 +1,5 @@
 export const rafControlSource = `(() => {
-  if (window.__siteSpecRafControl) return;
+  if (window.__recreateRafControl) return;
   const nativeRaf = window.requestAnimationFrame.bind(window);
   const nativeNow = performance.now.bind(performance);
   let paused = false;
@@ -16,7 +16,7 @@ export const rafControlSource = `(() => {
       callback(timestamp);
     }
   });
-  window.__siteSpecRafControl = {
+  window.__recreateRafControl = {
     pause() {
       paused = true;
     },
@@ -51,8 +51,8 @@ export const discoverWebglCanvasExpression = `(() => {
       const b = right.getBoundingClientRect();
       return b.width * b.height - a.width * a.height;
     })[0];
-  if (!canvas || !window.__siteSpecRafControl) return null;
-  window.__siteSpecWebglCanvas = canvas;
+  if (!canvas || !window.__recreateRafControl) return null;
+  window.__recreateWebglCanvas = canvas;
   const rect = canvas.getBoundingClientRect();
   return {
     label: canvas.getAttribute('aria-label') || 'WebGL canvas',
@@ -60,12 +60,12 @@ export const discoverWebglCanvasExpression = `(() => {
   };
 })()`;
 
-export const cleanupWebglExpression = `window.__siteSpecRafControl?.resume();
-  delete window.__siteSpecWebglCanvas`;
+export const cleanupWebglExpression = `window.__recreateRafControl?.resume();
+  delete window.__recreateWebglCanvas`;
 
 export const webglStepSignatureExpression = (deltaMs) => `(() => {
-  const callbacks = window.__siteSpecRafControl.step(${Number(deltaMs)});
-  const canvas = window.__siteSpecWebglCanvas;
+  const callbacks = window.__recreateRafControl.step(${Number(deltaMs)});
+  const canvas = window.__recreateWebglCanvas;
   const gl = canvas?.getContext('webgl2') || canvas?.getContext('webgl');
   if (!gl) return null;
   gl.finish();

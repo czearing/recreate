@@ -69,7 +69,7 @@ export function splitCssByComponent(cssSources, definitions) {
   for (const candidate of candidates) {
     if (lastByRule.get(candidate.canonical) !== candidate) continue;
     keptRuleCount += 1;
-    const layer = `siteSpec${String(candidate.order).padStart(4, '0')}`;
+    const layer = `recreate${String(candidate.order).padStart(4, '0')}`;
     layers.push(layer);
     const sourceText = `@layer ${layer}{${candidate.canonical}}`;
     if (candidate.owners.size !== 1) {

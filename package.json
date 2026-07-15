@@ -1,11 +1,12 @@
 {
-  "name": "@czearing/recreate",
+  "name": "recreate-cli",
   "version": "0.1.0",
   "private": false,
   "description": "Capture live interfaces as structured evidence for native reconstruction and validation.",
   "type": "module",
   "bin": {
     "recreate": "src/extract.mjs",
+    "recreate-cli": "src/extract.mjs",
     "site-spec": "src/extract.mjs"
   },
   "files": [
@@ -17,12 +18,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/czearing/site-spec.git"
+    "url": "https://github.com/czearing/recreate.git"
+  },
+  "homepage": "https://github.com/czearing/recreate#readme",
+  "bugs": {
+    "url": "https://github.com/czearing/recreate/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": [
     "mcp",
     "copilot",
@@ -36,7 +42,7 @@
     "build:react": "node build-react.mjs",
     "build:static": "node build-static.mjs",
     "compare:native": "node src/compare-native-state.mjs",
-    "check": "node --check src/extract.mjs && node --check src/acceptance-matrix.mjs && node --check src/agent-components.mjs && node --check src/agent-readiness.mjs && node --check src/agent-style.mjs && node --check src/compare-native-state.mjs && node --check src/generation-readiness.mjs && node --check src/geometry-normalization.mjs && node --check src/capture-compaction.mjs && node --check src/destination-contract.mjs && node --check src/drag-probe.mjs && node --check src/drag-runtime.mjs && node --check src/evidence-filter.mjs && node --check src/figma-assets.mjs && node --check src/figma-capture.mjs && node --check src/figma-components.mjs && node --check src/figma-evidence.mjs && node --check src/figma-interactions.mjs && node --check src/figma-kiwi.mjs && node --check src/figma-node.mjs && node --check src/figma-resource.mjs && node --check src/figma-sections.mjs && node --check src/figma-styles.mjs && node --check src/figma-url.mjs && node --check src/figma-values.mjs && node --check src/figma-vector-network.mjs && node --check src/figma-vectors.mjs && node --check src/hover-probe.mjs && node --check src/hover-runtime.mjs && node --check src/hover-style-runtime.mjs && node --check src/iframe-probe.mjs && node --check src/iframe-runtime.mjs && node --check src/interaction-targeting.mjs && node --check src/lifecycle-recorder.js && node --check src/page-global-evidence.mjs && node --check src/react-source/color-evidence.mjs && node --check src/react-source/css-format.mjs && node --check src/react-source/css-split.mjs && node --check src/react-source/html-to-jsx.mjs && node --check src/react-source/jsx-format.mjs && node --check src/react-source/project.mjs && node --check src/react-source/repeated-components.mjs && node --check src/release-version.mjs && node --check src/shell-detection.mjs && node --check src/validate-native-implementation.mjs && node --check src/virtual-list-probe.mjs && node --check src/webgl-probe.mjs && node --check src/webgl-runtime.mjs && node --check build-react.mjs && node --check build-static.mjs",
+    "check": "node --check src/extract.mjs && node --check src/acceptance-matrix.mjs && node --check src/agent-components.mjs && node --check src/agent-readiness.mjs && node --check src/agent-style.mjs && node --check src/cli-arguments.mjs && node --check src/compare-native-state.mjs && node --check src/generation-readiness.mjs && node --check src/geometry-normalization.mjs && node --check src/capture-compaction.mjs && node --check src/destination-contract.mjs && node --check src/drag-probe.mjs && node --check src/drag-runtime.mjs && node --check src/evidence-filter.mjs && node --check src/figma-assets.mjs && node --check src/figma-capture.mjs && node --check src/figma-components.mjs && node --check src/figma-evidence.mjs && node --check src/figma-interactions.mjs && node --check src/figma-kiwi.mjs && node --check src/figma-node.mjs && node --check src/figma-resource.mjs && node --check src/figma-sections.mjs && node --check src/figma-styles.mjs && node --check src/figma-url.mjs && node --check src/figma-values.mjs && node --check src/figma-vector-network.mjs && node --check src/figma-vectors.mjs && node --check src/hover-probe.mjs && node --check src/hover-runtime.mjs && node --check src/hover-style-runtime.mjs && node --check src/iframe-probe.mjs && node --check src/iframe-runtime.mjs && node --check src/interaction-targeting.mjs && node --check src/lifecycle-recorder.js && node --check src/page-global-evidence.mjs && node --check src/react-source/color-evidence.mjs && node --check src/react-source/css-format.mjs && node --check src/react-source/css-split.mjs && node --check src/react-source/html-to-jsx.mjs && node --check src/react-source/jsx-format.mjs && node --check src/react-source/project.mjs && node --check src/react-source/repeated-components.mjs && node --check src/release-version.mjs && node --check src/shell-detection.mjs && node --check src/validate-native-implementation.mjs && node --check src/virtual-list-probe.mjs && node --check src/webgl-probe.mjs && node --check src/webgl-runtime.mjs && node --check build-react.mjs && node --check build-static.mjs",
     "ci": "npm run check && npm test",
     "pack:check": "npm pack --dry-run",
     "prepublishOnly": "npm run ci",

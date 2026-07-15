@@ -81,10 +81,13 @@ for (const dependency of required) {
 }
 const forbidden = [
   { pattern: /<iframe\b/i, label: 'iframe embedding' },
-  { pattern: /site-spec-runtime\.js/i, label: 'site-spec runtime shipping' },
-  { pattern: /site-spec-manifest\.json/i, label: 'reconstruction manifest shipping' },
+  { pattern: /recreate-runtime\.js/i, label: 'recreate runtime shipping' },
+  { pattern: /site-spec-runtime\.js/i, label: 'legacy recreate runtime shipping' },
+  { pattern: /recreate-manifest\.json/i, label: 'reconstruction manifest shipping' },
+  { pattern: /site-spec-manifest\.json/i, label: 'legacy reconstruction manifest shipping' },
   { pattern: /ORACLE_ONLY\.txt/i, label: 'oracle output shipping' },
-  { pattern: /__site-spec[\\/]/i, label: 'reconstruction route shipping' },
+  { pattern: /__recreate[\\/]/i, label: 'reconstruction route shipping' },
+  { pattern: /__site-spec[\\/]/i, label: 'legacy reconstruction route shipping' },
   { pattern: /dangerouslySetInnerHTML/i, label: 'captured HTML embedding' },
 ];
 for (const { pattern, label } of forbidden) {

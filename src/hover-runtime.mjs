@@ -55,15 +55,15 @@ export const discoverHoverExpression = (match) => `(() => {
     }
     current = scrollParent;
   }
-  window.__siteSpecHoverWindowScroll = { x: scrollX, y: scrollY };
-  window.__siteSpecHoverScrollPositions = scrollPositions;
+  window.__recreateHoverWindowScroll = { x: scrollX, y: scrollY };
+  window.__recreateHoverScrollPositions = scrollPositions;
   root.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
   let previousFocus = document.activeElement;
   while (previousFocus?.shadowRoot?.activeElement) {
     previousFocus = previousFocus.shadowRoot.activeElement;
   }
-  window.__siteSpecHoverRoot = root;
-  window.__siteSpecHoverPreviousFocus = previousFocus;
+  window.__recreateHoverRoot = root;
+  window.__recreateHoverPreviousFocus = previousFocus;
   const rect = root.getBoundingClientRect();
   return {
     label: (
@@ -79,7 +79,7 @@ export const discoverHoverExpression = (match) => `(() => {
 })()`;
 
 export const hoverStateExpression = `(() => {
-  const root = window.__siteSpecHoverRoot;
+  const root = window.__recreateHoverRoot;
   if (!root) return null;
   const rect = root.getBoundingClientRect();
   const style = getComputedStyle(root);
@@ -95,7 +95,7 @@ export const hoverStateExpression = `(() => {
     scroll: {
       x: scrollX,
       y: scrollY,
-      containers: (window.__siteSpecHoverScrollPositions || []).map(position => ({
+      containers: (window.__recreateHoverScrollPositions || []).map(position => ({
         left: position.element.scrollLeft,
         top: position.element.scrollTop
       }))
@@ -105,10 +105,10 @@ export const hoverStateExpression = `(() => {
 })()`;
 
 export const prepareHoverExpression = `(() => {
-  const root = window.__siteSpecHoverRoot;
+  const root = window.__recreateHoverRoot;
   const animations = root.getAnimations({ subtree: true });
-  window.__siteSpecHoverBaselineAnimations = new Set(animations);
-  window.__siteSpecHoverPausedAnimations = animations
+  window.__recreateHoverBaselineAnimations = new Set(animations);
+  window.__recreateHoverPausedAnimations = animations
     .filter(animation =>
       !Number.isFinite(animation.effect?.getComputedTiming?.().endTime)
     )
@@ -125,8 +125,8 @@ export const prepareHoverExpression = `(() => {
 })()`;
 
 export const hoverAnimationExpression = `(() => {
-  const root = window.__siteSpecHoverRoot;
-  const baseline = window.__siteSpecHoverBaselineAnimations || new Set();
+  const root = window.__recreateHoverRoot;
+  const baseline = window.__recreateHoverBaselineAnimations || new Set();
   const relevant = root.getAnimations({ subtree: true })
     .filter(animation => !baseline.has(animation));
   const definitions = relevant.map(animation => ({
@@ -143,8 +143,8 @@ export const hoverAnimationExpression = `(() => {
 })()`;
 
 export const finishHoverLeaveExpression = `(() => {
-  const root = window.__siteSpecHoverRoot;
-  const baseline = window.__siteSpecHoverBaselineAnimations || new Set();
+  const root = window.__recreateHoverRoot;
+  const baseline = window.__recreateHoverBaselineAnimations || new Set();
   root.getAnimations({ subtree: true })
     .filter(animation => !baseline.has(animation))
     .forEach(animation => {
@@ -154,22 +154,22 @@ export const finishHoverLeaveExpression = `(() => {
 })()`;
 
 export const cleanupHoverExpression = `(() => {
-  const previous = window.__siteSpecHoverPreviousFocus;
+  const previous = window.__recreateHoverPreviousFocus;
   if (previous && previous !== document.body) previous.focus();
-  for (const state of window.__siteSpecHoverPausedAnimations || []) {
+  for (const state of window.__recreateHoverPausedAnimations || []) {
     state.animation.currentTime = state.currentTime;
     state.animation.playbackRate = state.playbackRate;
     if (state.playState === 'running') state.animation.play();
     else state.animation.pause();
   }
-  for (const position of window.__siteSpecHoverScrollPositions || []) {
+  for (const position of window.__recreateHoverScrollPositions || []) {
     position.element.scrollLeft = position.left;
     position.element.scrollTop = position.top;
   }
-  const windowScroll = window.__siteSpecHoverWindowScroll;
+  const windowScroll = window.__recreateHoverWindowScroll;
   if (windowScroll) window.scrollTo(windowScroll.x, windowScroll.y);
   const scrollRestored =
-    (window.__siteSpecHoverScrollPositions || []).every(position =>
+    (window.__recreateHoverScrollPositions || []).every(position =>
       position.element.scrollLeft === position.left &&
       position.element.scrollTop === position.top
     ) &&
@@ -177,11 +177,11 @@ export const cleanupHoverExpression = `(() => {
       scrollX === windowScroll.x &&
       scrollY === windowScroll.y
     ));
-  delete window.__siteSpecHoverRoot;
-  delete window.__siteSpecHoverPreviousFocus;
-  delete window.__siteSpecHoverScrollPositions;
-  delete window.__siteSpecHoverWindowScroll;
-  delete window.__siteSpecHoverBaselineAnimations;
-  delete window.__siteSpecHoverPausedAnimations;
+  delete window.__recreateHoverRoot;
+  delete window.__recreateHoverPreviousFocus;
+  delete window.__recreateHoverScrollPositions;
+  delete window.__recreateHoverWindowScroll;
+  delete window.__recreateHoverBaselineAnimations;
+  delete window.__recreateHoverPausedAnimations;
   return { scrollRestored };
 })()`;
