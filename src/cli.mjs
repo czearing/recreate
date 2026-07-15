@@ -18,11 +18,5 @@ Usage:
   recreate skill
   recreate --version`);
 } else {
-  try {
-    await import('./extract.mjs');
-  } catch (error) {
-    if (error?.code !== 'RECREATE_ACCESS_REQUIRED') throw error;
-    console.error(error.message);
-    process.exitCode = 2;
-  }
+  await import('./extract.mjs');
 }

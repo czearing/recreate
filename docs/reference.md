@@ -62,27 +62,6 @@ npx --yes --prefer-online recreate-cli@latest skill
 check the registry instead of trusting a cached package version. New releases
 are used on the next invocation. No reinstall is required.
 
-### Access-required pages
-
-Recreate detects access requirements from browser and network evidence. It does
-not match page text such as "login" or "sign in."
-
-When access is required, Recreate:
-
-1. Leaves the exact browser tab open.
-2. Writes `recreate-output/access-required.json`.
-3. Prints `RECREATE_ACCESS_REQUIRED` and an exact resume command.
-
-The skill asks for one action:
-
-```text
-Access is required in the browser Recreate opened. Complete it there. Recreate
-will continue automatically.
-```
-
-Credentials and session data stay in the browser. Recreate watches the same tab
-and continues as soon as access is ready.
-
 ### Verify the installation
 
 For GitHub Copilot CLI:
@@ -111,9 +90,6 @@ Start Edge with remote debugging enabled:
 ```powershell
 msedge.exe --remote-debugging-port=9222 --user-data-dir="$env:TEMP\recreate-edge"
 ```
-
-Use `--cdp-url http://localhost:<port>` when the browser uses another debugging
-port.
 
 Capture a public site:
 
