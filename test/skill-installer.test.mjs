@@ -32,7 +32,12 @@ test('builds a shared skill that resolves the latest npm release', () => {
     content,
     /npx --yes --prefer-online recreate-cli@latest skill/,
   );
-  assert.match(currentSkillInstructions(), /acceptance-matrix\.json/);
+  const instructions = currentSkillInstructions();
+  assert.match(instructions, /acceptance-matrix\.json/);
+  assert.match(instructions, /page as a whole/);
+  assert.match(instructions, /access page itself may be the requested interface/);
+  assert.match(instructions, /--reuse --target <target-id>/);
+  assert.doesNotMatch(instructions, /regex|text matching/i);
 });
 
 test('detects existing Copilot and Claude personal homes', () =>

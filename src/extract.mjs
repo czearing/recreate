@@ -42,7 +42,6 @@ import {
   interactionStateSettleDelay,
   selectInteractionIdentityRuntimeSource,
 } from './interaction-targeting.mjs';
-import { authenticationShellRuntimeSource } from './shell-detection.mjs';
 import {
   buildPrimitiveInventory,
   destinationContract,
@@ -99,7 +98,6 @@ if (!Array.isArray(interactionTargets)) {
   throw new Error('Interaction manifest must be a JSON array of { path, label } targets.');
 }
 const hasInteractionMatch = Boolean(interactionMatch || interactionTargets.length);
-const rejectAuthShell = Boolean(args['reject-auth-shell']);
 const isOverlayTreeRuntimeSource = `(element => {
   if (element.getAttribute('role') !== 'tree') return true;
   for (
@@ -1544,7 +1542,6 @@ async function waitForApplicationReady() {
                 )
               );
             })(),
-            hasAuthenticationShell: ${authenticationShellRuntimeSource},
             hasBlockingVisual: Array.from(new Set([
               ...Array.from(document.body?.children || []),
               ...document.querySelectorAll([
@@ -1606,10 +1603,7 @@ async function waitForApplicationReady() {
         })
       ).result.value;
 
-      if (
-        state.hasFatalError ||
-        (rejectAuthShell && state.hasAuthenticationShell)
-      ) {
+      if (state.hasFatalError) {
         return {
           ready: true,
           waitMs: Date.now() - startedAt,
@@ -2856,13 +2850,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   }).catch(() => ({ result: { value: '' } }))).result.value;
   if (baseUrl && currentUrl !== baseUrl) {
     await cdp.send('Page.navigate', { url: baseUrl });
-    const initialReadiness = await waitForApplicationReady();
-    if (
-      rejectAuthShell &&
-      initialReadiness.state?.hasAuthenticationShell
-    ) {
-      await rejectAuthenticationShell(url || page.url);
-    }
+    await waitForApplicationReady();
   }
   const crawlViewport = viewports[0];
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -4431,12 +4419,6 @@ async function extractViewport(viewport, captureIndex) {
   console.error('phase: wait ready');
   const readiness = await waitForApplicationReady();
   console.error('phase: ready done', JSON.stringify(readiness));
-  if (
-    rejectAuthShell &&
-    readiness.state?.hasAuthenticationShell
-  ) {
-    await rejectAuthenticationShell(url || page.url);
-  }
   let initialDocument = {
     url: latestDocumentResponse?.response?.url,
     status: latestDocumentResponse?.response?.status,
@@ -5250,24 +5232,6 @@ async function inlineSnapshotImages(snapshots) {
 }
 
 const captures = [];
-
-async function rejectAuthenticationShell(location) {
-  try {
-    await cdp.close();
-  } catch {}
-  try {
-    if (created && targetId) {
-      await browser?.send('Target.closeTarget', { targetId });
-    }
-  } catch {}
-  try {
-    await browser?.close();
-  } catch {}
-  throw new Error(
-    `Rejected authentication shell at ${location}. ` +
-    'Use an authenticated tab or omit --reject-auth-shell to capture it.',
-  );
-}
 
 if (created) {
   if (figmaSource) {
@@ -6155,14 +6119,6 @@ for (const [captureIndex, capture] of captures.entries()) {
   }
   if (capture.readiness?.state?.hasFatalError) {
     validationErrors.push(`capture ${captureIndex}: captured a fatal error shell`);
-  }
-  if (
-    rejectAuthShell &&
-    capture.readiness?.state?.hasAuthenticationShell
-  ) {
-    validationErrors.push(
-      `capture ${captureIndex}: captured an authentication shell`,
-    );
   }
   if (
     fullProfile &&

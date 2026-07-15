@@ -38,6 +38,10 @@ Run it from Copilot or Claude:
 
 Each run checks npm for the latest stable release. No reinstall is required.
 
+If the link opens an access page, the skill inspects it before capture. It asks
+whether that page is the intended interface or whether access should be
+completed in the open browser tab, then continues with the same session.
+
 Run Recreate directly at any time:
 
 ```bash
