@@ -9,6 +9,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
+  actions: write
   contents: write
   packages: write
   pull-requests: write
@@ -22,6 +23,14 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+      - if: ${{ steps.release.outputs.pr != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_PR: ${{ steps.release.outputs.pr }}
+        run: |
+          branch="$(printf '%s' "$RELEASE_PR" | jq -r '.headBranchName // empty')"
+          test -n "$branch"
+          gh workflow run ci.yml --ref "$branch"
       - if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
         with:
