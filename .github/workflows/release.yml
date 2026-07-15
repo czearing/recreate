@@ -30,7 +30,7 @@ jobs:
         run: |
           branch="$(printf '%s' "$RELEASE_PR" | jq -r '.headBranchName // empty')"
           test -n "$branch"
-          gh workflow run ci.yml --ref "$branch"
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$branch"
       - if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
         with:
