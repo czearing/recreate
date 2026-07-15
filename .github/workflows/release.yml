@@ -67,7 +67,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.release.outputs.tag_name }}
         run: |
-          version="${RELEASE_TAG#v}"
+          version="${RELEASE_TAG##*-v}"
           mkdir -p release-assets
           tarball_url=""
           for _ in {1..10}; do
