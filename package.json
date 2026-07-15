@@ -1,6 +1,6 @@
 {
   "name": "@czearing/recreate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "description": "Capture live interfaces as structured evidence for native reconstruction and validation.",
   "type": "module",
