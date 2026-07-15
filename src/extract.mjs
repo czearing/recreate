@@ -59,6 +59,14 @@ const args = Object.fromEntries(
   }),
 );
 
+if (args.version) {
+  const packageJson = JSON.parse(
+    fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+  );
+  console.log(packageJson.version);
+  process.exit(0);
+}
+
 const sourceUrl = String(args.url || '');
 const figmaSource = parseFigmaSource(sourceUrl);
 if (figmaSource?.kind === 'figma-unknown') {
