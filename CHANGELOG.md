@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.0...recreate-cli-v0.4.1) (2026-07-15)
+
+
+### Fixes
+
+* pin skill commands to public npm ([98445d9](https://github.com/czearing/recreate/commit/98445d9a24360e70c080a87f3cba3b4ec84e3ac1))
+
 ## [0.4.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.3.1...recreate-cli-v0.4.0) (2026-07-15)
 
 ### Fixes
