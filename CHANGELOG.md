@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.3...recreate-cli-v0.5.0) (2026-07-15)
+
+
+### Features
+
+* update skills through GitHub releases ([b3f5c67](https://github.com/czearing/recreate/commit/b3f5c677aef667d55db0c9c20ecec4a3f916656c))
+
 ## [0.4.3](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.2...recreate-cli-v0.4.3) (2026-07-15)
 
 
