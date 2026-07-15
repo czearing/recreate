@@ -19,10 +19,20 @@ Recreate captures a live interface and turns it into a complete, portable refere
 ## Get started
 
 ```bash
-npx recreate-cli https://example.com
+npx --yes recreate-cli@latest install
 ```
 
-Recreate saves the result to `recreate-output/`.
+Recreate detects GitHub Copilot CLI and Claude Code, then installs a personal
+`/recreate` skill for every client it finds.
+
+The skill checks npm for the newest Recreate release every time it runs. Your
+coworkers install it once and receive future updates automatically.
+
+Run Recreate directly at any time:
+
+```bash
+npx --yes --prefer-online recreate-cli@latest https://example.com
+```
 
 ## One capture. The whole interface.
 

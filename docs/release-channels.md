@@ -19,10 +19,13 @@ Automated CLI launches should select a release channel:
 npx --yes recreate-cli@beta https://example.com
 ```
 
-The package tag is resolved when a new MCP process starts. An active process
-keeps its current version until the next agent session, preventing mid-capture
-changes. Channel-based launches require registry access; use an installed exact
-version when a machine must work offline.
+The installed Recreate skill runs `recreate-cli@latest` with npm's
+`--prefer-online` option. npm checks the registry for a new stable release every
+time the skill starts. An active capture keeps its current version until it
+finishes, preventing mid-capture changes.
+
+Channel-based launches require registry access. Use an installed exact version
+when a machine must work offline.
 
 Use `@latest` for stable updates or an exact version to pin:
 

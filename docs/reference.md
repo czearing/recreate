@@ -6,17 +6,23 @@ The extractor records the exact initial document response, loaded DOM, authored 
 
 ## Install
 
-Install the current release:
+Install the personal Recreate skill for detected GitHub Copilot CLI and Claude
+Code clients:
 
 ```text
-npm install --global recreate-cli
+npx --yes recreate-cli@latest install
 ```
 
-Or run it without installing:
+Install for an explicit client when auto-detection is not available:
 
-```powershell
-npx --yes recreate-cli https://example.com
+```text
+npx --yes recreate-cli@latest install --copilot
+npx --yes recreate-cli@latest install --claude
+npx --yes recreate-cli@latest install --all
 ```
+
+The installed skill resolves `recreate-cli@latest` with npm online checks on
+every use, so the skill does not need to be reinstalled after a release.
 
 See [release channels and recovery](release-channels.md).
 
@@ -31,7 +37,7 @@ msedge.exe --remote-debugging-port=9222 --user-data-dir="$env:TEMP\recreate-edge
 Capture a public site:
 
 ```powershell
-recreate https://example.com
+npx --yes --prefer-online recreate-cli@latest https://example.com
 ```
 
 The installed package exposes both `recreate` and the temporary `site-spec`

@@ -13,7 +13,7 @@ test('prints the installed package version', () => {
   ).version;
   const version = execFileSync(
     process.execPath,
-    [path.join(root, 'src', 'extract.mjs'), '--version'],
+    [path.join(root, 'src', 'cli.mjs'), '--version'],
     { encoding: 'utf8' },
   ).trim();
 
