@@ -29,7 +29,7 @@ export const discoverDragExpression = `(() => {
   const identities = new Map(
     siblings.map((element, index) => [
       element,
-      element.id ? '#' + element.id : 'site-spec-drag-' + index
+      element.id ? '#' + element.id : 'recreate-drag-' + index
     ])
   );
   const identityFor = element => identities.get(element);
@@ -37,10 +37,10 @@ export const discoverDragExpression = `(() => {
   while (previousFocus?.shadowRoot?.activeElement) {
     previousFocus = previousFocus.shadowRoot.activeElement;
   }
-  window.__siteSpecDragPreviousFocus = previousFocus;
-  window.__siteSpecDragSource = source;
-  window.__siteSpecDragTarget = target;
-  window.__siteSpecDragIdentities = identities;
+  window.__recreateDragPreviousFocus = previousFocus;
+  window.__recreateDragSource = source;
+  window.__recreateDragTarget = target;
+  window.__recreateDragIdentities = identities;
   return {
     sourceId: identityFor(source),
     targetId: identityFor(target),
@@ -51,10 +51,10 @@ export const discoverDragExpression = `(() => {
 })()`;
 
 export const dragStateExpression = `(() => {
-  const source = window.__siteSpecDragSource;
+  const source = window.__recreateDragSource;
   if (!source) return null;
   const identityFor = element =>
-    window.__siteSpecDragIdentities?.get(element);
+    window.__recreateDragIdentities?.get(element);
   const items = Array.from(source.parentElement.children).filter(element =>
     element.matches('[data-draggable="true"],[draggable="true"]')
   );
@@ -70,6 +70,6 @@ export const dragStateExpression = `(() => {
 })()`;
 
 export const restoreDragRectsExpression = `(() => ({
-  sourceRect: window.__siteSpecDragSource?.getBoundingClientRect().toJSON(),
-  targetRect: window.__siteSpecDragTarget?.getBoundingClientRect().toJSON()
+  sourceRect: window.__recreateDragSource?.getBoundingClientRect().toJSON(),
+  targetRect: window.__recreateDragTarget?.getBoundingClientRect().toJSON()
 }))()`;

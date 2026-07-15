@@ -1,0 +1,17 @@
+name: Feature
+description: Propose a reusable capture or validation capability.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Use case
+      description: What interface or evidence class is unsupported?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance
+      description: What measurable result would prove support?
+    validations:
+      required: true

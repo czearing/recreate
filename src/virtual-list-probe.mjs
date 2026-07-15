@@ -42,8 +42,8 @@ const discoveryExpression = `(() => {
         while (previousFocus?.shadowRoot?.activeElement) {
           previousFocus = previousFocus.shadowRoot.activeElement;
         }
-        window.__siteSpecVirtualList = listbox;
-        window.__siteSpecVirtualPreviousFocus = previousFocus;
+        window.__recreateVirtualList = listbox;
+        window.__recreateVirtualPreviousFocus = previousFocus;
         return {
           label: listbox.getAttribute('aria-label') || 'Virtual listbox',
           tag: listbox.tagName.toLowerCase(),
@@ -69,7 +69,7 @@ const discoveryExpression = `(() => {
 })()`;
 
 const stateExpression = `(() => {
-  const listbox = window.__siteSpecVirtualList;
+  const listbox = window.__recreateVirtualList;
   if (!listbox) return null;
   return {
     activeDescendant: listbox.getAttribute('aria-activedescendant'),
@@ -100,14 +100,14 @@ async function restoreVirtualList(cdp) {
   await dispatchKey(cdp, 'Home', 'Home', 36);
   await delay(50);
   await evaluate(cdp, `(() => {
-    const listbox = window.__siteSpecVirtualList;
-    const previous = window.__siteSpecVirtualPreviousFocus;
+    const listbox = window.__recreateVirtualList;
+    const previous = window.__recreateVirtualPreviousFocus;
     if (previous && previous !== document.body) previous.focus();
     else listbox?.blur();
   })()`);
   const restored = await evaluate(cdp, stateExpression);
-  await evaluate(cdp, `delete window.__siteSpecVirtualList;
-    delete window.__siteSpecVirtualPreviousFocus`);
+  await evaluate(cdp, `delete window.__recreateVirtualList;
+    delete window.__recreateVirtualPreviousFocus`);
   return restored;
 }
 
@@ -121,7 +121,7 @@ export async function captureVirtualListState({
   if (states.length >= maxStates) return;
   const before = await evaluate(cdp, discoveryExpression);
   if (!before) return;
-  await evaluate(cdp, `window.__siteSpecVirtualList.focus()`);
+  await evaluate(cdp, `window.__recreateVirtualList.focus()`);
   await dispatchKey(cdp, 'ArrowDown', 'ArrowDown', 40);
   await dispatchKey(cdp, 'End', 'End', 35);
   await delay(50);

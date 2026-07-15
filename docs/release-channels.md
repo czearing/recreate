@@ -4,7 +4,7 @@
 
 | Channel | npm tag | Purpose |
 | --- | --- | --- |
-| Internal beta | `beta` | Every successful push to `main` |
+| Beta | `beta` | Every successful push to `main` |
 | Stable | `latest` | Versioned GitHub releases |
 | Pinned | Exact SemVer | Reproducible projects and rollback |
 
@@ -13,10 +13,10 @@ version. Published package versions are immutable.
 
 ## Automatic updates
 
-Claude and Copilot registrations should launch Recreate through a channel:
+Automated CLI launches should select a release channel:
 
 ```text
-npx --yes @czearing/recreate@beta
+npx --yes recreate-cli@beta https://example.com
 ```
 
 The package tag is resolved when a new MCP process starts. An active process
@@ -27,8 +27,8 @@ version when a machine must work offline.
 Use `@latest` for stable updates or an exact version to pin:
 
 ```text
-@czearing/recreate@latest
-@czearing/recreate@0.1.0
+recreate-cli@latest
+recreate-cli@0.1.0
 ```
 
 ## Release flow
@@ -41,21 +41,17 @@ Use `@latest` for stable updates or an exact version to pin:
 
 ## Recovery
 
-GitHub Packages never replaces an existing version. To recover from a bad
+npm never replaces an existing version. To recover from a bad
 release, move the channel tag back to a known version or pin the MCP
 registration to that version. Do not delete the broken version because it is
 part of the release audit trail.
 
 ```powershell
-npm dist-tag add @czearing/recreate@0.1.0-beta.42.1.sha-abcdef0 beta `
-  --registry=https://npm.pkg.github.com
+npm dist-tag add recreate-cli@0.1.0-beta.42.1.sha-abcdef0 beta
 ```
 
 Automatic updates must remain optional. Set a fixed package version in the MCP
 configuration when a project requires a frozen toolchain.
 
-## Authentication
-
-Private GitHub Packages require a classic personal access token with
-`read:packages`. Store it only in the user's npm configuration or credential
-manager. Never place a package token in a repository MCP configuration.
+Public installs require no package login. Releases use npm Trusted Publishing
+and provenance from GitHub Actions.

@@ -6,7 +6,7 @@ import test from 'node:test';
 import { writeFigmaSection } from '../src/figma-sections.mjs';
 
 test('preserves parent nodes when large sections split recursively', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-sections-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-sections-'));
   const root = { id: 'root', name: 'Library', type: 'FRAME' };
   const left = { id: 'left', name: 'Left', type: 'FRAME' };
   const right = { id: 'right', name: 'Right', type: 'FRAME' };

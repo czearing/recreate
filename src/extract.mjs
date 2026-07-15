@@ -50,6 +50,7 @@ import {
 import { captureVirtualListState } from './virtual-list-probe.mjs';
 import { captureWebglInteractionState } from './webgl-probe.mjs';
 import { rafControlSource } from './webgl-runtime.mjs';
+import { getPositionalUrl } from './cli-arguments.mjs';
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((arg, index, all) => {
@@ -67,7 +68,8 @@ if (args.version) {
   process.exit(0);
 }
 
-const sourceUrl = String(args.url || '');
+const positionalUrl = getPositionalUrl(process.argv.slice(2));
+const sourceUrl = String(args.url || positionalUrl);
 const figmaSource = parseFigmaSource(sourceUrl);
 if (figmaSource?.kind === 'figma-unknown') {
   throw new Error(
@@ -77,7 +79,7 @@ if (figmaSource?.kind === 'figma-unknown') {
 const url = figmaSource?.captureUrl || sourceUrl;
 const match = String(args.match || sourceUrl);
 const requestedTargetId = String(args.target || '');
-const outDir = path.resolve(String(args.out || 'site-spec'));
+const outDir = path.resolve(String(args.out || 'recreate-output'));
 const reuse = Boolean(args.reuse);
 const crawl = Boolean(args.crawl);
 const captureEditorProbes = Boolean(args['editor-probes']);
@@ -2308,7 +2310,7 @@ async function captureEditorStates(maxStates) {
     multiPageStates.push(state);
   };
 
-  const text = 'site-spec editor probe';
+  const text = 'recreate editor probe';
   if (await resetEditor()) {
     await cdp.send('Input.insertText', { text });
     await capture('editor-input', text, {
@@ -2532,8 +2534,8 @@ async function captureTooltipStates(maxStates) {
           if (tooltip?.getAttribute('role') !== 'tooltip') continue;
           const rect = trigger.getBoundingClientRect();
           if (rect.width <= 4 || rect.height <= 4) continue;
-          window.__siteSpecTooltipTrigger = trigger;
-          window.__siteSpecTooltip = tooltip;
+          window.__recreateTooltipTrigger = trigger;
+          window.__recreateTooltip = tooltip;
           const timing = {};
           const onEnter = () => {
             timing.startedAt = performance.now();
@@ -2587,8 +2589,8 @@ async function captureTooltipStates(maxStates) {
           tooltip.addEventListener('transitionstart', onTransitionStart);
           tooltip.addEventListener('transitionend', onTransitionEnd);
           observer.observe(tooltip, { attributes: true });
-          window.__siteSpecTooltipTiming = timing;
-          window.__siteSpecTooltipCleanup = () => {
+          window.__recreateTooltipTiming = timing;
+          window.__recreateTooltipCleanup = () => {
             observer.disconnect();
             trigger.removeEventListener('pointerenter', onEnter, { capture: true });
             trigger.removeEventListener('pointerleave', onLeave, { capture: true });
@@ -2619,7 +2621,7 @@ async function captureTooltipStates(maxStates) {
     (
       await cdp.send('Runtime.evaluate', {
         expression: `(() => {
-          const element = window.__siteSpecTooltip;
+          const element = window.__recreateTooltip;
           if (!element) return null;
           const rect = element.getBoundingClientRect();
           const style = getComputedStyle(element);
@@ -2631,8 +2633,8 @@ async function captureTooltipStates(maxStates) {
             width: rect.width,
             height: rect.height,
             now: performance.now(),
-            startedAt: window.__siteSpecTooltipTiming?.startedAt,
-            timing: window.__siteSpecTooltipTiming
+            startedAt: window.__recreateTooltipTiming?.startedAt,
+            timing: window.__recreateTooltipTiming
           };
         })()`,
         returnByValue: true,
@@ -2689,11 +2691,11 @@ async function captureTooltipStates(maxStates) {
       y: 0,
     });
     await cdp.send('Runtime.evaluate', {
-      expression: `window.__siteSpecTooltipCleanup?.();
-        delete window.__siteSpecTooltipTrigger;
-        delete window.__siteSpecTooltip;
-        delete window.__siteSpecTooltipTiming;
-        delete window.__siteSpecTooltipCleanup`,
+      expression: `window.__recreateTooltipCleanup?.();
+        delete window.__recreateTooltipTrigger;
+        delete window.__recreateTooltip;
+        delete window.__recreateTooltipTiming;
+        delete window.__recreateTooltipCleanup`,
     });
     return;
   }
@@ -2752,11 +2754,11 @@ async function captureTooltipStates(maxStates) {
   }
   state.dismissal ||= { action: 'pointerleave', closed: false };
   await cdp.send('Runtime.evaluate', {
-    expression: `window.__siteSpecTooltipCleanup?.();
-      delete window.__siteSpecTooltipTrigger;
-      delete window.__siteSpecTooltip;
-      delete window.__siteSpecTooltipTiming;
-      delete window.__siteSpecTooltipCleanup`,
+    expression: `window.__recreateTooltipCleanup?.();
+      delete window.__recreateTooltipTrigger;
+      delete window.__recreateTooltip;
+      delete window.__recreateTooltipTiming;
+      delete window.__recreateTooltipCleanup`,
   });
 }
 
@@ -2767,9 +2769,9 @@ async function navigateAndCaptureAllPages(targetUrl) {
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(function(){
       const orig = history.pushState.bind(history);
-      history.pushState = function(){ orig.apply(this, arguments); window.__siteSpecUrlChanged = location.href; };
+      history.pushState = function(){ orig.apply(this, arguments); window.__recreateUrlChanged = location.href; };
       const origR = history.replaceState.bind(history);
-      history.replaceState = function(){ origR.apply(this, arguments); window.__siteSpecUrlChanged = location.href; };
+      history.replaceState = function(){ origR.apply(this, arguments); window.__recreateUrlChanged = location.href; };
     })();`
   });
 
@@ -2876,13 +2878,13 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
   // Inject pushState intercept on the live page so clicks are trackable
   await cdp.send('Runtime.evaluate', {
     expression: `(function(){
-      if (window.__siteSpecCrawlReady) return;
-      window.__siteSpecCrawlReady = true;
-      window.__siteSpecLastPush = location.href;
+      if (window.__recreateCrawlReady) return;
+      window.__recreateCrawlReady = true;
+      window.__recreateLastPush = location.href;
       const orig = history.pushState.bind(history);
-      history.pushState = function(s,t,u){ orig(s,t,u); window.__siteSpecLastPush = location.href; };
+      history.pushState = function(s,t,u){ orig(s,t,u); window.__recreateLastPush = location.href; };
       const origR = history.replaceState.bind(history);
-      history.replaceState = function(s,t,u){ origR(s,t,u); window.__siteSpecLastPush = location.href; };
+      history.replaceState = function(s,t,u){ origR(s,t,u); window.__recreateLastPush = location.href; };
     })()`,
     returnByValue: true,
   }).catch(() => {});
@@ -3200,7 +3202,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
             )}
           );
           if (!element) return false;
-          const value = 'site-spec probe';
+          const value = 'recreate probe';
           const prototype = element instanceof HTMLTextAreaElement
             ? HTMLTextAreaElement.prototype
             : HTMLInputElement.prototype;
@@ -3421,7 +3423,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
       };
       state.probe = {
         sequence: [
-          { action: 'enter', value: 'site-spec probe', submit: true },
+          { action: 'enter', value: 'recreate probe', submit: true },
           {
             action: action.action,
             testId: action.testId || undefined,
@@ -3505,7 +3507,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
           };
           nestedState.probe = {
             sequence: [
-              { action: 'enter', value: 'site-spec probe', submit: true },
+              { action: 'enter', value: 'recreate probe', submit: true },
               { action: 'click', testId: action.testId },
               {
                 action: 'click',
@@ -3686,7 +3688,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
 
     // Reset intercept and click the element
     await cdp.send('Runtime.evaluate', {
-      expression: `window.__siteSpecLastPush = location.href`,
+      expression: `window.__recreateLastPush = location.href`,
       returnByValue: true,
     }).catch(() => {});
 
@@ -3730,7 +3732,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         if (!el) return 'not-found:' + expectedLabel.slice(0, 20);
         el.scrollIntoView({ block: 'center', behavior: 'instant' });
         if (${JSON.stringify(candidateUsesTextEntry(candidate))}) {
-          const value = 'site-spec probe';
+          const value = 'recreate probe';
           const prototype = el instanceof HTMLTextAreaElement
             ? HTMLTextAreaElement.prototype
             : HTMLInputElement.prototype;
@@ -4066,7 +4068,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.trigger = candidate.text || candidate.placeholder;
         state.triggerElement = triggerElementFor(candidate);
         state.probe = clickedVal.startsWith('entered')
-          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          ? { action: 'enter', value: 'recreate probe', submit: true }
           : { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
@@ -4129,7 +4131,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.trigger = candidate.text || candidate.placeholder;
         state.triggerElement = triggerElementFor(candidate);
         state.probe = clickedVal.startsWith('entered')
-          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          ? { action: 'enter', value: 'recreate probe', submit: true }
           : { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
@@ -4160,7 +4162,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
         state.trigger = label;
         state.triggerElement = triggerElementFor(candidate);
         state.probe = clickedVal.startsWith('entered')
-          ? { action: 'enter', value: 'site-spec probe', submit: true }
+          ? { action: 'enter', value: 'recreate probe', submit: true }
           : { action: 'click' };
         state.network = networkEvidenceSince(networkStartIndex);
         multiPageStates.push(state);
@@ -4218,7 +4220,7 @@ async function crawlRoutes(baseUrl, maxRoutes = 30) {
     state.trigger = candidate.text || candidate.placeholder;
     state.triggerElement = triggerElementFor(candidate);
     state.probe = clickedVal.startsWith('entered')
-      ? { action: 'enter', value: 'site-spec probe', submit: true }
+      ? { action: 'enter', value: 'recreate probe', submit: true }
       : { action: 'click' };
     state.network = networkEvidenceSince(networkStartIndex);
     multiPageStates.push(state);
@@ -6750,7 +6752,7 @@ const implementationBlueprint = {
     forbiddenAsDeliverable: [
       'captured HTML',
       'generated static reconstruction',
-      'site-spec-runtime.js',
+      'recreate-runtime.js',
       'redirects or links to reconstruction routes',
     ],
   },

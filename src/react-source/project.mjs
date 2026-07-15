@@ -113,7 +113,7 @@ createRoot(document.getElementById('root')!).render(
 </html>
 `);
   write(path.join(outDir, 'package.json'), `${JSON.stringify({
-    name: 'site-spec-react-output',
+    name: 'recreate-react-output',
     private: true,
     version: '0.0.0',
     type: 'module',

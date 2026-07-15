@@ -11,7 +11,7 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
+  id-token: write
 
 jobs:
   publish:
@@ -22,13 +22,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: "@czearing"
+          registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run ci
       - id: version
         run: npm run version:beta
-      - run: npm publish --tag beta
+      - run: npm install --global npm@latest
+      - run: npm publish --tag beta --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo "Published @czearing/recreate@${{ steps.version.outputs.version }}"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "Published recreate-cli@${{ steps.version.outputs.version }}"

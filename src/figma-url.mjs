@@ -23,7 +23,7 @@ export function parseFigmaSource(rawUrl) {
       publicUrl: publicUrl.href,
       captureUrl:
         `https://embed.figma.com/file/${fileId}/hf_embed` +
-        '?community_viewer=true&embed_host=site-spec&kind=file&page-selector=0&viewer=1',
+        '?community_viewer=true&embed_host=recreate&kind=file&page-selector=0&viewer=1',
       canvasUrl: `https://embed.figma.com/community/file/${fileId}/canvas`,
       imageBatchUrl:
         `https://embed.figma.com/community/file/${fileId}/image/batch`,

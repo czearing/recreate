@@ -1,5 +1,5 @@
 export const hoverRuleExpression = `(() => {
-  const root = window.__siteSpecHoverRoot;
+  const root = window.__recreateHoverRoot;
   const rules = [];
   const visit = list => {
     for (const rule of list || []) {

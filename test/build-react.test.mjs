@@ -6,7 +6,7 @@ import test from 'node:test';
 import { buildReactProject } from '../src/react-source/project.mjs';
 
 test('emits readable React source without reconstruction runtime', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-react-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-react-'));
   const specDir = path.join(root, 'spec');
   const outDir = path.join(root, 'react');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
@@ -32,7 +32,7 @@ test('emits readable React source without reconstruction runtime', () => {
   assert.ok(result.maxComponentLines < 200);
   assert.match(source, /<h1 className="hero">/);
   assert.match(source, /disabled/);
-  assert.doesNotMatch(source, /dangerouslySetInnerHTML|site-spec-runtime|application\/json/);
+  assert.doesNotMatch(source, /dangerouslySetInnerHTML|recreate-runtime|application\/json/);
   assert.doesNotMatch(source, /<svg/);
   const assetFiles = fs.readdirSync(path.join(outDir, 'public', 'assets'));
   assert.equal(assetFiles.length, 1);
@@ -53,7 +53,7 @@ test('emits readable React source without reconstruction runtime', () => {
 });
 
 test('deduplicates repeated structures into one typed component', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-react-repeat-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-react-repeat-'));
   const specDir = path.join(root, 'spec');
   const outDir = path.join(root, 'react');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });

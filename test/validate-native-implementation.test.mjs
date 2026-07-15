@@ -134,7 +134,7 @@ test('native source cannot pass without structured fidelity evidence', () => {
 
   fs.appendFileSync(
     path.join(root, 'src', 'app.tsx'),
-    "\nexport const route = '/__site-spec/state/000';",
+    "\nexport const route = '/__recreate/state/000';",
   );
   const reconstruction = invoke(evidence);
   assert.equal(reconstruction.status, 1);

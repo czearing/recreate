@@ -57,7 +57,7 @@ test('extracts and deduplicates Figma image hashes', () => {
 });
 
 test('persists explicit asset errors without discarding graph evidence', async () => {
-  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-assets-'));
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-assets-'));
   fs.mkdirSync(path.join(outDir, 'evidence', 'figma'), { recursive: true });
   const result = await localizeFigmaImages({
     cdp: {

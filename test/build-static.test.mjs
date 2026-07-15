@@ -23,7 +23,7 @@ function node(pathname, parentPath, tag, attrs = {}, text = '') {
 }
 
 test('builds local state routes and wires distinct interactive controls', () => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-build-'));
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-build-'));
   const specDir = path.join(temp, 'spec');
   const buildDir = path.join(temp, 'build');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
@@ -125,16 +125,16 @@ test('builds local state routes and wires distinct interactive controls', () => 
   const home = fs.readFileSync(path.join(buildDir, 'index.html'), 'utf8');
   assert.match(
     home,
-    /data-site-spec-target="\/app\/notebook\/my-notebook"/,
+    /data-recreate-target="\/app\/notebook\/my-notebook"/,
   );
   assert.match(
     home,
-    /data-site-spec-target="\/__site-spec\/state\/001"/,
+    /data-recreate-target="\/__recreate\/state\/001"/,
   );
-  assert.match(home, /data-site-spec-target="\/chat\/session-123"/);
+  assert.match(home, /data-recreate-target="\/chat\/session-123"/);
   assert.match(
     home,
-    /data-site-spec-target="\/app\/notebook\/my-notebook\?view=compact"/,
+    /data-recreate-target="\/app\/notebook\/my-notebook\?view=compact"/,
   );
 
   const route = fs.readFileSync(
@@ -144,13 +144,13 @@ test('builds local state routes and wires distinct interactive controls', () => 
   assert.doesNotMatch(route, /<script src="app\.js"/);
   assert.doesNotMatch(route, /crossorigin/i);
   assert.doesNotMatch(route, /href="\.\/app\.css"/);
-  assert.match(route, /data-site-spec-href="\/stylesheets\/0000\.css"/);
-  assert.match(route, /data-site-spec-href="\/state-styles\/000\.css"/);
+  assert.match(route, /data-recreate-href="\/stylesheets\/0000\.css"/);
+  assert.match(route, /data-recreate-href="\/state-styles\/000\.css"/);
   assert.match(route, /<base href="https:\/\/example\.test\/app\/">/);
-  assert.match(route, /script\.src=location\.origin\+"\/site-spec-runtime\.js"/);
+  assert.match(route, /script\.src=location\.origin\+"\/recreate-runtime\.js"/);
 
   const manifest = JSON.parse(
-    fs.readFileSync(path.join(buildDir, 'site-spec-manifest.json'), 'utf8'),
+    fs.readFileSync(path.join(buildDir, 'recreate-manifest.json'), 'utf8'),
   );
   assert.equal(manifest.oracleOnly, true);
   assert.match(
@@ -163,7 +163,7 @@ test('builds local state routes and wires distinct interactive controls', () => 
   assert.equal(routeTrigger.testId, 'notebook-card');
   assert.equal(routeTrigger.tag, 'div');
   assert.equal(
-    fs.existsSync(path.join(buildDir, '__site-spec', 'state', '001', 'index.html')),
+    fs.existsSync(path.join(buildDir, '__recreate', 'state', '001', 'index.html')),
     true,
   );
   assert.equal(
@@ -172,12 +172,12 @@ test('builds local state routes and wires distinct interactive controls', () => 
   );
   assert.match(route, /state-0/);
   const queryRoute = fs.readFileSync(
-    path.join(buildDir, '__site-spec', 'query', '003', 'index.html'),
+    path.join(buildDir, '__recreate', 'query', '003', 'index.html'),
     'utf8',
   );
   assert.match(queryRoute, /state-3/);
   const runtime = fs.readFileSync(
-    path.join(buildDir, 'site-spec-runtime.js'),
+    path.join(buildDir, 'recreate-runtime.js'),
     'utf8',
   );
   assert.match(runtime, /new URL\(target, location\.origin\)/);
@@ -189,12 +189,12 @@ test('builds local state routes and wires distinct interactive controls', () => 
   const server = fs.readFileSync(path.join(buildDir, 'server.mjs'), 'utf8');
   assert.match(
     server,
-    /"\/app\/notebook\/my-notebook\?view=compact":"\/__site-spec\/query\/003"/,
+    /"\/app\/notebook\/my-notebook\?view=compact":"\/__recreate\/query\/003"/,
   );
 });
 
 test('emits viewport-specific layout overrides from state evidence', () => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-responsive-'));
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-responsive-'));
   const specDir = path.join(temp, 'spec');
   const buildDir = path.join(temp, 'build');
   fs.mkdirSync(path.join(specDir, 'evidence'), { recursive: true });
@@ -250,7 +250,7 @@ test('emits viewport-specific layout overrides from state evidence', () => {
 
   buildStatic({ specDir, buildDir });
   const manifest = JSON.parse(
-    fs.readFileSync(path.join(buildDir, 'site-spec-manifest.json'), 'utf8'),
+    fs.readFileSync(path.join(buildDir, 'recreate-manifest.json'), 'utf8'),
   );
   assert.deepEqual(manifest.responsiveByPath['/'], [{
     maxWidth: 390,
@@ -260,14 +260,14 @@ test('emits viewport-specific layout overrides from state evidence', () => {
     }],
   }]);
   const runtime = fs.readFileSync(
-    path.join(buildDir, 'site-spec-runtime.js'),
+    path.join(buildDir, 'recreate-runtime.js'),
     'utf8',
   );
   assert.match(runtime, /style\.setProperty\(property, value, 'important'\)/);
 });
 
 test('uses the settled captured home document when available', () => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'site-spec-home-'));
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'recreate-home-'));
   const specDir = path.join(temp, 'spec');
   const buildDir = path.join(temp, 'build');
   fs.mkdirSync(path.join(specDir, 'pages'), { recursive: true });
@@ -310,7 +310,7 @@ test('uses the settled captured home document when available', () => {
 
   const home = fs.readFileSync(path.join(buildDir, 'index.html'), 'utf8');
   assert.match(home, /data-captured-home/);
-  assert.match(home, /data-site-spec-href="\/state-styles\/home\.css"/);
+  assert.match(home, /data-recreate-href="\/state-styles\/home\.css"/);
   assert.doesNotMatch(home, /loading-fallback/);
   assert.doesNotMatch(home, /<script src="app\.js"/);
   assert.doesNotMatch(home, /blob:https:/);

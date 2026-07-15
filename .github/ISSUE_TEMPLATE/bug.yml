@@ -1,0 +1,27 @@
+name: Bug
+description: Report incorrect capture, generation, or validation behavior.
+title: "fix: "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What happened, and what should have happened?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Minimal URL, command, and flags. Remove private data.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version
+      placeholder: recreate --version
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Evidence
+      description: Sanitized logs, readiness failures, or structured comparison.
