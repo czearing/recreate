@@ -62,3 +62,20 @@ jobs:
         run: npm publish --tag latest --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - if: ${{ steps.release.outputs.release_created }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          mkdir -p release-assets
+          tarball_url=""
+          for _ in {1..10}; do
+            tarball_url="$(npm view "recreate-cli@$version" dist.tarball --registry=https://registry.npmjs.org 2>/dev/null || true)"
+            [ -n "$tarball_url" ] && break
+            sleep 3
+          done
+          test -n "$tarball_url"
+          curl --fail --location --retry 3 "$tarball_url" \
+            --output "release-assets/recreate-cli-$version.tgz"
+          gh release upload "$RELEASE_TAG" "release-assets/recreate-cli-$version.tgz" --clobber

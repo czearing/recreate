@@ -39,6 +39,8 @@ recreate-cli@0.1.0
 4. Merging that PR creates a GitHub release and publishes the exact version
    with the `latest` tag.
 
+Each stable GitHub release includes the exact tarball published to npm.
+
 ## Recovery
 
 npm never replaces an existing version. To recover from a bad
