@@ -10,15 +10,15 @@ Install the personal Recreate skill for detected GitHub Copilot CLI and Claude
 Code clients:
 
 ```text
-npx --yes recreate-cli@latest install
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install
 ```
 
 Install for an explicit client when auto-detection is not available:
 
 ```text
-npx --yes recreate-cli@latest install --copilot
-npx --yes recreate-cli@latest install --claude
-npx --yes recreate-cli@latest install --all
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --copilot
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --claude
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install --all
 ```
 
 The installed skill resolves `recreate-cli@latest` with npm online checks on
@@ -70,7 +70,7 @@ data remain in the browser.
 The installed `SKILL.md` is a small launcher. Every invocation runs:
 
 ```text
-npx --yes --prefer-online recreate-cli@latest skill
+npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest skill
 ```
 
 `@latest` selects the current stable release. `--prefer-online` forces npm to
@@ -109,7 +109,7 @@ msedge.exe --remote-debugging-port=9222 --user-data-dir="$env:TEMP\recreate-edge
 Capture a public site:
 
 ```powershell
-npx --yes --prefer-online recreate-cli@latest https://example.com
+npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest https://example.com
 ```
 
 The installed package exposes both `recreate` and the temporary `site-spec`

@@ -16,7 +16,7 @@ version. Published package versions are immutable.
 Automated CLI launches should select a release channel:
 
 ```text
-npx --yes recreate-cli@beta https://example.com
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@beta https://example.com
 ```
 
 The installed Recreate skill runs `recreate-cli@latest` with npm's

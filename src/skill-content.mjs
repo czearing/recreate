@@ -1,5 +1,5 @@
 export const latestRecreateCommand =
-  'npx --yes --prefer-online recreate-cli@latest';
+  'npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest';
 
 export function installedSkillContent() {
   return `---

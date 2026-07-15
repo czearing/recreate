@@ -19,7 +19,7 @@ Recreate captures a live interface and turns it into a complete, portable refere
 ## Get started
 
 ```bash
-npx --yes recreate-cli@latest install
+npx --yes --registry=https://registry.npmjs.org/ recreate-cli@latest install
 ```
 
 Recreate detects GitHub Copilot CLI and Claude Code, then installs a personal
@@ -45,7 +45,7 @@ completed in the open browser tab, then continues with the same session.
 Run Recreate directly at any time:
 
 ```bash
-npx --yes --prefer-online recreate-cli@latest https://example.com
+npx --yes --prefer-online --registry=https://registry.npmjs.org/ recreate-cli@latest https://example.com
 ```
 
 ## One capture. The whole interface.

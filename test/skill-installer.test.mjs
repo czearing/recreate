@@ -30,7 +30,7 @@ test('builds a shared skill that resolves the latest npm release', () => {
   assert.match(content, /^---\nname: recreate\n/);
   assert.match(
     content,
-    /npx --yes --prefer-online recreate-cli@latest skill/,
+    /--registry=https:\/\/registry\.npmjs\.org\/ recreate-cli@latest skill/,
   );
   const instructions = currentSkillInstructions();
   assert.match(instructions, /acceptance-matrix\.json/);
