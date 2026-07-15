@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.3.1...recreate-cli-v0.4.0) (2026-07-15)
+
+### Fixes
+
+* let the agent resolve access ambiguity ([f2fbbd2](https://github.com/czearing/recreate/commit/f2fbbd2833e1e2656496c1af56068ef0225afcb8))
+
 ## [0.3.1](https://github.com/czearing/recreate/compare/recreate-cli-v0.3.0...recreate-cli-v0.3.1) (2026-07-15)
 
 
