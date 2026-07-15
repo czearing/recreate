@@ -30,7 +30,18 @@ jobs:
         run: |
           branch="$(printf '%s' "$RELEASE_PR" | jq -r '.headBranchName // empty')"
           test -n "$branch"
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$branch" --jq '.object.sha')"
           gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$branch"
+          run_id=""
+          for _ in {1..15}; do
+            run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml \
+              --event workflow_dispatch --commit "$sha" --limit 1 \
+              --json databaseId --jq '.[0].databaseId // empty')"
+            [ -n "$run_id" ] && break
+            sleep 2
+          done
+          test -n "$run_id"
+          gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --exit-status
       - if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
         with:
