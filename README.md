@@ -44,8 +44,16 @@ every invocation.
 
 ## Capture
 
+Open authenticated or access-controlled sources in Recreate's visible browser:
+
 ```bash
-recreate capture https://example.com
+recreate open https://example.com
+```
+
+After access is complete, capture the returned target without reloading it:
+
+```bash
+recreate capture --reuse --target <target-id> --cdp-url <cdp-url>
 ```
 
 Recreate writes:

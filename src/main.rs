@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
         Command::Capture(args) => capture::run(args).await,
         Command::Generate(args) => generate::from_file(&args.spec, &args.out).await,
         Command::Install(args) => skill::install(args),
+        Command::Open(args) => browser::open(args).await,
         Command::Skill => {
             print!("{}", skill::workflow());
             Ok(())

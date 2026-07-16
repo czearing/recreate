@@ -13,8 +13,16 @@ pub enum Command {
     Capture(CaptureArgs),
     Generate(GenerateArgs),
     Install(InstallArgs),
+    Open(OpenArgs),
     Skill,
     Verify(VerifyArgs),
+}
+
+#[derive(Args, Clone)]
+pub struct OpenArgs {
+    pub url: String,
+    #[arg(long, default_value = "http://127.0.0.1:9223")]
+    pub cdp_url: String,
 }
 
 #[derive(Args, Clone)]
@@ -93,5 +101,15 @@ mod tests {
             args.viewports,
             "1920x1080,1440x900,768x1024,390x844,320x568"
         );
+    }
+
+    #[test]
+    fn opens_a_visible_authentication_target() {
+        let cli = Cli::try_parse_from(["recreate", "open", "https://example.com"]).unwrap();
+        let Command::Open(args) = cli.command else {
+            panic!("expected open");
+        };
+        assert_eq!(args.url, "https://example.com");
+        assert_eq!(args.cdp_url, "http://127.0.0.1:9223");
     }
 }

@@ -1,6 +1,9 @@
-use crate::{cdp::Cdp, cli::CaptureArgs};
+use crate::{
+    cdp::Cdp,
+    cli::{CaptureArgs, OpenArgs},
+};
 use anyhow::{Context, Result, bail};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
     path::{Path, PathBuf},
@@ -8,12 +11,29 @@ use std::{
     time::Duration,
 };
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Target {
     pub id: String,
     pub url: String,
     #[serde(rename = "webSocketDebuggerUrl")]
     pub websocket_url: String,
+}
+
+pub async fn open(args: OpenArgs) -> Result<()> {
+    ensure_endpoint(&args.cdp_url).await?;
+    let target = create(&args.cdp_url, &args.url).await?;
+    reqwest::get(format!("{}/json/activate/{}", args.cdp_url, target.id))
+        .await?
+        .error_for_status()?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "cdp_url": args.cdp_url,
+            "target": target.id,
+            "url": target.url
+        }))?
+    );
+    Ok(())
 }
 
 pub async fn target(args: &CaptureArgs) -> Result<(Target, Cdp)> {
@@ -83,7 +103,9 @@ fn launch(endpoint: &str) -> Result<()> {
         .and_then(|(_, value)| value.parse::<u16>().ok())
         .context("CDP endpoint must include a port")?;
     let executable = browser_executable().context("Chrome, Edge, or Chromium not found")?;
-    let profile = dirs_home()?.join(".recreate").join("browser-profile");
+    let profile = dirs_home()?
+        .join(".recreate")
+        .join(format!("browser-profile-{port}"));
     std::fs::create_dir_all(&profile)?;
     Command::new(executable)
         .args([

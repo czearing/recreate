@@ -1,5 +1,7 @@
 pub const SOURCE: &str = r#"
 (() => {
+  if (window.__recreateLifecycleInstalled) return;
+  window.__recreateLifecycleInstalled = true;
   window.__recreateLifecycleAnimations = [];
   window.__recreateLifecycleDone = false;
   window.__recreatePendingRequests = 0;
@@ -24,7 +26,7 @@ pub const SOURCE: &str = r#"
     }
     return originalSend.apply(this, args);
   };
-  addEventListener('DOMContentLoaded', () => {
+  const record = () => {
     const start = performance.now();
     const previous = new WeakMap();
     const tracks = new Map();
@@ -101,6 +103,11 @@ pub const SOURCE: &str = r#"
       }
     };
     requestAnimationFrame(sample);
-  }, { once: true });
+  };
+  if (document.readyState === 'loading') {
+    addEventListener('DOMContentLoaded', record, { once: true });
+  } else {
+    record();
+  }
 })()
 "#;

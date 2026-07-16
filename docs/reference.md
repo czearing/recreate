@@ -20,6 +20,7 @@ The capture includes:
 ```text
 recreate capture <url>
 recreate capture --reuse --target <target-id>
+recreate open <url>
 recreate generate --spec <spec.json> --out <directory>
 recreate verify --spec <spec.json> --url <generated-url>
 recreate verify --spec <spec.json> --url <generated-url> --interaction 1
@@ -37,12 +38,13 @@ Capture options:
 
 ## Browser access
 
-The skill opens the source in an installed Chromium browser and inspects the
-rendered page before capture.
+The skill uses `recreate open` to create the source in a dedicated visible
+Chromium profile and inspects the returned target before capture.
 
 If the visible page could be either the intended design or an access step, the
 skill asks one short question. Credentials and session state remain inside the
 browser. Capture reuses the exact CDP endpoint and target identifier.
+Reuse capture does not navigate or reload the authenticated target.
 
 ## Generated React
 

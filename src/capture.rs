@@ -21,10 +21,13 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         json!({ "source": lifecycle_script::SOURCE }),
     )
     .await?;
+    if args.reuse {
+        cdp.evaluate(lifecycle_script::SOURCE).await?;
+    }
     let requested_url = args.url.clone().unwrap_or_else(|| target.url.clone());
     let mut states = Vec::new();
     for (index, viewport) in viewports.into_iter().enumerate() {
-        let state = capture_state(&mut cdp, viewport.clone(), index == 0).await?;
+        let state = capture_state(&mut cdp, viewport.clone(), index == 0 && !args.reuse).await?;
         let screenshot = cdp
             .send("Page.captureScreenshot", json!({ "format": "png" }))
             .await?;

@@ -25,16 +25,20 @@ pub fn workflow() -> &'static str {
     r#"Current Recreate workflow:
 
 1. Get the source URL and destination repository.
-2. Handle browser setup. Reuse port 9222 or launch installed Chrome, Edge, or
-   Chromium with a persistent Recreate profile.
-3. Open and inspect the rendered page through CDP. Never substitute raw HTML.
+2. Open the source in a dedicated visible browser:
+   recreate open <url>
+   Keep the returned cdp_url and target id. Never use a headless test browser
+   for a user access or sign-in step.
+3. Inspect that exact rendered target through CDP. Never substitute raw HTML.
 4. Decide from the full rendered page whether it is the requested interface or
    an access step. If ambiguous, ask one short question: recreate the visible
-   page or wait for the page behind it.
-5. Judge access from rendered controls and content, never URL/title keywords or
-   site-specific login patterns. Keep credentials and session data in-browser.
-6. Capture the exact inspected target:
-   recreate capture --reuse --target <id> --cdp-url http://127.0.0.1:9222
+   page or wait for the page behind it. Judge from rendered controls and content,
+   never URL/title keywords or site-specific login patterns.
+5. If access is required, foreground the exact target and ask the user to
+   complete access there. Confirm the requested interface is visibly rendered
+   in the same target before capture. Keep credentials and session data in-browser.
+6. Capture the exact inspected target without navigation or reload:
+   recreate capture --reuse --target <id> --cdp-url <cdp_url>
 7. Build from react/src/App.jsx and validate acceptance.json.
 "#
 }
@@ -118,5 +122,8 @@ mod tests {
     fn workflow_uses_rendered_access_state_not_login_patterns() {
         assert!(workflow().contains("never URL/title keywords"));
         assert!(workflow().contains("rendered controls and content"));
+        assert!(workflow().contains("recreate open <url>"));
+        assert!(workflow().contains("without navigation or reload"));
+        assert!(workflow().contains("Never use a headless test browser"));
     }
 }
