@@ -23,9 +23,6 @@ jobs:
           - os: windows-latest
             source: target/release/recreate.exe
             asset: recreate-windows-x86_64.exe
-          - os: macos-13
-            source: target/release/recreate
-            asset: recreate-macos-x86_64
           - os: macos-14
             source: target/release/recreate
             asset: recreate-macos-aarch64

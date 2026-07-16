@@ -93,7 +93,6 @@ fn asset_name() -> &'static str {
     match (std::env::consts::OS, std::env::consts::ARCH) {
         ("windows", "x86_64") => "recreate-windows-x86_64.exe",
         ("linux", "x86_64") => "recreate-linux-x86_64",
-        ("macos", "x86_64") => "recreate-macos-x86_64",
         ("macos", "aarch64") => "recreate-macos-aarch64",
         _ => "recreate-unsupported",
     }
