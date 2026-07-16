@@ -1,7 +1,12 @@
 use anyhow::{Context, Result};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use std::{fs, path::PathBuf, process::Command};
+use std::{
+    fs,
+    path::PathBuf,
+    process::Command,
+    time::{Duration, SystemTime},
+};
 
 const RELEASE_API: &str =
     "https://api.github.com/repos/czearing/recreate/releases/tags/recreate-main";
@@ -22,16 +27,21 @@ pub async fn refresh() -> Result<bool> {
     if std::env::var_os("RECREATE_NO_UPDATE").is_some() || !installed_binary()? {
         return Ok(false);
     }
+    if recently_checked()? {
+        return Ok(false);
+    }
     let client = reqwest::Client::new();
-    let release: Release = client
+    let response = client
         .get(RELEASE_API)
         .header("Accept", "application/vnd.github+json")
         .header("User-Agent", "recreate")
         .send()
-        .await?
-        .error_for_status()?
-        .json()
         .await?;
+    mark_checked()?;
+    if !response.status().is_success() {
+        return Ok(false);
+    }
+    let release: Release = response.json().await?;
     let name = asset_name();
     let asset = release
         .assets
@@ -79,6 +89,33 @@ fn installed_binary() -> Result<bool> {
         .and_then(|parent| parent.parent())
         .and_then(|parent| parent.file_name())
         .is_some_and(|name| name == ".recreate"))
+}
+
+fn recently_checked() -> Result<bool> {
+    let path = check_path()?;
+    let Ok(metadata) = fs::metadata(path) else {
+        return Ok(false);
+    };
+    Ok(SystemTime::now()
+        .duration_since(metadata.modified()?)
+        .unwrap_or_default()
+        < Duration::from_secs(300))
+}
+
+fn mark_checked() -> Result<()> {
+    let path = check_path()?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, b"checked")?;
+    Ok(())
+}
+
+fn check_path() -> Result<PathBuf> {
+    Ok(std::env::current_exe()?
+        .parent()
+        .context("installed binary directory unavailable")?
+        .join(".update-check"))
 }
 
 fn temporary_path(current: &std::path::Path) -> PathBuf {

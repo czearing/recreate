@@ -91,7 +91,8 @@ pub async fn capture(
             if cdp.evaluate("location.href").await?.as_str() != Some(requested_url) {
                 continue;
             }
-            let state = capture::read_state(cdp, baseline.viewport.clone()).await?;
+            let mut state = capture::read_state(cdp, baseline.viewport.clone()).await?;
+            state.animations.clear();
             let fresh = &fresh_baselines[index];
             if state_hash(&state)? != state_hash(fresh)? {
                 states.push(state);
