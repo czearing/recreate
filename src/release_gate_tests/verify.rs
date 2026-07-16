@@ -117,13 +117,23 @@ async fn verify_interaction(
         json!({"features":[{"name":"prefers-reduced-motion","value":"reduce"}]}),
     )
     .await?;
+    settle(cdp).await?;
+    let media_reduced = cdp
+        .evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
+        .await?
+        == json!(true);
     dispatch_key(cdp, "Enter", 13).await?;
     settle(cdp).await?;
     let reduced = cdp
-        .evaluate("getComputedStyle(document.querySelector('[role=\"dialog\"]')).animationName")
+        .evaluate(
+            "(() => { const node=document.querySelector('[role=\"dialog\"]'); \
+             const style=getComputedStyle(node); return node.getAnimations({subtree:true}).length===0 \
+             && style.animationName==='none' \
+             && style.transitionDuration.split(',').every(value=>parseFloat(value)===0); })()",
+        )
         .await?
-        == json!("none");
-    Ok((keyboard, restored, reduced))
+        == json!(true);
+    Ok((keyboard, restored, media_reduced && reduced))
 }
 
 async fn dispatch_key(cdp: &mut crate::cdp::Cdp, key: &str, code: u32) -> Result<()> {

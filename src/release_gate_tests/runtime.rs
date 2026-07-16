@@ -41,24 +41,53 @@ impl Drop for Server {
 }
 
 pub fn build(root: &Path) -> Result<()> {
-    run_npm(
-        root,
-        &[
-            "install",
-            "--save-exact",
-            "--ignore-scripts",
-            "--no-audit",
-            "--no-fund",
-            "vite@8.1.2",
-            "react@19.2.0",
-            "react-dom@19.2.0",
-        ],
-    )?;
-    run_npm(root, &["run", "build"])?;
+    let runtime = runtime_root();
+    let vite = vite_executable(&runtime);
+    if !vite.exists() {
+        fs::create_dir_all(&runtime)?;
+        run_npm(
+            &runtime,
+            &[
+                "install",
+                "--save-exact",
+                "--ignore-scripts",
+                "--no-audit",
+                "--no-fund",
+                "vite@8.1.2",
+                "react@19.2.0",
+                "react-dom@19.2.0",
+            ],
+        )?;
+    }
+    link_dependencies(root, &runtime)?;
+    let status = Command::new(vite)
+        .arg("build")
+        .arg(root)
+        .current_dir(root)
+        .env("CI", "1")
+        .status()
+        .context("run shared Vite build")?;
+    if !status.success() {
+        bail!("shared Vite build failed with {status}");
+    }
     if !root.join("dist/index.html").exists() {
         bail!("generated Vite build did not create dist/index.html");
     }
     Ok(())
+}
+
+fn runtime_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("target")
+        .join("release-gate")
+        .join("runtime")
+}
+
+fn vite_executable(runtime: &Path) -> PathBuf {
+    runtime
+        .join("node_modules")
+        .join(".bin")
+        .join(if cfg!(windows) { "vite.cmd" } else { "vite" })
 }
 
 fn run_npm(root: &Path, args: &[&str]) -> Result<()> {
@@ -71,6 +100,26 @@ fn run_npm(root: &Path, args: &[&str]) -> Result<()> {
         .with_context(|| format!("run npm {}", args.join(" ")))?;
     if !status.success() {
         bail!("npm {} failed with {status}", args.join(" "));
+    }
+    Ok(())
+}
+
+#[cfg(unix)]
+fn link_dependencies(root: &Path, runtime: &Path) -> Result<()> {
+    std::os::unix::fs::symlink(runtime.join("node_modules"), root.join("node_modules"))?;
+    Ok(())
+}
+
+#[cfg(windows)]
+fn link_dependencies(root: &Path, runtime: &Path) -> Result<()> {
+    let status = Command::new("cmd")
+        .args(["/c", "mklink", "/J"])
+        .arg(root.join("node_modules"))
+        .arg(runtime.join("node_modules"))
+        .status()
+        .context("link shared Node dependencies")?;
+    if !status.success() {
+        bail!("link shared Node dependencies failed with {status}");
     }
     Ok(())
 }

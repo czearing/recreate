@@ -143,7 +143,7 @@ mod tests {
                 .unwrap();
         });
         let url = format!("ws://{address}");
-        let mut cdp = Cdp::connect_with_timeout(&url, std::time::Duration::from_millis(10))
+        let mut cdp = Cdp::connect_with_timeout(&url, std::time::Duration::from_millis(250))
             .await
             .unwrap();
         assert!(cdp.send("Page.reload", json!({})).await.is_err());
