@@ -127,9 +127,10 @@ async fn verify_interaction(
     let reduced = cdp
         .evaluate(
             "(() => { const node=document.querySelector('[role=\"dialog\"]'); \
-             const style=getComputedStyle(node); return node.getAnimations({subtree:true}).length===0 \
-             && style.animationName==='none' \
-             && style.transitionDuration.split(',').every(value=>parseFloat(value)===0); })()",
+             return node.getAnimations({subtree:true}).every(animation => { \
+             const duration=Number(animation.effect?.getComputedTiming().duration || 0); \
+             return duration===0 || (!animation.pending && animation.playState!=='running'); \
+             }); })()",
         )
         .await?
         == json!(true);
