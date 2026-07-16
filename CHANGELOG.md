@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/czearing/recreate/compare/recreate-cli-v0.5.0...recreate-cli-v0.5.1) (2026-07-16)
+
+
+### Fixes
+
+* clarify automatic release updates ([0b4bd5c](https://github.com/czearing/recreate/commit/0b4bd5c28aba1ed1430b8d71bc91e3377833ae96))
+
 ## [0.5.0](https://github.com/czearing/recreate/compare/recreate-cli-v0.4.3...recreate-cli-v0.5.0) (2026-07-15)
 
 
