@@ -62,7 +62,7 @@ pub fn build(root: &Path) -> Result<()> {
     link_dependencies(root, &runtime)?;
     let status = Command::new(vite)
         .arg("build")
-        .arg(root)
+        .arg(".")
         .current_dir(root)
         .env("CI", "1")
         .status()

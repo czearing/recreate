@@ -89,6 +89,7 @@ async fn verify_interaction(
         return Ok((true, true, true));
     };
     crate::browser::set_viewport(cdp, VIEWPORTS[0].0, VIEWPORTS[0].1).await?;
+    settle(cdp).await?;
     cdp.evaluate("document.querySelector('[data-recreate-control]').focus()")
         .await?;
     dispatch_key(cdp, "Enter", 13).await?;
