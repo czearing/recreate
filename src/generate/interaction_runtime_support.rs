@@ -1,5 +1,5 @@
 use crate::{
-    compare::same_rect,
+    compare_node::same_rect,
     model::{Node, PageState},
 };
 use anyhow::Result;

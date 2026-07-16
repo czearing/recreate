@@ -69,6 +69,12 @@ classes use non-overlapping viewport bands so adjacent layouts cannot collide.
 generated page through CDP and compares text, visible geometry, and key computed
 styles for every captured node and interaction state.
 
+Verification runs against the production build after React conversion,
+component deduplication, responsive compaction, and Vite minification. It
+requires identical expected and actual node-path sets, preserved structure,
+behavior-bearing attributes, pseudo content, text, geometry, and key styles.
+Missing or unexpected nodes fail verification.
+
 CI and publish validation run generic browser fixtures through a release gate.
 The retained platform evidence artifacts record built generated-project parity at
 1920x1080, 1440x900, 768x1024, 390x844, and 320x568; horizontal overflow;

@@ -1,22 +1,29 @@
 use crate::{
     browser, capture,
     cli::{CaptureArgs, VerifyArgs},
+    compare_node::compare,
     lifecycle_script,
-    model::{Node, PageState, Specification},
+    model::Specification,
 };
 use anyhow::{Context, Result};
 use serde::Serialize;
-use std::{collections::BTreeMap, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 #[derive(Serialize)]
-struct Report {
-    passed: bool,
-    matched: usize,
-    missing: usize,
-    text_mismatches: usize,
-    geometry_mismatches: usize,
-    style_mismatches: usize,
-    details: Vec<String>,
+pub(crate) struct Report {
+    pub(crate) passed: bool,
+    pub(crate) expected: usize,
+    pub(crate) actual: usize,
+    pub(crate) matched: usize,
+    pub(crate) missing: usize,
+    pub(crate) unexpected: usize,
+    pub(crate) structure_mismatches: usize,
+    pub(crate) attribute_mismatches: usize,
+    pub(crate) pseudo_mismatches: usize,
+    pub(crate) text_mismatches: usize,
+    pub(crate) geometry_mismatches: usize,
+    pub(crate) style_mismatches: usize,
+    pub(crate) details: Vec<String>,
 }
 
 pub async fn run(args: VerifyArgs) -> Result<()> {
@@ -32,8 +39,14 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
     };
     let mut totals = Report {
         passed: true,
+        expected: 0,
+        actual: 0,
         matched: 0,
         missing: 0,
+        unexpected: 0,
+        structure_mismatches: 0,
+        attribute_mismatches: 0,
+        pseudo_mismatches: 0,
         text_mismatches: 0,
         geometry_mismatches: 0,
         style_mismatches: 0,
@@ -67,6 +80,10 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         merge(&mut totals, compare(expected, &actual));
     }
     totals.passed = totals.missing == 0
+        && totals.unexpected == 0
+        && totals.structure_mismatches == 0
+        && totals.attribute_mismatches == 0
+        && totals.pseudo_mismatches == 0
         && totals.text_mismatches == 0
         && totals.geometry_mismatches == 0
         && totals.style_mismatches == 0;
@@ -86,78 +103,15 @@ async fn click(cdp: &mut crate::cdp::Cdp, path: &str) -> Result<()> {
     Ok(())
 }
 
-fn compare(expected: &PageState, actual: &PageState) -> Report {
-    let actual: BTreeMap<_, _> = actual.nodes.iter().map(|node| (&node.path, node)).collect();
-    let mut report = Report {
-        passed: true,
-        matched: 0,
-        missing: 0,
-        text_mismatches: 0,
-        geometry_mismatches: 0,
-        style_mismatches: 0,
-        details: Vec::new(),
-    };
-    for node in &expected.nodes {
-        let Some(candidate) = actual.get(&node.path) else {
-            report.missing += 1;
-            detail(&mut report, format!("missing {}", node.path));
-            continue;
-        };
-        report.matched += 1;
-        if node.text != candidate.text {
-            report.text_mismatches += 1;
-            detail(&mut report, format!("text {}", node.path));
-        }
-        if !same_rect(node, candidate) {
-            report.geometry_mismatches += 1;
-            detail(
-                &mut report,
-                format!(
-                    "rect {} expected={:?} actual={:?}",
-                    node.path, node.rect, candidate.rect
-                ),
-            );
-        }
-        if !same_style(node, candidate) {
-            report.style_mismatches += 1;
-            detail(&mut report, format!("style {}", node.path));
-        }
-    }
-    report
-}
-
-pub(crate) fn same_rect(left: &Node, right: &Node) -> bool {
-    if left.rect.width == 0.0 || left.rect.height == 0.0 {
-        return true;
-    }
-    [
-        (left.rect.x, right.rect.x),
-        (left.rect.y, right.rect.y),
-        (left.rect.width, right.rect.width),
-        (left.rect.height, right.rect.height),
-    ]
-    .into_iter()
-    .all(|(left, right)| (left - right).abs() <= 1.5)
-}
-
-fn same_style(left: &Node, right: &Node) -> bool {
-    [
-        "color",
-        "background-color",
-        "font-family",
-        "font-size",
-        "font-weight",
-        "border-radius",
-        "display",
-        "position",
-    ]
-    .into_iter()
-    .all(|key| left.style.get(key) == right.style.get(key))
-}
-
 fn merge(total: &mut Report, value: Report) {
+    total.expected += value.expected;
+    total.actual += value.actual;
     total.matched += value.matched;
     total.missing += value.missing;
+    total.unexpected += value.unexpected;
+    total.structure_mismatches += value.structure_mismatches;
+    total.attribute_mismatches += value.attribute_mismatches;
+    total.pseudo_mismatches += value.pseudo_mismatches;
     total.text_mismatches += value.text_mismatches;
     total.geometry_mismatches += value.geometry_mismatches;
     total.style_mismatches += value.style_mismatches;
@@ -166,7 +120,7 @@ fn merge(total: &mut Report, value: Report) {
     }
 }
 
-fn detail(report: &mut Report, value: String) {
+pub(crate) fn detail(report: &mut Report, value: String) {
     if report.details.len() < 30 {
         report.details.push(value);
     }

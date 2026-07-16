@@ -6,7 +6,7 @@ pub fn all_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String 
         .iter()
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
-        .map(|(key, value)| format!(" {}={}", jsx_attribute(key), quoted(rewrite(value, assets))))
+        .map(|(key, value)| render_attribute(key, rewrite(value, assets)))
         .collect()
 }
 
@@ -19,8 +19,43 @@ pub fn dynamic_attributes(node: &Node, assets: &BTreeMap<String, String>) -> Str
         .iter()
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
-        .map(|(key, value)| format!(" {}={}", jsx_attribute(key), quoted(rewrite(value, assets))))
+        .map(|(key, value)| render_attribute(key, rewrite(value, assets)))
         .collect()
+}
+
+fn render_attribute(key: &str, value: &str) -> String {
+    let value = if boolean_attribute(key) {
+        "{true}".into()
+    } else {
+        quoted(value)
+    };
+    format!(" {}={value}", jsx_attribute(key))
+}
+
+fn boolean_attribute(key: &str) -> bool {
+    matches!(
+        key,
+        "allowfullscreen"
+            | "autofocus"
+            | "autoplay"
+            | "checked"
+            | "controls"
+            | "default"
+            | "disabled"
+            | "formnovalidate"
+            | "hidden"
+            | "itemscope"
+            | "loop"
+            | "multiple"
+            | "muted"
+            | "novalidate"
+            | "open"
+            | "playsinline"
+            | "readonly"
+            | "required"
+            | "reversed"
+            | "selected"
+    )
 }
 
 pub fn quoted(value: &str) -> String {
@@ -110,5 +145,27 @@ mod tests {
         let output = dynamic_attributes(&node, &Default::default());
         assert!(output.contains("aria-expanded={\"true\"}"));
         assert!(output.contains("role={\"button\"}"));
+    }
+
+    #[test]
+    fn preserves_boolean_control_state() {
+        let mut node = crate::model::Node {
+            path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
+            parent: Some("html>body:nth-of-type(1)".into()),
+            tag: "button".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: crate::model::Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 10.0,
+                height: 10.0,
+            },
+            style: Default::default(),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("disabled".into(), String::new());
+        assert!(all_attributes(&node, &Default::default()).contains(" disabled={true}"));
     }
 }

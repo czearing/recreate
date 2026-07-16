@@ -1,7 +1,7 @@
 use crate::{
     browser, capture,
     cli::CaptureArgs,
-    compare::same_rect,
+    compare_node::same_rect,
     lifecycle_script,
     model::{PageState, Styles, Viewport},
 };

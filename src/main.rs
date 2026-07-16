@@ -4,6 +4,7 @@ mod capture;
 mod cdp;
 mod cli;
 mod compare;
+mod compare_node;
 #[cfg(test)]
 mod compare_tests;
 mod generate;

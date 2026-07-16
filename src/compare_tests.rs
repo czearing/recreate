@@ -1,6 +1,6 @@
 use crate::{
-    compare::same_rect,
-    model::{Attributes, Node, Rect, Styles},
+    compare_node::{compare, same_rect},
+    model::{Attributes, Node, PageState, Rect, Styles, Viewport},
 };
 
 fn node(path: &str, x: f64) -> Node {
@@ -35,4 +35,27 @@ fn ignores_zero_area_wrapper_geometry() {
     let mut actual = node("a", 100.0);
     actual.rect.width = 1000.0;
     assert!(same_rect(&expected, &actual));
+}
+
+#[test]
+fn rejects_missing_and_unexpected_nodes_after_conversion() {
+    let expected = state(vec![node("html", 0.0), node("html>body", 0.0)]);
+    let actual = state(vec![node("html", 0.0), node("html>main", 0.0)]);
+    let report = compare(&expected, &actual);
+    assert_eq!(report.missing, 1);
+    assert_eq!(report.unexpected, 1);
+}
+
+fn state(nodes: Vec<Node>) -> PageState {
+    PageState {
+        url: "https://example.test".into(),
+        title: "Exact".into(),
+        viewport: Viewport::default(),
+        nodes,
+        animations: Vec::new(),
+        state_styles: Vec::new(),
+        css_rules: Vec::new(),
+        asset_urls: Vec::new(),
+        asset_data: Default::default(),
+    }
 }

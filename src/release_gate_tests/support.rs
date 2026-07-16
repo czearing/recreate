@@ -68,6 +68,11 @@ pub fn parity(left: &PageState, right: &PageState) -> Parity {
         mismatches: 0,
         details: Vec::new(),
     };
+    let expected = left
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
     for expected in &left.nodes {
         let Some(candidate) = actual.get(expected.path.as_str()) else {
             mismatch(&mut report, format!("missing {}", expected.path));
@@ -76,7 +81,7 @@ pub fn parity(left: &PageState, right: &PageState) -> Parity {
         if expected.text != candidate.text {
             mismatch(&mut report, format!("text {}", expected.path));
         }
-        if !crate::compare::same_rect(expected, candidate) {
+        if !crate::compare_node::same_rect(expected, candidate) {
             mismatch(
                 &mut report,
                 format!(
@@ -99,6 +104,9 @@ pub fn parity(left: &PageState, right: &PageState) -> Parity {
                 mismatch(&mut report, format!("style {key} {}", expected.path));
             }
         }
+    }
+    for path in actual.keys().filter(|path| !expected.contains(*path)) {
+        mismatch(&mut report, format!("unexpected {path}"));
     }
     report
 }
@@ -180,7 +188,6 @@ pub fn browser_path() -> Option<PathBuf> {
         .or_else(|| {
             [
                 r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
                 "/usr/bin/google-chrome",
                 "/usr/bin/chromium",
                 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
