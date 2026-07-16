@@ -1,0 +1,50 @@
+{
+  "browser": "Edge 150 / CDP 1.3",
+  "initial": {
+    "expanded": "false",
+    "dialog": false
+  },
+  "tab": {
+    "active": "trigger",
+    "outline": "3px"
+  },
+  "opened": {
+    "expanded": "true",
+    "role": "dialog",
+    "modal": "true",
+    "active": "Close"
+  },
+  "restored": {
+    "expanded": "false",
+    "dialog": false,
+    "active": "trigger"
+  },
+  "reducedMotion": {
+    "matches": true,
+    "animation": "none"
+  },
+  "mobile": {
+    "width": 390,
+    "expanded": "true",
+    "dialog": "dialog"
+  },
+  "desktop": {
+    "width": 1200,
+    "expanded": "true",
+    "dialog": "dialog"
+  },
+  "accessibilityRoles": [
+    {
+      "role": "dialog",
+      "name": "Account details"
+    },
+    {
+      "role": "button",
+      "name": "Account details"
+    },
+    {
+      "role": "button",
+      "name": "Close"
+    }
+  ]
+}

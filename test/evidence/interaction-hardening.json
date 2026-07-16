@@ -1,0 +1,32 @@
+{
+  "browser": "Edge 150 / CDP 1.3",
+  "before": {
+    "milliseconds": 13475,
+    "specBytes": 109979,
+    "interactionBytes": 41163
+  },
+  "after": {
+    "milliseconds": 8762,
+    "specBytes": 108229,
+    "interactionBytes": 39797
+  },
+  "reduction": {
+    "timePercent": 35.0,
+    "specPercent": 1.6,
+    "interactionPercent": 3.3
+  },
+  "parity": {
+    "baselineNodesExact": true,
+    "interactionNodesExact": true,
+    "triggerPathExact": true,
+    "focusedPathExact": true
+  },
+  "compactedInteraction": {
+    "states": 2,
+    "cssRules": 0,
+    "assetUrls": 0,
+    "assetDataKeys": 0
+  },
+  "runtimeValidation": "passed with feed-approved Vite 8.1.2; default resolution to 8.1.4 was policy-blocked",
+  "cdpRecovery": "one fresh-target regeneration recovered after a bounded Runtime.evaluate timeout"
+}

@@ -20,19 +20,36 @@ jobs:
           - os: ubuntu-latest
             source: target/release/recreate
             asset: recreate-linux-x86_64
+            browser: /usr/bin/google-chrome
           - os: windows-latest
             source: target/release/recreate.exe
             asset: recreate-windows-x86_64.exe
-          - os: macos-14
+            browser: C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+          - os: macos-15
             source: target/release/recreate
             asset: recreate-macos-aarch64
+            browser: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --all-targets
-      - run: cargo build --release
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --all-targets --locked
+        env:
+          RECREATE_BROWSER: ${{ matrix.browser }}
+      - run: cargo build --release --locked
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-evidence-${{ matrix.asset }}
+          path: target/release-gate/evidence.json
+          if-no-files-found: error
       - shell: bash
         run: cp "${{ matrix.source }}" "${{ matrix.asset }}"
       - uses: actions/upload-artifact@v4
@@ -47,6 +64,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
+          pattern: recreate-*
           path: artifacts
           merge-multiple: true
       - env:

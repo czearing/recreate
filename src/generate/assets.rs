@@ -15,11 +15,7 @@ pub async fn download(
     fs::create_dir_all(&directory)?;
     let client = reqwest::Client::new();
     let mut map = BTreeMap::new();
-    for (url, data) in specification
-        .states
-        .iter()
-        .flat_map(|state| &state.asset_data)
-    {
+    for (url, data) in states(specification).flat_map(|state| &state.asset_data) {
         if map.contains_key(url) {
             continue;
         }
@@ -32,14 +28,11 @@ pub async fn download(
             map.insert(url.clone(), format!("/assets/{filename}"));
         }
     }
-    for url in specification
-        .states
-        .iter()
-        .flat_map(|state| &state.asset_urls)
-    {
+    for url in states(specification).flat_map(|state| &state.asset_urls) {
         if map.contains_key(url) || url.starts_with("data:") || url.starts_with("blob:") {
             continue;
         }
+
         let Ok(parsed) = Url::parse(url) else {
             continue;
         };
@@ -62,13 +55,39 @@ pub async fn download(
             .unwrap_or_default()
             .to_string();
         let bytes = response.bytes().await?;
+        if !usable_asset(&parsed, &content_type, &bytes) {
+            continue;
+        }
         let hash = hex::encode(Sha256::digest(&bytes));
         let extension = extension(&parsed, &content_type);
         let filename = format!("{}.{}", &hash[..20], extension);
         fs::write(directory.join(&filename), bytes)?;
         map.insert(url.clone(), format!("/assets/{filename}"));
     }
+
     Ok(map)
+}
+
+fn usable_asset(url: &Url, content_type: &str, bytes: &[u8]) -> bool {
+    let content_type = content_type.split(';').next().unwrap_or_default();
+    if matches!(content_type, "text/html" | "application/xhtml+xml") {
+        return false;
+    }
+    if url.path().ends_with(".svg") {
+        return content_type == "image/svg+xml"
+            || std::str::from_utf8(bytes)
+                .is_ok_and(|value| value.trim_start().starts_with("<svg"));
+    }
+    true
+}
+
+fn states(specification: &Specification) -> impl Iterator<Item = &crate::model::PageState> {
+    specification.states.iter().chain(
+        specification
+            .interactions
+            .iter()
+            .flat_map(|interaction| interaction.states.iter()),
+    )
 }
 
 fn data_extension(metadata: &str) -> &'static str {
@@ -136,5 +155,45 @@ mod tests {
             secure: true,
         }];
         assert_eq!(cookie_header(&url, &cookies), "session=value");
+    }
+
+    #[test]
+    fn includes_assets_introduced_by_interactions() {
+        let state = serde_json::json!({
+            "url":"https://example.test",
+            "title":"Fixture",
+            "viewport":{"width":800,"height":600},
+            "nodes":[],
+            "animations":[],
+            "state_styles":[],
+            "css_rules":[],
+            "asset_urls":["https://example.test/dialog.svg"],
+            "asset_data":{}
+        });
+        let specification: Specification = serde_json::from_value(serde_json::json!({
+            "schema_version":1,
+            "requested_url":"https://example.test",
+            "captured_url":"https://example.test",
+            "states":[state.clone()],
+            "interactions":[{
+                "trigger_path":"html>body>button",
+                "trigger_tag":"button",
+                "trigger_label":"Open",
+                "states":[state]
+            }]
+        }))
+        .unwrap();
+        assert_eq!(states(&specification).count(), 2);
+    }
+
+    #[test]
+    fn rejects_login_html_disguised_as_svg() {
+        let url = Url::parse("https://example.test/image.svg").unwrap();
+        assert!(!usable_asset(&url, "text/html; charset=utf-8", b"<html>"));
+        assert!(usable_asset(
+            &url,
+            "image/svg+xml",
+            br#"<svg xmlns="http://www.w3.org/2000/svg"/>"#
+        ));
     }
 }

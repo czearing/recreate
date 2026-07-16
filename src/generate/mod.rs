@@ -1,11 +1,41 @@
+#[cfg(test)]
+mod animation_order_tests;
+mod animation_timing;
 mod animations;
 mod assets;
+#[cfg(test)]
+mod authenticated_interaction_runtime_tests;
 mod css;
+#[cfg(test)]
+mod interaction_geometry_support;
+#[cfg(test)]
+mod interaction_runtime_support;
+#[cfg(test)]
+mod interaction_runtime_tests;
+mod interactions;
 mod jsx;
 mod jsx_attrs;
 mod jsx_states;
+mod jsx_variants;
+#[cfg(test)]
+#[path = "mount_tests.rs"]
+mod mount_tests;
 mod names;
+mod responsive;
+#[cfg(test)]
+mod responsive_runtime_support;
+#[cfg(test)]
+mod responsive_runtime_tests;
 mod roots;
+mod state_styles;
+mod structural_css;
+#[cfg(test)]
+mod structural_runtime_support;
+#[cfg(test)]
+mod structural_runtime_tests;
+#[cfg(test)]
+mod structural_tests;
+mod structural_tree;
 #[cfg(test)]
 mod tests;
 mod tree;
@@ -31,13 +61,36 @@ pub async fn write_project(
     let source = root.join("src");
     fs::create_dir_all(source.join("components"))?;
     let assets = assets::download(specification, &root, cookies).await?;
-    let styles = css::build(specification, &assets);
+    let mut styles = css::build(specification, &assets);
+    styles.css.push_str(interactions::FOCUS_CSS);
     let components = tree::components(specification, &styles.classes);
+    let state_classes = structural_css::class_maps(
+        &specification.states,
+        &styles.classes,
+        &assets,
+        &mut styles.css,
+    );
+    let interaction_state_classes = specification
+        .interactions
+        .iter()
+        .zip(&styles.interaction_classes)
+        .map(|(interaction, classes)| {
+            structural_css::class_maps(&interaction.states, classes, &assets, &mut styles.css)
+        })
+        .collect::<Vec<_>>();
     let (html_class, body_class, root_class) = roots::classes(specification, &components);
+    let has_root = specification.states.first().is_some_and(|state| {
+        state.nodes.iter().any(|node| {
+            node.attributes
+                .get("id")
+                .is_some_and(|value| value == "root")
+        })
+    });
+    let (mount_source, mount_markup) = mount(has_root, &root_class)?;
     fs::write(source.join("styles.css"), styles.css)?;
     fs::write(
         source.join("App.jsx"),
-        jsx::app(specification, &components, &assets),
+        jsx::app(specification, &components, &state_classes, &assets),
     )?;
     let mut component_index = String::new();
     for component in &components.items {
@@ -58,17 +111,16 @@ pub async fn write_project(
         jsx_states::interaction_states(
             specification,
             &components,
-            &styles.interaction_classes,
+            &interaction_state_classes,
             &assets,
         ),
     )?;
     fs::write(
         source.join("main.jsx"),
         format!(
-            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport './styles.css';\nimport App from './App.jsx';\ndocument.documentElement.className={};\ndocument.body.className={};\nconst root=document.getElementById('root');\nroot.className={};\ncreateRoot(root).render(<App />);\n",
+            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport './styles.css';\nimport App from './App.jsx';\ndocument.documentElement.className={};\ndocument.body.className={};\n{mount_source}\n",
             serde_json::to_string(&html_class)?,
             serde_json::to_string(&body_class)?,
-            serde_json::to_string(&root_class)?
         ),
     )?;
     let title = specification
@@ -76,18 +128,32 @@ pub async fn write_project(
         .first()
         .map(|state| state.title.as_str())
         .unwrap_or("Recreate");
-    fs::write(
-        root.join("index.html"),
-        format!(
-            "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{}</title></head><body><div id=\"root\"></div><script type=\"module\" src=\"/src/main.jsx\"></script></body></html>",
-            escape_html(title)
-        ),
-    )?;
+    fs::write(root.join("index.html"), document(title, mount_markup))?;
     fs::write(
         root.join("package.json"),
         r#"{"private":true,"scripts":{"dev":"vite","build":"vite build"},"dependencies":{"vite":"^8.1.0","react":"^19.2.0","react-dom":"^19.2.0"}}"#,
     )?;
     Ok(())
+}
+
+fn mount(has_root: bool, root_class: &str) -> Result<(String, &'static str)> {
+    if !has_root {
+        return Ok(("createRoot(document.body).render(<App />);".into(), ""));
+    }
+    Ok((
+        format!(
+            "const root=document.getElementById('root');\nroot.className={};\ncreateRoot(root).render(<App />);",
+            serde_json::to_string(root_class)?
+        ),
+        "<div id=\"root\"></div>",
+    ))
+}
+
+fn document(title: &str, mount_markup: &str) -> String {
+    format!(
+        "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>{}</title></head><body>{mount_markup}<script type=\"module\" src=\"/src/main.jsx\"></script></body></html>",
+        escape_html(title),
+    )
 }
 
 fn escape_html(value: &str) -> String {

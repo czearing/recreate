@@ -1,0 +1,56 @@
+{
+  "browser": "Edge 150 / CDP 1.3",
+  "runtime": "generated React dist",
+  "tab": {
+    "role": "button",
+    "expanded": "false",
+    "outline": "2px"
+  },
+  "opened": {
+    "expanded": "true",
+    "role": "dialog",
+    "modal": "true",
+    "active": "Close"
+  },
+  "restored": {
+    "dialog": false,
+    "role": "button",
+    "expanded": "false"
+  },
+  "reducedMotion": {
+    "matches": true,
+    "animation": "none"
+  },
+  "network": {
+    "before": {
+      "url": "/favicon.ico",
+      "status": 404,
+      "type": "Other"
+    },
+    "cause": "preserved generated artifact predated the data favicon invariant",
+    "afterConsoleErrors": 0,
+    "afterNetworkErrors": 0
+  },
+  "mobile": {
+    "width": 390,
+    "dialog": "dialog"
+  },
+  "desktop": {
+    "width": 1200,
+    "dialog": "dialog"
+  },
+  "accessibilityRoles": [
+    {
+      "role": "dialog",
+      "name": "Account details"
+    },
+    {
+      "role": "button",
+      "name": "Close"
+    },
+    {
+      "role": "button",
+      "name": "Account details"
+    }
+  ]
+}

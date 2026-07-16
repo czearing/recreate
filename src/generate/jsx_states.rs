@@ -1,11 +1,11 @@
-use super::{jsx, tree};
-use crate::model::{PageState, Specification};
+use super::{interactions, jsx_variants, structural_tree, tree};
+use crate::model::Specification;
 use std::collections::BTreeMap;
 
 pub fn interaction_states(
     specification: &Specification,
     base: &tree::Components,
-    class_maps: &[BTreeMap<String, String>],
+    class_maps: &[Vec<BTreeMap<String, String>>],
     assets: &BTreeMap<String, String>,
 ) -> String {
     let imports = base
@@ -15,70 +15,39 @@ pub fn interaction_states(
         .collect::<Vec<_>>()
         .join(", ");
     let mut output = format!(
-        "import React from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {imports} }} from './components/index.js';\n"
+        "import React from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {imports} }} from './components/index.js';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\n{}\n",
+        jsx_variants::selector()
     );
     for (index, interaction) in specification.interactions.iter().enumerate() {
-        let (Some(state), Some(classes)) = (interaction.states.first(), class_maps.get(index))
-        else {
+        let Some(classes) = class_maps.get(index) else {
             continue;
         };
-        let components = tree::for_state(base, state, classes);
-        let handlers = BTreeMap::from([(
-            interaction.trigger_path.clone(),
-            "onClick={onReset}".to_string(),
-        )]);
-        let (content, portal) = page_parts(state, &components, assets, &handlers);
+        let views = interaction
+            .states
+            .iter()
+            .zip(classes)
+            .enumerate()
+            .map(|(state_index, (state, classes))| {
+                let components = structural_tree::for_state(base, state, classes);
+                let handlers = interactions::state_handlers(interaction, state);
+                let page = jsx_variants::page(state, &components, assets, &handlers);
+                format!(
+                    "function Interaction{}View{state_index}({{onReset}}){{return {page}}}\n",
+                    index + 1
+                )
+            })
+            .collect::<String>();
+        let names = (0..interaction.states.len())
+            .map(|state_index| format!("Interaction{}View{state_index}", index + 1))
+            .collect::<Vec<_>>()
+            .join(",");
+        let widths = jsx_variants::widths(&interaction.states);
         output.push_str(&format!(
-            "export function Interaction{}({{onReset}}){{return <>{}{}</>}}\n",
+            "{views}const interaction{}Views=[{names}];\nexport function Interaction{}({{width,onReset}}){{const View=interaction{}Views[selectViewport(width,[{widths}])];return <View onReset={{onReset}}/>}}\n",
             index + 1,
-            content,
-            portal
+            index + 1,
+            index + 1
         ));
     }
     output
-}
-
-fn page_parts(
-    state: &PageState,
-    components: &tree::Components,
-    assets: &BTreeMap<String, String>,
-    handlers: &BTreeMap<String, String>,
-) -> (String, String) {
-    let body = state
-        .nodes
-        .iter()
-        .find(|node| node.tag == "body")
-        .map(|node| node.path.as_str())
-        .unwrap_or("html");
-    let root = state
-        .nodes
-        .iter()
-        .find(|node| {
-            node.attributes
-                .get("id")
-                .is_some_and(|value| value == "root")
-        })
-        .map(|node| node.path.as_str())
-        .unwrap_or(body);
-    let content = components
-        .children
-        .get(root)
-        .into_iter()
-        .flatten()
-        .map(|path| jsx::render(path, components, assets, 2, true, handlers))
-        .collect();
-    let portal_nodes = components
-        .children
-        .get(body)
-        .into_iter()
-        .flatten()
-        .filter(|path| path.as_str() != root)
-        .map(|path| jsx::render(path, components, assets, 2, true, handlers))
-        .collect::<String>();
-    let portal = if portal_nodes.is_empty() {
-        String::new()
-    } else {
-        format!("{{createPortal(<>{portal_nodes}</>,document.body)}}")
-    };
-    (content, portal)
 }

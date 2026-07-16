@@ -21,6 +21,10 @@ pub fn parse_viewports(input: &str) -> Result<Vec<Viewport>> {
     if values.is_empty() {
         bail!("at least one viewport is required");
     }
+    values.sort_by_key(|viewport| std::cmp::Reverse(viewport.width));
+    if values.windows(2).any(|pair| pair[0].width == pair[1].width) {
+        bail!("viewport widths must be unique");
+    }
     Ok(values)
 }
 
@@ -30,9 +34,23 @@ mod tests {
 
     #[test]
     fn parses_viewport_matrix() {
+        let result = parse_viewports("390x844,1920x1080,768x1024").unwrap();
+        assert_eq!(result[0].width, 1920);
+        assert_eq!(result[1].width, 768);
+        assert_eq!(result[2].width, 390);
+    }
+
+    #[test]
+    fn rejects_duplicate_widths() {
+        let result = parse_viewports("390x844,390x700");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn preserves_viewport_height() {
         let result = parse_viewports("1440x900,390x844").unwrap();
         assert_eq!(result.len(), 2);
-        assert_eq!(result[1].width, 390);
+        assert_eq!(result[1].height, 844);
     }
 
     #[test]

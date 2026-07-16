@@ -1,0 +1,40 @@
+{
+  "captured_viewports": [
+    {"width": 1920, "height": 1080, "horizontal_overflow_px": 0},
+    {"width": 1440, "height": 900, "horizontal_overflow_px": 0},
+    {"width": 768, "height": 1024, "horizontal_overflow_px": 0},
+    {"width": 390, "height": 844, "horizontal_overflow_px": 0},
+    {"width": 320, "height": 568, "horizontal_overflow_px": 0}
+  ],
+  "generated_runtime": {
+    "captured_states": 5,
+    "exact_parity_states": 5,
+    "horizontal_overflow_failures": 0,
+    "exact_parity_runtime_ms": 13320
+  },
+  "boundary_sweep": {
+    "widths": [319, 320, 321, 389, 390, 391, 767, 768, 769, 1439, 1440, 1441, 1919, 1920],
+    "active_band_failures": 0,
+    "horizontal_overflow_failures": 0,
+    "dom_text_stability_failures": 0,
+    "pseudo_rule_collision_failures": 0,
+    "console_errors": 0,
+    "network_errors": 0,
+    "runtime_ms": 4220
+  },
+  "form_grid": {
+    "captured_states": 3,
+    "matched_nodes": 66,
+    "missing_nodes": 0,
+    "text_mismatches": 0,
+    "geometry_mismatches": 0,
+    "style_mismatches": 0
+  },
+  "browser": "Edge 150.0.4078.65",
+  "notes": [
+    "Only genuinely captured fixture states were compared.",
+    "The generated evidence build used Vite 8.0.16 because the configured feed blocked Vite 8.1.4.",
+    "The boundary sweep found and fixed fixed-pixel root widths that caused 2px overflow at 319px and 61px overflow at 321px.",
+    "Fluid viewport roots omit captured widths only for full-width or small symmetric insets; centered fixed-width roots remain fixed."
+  ]
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Responsive structure fixture</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+      #root { min-height: 100vh; padding: 24px; }
+      main { width: 320px; max-width: 100%; }
+      button { padding: 10px 14px; }
+      button:focus-visible { outline: 3px solid #075cca; outline-offset: 2px; }
+      nav, section, [role="dialog"] { margin-top: 16px; padding: 16px; background: #eaf2ff; }
+      [role="dialog"] { transition: opacity 120ms ease; }
+      @media (max-width: 390px) {
+        #root { padding: 12px; }
+        section, [role="dialog"] { padding: 12px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        [role="dialog"] { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      const root = document.querySelector('#root');
+      let open = false;
+      const render = () => {
+        const mobile = matchMedia('(max-width: 390px)').matches;
+        root.innerHTML = `<main data-layout="${mobile ? 'mobile' : 'desktop'}">
+          <h1>${mobile ? 'Trips' : 'Upcoming trips'}</h1>
+          <button type="button" aria-haspopup="dialog" aria-expanded="${open}">
+            ${mobile ? 'Mobile details' : 'Desktop itinerary'}
+          </button>
+          ${mobile
+            ? '<section aria-label="Mobile summary"><strong>SEA</strong><span>Friday</span></section>'
+            : '<nav aria-label="Desktop itinerary"><ol><li>Seattle</li><li>Friday</li></ol></nav>'}
+          ${open ? `<div role="dialog" aria-modal="true" tabindex="-1">
+            ${mobile ? 'Mobile trip actions' : 'Desktop trip actions'}
+          </div>` : ''}
+        </main>`;
+        const button = root.querySelector('button');
+        button.addEventListener('click', () => {
+          open = !open;
+          render();
+          (open ? root.querySelector('[role="dialog"]') : root.querySelector('button')).focus();
+        });
+      };
+      matchMedia('(max-width: 390px)').addEventListener('change', render);
+      render();
+    </script>
+  </body>
+</html>

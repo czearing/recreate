@@ -1,5 +1,7 @@
 use super::{
+    interactions,
     jsx_attrs::{all_attributes, dynamic_attributes, jsx_tag, quoted, static_attributes, void_tag},
+    jsx_variants, structural_tree,
     tree::Components,
 };
 use crate::model::Specification;
@@ -8,81 +10,50 @@ use std::collections::BTreeMap;
 pub fn app(
     specification: &Specification,
     components: &Components,
+    class_maps: &[BTreeMap<String, String>],
     assets: &BTreeMap<String, String>,
 ) -> String {
-    let Some(state) = specification.states.first() else {
+    if specification.states.is_empty() {
         return "export default function App(){return null}\n".into();
-    };
-    let body_path = state
-        .nodes
+    }
+    let handlers = interactions::base_handlers(specification);
+    let views = specification
+        .states
         .iter()
-        .find(|node| node.tag == "body")
-        .map(|node| node.path.as_str())
-        .unwrap_or("html");
-    let root = state
-        .nodes
-        .iter()
-        .find(|node| {
-            node.attributes
-                .get("id")
-                .is_some_and(|value| value == "root")
-        })
-        .or_else(|| state.nodes.iter().find(|node| node.tag == "body"))
-        .map(|node| node.path.as_str())
-        .unwrap_or("html");
-    let handlers: BTreeMap<_, _> = specification
-        .interactions
-        .iter()
+        .zip(class_maps)
         .enumerate()
-        .map(|(index, interaction)| {
-            (
-                interaction.trigger_path.clone(),
-                format!("onClick={{()=>setState({})}}", index + 1),
-            )
+        .map(|(index, (state, classes))| {
+            let current = structural_tree::for_state(components, state, classes);
+            let page = jsx_variants::page(state, &current, assets, &handlers);
+            format!("function Baseline{index}({{activate}}){{return {page}}}\n")
         })
-        .collect();
-    let content = components
-        .children
-        .get(root)
-        .into_iter()
-        .flatten()
-        .map(|path| render(path, components, assets, 2, true, &handlers))
         .collect::<String>();
-    let portals = if root == body_path {
-        String::new()
-    } else {
-        components
-            .children
-            .get(body_path)
-            .into_iter()
-            .flatten()
-            .filter(|path| path.as_str() != root)
-            .map(|path| render(path, components, assets, 2, true, &handlers))
-            .collect::<String>()
-    };
-    let portal = if portals.is_empty() {
-        String::new()
-    } else {
-        format!("{{createPortal(<>{portals}</>,document.body)}}")
-    };
+    let view_names = (0..specification.states.len())
+        .map(|index| format!("Baseline{index}"))
+        .collect::<Vec<_>>()
+        .join(",");
+    let widths = jsx_variants::widths(&specification.states);
     let state_imports = (1..=specification.interactions.len())
         .map(|index| format!("Interaction{index}"))
         .collect::<Vec<_>>()
         .join(", ");
     let state_branches = (1..=specification.interactions.len())
         .map(|index| {
-            format!("if(state==={index})return <Interaction{index} onReset={{()=>setState(0)}}/>;")
+            format!(
+                "if(state==={index})return <Interaction{index} width={{width}} onReset={{reset}}/>;"
+            )
         })
         .collect::<String>();
     format!(
-        "import React,{{useState}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {} }} from './components/index.js';\nimport {{ {} }} from './states.jsx';\nexport default function App(){{const[state,setState]=useState(0);{state_branches}return <>{content}{portal}</>}}\n",
+        "import React,{{useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {} }} from './components/index.js';\nimport {{ {} }} from './states.jsx';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\n{}\nconst viewportWidths=[{widths}];\nconst subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\nexport default function App(){{const[state,setState]=useState(0);const lastTrigger=useRef('');const width=useSyncExternalStore(subscribe,()=>document.documentElement.clientWidth,()=>0);const viewport=selectViewport(width,viewportWidths);const View=baselineViews[viewport];const activate=(event,next)=>{{lastTrigger.current=event.currentTarget.dataset.recreateTrigger;setState(next)}};const reset=()=>{{setState(0);requestAnimationFrame(()=>document.querySelector('[data-recreate-trigger=\"'+lastTrigger.current+'\"]')?.focus())}};{state_branches}return <View activate={{activate}}/>}}\n",
         components
             .items
             .iter()
             .map(|item| item.name.as_str())
             .collect::<Vec<_>>()
             .join(", "),
-        state_imports
+        state_imports,
+        jsx_variants::selector(),
     )
 }
 

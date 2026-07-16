@@ -28,6 +28,16 @@ pub const SOURCE: &str = r#"
     const start = performance.now();
     const previous = new WeakMap();
     const tracks = new Map();
+    const safe = new Set([
+      'offset','easing','composite','computedOffset',
+      'opacity','transform','filter','clipPath'
+    ]);
+    let fullSample = true;
+    new MutationObserver(() => {
+      fullSample = true;
+    }).observe(document.documentElement, {
+      attributes: true, childList: true, characterData: true, subtree: true
+    });
     const pathOf = element => {
       if (element === document.documentElement) return 'html';
       const parts = [];
@@ -41,7 +51,21 @@ pub const SOURCE: &str = r#"
     };
     const sample = () => {
       const now = performance.now();
-      for (const element of document.querySelectorAll('*')) {
+      const animations = document.getAnimations({ subtree: true });
+      const active = animations
+        .map(animation => animation.effect?.target)
+        .filter(element => element instanceof Element);
+      const affectsLayout = animations.some(animation =>
+        animation.effect?.getKeyframes?.().some(frame =>
+          Object.keys(frame).some(key => !safe.has(key))
+        )
+      );
+      const loading = document.fonts.status !== 'loaded' ||
+        Array.from(document.images).some(image => !image.complete);
+      const elements = fullSample || loading || affectsLayout
+        ? document.querySelectorAll('*')
+        : new Set(active);
+      for (const element of elements) {
         const rect = element.getBoundingClientRect();
         const style = getComputedStyle(element);
         const value = {
@@ -64,6 +88,7 @@ pub const SOURCE: &str = r#"
         frames.push(value);
         tracks.set(path, frames);
       }
+      fullSample = false;
       if (now - start < 2500) {
         requestAnimationFrame(sample);
       } else {

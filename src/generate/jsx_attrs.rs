@@ -10,37 +10,15 @@ pub fn all_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String 
         .collect()
 }
 
-pub fn static_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
-    node.attributes
-        .iter()
-        .filter(|(key, _)| {
-            !matches!(
-                key.as_str(),
-                "class"
-                    | "style"
-                    | "id"
-                    | "href"
-                    | "src"
-                    | "srcset"
-                    | "alt"
-                    | "title"
-                    | "aria-label"
-                    | "value"
-            )
-        })
-        .map(|(key, value)| format!(" {}={}", jsx_attribute(key), quoted(rewrite(value, assets))))
-        .collect()
+pub fn static_attributes(_node: &Node, _assets: &BTreeMap<String, String>) -> String {
+    String::new()
 }
 
 pub fn dynamic_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
     node.attributes
         .iter()
-        .filter(|(key, _)| {
-            matches!(
-                key.as_str(),
-                "id" | "href" | "src" | "srcset" | "alt" | "title" | "aria-label" | "value"
-            )
-        })
+        .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
+        .filter(|(key, _)| !key.starts_with("on"))
         .map(|(key, value)| format!(" {}={}", jsx_attribute(key), quoted(rewrite(value, assets))))
         .collect()
 }
@@ -106,5 +84,31 @@ mod tests {
         assert_eq!(jsx_attribute("stroke-width"), "strokeWidth");
         assert_eq!(jsx_attribute("aria-label"), "aria-label");
         assert_eq!(jsx_tag("lineargradient"), "linearGradient");
+    }
+
+    #[test]
+    fn keeps_accessibility_state_on_component_instances() {
+        let mut node = crate::model::Node {
+            path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
+            parent: Some("html>body:nth-of-type(1)".into()),
+            tag: "button".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: crate::model::Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 10.0,
+                height: 10.0,
+            },
+            style: Default::default(),
+            before: None,
+            after: None,
+        };
+        node.attributes
+            .insert("aria-expanded".into(), "true".into());
+        node.attributes.insert("role".into(), "button".into());
+        let output = dynamic_attributes(&node, &Default::default());
+        assert!(output.contains("aria-expanded={\"true\"}"));
+        assert!(output.contains("role={\"button\"}"));
     }
 }

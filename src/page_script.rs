@@ -1,24 +1,10 @@
-pub const CAPTURE: &str = r#"
+use crate::{asset_script, style_contract};
+
+const CAPTURE: &str = r#"
 (async () => {
-  const props = [
-    'display','position','inset','top','right','bottom','left','box-sizing',
-    'width','height','min-width','max-width','min-height','max-height',
-    'margin','padding','gap','row-gap','column-gap','flex','flex-grow',
-    'flex-shrink','flex-basis','flex-direction','flex-wrap','justify-content',
-    'align-items','align-self','order','grid-template-columns',
-    'grid-template-rows','grid-auto-flow','overflow','overflow-x','overflow-y',
-    'z-index','color','background-color','background-image','background-size',
-    'background-position','background-repeat','border','border-radius',
-    'box-shadow','opacity','filter','transform','transform-origin',
-    'font-family','font-size','font-weight','font-style','line-height',
-    'font-stretch','font-kerning','font-feature-settings','font-variation-settings',
-    'letter-spacing','text-align','text-transform','text-rendering','white-space','word-break',
-    'object-fit','object-position','cursor','pointer-events','transition',
-    'animation','mask-image','mask-size','mask-position','mask-repeat',
-    'mask-composite','clip-path'
-  ];
-  const ignored = new Set(['SCRIPT','STYLE','NOSCRIPT','META','LINK','HEAD']);
-  const styleMap = style => Object.fromEntries(props.map(p => [p, style.getPropertyValue(p)]));
+  const props = [__STYLE_PROPERTIES__];
+  const ignored = new Set(['SCRIPT','STYLE','NOSCRIPT','META','LINK','HEAD']), directionalBorders = [__DIRECTIONAL_BORDERS__];
+  const styleMap = style => { const values = Object.fromEntries(props.map(p => [p, style.getPropertyValue(p)])); if (!values.border) for (const property of directionalBorders) values[property] = style.getPropertyValue(property); return values; };
   const pathOf = element => {
     if (element === document.documentElement) return 'html';
     const parts = [];
@@ -92,20 +78,63 @@ pub const CAPTURE: &str = r#"
     }
   };
   walk(document.documentElement);
-  const liveAnimations = document.getAnimations({ subtree: true }).map(animation => ({
-    target: animation.effect?.target ? pathOf(animation.effect.target) : '',
-    keyframes: animation.effect?.getKeyframes?.() || [],
-    timing: animation.effect?.getTiming?.() || {}
-  })).filter(animation => animation.target);
+  const liveAnimations = document.getAnimations({ subtree: true }).map(animation => {
+    const timing = animation.effect?.getTiming?.() || {};
+    return {
+      target: animation.effect?.target ? pathOf(animation.effect.target) : '',
+      keyframes: animation.effect?.getKeyframes?.() || [],
+      timing: {
+        ...timing,
+        iterations: timing.iterations === Infinity ? 'infinite' : timing.iterations,
+        playState: animation.playState,
+        playbackRate: animation.playbackRate
+      }
+    };
+  }).filter(animation => animation.target);
   const animations = [
     ...liveAnimations,
     ...(window.__recreateLifecycleAnimations || [])
   ];
-  const cssRules = [];
-  const visitRules = rules => {
+  const cssRules = [], stateStyles = [], stateStyleKeys = new Set();
+  const dynamicState = /:(hover|focus-visible|focus-within|focus|active)\b/g;
+  const visitRules = (rules, media = null) => {
     for (const rule of Array.from(rules || [])) {
       cssRules.push(rule.cssText);
-      if (rule.cssRules) visitRules(rule.cssRules);
+      const reduced = media?.includes('prefers-reduced-motion') || false;
+      if (rule.selectorText && rule.style) {
+        for (const selector of rule.selectorText.split(',')) {
+          const states = Array.from(selector.matchAll(dynamicState), match => match[0]);
+          const tail = selector.trim().split(/[\s>+~]+/).pop() || '';
+          if (states.length && !/:(hover|focus-visible|focus-within|focus|active)\b/.test(tail)) {
+            continue;
+          }
+          if (!states.length && !reduced) continue;
+          const base = selector.replace(dynamicState, '').trim();
+          const pseudoElement = base.match(/::[\w-]+$/)?.[0] || '', query = base.slice(0, base.length - pseudoElement.length);
+          if (!query) continue;
+          try {
+            for (const element of document.querySelectorAll(query)) {
+              const captured = {
+                target: pathOf(element),
+                pseudo: states.length || pseudoElement ? `${states.join('')}${pseudoElement}` : null,
+                media,
+                declarations: rule.style.cssText
+              };
+              const key = JSON.stringify(captured);
+              if (!stateStyleKeys.has(key)) {
+                stateStyleKeys.add(key);
+                stateStyles.push(captured);
+              }
+            }
+          } catch {}
+        }
+      }
+      if (rule.cssRules) {
+        const nestedMedia = rule.type === CSSRule.MEDIA_RULE
+          ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
+          : media;
+        visitRules(rule.cssRules, nestedMedia);
+      }
     }
   };
   for (const sheet of Array.from(document.styleSheets)) {
@@ -128,28 +157,30 @@ pub const CAPTURE: &str = r#"
       } catch {}
     }
   }
-  const assetData = {};
-  await Promise.all(Array.from(assets)
-    .filter(url => url.startsWith('blob:'))
-    .map(async url => {
-      try {
-        const blob = await fetch(url).then(response => response.blob());
-        assetData[url] = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch {}
-    }));
+__ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,
     title: document.title,
     nodes,
     animations,
+    state_styles: stateStyles,
     css_rules: cssRules,
     asset_urls: Array.from(assets),
     asset_data: assetData
   });
 })()
 "#;
+
+pub fn source() -> String {
+    CAPTURE
+        .replace("__STYLE_PROPERTIES__", style_contract::PROPERTIES)
+        .replace(
+            "__DIRECTIONAL_BORDERS__",
+            style_contract::DIRECTIONAL_BORDERS,
+        )
+        .replace("__ASSET_CAPTURE__", asset_script::SOURCE)
+}
+
+#[cfg(test)]
+#[path = "page_script_tests.rs"]
+mod tests;

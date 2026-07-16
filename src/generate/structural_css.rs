@@ -1,0 +1,74 @@
+use super::{css::declarations, responsive};
+use crate::model::{Node, PageState};
+use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
+
+pub fn class_maps(
+    states: &[PageState],
+    base: &BTreeMap<String, String>,
+    assets: &BTreeMap<String, String>,
+    css: &mut String,
+) -> Vec<BTreeMap<String, String>> {
+    states
+        .iter()
+        .map(|state| {
+            let mut classes = base.clone();
+            for node in &state.nodes {
+                if node.tag == "#text" || classes.contains_key(&node.path) {
+                    continue;
+                }
+                let class = class_name(node, &state.viewport, assets);
+                append_rule(&class, node, &state.viewport, assets, css);
+                classes.insert(node.path.clone(), class);
+            }
+            classes
+        })
+        .collect()
+}
+
+fn class_name(
+    node: &Node,
+    viewport: &crate::model::Viewport,
+    assets: &BTreeMap<String, String>,
+) -> String {
+    let mut signature = responsive::base_declarations(node, viewport, assets);
+    if let Some(before) = &node.before {
+        signature.push_str(&before.content);
+        signature.push_str(&declarations(&before.style, assets));
+    }
+    if let Some(after) = &node.after {
+        signature.push_str(&after.content);
+        signature.push_str(&declarations(&after.style, assets));
+    }
+    format!("s{}", &hex::encode(Sha256::digest(signature))[..10])
+}
+
+fn append_rule(
+    class: &str,
+    node: &Node,
+    viewport: &crate::model::Viewport,
+    assets: &BTreeMap<String, String>,
+    css: &mut String,
+) {
+    if css.contains(&format!(".{class}{{")) {
+        return;
+    }
+    css.push_str(&format!(
+        ".{class}{{{}}}\n",
+        responsive::base_declarations(node, viewport, assets)
+    ));
+    if let Some(before) = &node.before {
+        css.push_str(&format!(
+            ".{class}::before{{content:{};{}}}\n",
+            before.content,
+            declarations(&before.style, assets)
+        ));
+    }
+    if let Some(after) = &node.after {
+        css.push_str(&format!(
+            ".{class}::after{{content:{};{}}}\n",
+            after.content,
+            declarations(&after.style, assets)
+        ));
+    }
+}

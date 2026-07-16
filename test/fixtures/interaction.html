@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interaction fixture</title>
+    <style>
+      [role="dialog"] {
+        position: fixed;
+        inset: 20%;
+        border: 1px solid;
+        padding: 1rem;
+        background: white;
+      }
+      [role="button"]:focus-visible { outline: 3px solid #1769e0; outline-offset: 2px; }
+      @media (prefers-reduced-motion: no-preference) {
+        [role="dialog"] { animation: reveal 120ms ease-out; }
+      }
+      @keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <main>
+        <div id="trigger" role="button" tabindex="0"
+          aria-haspopup="dialog" aria-expanded="false">
+          Account details
+        </div>
+      </main>
+    </div>
+    <script>
+      const trigger = document.querySelector('#trigger');
+      const close = () => {
+        document.querySelector('[role="dialog"]')?.remove();
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.focus();
+      };
+      trigger.addEventListener('click', () => {
+        trigger.setAttribute('aria-expanded', 'true');
+        const dialog = document.createElement('section');
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('aria-labelledby', 'dialog-title');
+        dialog.innerHTML =
+          '<h2 id="dialog-title">Account details</h2><button>Close</button>';
+        document.body.append(dialog);
+        dialog.querySelector('button').addEventListener('click', close);
+        dialog.querySelector('button').focus();
+      });
+      trigger.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          trigger.click();
+        }
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && document.querySelector('[role="dialog"]')) close();
+      });
+    </script>
+  </body>
+</html>

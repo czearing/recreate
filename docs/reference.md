@@ -7,7 +7,7 @@ subsites.
 
 The capture includes:
 
-- desktop and mobile DOM structure
+- narrow mobile, mobile, tablet, desktop, and wide desktop DOM structure
 - computed layout and visual styles
 - authored CSS rules and local font assets
 - images, SVGs, data assets, and browser blob assets
@@ -32,7 +32,7 @@ Capture options:
 ```text
 --cdp-url http://127.0.0.1:9222
 --out recreate-output
---viewports 1440x900,390x844
+--viewports 1920x1080,1440x900,768x1024,390x844,320x568
 ```
 
 ## Browser access
@@ -59,10 +59,27 @@ react/
 ```
 
 Repeated structures and exact style matrices are deduplicated. Responsive
-classes include every captured viewport so mobile overrides cannot collide.
+classes use non-overlapping viewport bands so adjacent layouts cannot collide.
 
 ## Validation
 
 `acceptance.json` checks evidence completeness. `recreate verify` loads the
 generated page through CDP and compares text, visible geometry, and key computed
 styles for every captured node and interaction state.
+
+CI and publish validation run generic browser fixtures through a release gate.
+The retained platform evidence artifacts record built generated-project parity at
+1920x1080, 1440x900, 768x1024, 390x844, and 320x568; horizontal overflow;
+browser console and network errors; capture, build, and browser runtime;
+generated source and build size; keyboard activation and focus restoration; and
+reduced-motion behavior.
+
+## Durable authenticated reference
+
+The final authenticated reference is generated from the persisted specification
+with the locked release binary and served from
+`review/authenticated-reference-v4/react` at `http://127.0.0.1:4557/`
+(PID `23576`). The release binary SHA-256 is
+`2B81742E7410AF0CEC2E206F937495848E71C07A3F681B32B16AF1FDD60FC1E8`.
+Runtime proof is recorded in
+`review/authenticated-reference-v4/runtime-evidence.json`.

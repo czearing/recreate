@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Disclosure interaction fixture</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { min-height: 100vh; margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+      #root {
+        width: min(720px, 100%);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      button { padding: 8px 12px; }
+      button:focus-visible { outline: 3px solid #1769e0; outline-offset: 2px; }
+      .panel {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 160ms ease;
+      }
+      .panel[aria-hidden="true"] { grid-template-rows: 0fr; }
+      .panel > div { min-height: 0; overflow: hidden; }
+      .panel p { margin: 16px 0; padding: 16px; background: #eef4ff; }
+      footer { border-top: 1px solid #789; padding-top: 16px; }
+      @media (max-width: 480px) {
+        #root { padding: 16px; }
+        .panel p { padding: 12px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .panel { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <main>
+        <h1>Order summary</h1>
+        <button type="button" aria-controls="shipping-details" aria-expanded="false">
+          Shipping details
+        </button>
+        <section id="shipping-details" class="panel" aria-hidden="true">
+          <div><p>Ships in two business days with tracking included.</p></div>
+        </section>
+      </main>
+      <footer>Secure checkout</footer>
+    </div>
+    <script>
+      const button = document.querySelector('button');
+      const panel = document.querySelector('#shipping-details');
+      button.addEventListener('click', () => {
+        const expanded = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(expanded));
+        panel.setAttribute('aria-hidden', String(!expanded));
+      });
+    </script>
+  </body>
+</html>

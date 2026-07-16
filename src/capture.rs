@@ -41,7 +41,7 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
-    let interaction_states = interactions::capture(&mut cdp, &states, &requested_url).await?;
+    let interaction_states = interactions::capture(&mut cdp, &states).await?;
     let specification = Specification {
         schema_version: 1,
         requested_url,
@@ -82,7 +82,8 @@ pub async fn capture_state(
 }
 
 pub async fn read_state(cdp: &mut crate::cdp::Cdp, viewport: Viewport) -> Result<PageState> {
-    let raw = cdp.evaluate(page_script::CAPTURE).await?;
+    let source = page_script::source();
+    let raw = cdp.evaluate(&source).await?;
     let text = raw.as_str().context("capture script returned non-string")?;
     let mut state: PageState = serde_json::from_str(text)?;
     state.viewport = viewport;

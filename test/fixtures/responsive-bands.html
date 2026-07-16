@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      .card {
+        height: 48px;
+        width: 100px;
+      }
+      .card::before {
+        color: red;
+        content: "wide";
+      }
+      @media (min-width: 769px) and (max-width: 1440px) {
+        .card { width: 95px; }
+      }
+      @media (min-width: 391px) and (max-width: 768px) {
+        .card { width: 90px; }
+      }
+      @media (min-width: 321px) and (max-width: 390px) {
+        .card { width: 80px; }
+        .card::before {
+          color: blue;
+          content: "mobile";
+        }
+      }
+      @media (max-width: 320px) {
+        .card { width: 70px; }
+        .card::before { content: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <main class="card">Responsive evidence</main>
+    </div>
+  </body>
+</html>

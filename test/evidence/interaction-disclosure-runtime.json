@@ -1,0 +1,29 @@
+{
+  "browser": "Edge 150 / CDP 1.3",
+  "fixture": "test/fixtures/interaction-disclosure.html",
+  "viewports": [
+    {
+      "width": 1200,
+      "footerYAfterExpansion": 237.875
+    },
+    {
+      "width": 390,
+      "footerYAfterExpansion": 245.875
+    }
+  ],
+  "captureMilliseconds": 7865,
+  "buildMilliseconds": 1936,
+  "runtimeGateMilliseconds": 20692,
+  "checks": {
+    "keyboardEnterActivation": true,
+    "ariaExpandedToggle": true,
+    "responsivePersistence": true,
+    "focusRemainsOnButton": true,
+    "exactPostInteractionGeometry": true,
+    "exactPostInteractionStyles": true,
+    "reducedMotionTransitionDuration": "0s",
+    "consoleErrors": 0,
+    "networkErrors": 0,
+    "settlingBoundMilliseconds": 500
+  }
+}

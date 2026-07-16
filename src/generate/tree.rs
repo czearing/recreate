@@ -1,4 +1,4 @@
-use super::names;
+use super::{names, structural_tree};
 use crate::model::{Node, Specification};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashMap};
@@ -27,7 +27,7 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             nodes: BTreeMap::new(),
         };
     };
-    let children = children(&state.nodes);
+    let children = structural_tree::children(&state.nodes);
     let nodes: BTreeMap<_, _> = state
         .nodes
         .iter()
@@ -96,43 +96,6 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
     }
 }
 
-pub fn for_state(
-    base: &Components,
-    state: &crate::model::PageState,
-    classes: &BTreeMap<String, String>,
-) -> Components {
-    let nodes: BTreeMap<_, _> = state
-        .nodes
-        .iter()
-        .cloned()
-        .map(|node| (node.path.clone(), node))
-        .collect();
-    Components {
-        items: base.items.clone(),
-        by_root: base
-            .by_root
-            .iter()
-            .filter(|(path, _)| nodes.contains_key(*path))
-            .map(|(path, index)| (path.clone(), *index))
-            .collect(),
-        children: children(&state.nodes),
-        classes: classes.clone(),
-        nodes,
-    }
-}
-
-fn children(nodes: &[Node]) -> BTreeMap<String, Vec<String>> {
-    let mut map: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    for node in nodes {
-        if let Some(parent) = &node.parent {
-            map.entry(parent.clone())
-                .or_default()
-                .push(node.path.clone());
-        }
-    }
-    map
-}
-
 fn fingerprint(
     path: &str,
     nodes: &BTreeMap<String, &Node>,
@@ -173,10 +136,7 @@ fn fingerprint(
 }
 
 pub fn dynamic_attribute(name: &str) -> bool {
-    matches!(
-        name,
-        "id" | "href" | "src" | "srcset" | "alt" | "title" | "aria-label" | "value"
-    )
+    !matches!(name, "class" | "style") && !name.starts_with("on")
 }
 
 fn subtree_size(path: &str, children: &BTreeMap<String, Vec<String>>) -> usize {
@@ -189,12 +149,5 @@ fn subtree_size(path: &str, children: &BTreeMap<String, Vec<String>>) -> usize {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn identifies_dynamic_attributes() {
-        assert!(dynamic_attribute("href"));
-        assert!(!dynamic_attribute("role"));
-    }
-}
+#[path = "tree_tests.rs"]
+mod tests;

@@ -31,7 +31,8 @@ pub fn workflow() -> &'static str {
 4. Decide from the full rendered page whether it is the requested interface or
    an access step. If ambiguous, ask one short question: recreate the visible
    page or wait for the page behind it.
-5. Keep credentials and session data inside the browser.
+5. Judge access from rendered controls and content, never URL/title keywords or
+   site-specific login patterns. Keep credentials and session data in-browser.
 6. Capture the exact inspected target:
    recreate capture --reuse --target <id> --cdp-url http://127.0.0.1:9222
 7. Build from react/src/App.jsx and validate acceptance.json.
@@ -111,5 +112,11 @@ mod tests {
         assert!(content.contains("skill"));
         assert!(!content.contains("node "));
         assert!(!content.contains("npm "));
+    }
+
+    #[test]
+    fn workflow_uses_rendered_access_state_not_login_patterns() {
+        assert!(workflow().contains("never URL/title keywords"));
+        assert!(workflow().contains("rendered controls and content"));
     }
 }

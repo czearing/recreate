@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generic dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.4 system-ui; color: #172033; background: #f4f7fb; }
+    header { display: flex; justify-content: space-between; padding: 24px; background: #172033; color: white; }
+    main { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 24px; }
+    .card { padding: 20px; border-radius: 14px; background: white; transition: transform 180ms ease; }
+    .card:hover { transform: translateY(-2px); }
+    button { border: 0; border-radius: 8px; padding: 10px 14px; color: white; background: #405cf5; }
+    [hidden] { display: none; }
+    @media (max-width: 600px) {
+      header { align-items: flex-start; flex-direction: column; gap: 12px; }
+      main { grid-template-columns: 1fr; padding: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition-duration: 0s; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+  <header><strong>Northstar</strong><span>Quarterly overview</span></header>
+  <main>
+    <section class="card"><h1>Revenue</h1><p>$128,400</p></section>
+    <section class="card"><h2>Customers</h2><p>2,418 active</p></section>
+    <section class="card">
+      <h2>Details</h2>
+      <button type="button" aria-expanded="false" aria-controls="details">Show details</button>
+      <p id="details" hidden>Retention is 94 percent.</p>
+    </section>
+  </main>
+  </div>
+  <script>
+    const button = document.querySelector('button');
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      document.querySelector('#details').hidden = expanded;
+    });
+    button.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        button.click();
+      }
+    });
+  </script>
+</body>
+</html>

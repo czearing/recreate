@@ -25,7 +25,7 @@ pub struct Rect {
     pub height: f64,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Node {
     pub path: String,
     pub parent: Option<String>,
@@ -38,7 +38,7 @@ pub struct Node {
     pub after: Option<Pseudo>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Pseudo {
     pub content: String,
     pub style: Styles,
@@ -51,6 +51,14 @@ pub struct Animation {
     pub timing: Value,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct StateStyle {
+    pub target: String,
+    pub pseudo: Option<String>,
+    pub media: Option<String>,
+    pub declarations: String,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PageState {
     pub url: String,
@@ -59,6 +67,8 @@ pub struct PageState {
     pub viewport: Viewport,
     pub nodes: Vec<Node>,
     pub animations: Vec<Animation>,
+    #[serde(default)]
+    pub state_styles: Vec<StateStyle>,
     pub css_rules: Vec<String>,
     pub asset_urls: Vec<String>,
     #[serde(default)]
@@ -80,6 +90,8 @@ pub struct Interaction {
     pub trigger_path: String,
     pub trigger_tag: String,
     pub trigger_label: String,
+    #[serde(default)]
+    pub focused_path: Option<String>,
     pub states: Vec<PageState>,
 }
 

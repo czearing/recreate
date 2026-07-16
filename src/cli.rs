@@ -48,7 +48,7 @@ pub struct CaptureArgs {
     pub cdp_url: String,
     #[arg(long, default_value = "recreate-output")]
     pub out: PathBuf,
-    #[arg(long, default_value = "1440x900,390x844")]
+    #[arg(long, default_value = "1920x1080,1440x900,768x1024,390x844,320x568")]
     pub viewports: String,
 }
 
@@ -81,5 +81,17 @@ mod tests {
         };
         assert_eq!(args.url.as_deref(), Some("https://example.com"));
         assert_eq!(args.viewports, "1200x800,390x844");
+    }
+
+    #[test]
+    fn defaults_to_five_responsive_layouts() {
+        let cli = Cli::try_parse_from(["recreate", "capture", "https://example.com"]).unwrap();
+        let Command::Capture(args) = cli.command else {
+            panic!("expected capture");
+        };
+        assert_eq!(
+            args.viewports,
+            "1920x1080,1440x900,768x1024,390x844,320x568"
+        );
     }
 }

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generic form</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.4 system-ui; color: #1f2937; background: #eef2ff; }
+    main { width: min(680px, calc(100% - 32px)); margin: 40px auto; padding: 28px; background: white; border-radius: 16px; }
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    label { display: grid; gap: 6px; font-weight: 650; }
+    label:last-of-type { grid-column: 1 / -1; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #a5b4fc; border-radius: 7px; font: inherit; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { justify-self: start; padding: 11px 18px; border: 0; border-radius: 7px; background: #4338ca; color: white; }
+    @media (max-width: 540px) {
+      main { margin: 16px auto; padding: 20px; }
+      form { grid-template-columns: 1fr; }
+      label:last-of-type { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+  <main>
+    <h1>Request a sample</h1>
+    <form>
+      <label>Name<input name="name" autocomplete="name"></label>
+      <label>Team size<select name="size"><option>1-10</option><option>11-50</option></select></label>
+      <label>Notes<textarea name="notes"></textarea></label>
+      <button type="submit">Send request</button>
+    </form>
+  </main>
+  </div>
+</body>
+</html>

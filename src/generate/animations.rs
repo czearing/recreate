@@ -1,40 +1,110 @@
 use crate::model::Animation;
 use serde_json::{Map, Value};
-use std::collections::BTreeMap;
+use sha2::{Digest, Sha256};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, css: &mut String) {
-    for (index, animation) in animations.iter().enumerate() {
+    let mut emitted_keyframes = BTreeSet::new();
+    let mut targets: BTreeMap<&str, Vec<(String, String, &Animation)>> = BTreeMap::new();
+    for animation in animations {
         if animation.keyframes.len() < 2 {
             continue;
         }
-        let name = format!("recreate{index}");
-        let class = format!("a{index}");
-        css.push_str(&format!("@keyframes {name}{{"));
-        for (frame_index, frame) in animation.keyframes.iter().enumerate() {
-            let offset = frame["offset"]
-                .as_f64()
-                .unwrap_or(frame_index as f64 / (animation.keyframes.len() - 1) as f64);
+        let digest = animation_digest(animation);
+        let name = format!("recreate{}", &digest[..10]);
+        if emitted_keyframes.insert(digest.clone()) {
+            append_keyframes(animation, &name, css);
+        }
+        targets
+            .entry(&animation.target)
+            .or_default()
+            .push((digest, name, animation));
+    }
+    let mut emitted_classes = BTreeSet::new();
+    let mut reduced_classes = Vec::new();
+    for (target, rules) in targets {
+        let signature = rules
+            .iter()
+            .map(|(digest, _, _)| digest.as_str())
+            .collect::<Vec<_>>()
+            .join("|");
+        let digest = hex::encode(Sha256::digest(signature));
+        let class = format!("a{}", &digest[..10]);
+        if emitted_classes.insert(digest) {
+            let names: Vec<String> = rules.iter().map(|(_, name, _)| name.clone()).collect();
+            let animations: Vec<&Animation> =
+                rules.iter().map(|(_, _, animation)| *animation).collect();
             css.push_str(&format!(
-                "{}%{{{}}}",
-                (offset * 100.0).round(),
-                declarations(frame.as_object())
+                ".{class}{{{}}}\n",
+                super::animation_timing::declarations(&animations, &names)
+            ));
+            reduced_classes.push(class.clone());
+        }
+        classes
+            .entry(target.into())
+            .and_modify(|value| append_class(value, &class));
+    }
+    if !reduced_classes.is_empty() {
+        css.push_str("@media (prefers-reduced-motion: reduce){");
+        for class in reduced_classes {
+            css.push_str(&format!(
+                ".{class}{{animation:none!important;transition:none!important;}}"
             ));
         }
         css.push_str("}\n");
-        let duration = animation.timing["duration"].as_f64().unwrap_or(0.0);
-        let delay = animation.timing["delay"].as_f64().unwrap_or(0.0);
-        let easing = animation.timing["easing"].as_str().unwrap_or("linear");
-        let iterations = animation.timing["iterations"].as_f64().unwrap_or(1.0);
-        css.push_str(&format!(
-            ".{class}{{animation:{name} {duration}ms {easing} {delay}ms {iterations};}}\n"
-        ));
-        classes
-            .entry(animation.target.clone())
-            .and_modify(|value| value.push_str(&format!(" {class}")));
     }
 }
 
-fn declarations(values: Option<&Map<String, Value>>) -> String {
+fn animation_digest(animation: &Animation) -> String {
+    let signature =
+        serde_json::to_vec(&(&animation.keyframes, &animation.timing)).unwrap_or_default();
+    hex::encode(Sha256::digest(signature))
+}
+
+fn append_keyframes(animation: &Animation, name: &str, css: &mut String) {
+    let final_position = position(animation.keyframes.last());
+    css.push_str(&format!("@keyframes {name}{{"));
+    let mut frames: BTreeMap<i32, Map<String, Value>> = BTreeMap::new();
+    for (index, frame) in animation.keyframes.iter().enumerate() {
+        let offset = frame["offset"]
+            .as_f64()
+            .unwrap_or(index as f64 / (animation.keyframes.len() - 1) as f64);
+        if let Some(values) = frame.as_object() {
+            frames
+                .entry((offset * 100.0).round() as i32)
+                .or_default()
+                .extend(values.clone());
+        }
+    }
+    for (offset, frame) in frames {
+        css.push_str(&format!(
+            "{offset}%{{{}}}",
+            declarations(Some(&frame), final_position)
+        ));
+    }
+    css.push_str("}\n");
+}
+
+fn append_class(value: &mut String, class: &str) {
+    if !value.split_whitespace().any(|item| item == class) {
+        value.push(' ');
+        value.push_str(class);
+    }
+}
+
+fn position(frame: Option<&Value>) -> (f64, f64) {
+    frame
+        .and_then(Value::as_object)
+        .map(|values| {
+            (
+                values.get("x").and_then(Value::as_f64).unwrap_or(0.0),
+                values.get("y").and_then(Value::as_f64).unwrap_or(0.0),
+            )
+        })
+        .unwrap_or_default()
+}
+
+fn declarations(values: Option<&Map<String, Value>>, final_position: (f64, f64)) -> String {
     let Some(values) = values else {
         return String::new();
     };
@@ -44,12 +114,18 @@ fn declarations(values: Option<&Map<String, Value>>) -> String {
     if x.is_some() || y.is_some() {
         output.push_str(&format!(
             "translate:{}px {}px;",
-            x.unwrap_or(0.0),
-            y.unwrap_or(0.0)
+            x.unwrap_or(final_position.0) - final_position.0,
+            y.unwrap_or(final_position.1) - final_position.1
         ));
     }
     for (key, value) in values {
-        if ["offset", "easing", "composite", "computedOffset", "x", "y"].contains(&key.as_str()) {
+        if key == "easing" {
+            if let Some(value) = value.as_str() {
+                output.push_str(&format!("animation-timing-function:{value};"));
+            }
+            continue;
+        }
+        if ["offset", "composite", "computedOffset", "x", "y"].contains(&key.as_str()) {
             continue;
         }
         if let Some(value) = css_value(key, value) {
@@ -85,15 +161,5 @@ fn kebab(value: &str) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn converts_geometry_frames_to_css() {
-        let frame = json!({"offset":0.5,"x":10,"y":20,"opacity":"0.5"});
-        let css = declarations(frame.as_object());
-        assert!(css.contains("translate:10px 20px"));
-        assert!(css.contains("opacity:0.5"));
-    }
-}
+#[path = "animation_tests.rs"]
+mod tests;
