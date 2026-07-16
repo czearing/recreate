@@ -169,7 +169,7 @@ pub fn launch_browser(path: &Path, profile: &Path, port: u16) -> Child {
 
 pub async fn wait_for_browser(port: u16) {
     let url = format!("http://127.0.0.1:{port}/json/version");
-    for _ in 0..120 {
+    for _ in 0..300 {
         if reqwest::get(&url)
             .await
             .is_ok_and(|response| response.status().is_success())
