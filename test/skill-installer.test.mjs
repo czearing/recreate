@@ -116,3 +116,19 @@ test('runs the terminal installer against an isolated home', () =>
       ),
     );
   }));
+
+test('installer states the automatic GitHub update contract', () =>
+  withTemporaryHome((home) => {
+    const output = execFileSync(
+      process.execPath,
+      [path.join(root, 'src', 'cli.mjs'), 'install', '--all'],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RECREATE_HOME: home },
+      },
+    );
+    assert.match(
+      output,
+      /Every invocation resolves the latest stable Recreate package from GitHub Releases/,
+    );
+  }));

@@ -103,7 +103,7 @@ export function installSkill(
   }
   console.log('');
   console.log(
-    'Every use checks GitHub Releases for the latest stable Recreate package.',
+    'Every invocation resolves the latest stable Recreate package from GitHub Releases.',
   );
   for (const result of installed) console.log(`- ${result.clientName}: ${result.reload}`);
   return installed;
