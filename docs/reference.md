@@ -74,12 +74,10 @@ browser console and network errors; capture, build, and browser runtime;
 generated source and build size; keyboard activation and focus restoration; and
 reduced-motion behavior.
 
-## Durable authenticated reference
+## Authenticated reference proof
 
-The final authenticated reference is generated from the persisted specification
-with the locked release binary and served from
-`review/authenticated-reference-v4/react` at `http://127.0.0.1:4557/`
-(PID `23576`). The release binary SHA-256 is
-`2B81742E7410AF0CEC2E206F937495848E71C07A3F681B32B16AF1FDD60FC1E8`.
-Runtime proof is recorded in
-`review/authenticated-reference-v4/runtime-evidence.json`.
+Authenticated captures are validated from persisted specifications so release
+proof does not depend on an expiring browser session. The final MVP reference
+checks baseline and interaction parity, embedded authenticated assets, five
+responsive layouts, normal motion, reduced motion, keyboard activation, focus
+restoration, console errors, and network errors.
