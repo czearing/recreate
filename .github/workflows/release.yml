@@ -1,85 +1,63 @@
-name: Stable release
+name: Publish main binaries
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
-  group: stable-release
-  cancel-in-progress: false
+  group: publish-main
+  cancel-in-progress: true
 
 permissions:
-  actions: write
   contents: write
-  id-token: write
-  pull-requests: write
 
 jobs:
-  release:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            source: target/release/recreate
+            asset: recreate-linux-x86_64
+          - os: windows-latest
+            source: target/release/recreate.exe
+            asset: recreate-windows-x86_64.exe
+          - os: macos-13
+            source: target/release/recreate
+            asset: recreate-macos-x86_64
+          - os: macos-14
+            source: target/release/recreate
+            asset: recreate-macos-aarch64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --all-targets
+      - run: cargo build --release
+      - shell: bash
+        run: cp "${{ matrix.source }}" "${{ matrix.asset }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: ${{ matrix.asset }}
+          if-no-files-found: error
+
+  publish:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - id: release
-        uses: googleapis/release-please-action@v5
+      - uses: actions/download-artifact@v4
         with:
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-      - if: ${{ steps.release.outputs.pr != '' }}
-        env:
+          path: artifacts
+          merge-multiple: true
+      - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_PR: ${{ steps.release.outputs.pr }}
         run: |
-          branch="$(printf '%s' "$RELEASE_PR" | jq -r '.headBranchName // empty')"
-          test -n "$branch"
-          sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$branch" --jq '.object.sha')"
-          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$branch"
-          run_id=""
-          for _ in {1..15}; do
-            run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml \
-              --event workflow_dispatch --commit "$sha" --limit 1 \
-              --json databaseId --jq '.[0].databaseId // empty')"
-            [ -n "$run_id" ] && break
-            sleep 2
-          done
-          test -n "$run_id"
-          gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --exit-status
-      - if: ${{ steps.release.outputs.release_created }}
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ steps.release.outputs.tag_name }}
-      - if: ${{ steps.release.outputs.release_created }}
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
-      - if: ${{ steps.release.outputs.release_created }}
-        run: npm ci
-      - if: ${{ steps.release.outputs.release_created }}
-        run: npm run ci
-      - if: ${{ steps.release.outputs.release_created }}
-        run: npm install --global npm@latest
-      - if: ${{ steps.release.outputs.release_created }}
-        run: npm publish --tag latest --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - if: ${{ steps.release.outputs.release_created }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ steps.release.outputs.tag_name }}
-        run: |
-          version="${RELEASE_TAG##*-v}"
-          mkdir -p release-assets
-          tarball_url=""
-          for _ in {1..10}; do
-            tarball_url="$(npm view "recreate-cli@$version" dist.tarball --registry=https://registry.npmjs.org 2>/dev/null || true)"
-            [ -n "$tarball_url" ] && break
-            sleep 3
-          done
-          test -n "$tarball_url"
-          curl --fail --location --retry 3 "$tarball_url" \
-            --output "release-assets/recreate-cli-$version.tgz"
-          cp "release-assets/recreate-cli-$version.tgz" \
-            "release-assets/recreate-cli.tgz"
-          gh release upload "$RELEASE_TAG" \
-            "release-assets/recreate-cli-$version.tgz" \
-            "release-assets/recreate-cli.tgz" --clobber
+          gh release view recreate-main --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
+            gh release create recreate-main --repo "$GITHUB_REPOSITORY" \
+              --prerelease --title "Recreate main" \
+              --notes "Latest validated main build."
+          gh release upload recreate-main --repo "$GITHUB_REPOSITORY" \
+            artifacts/* --clobber

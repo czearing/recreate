@@ -1,8 +1,3 @@
-node_modules/
-site-spec/
-site-spec*/
-recreate/
-recreate*/
-captures/
-artifacts/
+/target/
+/recreate-output/
 *.log

@@ -1,0 +1,30 @@
+[package]
+name = "recreate"
+version = "0.6.0"
+edition = "2024"
+description = "Capture any interface. Keep every detail."
+license = "MIT"
+repository = "https://github.com/czearing/recreate"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+clap = { version = "4", features = ["derive"] }
+futures-util = "0.3"
+hex = "0.4"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+self-replace = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", "time"] }
+tokio-tungstenite = "0.28"
+url = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+strip = true

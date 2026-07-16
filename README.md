@@ -8,66 +8,63 @@
 
 <div align="center">
 
-<a href="https://github.com/czearing/recreate/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/czearing/recreate/ci.yml?branch=main&style=flat-square&label=CI&labelColor=171A24&color=6C7CFF"></a> <a href="https://www.npmjs.com/package/recreate-cli"><img alt="npm" src="https://img.shields.io/npm/v/recreate-cli?style=flat-square&label=npm&labelColor=171A24&color=6C7CFF"></a> <a href="https://www.npmjs.com/package/recreate-cli"><img alt="downloads" src="https://img.shields.io/npm/dm/recreate-cli?style=flat-square&label=downloads&labelColor=171A24&color=6C7CFF"></a> <a href="https://github.com/czearing/recreate/issues"><img alt="issues" src="https://img.shields.io/github/issues/czearing/recreate?style=flat-square&label=issues&labelColor=171A24&color=6C7CFF"></a> <a href="LICENSE"><img alt="license" src="https://img.shields.io/github/license/czearing/recreate?style=flat-square&label=license&labelColor=171A24&color=6C7CFF"></a>
-
-[Get started](#get-started) · [Documentation](docs/reference.md) · [Report an issue](https://github.com/czearing/recreate/issues/new/choose) · [npm](https://www.npmjs.com/package/recreate-cli)
+<a href="https://github.com/czearing/recreate/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/czearing/recreate/ci.yml?branch=main&style=flat-square&label=CI&labelColor=171A24&color=6C7CFF"></a>
+<a href="https://github.com/czearing/recreate/releases/tag/recreate-main"><img alt="release" src="https://img.shields.io/github/v/release/czearing/recreate?include_prereleases&style=flat-square&label=release&labelColor=171A24&color=6C7CFF"></a>
+<a href="https://github.com/czearing/recreate/issues"><img alt="issues" src="https://img.shields.io/github/issues/czearing/recreate?style=flat-square&label=issues&labelColor=171A24&color=6C7CFF"></a>
+<a href="LICENSE"><img alt="license" src="https://img.shields.io/github/license/czearing/recreate?style=flat-square&label=license&labelColor=171A24&color=6C7CFF"></a>
 
 </div>
 
-Recreate captures a live interface and turns it into a complete, portable reference. Structure, styling, assets, responsive behavior, and interactions stay together, ready to rebuild and verify.
+Recreate captures one rendered page and turns it into local assets, responsive
+evidence, animation data, interaction states, and clean React components.
 
-## Get started
+## Install
+
+### Windows
+
+```powershell
+$dir = "$HOME\.recreate\bin"
+New-Item -ItemType Directory -Force $dir | Out-Null
+curl.exe -L https://github.com/czearing/recreate/releases/download/recreate-main/recreate-windows-x86_64.exe -o "$dir\recreate.exe"
+& "$dir\recreate.exe" install
+```
+
+### macOS and Linux
 
 ```bash
-npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate install
+mkdir -p "$HOME/.recreate/bin"
+# Download the matching binary from the recreate-main release, then:
+chmod +x "$HOME/.recreate/bin/recreate"
+"$HOME/.recreate/bin/recreate" install
 ```
 
-Recreate detects GitHub Copilot CLI and Claude Code, then installs a personal
-`/recreate` skill for every client it finds.
+The installer adds a personal `/recreate` skill for GitHub Copilot CLI and
+Claude Code. The native binary checks GitHub Releases for validated updates on
+every invocation.
 
-| Client | Installed skill |
-| --- | --- |
-| GitHub Copilot CLI | `~/.copilot/skills/recreate/SKILL.md` |
-| Claude Code | `~/.claude/skills/recreate/SKILL.md` |
-
-Run it from Copilot or Claude:
-
-```text
-/recreate Capture https://example.com and rebuild it in this project.
-```
-
-Each run checks GitHub Releases for the package published by the latest stable
-npm release. No reinstall is required, even when a network blocks public npm.
-
-If the link opens an access page, the skill inspects it before capture. It asks
-whether that page is the intended interface or whether access should be
-completed in the open browser tab, then continues with the same session.
-
-Run Recreate directly at any time:
+## Capture
 
 ```bash
-npm exec --yes --package=https://github.com/czearing/recreate/releases/latest/download/recreate-cli.tgz -- recreate https://example.com
+recreate capture https://example.com
 ```
 
-## One capture. The whole interface.
+Recreate writes:
 
-| | |
-| --- | --- |
-| **Structure** | Pages, sections, components, and content |
-| **Visual system** | Layout, type, color, spacing, and assets |
-| **Responsive behavior** | Desktop and mobile states captured together |
-| **Interactions** | Navigation, menus, dialogs, focus, hover, and motion |
+- `spec.json`
+- `acceptance.json`
+- source screenshots for each viewport
+- local assets and fonts
+- `react/` with semantic component folders, JSX, CSS, and interaction states
 
-## Built for accurate recreation
+## Verify
 
-Screenshots show how a page looked once. Recreate preserves the details that made it work, including the relationships between elements and the changes between states. The result is easier to understand, easier to reproduce, and easier to check.
+Start the generated React project, then compare it with the captured evidence:
 
-## Links
+```bash
+recreate verify --spec recreate-output/spec.json --url http://127.0.0.1:5173
+```
 
-- [Documentation](docs/reference.md)
-- [Release channels](docs/release-channels.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security](SECURITY.md)
+See [the reference](docs/reference.md) for the full command surface.
 
 ## License
 

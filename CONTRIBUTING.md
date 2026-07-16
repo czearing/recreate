@@ -3,8 +3,9 @@
 ## Setup
 
 ```bash
-npm install
-npm run ci
+cargo test --all-targets
+cargo clippy --all-targets -- -D warnings
+cargo build --release
 ```
 
 ## Pull requests
@@ -12,7 +13,7 @@ npm run ci
 - Keep changes focused.
 - Add regression coverage for behavior changes.
 - Preserve structured evidence and restoration paths.
-- Run `npm run ci` and `npm run pack:check`.
+- Run formatting, Clippy, tests, and the release build.
 - Use Conventional Commit titles (`feat:`, `fix:`, `docs:`).
 
 Do not commit captured sites, credentials, browser profiles, or generated

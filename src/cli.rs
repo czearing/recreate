@@ -1,0 +1,85 @@
+use clap::{Args, Parser, Subcommand};
+use std::path::PathBuf;
+
+#[derive(Parser)]
+#[command(name = "recreate", version, about)]
+pub struct Cli {
+    #[command(subcommand)]
+    pub command: Command,
+}
+
+#[derive(Subcommand)]
+pub enum Command {
+    Capture(CaptureArgs),
+    Generate(GenerateArgs),
+    Install(InstallArgs),
+    Skill,
+    Verify(VerifyArgs),
+}
+
+#[derive(Args, Clone)]
+pub struct GenerateArgs {
+    #[arg(long)]
+    pub spec: PathBuf,
+    #[arg(long)]
+    pub out: PathBuf,
+}
+
+#[derive(Args, Clone)]
+pub struct VerifyArgs {
+    #[arg(long)]
+    pub spec: PathBuf,
+    #[arg(long)]
+    pub url: String,
+    #[arg(long, default_value = "http://127.0.0.1:9222")]
+    pub cdp_url: String,
+    #[arg(long)]
+    pub interaction: Option<usize>,
+}
+
+#[derive(Args, Clone)]
+pub struct CaptureArgs {
+    pub url: Option<String>,
+    #[arg(long)]
+    pub reuse: bool,
+    #[arg(long)]
+    pub target: Option<String>,
+    #[arg(long, default_value = "http://127.0.0.1:9222")]
+    pub cdp_url: String,
+    #[arg(long, default_value = "recreate-output")]
+    pub out: PathBuf,
+    #[arg(long, default_value = "1440x900,390x844")]
+    pub viewports: String,
+}
+
+#[derive(Args, Clone)]
+pub struct InstallArgs {
+    #[arg(long)]
+    pub copilot: bool,
+    #[arg(long)]
+    pub claude: bool,
+    #[arg(long)]
+    pub all: bool,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_single_page_capture() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "capture",
+            "https://example.com",
+            "--viewports",
+            "1200x800,390x844",
+        ])
+        .unwrap();
+        let Command::Capture(args) = cli.command else {
+            panic!("expected capture");
+        };
+        assert_eq!(args.url.as_deref(), Some("https://example.com"));
+        assert_eq!(args.viewports, "1200x800,390x844");
+    }
+}
