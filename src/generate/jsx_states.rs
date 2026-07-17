@@ -29,7 +29,12 @@ pub fn interaction_states(
             .enumerate()
             .map(|(state_index, (state, classes))| {
                 let components = structural_tree::for_state(base, state, classes);
-                let handlers = interactions::state_handlers(interaction, state);
+                let baseline = specification
+                    .states
+                    .iter()
+                    .find(|baseline| baseline.viewport.width == state.viewport.width)
+                    .unwrap_or(&specification.states[0]);
+                let handlers = interactions::state_handlers(interaction, state, baseline);
                 let page = jsx_variants::page(state, &components, assets, &handlers);
                 format!(
                     "function Interaction{}View{state_index}({{onReset}}){{return {page}}}\n",

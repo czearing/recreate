@@ -2,7 +2,7 @@ use crate::{
     browser, capture,
     cli::{CaptureArgs, VerifyArgs},
     compare_node::compare,
-    lifecycle_script,
+    interactions_input, lifecycle_script,
     model::Specification,
 };
 use anyhow::{Context, Result};
@@ -56,6 +56,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         let capture_args = CaptureArgs {
             url: Some(args.url.clone()),
             reuse: false,
+            reload: false,
             target: None,
             cdp_url: args.cdp_url.clone(),
             out: PathBuf::new(),
@@ -65,13 +66,23 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
             .await?;
         cdp.send(
+            "Emulation.setEmulatedMedia",
+            serde_json::json!({
+                "features":[{"name":"prefers-reduced-motion","value":"no-preference"}]
+            }),
+        )
+        .await?;
+        cdp.send(
             "Page.addScriptToEvaluateOnNewDocument",
             serde_json::json!({ "source": lifecycle_script::SOURCE }),
         )
         .await?;
+        cdp.send("Page.reload", serde_json::json!({"ignoreCache":false}))
+            .await?;
         let actual = if let Some(trigger) = trigger {
             let _ = capture::capture_state(&mut cdp, expected.viewport.clone(), true).await?;
-            click(&mut cdp, trigger).await?;
+            cdp.evaluate("scrollTo(0,0)").await?;
+            interactions_input::click(&mut cdp, trigger).await?;
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
             capture::read_state(&mut cdp, expected.viewport.clone()).await?
         } else {
@@ -91,15 +102,6 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
     if !totals.passed {
         anyhow::bail!("generated page does not match captured evidence");
     }
-    Ok(())
-}
-
-async fn click(cdp: &mut crate::cdp::Cdp, path: &str) -> Result<()> {
-    let expression = format!(
-        "document.querySelector({})?.click()",
-        serde_json::to_string(path)?
-    );
-    cdp.evaluate(&expression).await?;
     Ok(())
 }
 

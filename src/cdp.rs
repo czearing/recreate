@@ -1,7 +1,10 @@
 use anyhow::{Context, Result, bail};
 use futures_util::{SinkExt, StreamExt};
 use serde_json::{Value, json};
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async, tungstenite::Message};
+use tokio_tungstenite::{
+    MaybeTlsStream, WebSocketStream, connect_async_with_config,
+    tungstenite::{Message, protocol::WebSocketConfig},
+};
 
 type Socket = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;
 
@@ -19,7 +22,10 @@ impl Cdp {
     }
 
     async fn connect_with_timeout(url: &str, command_timeout: std::time::Duration) -> Result<Self> {
-        let (socket, _) = connect_async(url)
+        let config = WebSocketConfig::default()
+            .max_message_size(Some(64 * 1024 * 1024))
+            .max_frame_size(Some(64 * 1024 * 1024));
+        let (socket, _) = connect_async_with_config(url, Some(config), false)
             .await
             .with_context(|| format!("connect CDP websocket {url}"))?;
         Ok(Self {

@@ -31,13 +31,13 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("onKeyDown"));
     assert!(app.contains("data-recreate-trigger"));
     assert!(app.contains("document.querySelector"));
+    assert!(app.contains("event.key==='Escape'"));
     assert!(app.contains("function Baseline0({activate})"));
     assert!(app.contains("return <View activate={activate}/>"));
     let states = std::fs::read_to_string(root.join("src/states.jsx")).unwrap();
     assert!(states.contains("aria-expanded={\"true\"}"));
     assert!(states.contains("aria-modal={\"true\"}"));
     assert!(states.contains("autoFocus"));
-    assert!(states.contains("event.key==='Escape'"));
     assert!(states.contains("onClick={event=>onReset(event)}"));
     let css = std::fs::read_to_string(root.join("src/styles.css")).unwrap();
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));

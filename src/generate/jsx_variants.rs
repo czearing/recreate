@@ -41,6 +41,45 @@ pub fn selector() -> &'static str {
     "const selectViewport=(width,widths)=>{for(let index=0;index<widths.length;index++){if(width>=widths[index])return index}return widths.length-1};"
 }
 
+pub fn fragment(
+    components: &tree::Components,
+    assets: &BTreeMap<String, String>,
+    delay_ms: u64,
+    duration_ms: u64,
+) -> String {
+    let handlers = components
+        .nodes
+        .values()
+        .filter(|node| {
+            node.parent
+                .as_deref()
+                .is_none_or(|parent| !components.nodes.contains_key(parent))
+        })
+        .map(|node| {
+            (
+                node.path.clone(),
+                format!(
+                    "data-recreate-startup=\"true\" style={{{{\
+                     \"--recreate-startup-delay\":\"{delay_ms}ms\",\
+                     \"--recreate-startup-duration\":\"{duration_ms}ms\"\
+                     }}}}"
+                ),
+            )
+        })
+        .collect();
+    let roots = components
+        .nodes
+        .values()
+        .filter(|node| {
+            node.parent
+                .as_deref()
+                .is_none_or(|parent| !components.nodes.contains_key(parent))
+        })
+        .map(|node| jsx::render(&node.path, components, assets, 2, true, &handlers))
+        .collect::<String>();
+    format!("<>{roots}</>")
+}
+
 pub fn widths(states: &[PageState]) -> String {
     states
         .iter()

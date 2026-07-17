@@ -85,6 +85,9 @@ fn state(width: u32) -> PageState {
             dpr: 1.0,
         },
         nodes,
+        startup_nodes: Vec::new(),
+        startup_delay_ms: 0,
+        startup_duration_ms: 0,
         animations: vec![Animation {
             target: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
             keyframes: vec![

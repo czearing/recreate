@@ -44,6 +44,9 @@ fn state(animated: bool) -> PageState {
             node("html", None, style.clone()),
             node(TARGET, Some("html"), style),
         ],
+        startup_nodes: Vec::new(),
+        startup_delay_ms: 0,
+        startup_duration_ms: 0,
         animations: animated
             .then(|| Animation {
                 target: TARGET.into(),

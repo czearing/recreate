@@ -50,10 +50,11 @@ Open authenticated or access-controlled sources in Recreate's visible browser:
 recreate open https://example.com
 ```
 
-After access is complete, capture the returned target without reloading it:
+After access is complete, instrument and reload that same authenticated target
+to capture startup motion:
 
 ```bash
-recreate capture --reuse --target <target-id> --cdp-url <cdp-url>
+recreate capture --reuse --reload --target <target-id> --cdp-url <cdp-url>
 ```
 
 Recreate writes:

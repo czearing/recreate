@@ -19,7 +19,7 @@ The capture includes:
 
 ```text
 recreate capture <url>
-recreate capture --reuse --target <target-id>
+recreate capture --reuse --reload --target <target-id>
 recreate open <url>
 recreate generate --spec <spec.json> --out <directory>
 recreate verify --spec <spec.json> --url <generated-url>
@@ -43,8 +43,9 @@ Chromium profile and inspects the returned target before capture.
 
 If the visible page could be either the intended design or an access step, the
 skill asks one short question. Credentials and session state remain inside the
-browser. Capture reuses the exact CDP endpoint and target identifier.
-Reuse capture does not navigate or reload the authenticated target.
+browser. Capture reuses the exact CDP endpoint and target identifier. The
+instrumented reload preserves the authenticated browser session while recording
+startup motion under `prefers-reduced-motion: no-preference`.
 
 ## Generated React
 

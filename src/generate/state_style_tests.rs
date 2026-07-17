@@ -3,10 +3,39 @@ use super::*;
 fn style(target: &str, pseudo: Option<&str>, declarations: &str) -> StateStyle {
     StateStyle {
         target: target.into(),
+        scope: None,
         pseudo: pseudo.map(str::to_string),
+        target_pseudo: None,
         media: None,
         declarations: declarations.into(),
     }
+}
+
+#[test]
+fn emits_ancestor_state_selector() {
+    let classes = BTreeMap::from([
+        ("html>body>div".into(), "card".into()),
+        ("html>body>div>button".into(), "menu".into()),
+    ]);
+    let mut scoped = style("html>body>div>button", Some(":hover"), "opacity: 1;");
+    scoped.scope = Some("html>body>div".into());
+    let mut css = String::new();
+    append(&[scoped], &classes, &BTreeMap::new(), &mut css);
+    assert!(css.contains(".card:hover .menu{opacity: 1;}"));
+}
+
+#[test]
+fn emits_mixed_ancestor_and_target_states() {
+    let classes = BTreeMap::from([
+        ("html>body>div".into(), "menu".into()),
+        ("html>body>div>button".into(), "item".into()),
+    ]);
+    let mut scoped = style("html>body>div>button", Some(":hover"), "opacity: 1;");
+    scoped.scope = Some("html>body>div".into());
+    scoped.target_pseudo = Some(":focus".into());
+    let mut css = String::new();
+    append(&[scoped], &classes, &BTreeMap::new(), &mut css);
+    assert!(css.contains(".menu:hover .item:focus{opacity: 1;}"));
 }
 
 #[test]

@@ -54,7 +54,11 @@ pub struct Animation {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct StateStyle {
     pub target: String,
+    #[serde(default)]
+    pub scope: Option<String>,
     pub pseudo: Option<String>,
+    #[serde(default)]
+    pub target_pseudo: Option<String>,
     pub media: Option<String>,
     pub declarations: String,
 }
@@ -66,6 +70,12 @@ pub struct PageState {
     #[serde(default)]
     pub viewport: Viewport,
     pub nodes: Vec<Node>,
+    #[serde(default)]
+    pub startup_nodes: Vec<Node>,
+    #[serde(default)]
+    pub startup_delay_ms: u64,
+    #[serde(default)]
+    pub startup_duration_ms: u64,
     pub animations: Vec<Animation>,
     #[serde(default)]
     pub state_styles: Vec<StateStyle>,

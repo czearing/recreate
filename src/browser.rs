@@ -22,9 +22,7 @@ pub struct Target {
 pub async fn open(args: OpenArgs) -> Result<()> {
     ensure_endpoint(&args.cdp_url).await?;
     let target = create(&args.cdp_url, &args.url).await?;
-    reqwest::get(format!("{}/json/activate/{}", args.cdp_url, target.id))
-        .await?
-        .error_for_status()?;
+    activate(&args.cdp_url, &target.id).await?;
     println!(
         "{}",
         serde_json::to_string_pretty(&serde_json::json!({
@@ -52,6 +50,9 @@ pub async fn target(args: &CaptureArgs) -> Result<(Target, Cdp)> {
         let url = args.url.as_deref().context("capture requires a URL")?;
         create(&args.cdp_url, url).await?
     };
+    if args.reuse {
+        activate(&args.cdp_url, &target.id).await?;
+    }
     let cdp = Cdp::connect(&target.websocket_url).await?;
     Ok((target, cdp))
 }
@@ -75,6 +76,13 @@ async fn create(endpoint: &str, url: &str) -> Result<Target> {
         .json()
         .await?;
     Ok(created)
+}
+
+async fn activate(endpoint: &str, id: &str) -> Result<()> {
+    reqwest::get(format!("{endpoint}/json/activate/{id}"))
+        .await?
+        .error_for_status()?;
+    Ok(())
 }
 
 async fn ensure_endpoint(endpoint: &str) -> Result<()> {

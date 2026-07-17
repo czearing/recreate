@@ -1,8 +1,15 @@
 use super::responsive;
-use super::{animations, state_styles};
-use crate::model::{Specification, Styles};
-use sha2::{Digest, Sha256};
+use super::{animations, interaction_scroll, interactions, startup_overlays, state_styles};
+use super::{
+    css_layout,
+    css_values::{hash, responsive_signature, style_signature},
+};
+use crate::model::Specification;
+#[cfg(test)]
+use crate::model::Styles;
 use std::collections::{BTreeMap, HashMap};
+
+pub(super) use super::css_values::declarations;
 
 pub struct CssOutput {
     pub css: String,
@@ -11,6 +18,15 @@ pub struct CssOutput {
 }
 
 pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -> CssOutput {
+    build_scoped(specification, assets, "r", true)
+}
+
+fn build_scoped(
+    specification: &Specification,
+    assets: &BTreeMap<String, String>,
+    prefix: &str,
+    include_interactions: bool,
+) -> CssOutput {
     let Some(base) = specification.states.first() else {
         return CssOutput {
             css: String::new(),
@@ -30,19 +46,32 @@ pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -
     }
     let mut signature_classes = HashMap::new();
     let mut classes = BTreeMap::new();
+    let base_nodes: HashMap<_, _> = base
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect();
     for node in &base.nodes {
         if node.tag == "#text" {
             continue;
         }
-        let signature = responsive_signature(specification, &node.path);
+        let parent = node
+            .parent
+            .as_deref()
+            .and_then(|parent| base_nodes.get(parent).copied());
+        let signature = format!(
+            "{}|layout:{}",
+            responsive_signature(specification, &node.path),
+            css_layout::role(node, parent, &base.viewport)
+        );
         let class = signature_classes
             .entry(signature.clone())
-            .or_insert_with(|| format!("r{}", &hash(&signature)[..10]))
+            .or_insert_with(|| format!("{prefix}{}", &hash(&signature)[..10]))
             .clone();
         if !css.contains(&format!(".{class}{{")) {
             css.push_str(&format!(
                 ".{class}{{{}}}\n",
-                responsive::base_declarations(node, &base.viewport, assets)
+                responsive::base_declarations(node, parent, &base.viewport, assets,)
             ));
         }
         if let Some(before) = &node.before {
@@ -61,21 +90,61 @@ pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -
         }
         classes.insert(node.path.clone(), class);
     }
+    for node in &base.startup_nodes {
+        if node.tag == "#text" {
+            continue;
+        }
+        let signature = style_signature(&node.style);
+        let class = format!("u{}", &hash(&signature)[..10]);
+        if !css.contains(&format!(".{class}{{")) {
+            css.push_str(&format!(
+                ".{class}{{{}}}\n",
+                declarations(&node.style, assets)
+            ));
+        }
+        classes.insert(node.path.clone(), class);
+    }
     responsive::append(specification, assets, &classes, &mut css);
     let mut interaction_classes = Vec::new();
-    for interaction in &specification.interactions {
+    for (index, interaction) in specification.interactions.iter().enumerate() {
+        let mut states = interaction.states.clone();
+        if !interactions::closable(interaction, &specification.states[0]) {
+            for state in &mut states {
+                let Some(baseline) = specification
+                    .states
+                    .iter()
+                    .find(|baseline| baseline.viewport.width == state.viewport.width)
+                else {
+                    continue;
+                };
+                let Some(owner) = interaction_scroll::owner_path(baseline, state) else {
+                    continue;
+                };
+                if let Some(node) = state.nodes.iter_mut().find(|node| node.path == owner) {
+                    node.style.insert("overflow-y".into(), "scroll".into());
+                    node.style
+                        .insert("scrollbar-gutter".into(), "stable".into());
+                }
+            }
+        }
         let interaction_spec = Specification {
             schema_version: specification.schema_version,
             requested_url: specification.requested_url.clone(),
             captured_url: specification.captured_url.clone(),
-            states: interaction.states.clone(),
+            states,
             interactions: Vec::new(),
         };
-        let output = build(&interaction_spec, assets);
+        let output = build_scoped(
+            &interaction_spec,
+            assets,
+            &format!("s{}-", index + 1),
+            false,
+        );
         css.push_str(&output.css);
         interaction_classes.push(output.classes);
     }
     animations::append(&base.animations, &mut classes, &mut css);
+    startup_overlays::append(&specification.states, &mut classes, &mut css);
     let inherited = specification
         .interactions
         .iter()
@@ -92,6 +161,9 @@ pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -
         })
         .collect::<Vec<_>>();
     state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
+    if !include_interactions {
+        interaction_classes.clear();
+    }
     CssOutput {
         css,
         classes,
@@ -99,99 +171,6 @@ pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -
     }
 }
 
-pub(super) fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
-    styles
-        .iter()
-        .filter(|(_, value)| !value.is_empty())
-        .map(|(key, value)| {
-            let value = assets
-                .iter()
-                .fold(value.clone(), |text, (url, local)| text.replace(url, local));
-            format!("{key}:{value};")
-        })
-        .collect()
-}
-
-fn style_signature(styles: &Styles) -> String {
-    styles
-        .iter()
-        .map(|(key, value)| format!("{key}:{value}"))
-        .collect::<Vec<_>>()
-        .join(";")
-}
-
-fn responsive_signature(specification: &Specification, path: &str) -> String {
-    specification
-        .states
-        .iter()
-        .filter_map(|state| state.nodes.iter().find(|node| node.path == path))
-        .map(|node| {
-            format!(
-                "{}|{}|{}",
-                style_signature(&node.style),
-                pseudo_signature(node.before.as_ref()),
-                pseudo_signature(node.after.as_ref())
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("||")
-}
-
-fn pseudo_signature(pseudo: Option<&crate::model::Pseudo>) -> String {
-    pseudo
-        .map(|pseudo| format!("{}:{}", pseudo.content, style_signature(&pseudo.style)))
-        .unwrap_or_default()
-}
-
-fn hash(value: &str) -> String {
-    hex::encode(Sha256::digest(value.as_bytes()))
-}
-
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn directional_border_contract_is_captured_and_generated() {
-        let mut styles = Styles::new();
-        for side in ["top", "right", "bottom", "left"] {
-            for (property, value) in [
-                ("width", "4px"),
-                ("style", "solid"),
-                ("color", "rgb(216, 168, 78)"),
-            ] {
-                let name = format!("border-{side}-{property}");
-                assert!(
-                    crate::style_contract::contains(&name),
-                    "missing capture property {name}"
-                );
-                styles.insert(name, value.into());
-            }
-        }
-        let css = declarations(&styles, &BTreeMap::new());
-        for side in ["top", "right", "bottom", "left"] {
-            assert!(css.contains(&format!("border-{side}-width:4px;")));
-            assert!(css.contains(&format!("border-{side}-style:solid;")));
-            assert!(css.contains(&format!("border-{side}-color:rgb(216, 168, 78);")));
-        }
-    }
-
-    #[test]
-    fn grid_item_contract_is_captured_and_generated() {
-        let mut styles = Styles::new();
-        for (name, value) in [
-            ("grid-column-start", "1"),
-            ("grid-column-end", "-1"),
-            ("grid-row-start", "auto"),
-            ("grid-row-end", "auto"),
-            ("justify-self", "start"),
-        ] {
-            assert!(crate::style_contract::contains(name));
-            styles.insert(name.into(), value.into());
-        }
-        let css = declarations(&styles, &BTreeMap::new());
-        for (name, value) in styles {
-            assert!(css.contains(&format!("{name}:{value};")));
-        }
-    }
-}
+#[path = "css_tests.rs"]
+mod tests;

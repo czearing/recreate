@@ -31,7 +31,7 @@ fn class_name(
     viewport: &crate::model::Viewport,
     assets: &BTreeMap<String, String>,
 ) -> String {
-    let mut signature = responsive::base_declarations(node, viewport, assets);
+    let mut signature = responsive::base_declarations(node, None, viewport, assets);
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
         signature.push_str(&declarations(&before.style, assets));
@@ -55,7 +55,7 @@ fn append_rule(
     }
     css.push_str(&format!(
         ".{class}{{{}}}\n",
-        responsive::base_declarations(node, viewport, assets)
+        responsive::base_declarations(node, None, viewport, assets)
     ));
     if let Some(before) = &node.before {
         css.push_str(&format!(

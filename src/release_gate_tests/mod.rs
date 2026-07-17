@@ -12,7 +12,7 @@ use std::{
 };
 use support::{
     browser_path, collect_errors, directory_size, free_port, launch_browser, selected_fixtures,
-    specification, viewport, wait_for_browser,
+    selected_viewports, specification, viewport, wait_for_browser,
 };
 
 const FIXTURES: &[&str] = &[
@@ -131,6 +131,7 @@ async fn validate_fixture(
     let args = CaptureArgs {
         url: Some(url::Url::from_file_path(fixture).unwrap().to_string()),
         reuse: false,
+        reload: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),
@@ -145,7 +146,7 @@ async fn validate_fixture(
     )
     .await?;
     let mut states = Vec::new();
-    for (index, &(width, height)) in VIEWPORTS.iter().enumerate() {
+    for (index, (width, height)) in selected_viewports(VIEWPORTS).into_iter().enumerate() {
         states.push(capture::capture_state(&mut cdp, viewport(width, height), index == 0).await?);
     }
     let captured_interactions = if name == "interaction" {

@@ -62,9 +62,13 @@ fn compare_node(report: &mut Report, expected: &Node, actual: &Node) {
             ),
         );
     }
-    if !same_style(expected, actual) {
+    let styles = style_differences(expected, actual);
+    if !styles.is_empty() {
         report.style_mismatches += 1;
-        detail(report, format!("style {}", expected.path));
+        detail(
+            report,
+            format!("style {} {}", expected.path, styles.join(",")),
+        );
     }
 }
 
@@ -123,7 +127,7 @@ pub(crate) fn same_rect(left: &Node, right: &Node) -> bool {
     .all(|(left, right)| (left - right).abs() <= 1.5)
 }
 
-fn same_style(left: &Node, right: &Node) -> bool {
+fn style_differences(left: &Node, right: &Node) -> Vec<String> {
     [
         "color",
         "background-color",
@@ -131,11 +135,20 @@ fn same_style(left: &Node, right: &Node) -> bool {
         "font-size",
         "font-weight",
         "border-radius",
+        "scrollbar-width",
         "display",
         "position",
     ]
     .into_iter()
-    .all(|key| left.style.get(key) == right.style.get(key))
+    .filter(|key| left.style.get(*key) != right.style.get(*key))
+    .map(|key| {
+        format!(
+            "{key}={:?}/{:?}",
+            left.style.get(key).map(String::as_str),
+            right.style.get(key).map(String::as_str)
+        )
+    })
+    .collect()
 }
 
 fn empty_report(expected: usize, actual: usize) -> Report {

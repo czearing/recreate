@@ -30,7 +30,13 @@ pub fn append_inherited(
 }
 
 type RuleKey = (String, Option<String>, String);
-type StyleKey<'a> = (&'a str, Option<&'a str>, Option<&'a str>);
+type StyleKey<'a> = (
+    &'a str,
+    Option<&'a str>,
+    Option<&'a str>,
+    Option<&'a str>,
+    Option<&'a str>,
+);
 
 fn collect(
     styles: &[StateStyle],
@@ -56,14 +62,19 @@ fn collect(
             style.media.clone(),
             declarations,
         );
-        let selector = format!(
+        let target = format!(
             "{}{}",
-            class
-                .split_whitespace()
-                .map(|name| format!(".{name}"))
-                .collect::<String>(),
-            style.pseudo.as_deref().unwrap_or_default()
+            selector(class),
+            style.target_pseudo.as_deref().unwrap_or_default()
         );
+        let selector = match style.scope.as_deref().and_then(|scope| classes.get(scope)) {
+            Some(scope) => format!(
+                "{}{} {target}",
+                selector(scope),
+                style.pseudo.as_deref().unwrap_or_default()
+            ),
+            None => format!("{target}{}", style.pseudo.as_deref().unwrap_or_default()),
+        };
         if let Some((_, selectors)) = groups.iter_mut().find(|(current, _)| current == &key) {
             selectors.insert(selector);
         } else {
@@ -75,9 +86,18 @@ fn collect(
 fn style_key(style: &StateStyle) -> StyleKey<'_> {
     (
         style.target.as_str(),
+        style.scope.as_deref(),
         style.pseudo.as_deref(),
+        style.target_pseudo.as_deref(),
         style.media.as_deref(),
     )
+}
+
+fn selector(class: &str) -> String {
+    class
+        .split_whitespace()
+        .map(|name| format!(".{name}"))
+        .collect()
 }
 
 fn emit(groups: Vec<(RuleKey, BTreeSet<String>)>, css: &mut String) {

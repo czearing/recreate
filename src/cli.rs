@@ -51,6 +51,8 @@ pub struct CaptureArgs {
     #[arg(long)]
     pub reuse: bool,
     #[arg(long)]
+    pub reload: bool,
+    #[arg(long)]
     pub target: Option<String>,
     #[arg(long, default_value = "http://127.0.0.1:9222")]
     pub cdp_url: String,

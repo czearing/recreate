@@ -1,10 +1,9 @@
 use crate::model::{Interaction, PageState, Specification, Viewport};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::{Child, Command},
-    time::Duration,
-};
+use std::{fs, path::Path};
+
+#[path = "browser_support.rs"]
+mod browser_support;
+pub use browser_support::{browser_path, free_port, launch_browser, wait_for_browser};
 
 pub fn viewport(width: u32, height: u32) -> Viewport {
     Viewport {
@@ -21,6 +20,13 @@ pub fn selected_fixtures<'a>(fixtures: &'a [&str]) -> Vec<&'a str> {
         .copied()
         .filter(|fixture| selected.as_deref().is_none_or(|value| value == *fixture))
         .collect()
+}
+
+pub fn selected_viewports(viewports: &[(u32, u32)]) -> Vec<(u32, u32)> {
+    if std::env::var_os("RECREATE_GATE_FIXTURE").is_some() && !viewports.is_empty() {
+        return vec![viewports[0]];
+    }
+    viewports.to_vec()
 }
 
 pub fn collect_errors(cdp: &mut crate::cdp::Cdp) -> (usize, usize) {
@@ -142,58 +148,4 @@ pub fn directory_size(path: &Path) -> std::io::Result<u64> {
         };
         Ok(total + value)
     })
-}
-
-pub fn free_port() -> u16 {
-    std::net::TcpListener::bind("127.0.0.1:0")
-        .unwrap()
-        .local_addr()
-        .unwrap()
-        .port()
-}
-
-pub fn launch_browser(path: &Path, profile: &Path, port: u16) -> Child {
-    Command::new(path)
-        .args([
-            "--headless=new",
-            "--disable-gpu",
-            "--no-first-run",
-            "--no-default-browser-check",
-            &format!("--remote-debugging-port={port}"),
-            &format!("--user-data-dir={}", profile.display()),
-            "about:blank",
-        ])
-        .spawn()
-        .unwrap()
-}
-
-pub async fn wait_for_browser(port: u16) {
-    let url = format!("http://127.0.0.1:{port}/json/version");
-    for _ in 0..300 {
-        if reqwest::get(&url)
-            .await
-            .is_ok_and(|response| response.status().is_success())
-        {
-            return;
-        }
-        tokio::time::sleep(Duration::from_millis(100)).await;
-    }
-    panic!("browser did not start");
-}
-
-pub fn browser_path() -> Option<PathBuf> {
-    std::env::var_os("RECREATE_BROWSER")
-        .map(PathBuf::from)
-        .filter(|path| path.exists())
-        .or_else(|| {
-            [
-                r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-                "/usr/bin/google-chrome",
-                "/usr/bin/chromium",
-                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            ]
-            .into_iter()
-            .map(PathBuf::from)
-            .find(|path| path.exists())
-        })
 }

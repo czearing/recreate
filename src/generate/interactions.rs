@@ -28,13 +28,33 @@ pub fn base_handlers(specification: &Specification) -> BTreeMap<String, String> 
         .collect()
 }
 
-pub fn state_handlers(interaction: &Interaction, state: &PageState) -> BTreeMap<String, String> {
+pub fn state_handlers(
+    interaction: &Interaction,
+    state: &PageState,
+    baseline: &PageState,
+) -> BTreeMap<String, String> {
     let nodes = nodes_by_path(state);
-    let trigger = nodes.get(interaction.trigger_path.as_str()).copied();
-    let mut handlers = BTreeMap::from([(
-        interaction.trigger_path.clone(),
-        trigger_binding(trigger, "event=>onReset(event)", None),
-    )]);
+    let trigger = nodes
+        .get(interaction.trigger_path.as_str())
+        .copied()
+        .or_else(|| {
+            state.nodes.iter().find(|node| {
+                node.tag == interaction.trigger_tag
+                    && node
+                        .attributes
+                        .get("aria-label")
+                        .is_some_and(|label| label == &interaction.trigger_label)
+            })
+        });
+    let trigger_path = trigger
+        .map(|node| node.path.clone())
+        .unwrap_or_else(|| interaction.trigger_path.clone());
+    let action = if closable_state(state, baseline) {
+        "event=>onReset(event)"
+    } else {
+        "event=>event.preventDefault()"
+    };
+    let mut handlers = BTreeMap::from([(trigger_path, trigger_binding(trigger, action, None))]);
     let popup = state.nodes.iter().find(|node| is_popup(node));
     let focused = interaction
         .focused_path
@@ -44,14 +64,56 @@ pub fn state_handlers(interaction: &Interaction, state: &PageState) -> BTreeMap<
     if let Some(node) = focused {
         append(&mut handlers, &node.path, &focus_binding(node));
     }
-    if let Some(popup) = popup {
-        append(
-            &mut handlers,
-            &popup.path,
-            "onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();onReset()}}}",
-        );
+    let baseline_paths = baseline
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    let roots: Vec<_> = state
+        .nodes
+        .iter()
+        .filter(|node| {
+            !baseline_paths.contains(node.path.as_str())
+                && node
+                    .parent
+                    .as_deref()
+                    .is_none_or(|parent| baseline_paths.contains(parent))
+        })
+        .collect();
+    let viewport_area = f64::from(state.viewport.width) * f64::from(state.viewport.height);
+    let compact = roots
+        .iter()
+        .any(|node| is_popup(node) || node.rect.width * node.rect.height < viewport_area * 0.8);
+    for node in roots.into_iter().filter(|node| {
+        !compact || is_popup(node) || node.rect.width * node.rect.height < viewport_area * 0.8
+    }) {
+        append(&mut handlers, &node.path, "data-recreate-surface=\"true\"");
     }
     handlers
+}
+
+pub fn closable(interaction: &Interaction, baseline: &PageState) -> bool {
+    interaction
+        .states
+        .first()
+        .is_some_and(|state| closable_state(state, baseline))
+}
+
+fn closable_state(state: &PageState, baseline: &PageState) -> bool {
+    if state.nodes.iter().any(is_popup) {
+        return true;
+    }
+    let baseline_paths = baseline
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    let state_paths = state
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    baseline_paths.symmetric_difference(&state_paths).count() >= 8
 }
 
 fn trigger_binding(node: Option<&Node>, action: &str, marker: Option<usize>) -> String {

@@ -1,6 +1,7 @@
 mod asset_script;
 mod browser;
 mod capture;
+mod capture_startup;
 mod cdp;
 mod cli;
 mod compare;
@@ -10,6 +11,7 @@ mod compare_tests;
 mod generate;
 mod interaction_state;
 mod interactions;
+mod interactions_input;
 mod lifecycle_script;
 mod model;
 mod page_script;
@@ -17,6 +19,7 @@ mod probe;
 #[cfg(test)]
 mod release_gate_tests;
 mod skill;
+mod state_style_script;
 mod style_contract;
 mod updater;
 mod validate;

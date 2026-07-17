@@ -33,6 +33,21 @@ pub fn validate(specification: &Specification, out: &Path) -> Result<Acceptance>
             paths.len() == state.nodes.len()
         }),
     );
+    checks.insert(
+        "all_animation_targets_exist".into(),
+        specification.states.iter().all(|state| {
+            let paths: std::collections::HashSet<_> = state
+                .nodes
+                .iter()
+                .chain(&state.startup_nodes)
+                .map(|node| node.path.as_str())
+                .collect();
+            state
+                .animations
+                .iter()
+                .all(|animation| paths.contains(animation.target.as_str()))
+        }),
+    );
     let mut counts = BTreeMap::new();
     counts.insert("states".into(), specification.states.len());
     counts.insert(

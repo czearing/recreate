@@ -14,5 +14,6 @@ fn preserves_dynamic_pseudo_element_selectors() {
     let script = source();
     assert!(script.contains("const pseudoElement = base.match(/::[\\w-]+$/)?.[0] || ''"));
     assert!(script.contains("document.querySelectorAll(query)"));
-    assert!(script.contains("`${states.join('')}${pseudoElement}`"));
+    assert!(script.contains("target_pseudo: scoped"));
+    assert!(script.contains("`${tailStates.join('')}${pseudoElement}`"));
 }

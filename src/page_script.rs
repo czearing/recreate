@@ -1,5 +1,4 @@
 use crate::{asset_script, style_contract};
-
 const CAPTURE: &str = r#"
 (async () => {
   const props = [__STYLE_PROPERTIES__];
@@ -26,7 +25,7 @@ const CAPTURE: &str = r#"
   };
   const nodes = [];
   const walk = element => {
-    if (ignored.has(element.tagName)) return;
+    if (ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup')) return;
     const path = pathOf(element);
     const rect = element.getBoundingClientRect();
     const attributes = Object.fromEntries(
@@ -91,55 +90,23 @@ const CAPTURE: &str = r#"
       }
     };
   }).filter(animation => animation.target);
+  const nodePaths = new Set(nodes.map(node => node.path));
+  const meaningfulTransient = animation => {
+    if (nodePaths.has(animation.target)) return true;
+    const frames = animation.keyframes || [];
+    if (frames.length < 2) return false;
+    const changed = key => new Set(frames.map(frame => String(frame[key]))).size > 1;
+    if (changed('opacity') || changed('transform') || changed('y') || changed('height')) {
+      return true;
+    }
+    const centers = frames.map(frame => Number(frame.x || 0) + Number(frame.width || 0) / 2);
+    return Math.max(...centers) - Math.min(...centers) > 1;
+  };
   const animations = [
     ...liveAnimations,
     ...(window.__recreateLifecycleAnimations || [])
-  ];
-  const cssRules = [], stateStyles = [], stateStyleKeys = new Set();
-  const dynamicState = /:(hover|focus-visible|focus-within|focus|active)\b/g;
-  const visitRules = (rules, media = null) => {
-    for (const rule of Array.from(rules || [])) {
-      cssRules.push(rule.cssText);
-      const reduced = media?.includes('prefers-reduced-motion') || false;
-      if (rule.selectorText && rule.style) {
-        for (const selector of rule.selectorText.split(',')) {
-          const states = Array.from(selector.matchAll(dynamicState), match => match[0]);
-          const tail = selector.trim().split(/[\s>+~]+/).pop() || '';
-          if (states.length && !/:(hover|focus-visible|focus-within|focus|active)\b/.test(tail)) {
-            continue;
-          }
-          if (!states.length && !reduced) continue;
-          const base = selector.replace(dynamicState, '').trim();
-          const pseudoElement = base.match(/::[\w-]+$/)?.[0] || '', query = base.slice(0, base.length - pseudoElement.length);
-          if (!query) continue;
-          try {
-            for (const element of document.querySelectorAll(query)) {
-              const captured = {
-                target: pathOf(element),
-                pseudo: states.length || pseudoElement ? `${states.join('')}${pseudoElement}` : null,
-                media,
-                declarations: rule.style.cssText
-              };
-              const key = JSON.stringify(captured);
-              if (!stateStyleKeys.has(key)) {
-                stateStyleKeys.add(key);
-                stateStyles.push(captured);
-              }
-            }
-          } catch {}
-        }
-      }
-      if (rule.cssRules) {
-        const nestedMedia = rule.type === CSSRule.MEDIA_RULE
-          ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
-          : media;
-        visitRules(rule.cssRules, nestedMedia);
-      }
-    }
-  };
-  for (const sheet of Array.from(document.styleSheets)) {
-    try { visitRules(sheet.cssRules); } catch {}
-  }
+  ].filter(meaningfulTransient);
+__STATE_STYLE_CAPTURE__
   const assets = new Set();
   document.querySelectorAll('img,video,source').forEach(element => {
     const url = element.currentSrc || element.src;
@@ -178,6 +145,7 @@ pub fn source() -> String {
             "__DIRECTIONAL_BORDERS__",
             style_contract::DIRECTIONAL_BORDERS,
         )
+        .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
         .replace("__ASSET_CAPTURE__", asset_script::SOURCE)
 }
 

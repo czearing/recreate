@@ -130,6 +130,7 @@ async fn connect(url: &str, endpoint: &str) -> Result<crate::cdp::Cdp> {
     let args = CaptureArgs {
         url: Some(url.into()),
         reuse: false,
+        reload: false,
         target: None,
         cdp_url: endpoint.into(),
         out: Default::default(),

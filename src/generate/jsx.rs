@@ -1,5 +1,5 @@
 use super::{
-    interactions,
+    interaction_scroll, interactions,
     jsx_attrs::{all_attributes, dynamic_attributes, jsx_tag, quoted, static_attributes, void_tag},
     jsx_variants, structural_tree,
     tree::Components,
@@ -25,7 +25,18 @@ pub fn app(
         .map(|(index, (state, classes))| {
             let current = structural_tree::for_state(components, state, classes);
             let page = jsx_variants::page(state, &current, assets, &handlers);
-            format!("function Baseline{index}({{activate}}){{return {page}}}\n")
+            let startup = if state.startup_nodes.is_empty() {
+                String::new()
+            } else {
+                let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
+                jsx_variants::fragment(
+                    &startup,
+                    assets,
+                    state.startup_delay_ms,
+                    state.startup_duration_ms,
+                )
+            };
+            format!("function Baseline{index}({{activate}}){{return <>{page}{startup}</>}}\n")
         })
         .collect::<String>();
     let view_names = (0..specification.states.len())
@@ -44,8 +55,15 @@ pub fn app(
             )
         })
         .collect::<String>();
+    let closable = std::iter::once("false".to_string())
+        .chain(specification.interactions.iter().map(|interaction| {
+            interactions::closable(interaction, &specification.states[0]).to_string()
+        }))
+        .collect::<Vec<_>>()
+        .join(",");
+    let scroll_targets = interaction_scroll::targets(specification);
     format!(
-        "import React,{{useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {} }} from './components/index.js';\nimport {{ {} }} from './states.jsx';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\n{}\nconst viewportWidths=[{widths}];\nconst subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\nexport default function App(){{const[state,setState]=useState(0);const lastTrigger=useRef('');const width=useSyncExternalStore(subscribe,()=>document.documentElement.clientWidth,()=>0);const viewport=selectViewport(width,viewportWidths);const View=baselineViews[viewport];const activate=(event,next)=>{{lastTrigger.current=event.currentTarget.dataset.recreateTrigger;setState(next)}};const reset=()=>{{setState(0);requestAnimationFrame(()=>document.querySelector('[data-recreate-trigger=\"'+lastTrigger.current+'\"]')?.focus())}};{state_branches}return <View activate={{activate}}/>}}\n",
+        "import React,{{useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {} }} from './components/index.js';\nimport {{ {} }} from './states.jsx';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nconst pathOf=element=>{{const parts=[];for(let node=element;node&&node!==document.documentElement;node=node.parentElement){{const peers=node.parentElement?[...node.parentElement.children].filter(child=>child.tagName===node.tagName):[node];parts.push(`${{node.tagName.toLowerCase()}}:nth-of-type(${{peers.indexOf(node)+1}})`)}}return `html>${{parts.reverse().join('>')}}`}};\nconst captureScroll=element=>{{const elements=[];for(let node=element?.parentElement;node&&node!==document.documentElement;node=node.parentElement){{if(node.scrollLeft||node.scrollTop)elements.push([pathOf(node),node.scrollLeft,node.scrollTop])}}return{{window:[scrollX,scrollY],elements}}}};\nconst restoreScroll=snapshot=>{{scrollTo(...snapshot.window);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element){{element.scrollLeft=left;element.scrollTop=top}}}})}};\n{}\nconst viewportWidths=[{widths}];\nconst closableStates=[{closable}];\nconst capturedScrolls={scroll_targets};\nconst capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;\nconst subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\nexport default function App(){{const[state,setState]=useState(0);const lastTrigger=useRef('');const scroll=useRef(null);const width=useSyncExternalStore(subscribe,()=>document.documentElement.clientWidth,()=>0);const viewport=selectViewport(width,viewportWidths);const View=baselineViews[viewport];const activate=(event,next)=>{{lastTrigger.current=event.currentTarget.dataset.recreateTrigger;const captured=capturedScroll(next,viewport);scroll.current=closableStates[next]?(event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{{window:[0,0],elements:[]}}):captureScroll(event.currentTarget)):captured;setState(next)}};const reset=()=>{{const selector='[data-recreate-trigger=\"'+lastTrigger.current+'\"]';scroll.current=captureScroll(document.querySelector(selector));setState(0);requestAnimationFrame(()=>document.querySelector(selector)?.focus({{preventScroll:true}}))}};useLayoutEffect(()=>{{if(!scroll.current)return;restoreScroll(scroll.current);requestAnimationFrame(()=>restoreScroll(scroll.current))}},[state]);useEffect(()=>{{if(!state||!closableStates[state])return;const key=event=>{{if(event.key==='Escape')reset()}};const pointer=event=>{{if(!event.target.closest('[data-recreate-surface],[data-recreate-control]'))reset()}};addEventListener('keydown',key);addEventListener('pointerdown',pointer);return()=>{{removeEventListener('keydown',key);removeEventListener('pointerdown',pointer)}}}},[state]);{state_branches}return <View activate={{activate}}/>}}\n",
         components
             .items
             .iter()

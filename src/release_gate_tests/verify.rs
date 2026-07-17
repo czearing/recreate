@@ -20,6 +20,7 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
     let args = CaptureArgs {
         url: Some(server.url()),
         reuse: false,
+        reload: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),
@@ -37,13 +38,8 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
     let mut parity_details = Vec::new();
     let mut horizontal_overflows = 0;
     for (index, expected) in spec.states.iter().enumerate() {
-        let &(width, height) = VIEWPORTS.get(index).expect("viewport evidence");
-        let actual = capture::capture_state(
-            &mut cdp,
-            super::support::viewport(width, height),
-            index == 0,
-        )
-        .await?;
+        let actual =
+            capture::capture_state(&mut cdp, expected.viewport.clone(), index == 0).await?;
         let parity = super::support::parity(expected, &actual);
         parity_mismatches += parity.mismatches;
         if parity_details.len() < 20 {

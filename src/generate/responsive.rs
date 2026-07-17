@@ -21,6 +21,11 @@ pub fn append(
 
     for (index, state) in states.iter().enumerate() {
         let mut rules = String::new();
+        let state_nodes: HashMap<_, _> = state
+            .nodes
+            .iter()
+            .map(|node| (node.path.as_str(), node))
+            .collect();
         for node in &state.nodes {
             let (Some(base_node), Some(class)) =
                 (base_nodes.get(node.path.as_str()), classes.get(&node.path))
@@ -30,8 +35,10 @@ pub fn append(
             append_node_rules(
                 base_node,
                 node,
-                &base.viewport,
-                &state.viewport,
+                node.parent
+                    .as_deref()
+                    .and_then(|parent| state_nodes.get(parent).copied()),
+                (&base.viewport, &state.viewport),
                 class,
                 assets,
                 &mut rules,
@@ -59,25 +66,33 @@ fn band(width: u32, smaller: Option<u32>, wider: u32, sparse: bool) -> (Option<u
 
 pub fn base_declarations(
     node: &Node,
+    parent: Option<&Node>,
     viewport: &Viewport,
     assets: &BTreeMap<String, String>,
 ) -> String {
     let mut styles = node.style.clone();
-    normalize_viewport_width(&mut styles, node, viewport, None);
+    super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     declarations(&styles, assets)
 }
 
 fn append_node_rules(
     base: &Node,
     node: &Node,
-    base_viewport: &Viewport,
-    viewport: &Viewport,
+    parent: Option<&Node>,
+    viewports: (&Viewport, &Viewport),
     class: &str,
     assets: &BTreeMap<String, String>,
     rules: &mut String,
 ) {
+    let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
-    normalize_viewport_width(&mut changed, node, viewport, Some((base, base_viewport)));
+    super::responsive_geometry::normalize(
+        &mut changed,
+        node,
+        parent,
+        viewport,
+        Some((base, base_viewport)),
+    );
     if !changed.is_empty() {
         rules.push_str(&format!(".{class}{{{}}}", declarations(&changed, assets)));
     }
@@ -98,35 +113,6 @@ fn append_node_rules(
         assets,
         rules,
     );
-}
-
-fn normalize_viewport_width(
-    styles: &mut Styles,
-    node: &Node,
-    viewport: &Viewport,
-    base: Option<(&Node, &Viewport)>,
-) {
-    if !fills_viewport(node, viewport) {
-        return;
-    }
-    let fixed_base = base.is_some_and(|(node, viewport)| !fills_viewport(node, viewport));
-    if fixed_base {
-        styles.insert("width".into(), "auto".into());
-    } else {
-        styles.remove("width");
-    }
-}
-
-fn fills_viewport(node: &Node, viewport: &Viewport) -> bool {
-    let viewport_width = f64::from(viewport.width);
-    let right_inset = viewport_width - node.rect.x - node.rect.width;
-    let is_root = matches!(node.tag.as_str(), "html" | "body")
-        || node.attributes.get("id").is_some_and(|id| id == "root");
-    is_root
-        && ((node.rect.width - viewport_width).abs() <= 1.0
-            || (node.rect.x - right_inset).abs() <= 1.0
-                && node.rect.x.abs() <= 32.0
-                && right_inset.abs() <= 32.0)
 }
 
 fn append_pseudo_rule(
@@ -176,6 +162,16 @@ fn media_rule(minimum: Option<u32>, maximum: u32, rules: &str) -> String {
         }
         None => format!("@media(max-width:{maximum}px){{{rules}}}\n"),
     }
+}
+
+#[cfg(test)]
+fn normalize_viewport_width(
+    styles: &mut Styles,
+    node: &Node,
+    viewport: &Viewport,
+    base: Option<(&Node, &Viewport)>,
+) {
+    super::responsive_geometry::normalize(styles, node, None, viewport, base);
 }
 
 #[cfg(test)]

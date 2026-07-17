@@ -37,8 +37,9 @@ pub fn workflow() -> &'static str {
 5. If access is required, foreground the exact target and ask the user to
    complete access there. Confirm the requested interface is visibly rendered
    in the same target before capture. Keep credentials and session data in-browser.
-6. Capture the exact inspected target without navigation or reload:
-   recreate capture --reuse --target <id> --cdp-url <cdp_url>
+6. Capture the exact inspected target with an instrumented reload so startup
+   motion is observed without navigating to another page:
+   recreate capture --reuse --reload --target <id> --cdp-url <cdp_url>
 7. Build from react/src/App.jsx and validate acceptance.json.
 "#
 }
@@ -123,7 +124,7 @@ mod tests {
         assert!(workflow().contains("never URL/title keywords"));
         assert!(workflow().contains("rendered controls and content"));
         assert!(workflow().contains("recreate open <url>"));
-        assert!(workflow().contains("without navigation or reload"));
+        assert!(workflow().contains("instrumented reload"));
         assert!(workflow().contains("Never use a headless test browser"));
     }
 }
