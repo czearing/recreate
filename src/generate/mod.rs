@@ -64,12 +64,6 @@ pub async fn write_project(
     out: &Path,
     cookies: &[BrowserCookie],
 ) -> Result<()> {
-    let started = std::time::Instant::now();
-    let timing = |phase: &str| {
-        if std::env::var_os("RECREATE_TIMING").is_some() {
-            eprintln!("{phase}={:.3}s", started.elapsed().as_secs_f64());
-        }
-    };
     let root = out.join("react");
     if root.exists() {
         fs::remove_dir_all(&root)?;
@@ -77,34 +71,33 @@ pub async fn write_project(
     let source = root.join("src");
     fs::create_dir_all(source.join("components"))?;
     let assets = assets::download(specification, &root, cookies).await?;
-    timing("assets");
     let mut styles = css::build(specification, &assets);
-    timing("css");
     styles.css.push_str(interactions::FOCUS_CSS);
     styles.css.push_str(interactions::REDUCED_MOTION_CSS);
     let components = tree::components(specification, &styles.classes);
     let mut structural_classes = std::collections::HashSet::new();
-    let state_classes = structural_css::class_maps(
+    let mut state_classes = structural_css::class_maps(
         &specification.states,
         &styles.classes,
         &assets,
         &mut styles.css,
         &mut structural_classes,
     );
+    for (state, classes) in specification.states.iter().zip(&mut state_classes) {
+        animations::append_startup(&state.animations, classes, &mut styles.css);
+    }
     let interaction_state_classes = specification
         .interactions
         .iter()
         .zip(&styles.interaction_classes)
         .map(|(interaction, classes)| {
-            let output = structural_css::class_maps(
+            structural_css::class_maps(
                 &interaction.states,
                 classes,
                 &assets,
                 &mut styles.css,
                 &mut structural_classes,
-            );
-            timing("interaction_structure");
-            output
+            )
         })
         .collect::<Vec<_>>();
     state_style_maps::append(

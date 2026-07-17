@@ -1,18 +1,10 @@
 use crate::model::PageState;
-use std::collections::BTreeMap;
 
-pub fn append(states: &[PageState], classes: &mut BTreeMap<String, String>, css: &mut String) {
-    let overlays: Vec<_> = states
+pub fn append(states: &[PageState], css: &mut String) {
+    if !states
         .iter()
-        .flat_map(|state| {
-            state
-                .startup_nodes
-                .iter()
-                .filter(|node| node.parent.is_none())
-                .map(move |node| (state, node))
-        })
-        .collect();
-    if overlays.is_empty() {
+        .any(|state| state.startup_nodes.iter().any(|node| node.parent.is_none()))
+    {
         return;
     }
     css.push_str(
@@ -22,25 +14,44 @@ pub fn append(states: &[PageState], classes: &mut BTreeMap<String, String>, css:
          animation-name:recreateStartupOverlay!important;animation-timing-function:linear!important;\
          animation-duration:var(--recreate-startup-duration,1ms)!important;\
          animation-delay:var(--recreate-startup-delay,0ms)!important;\
+         animation-iteration-count:1!important;animation-direction:normal!important;\
+         animation-play-state:running!important;\
          animation-fill-mode:forwards!important}\
          @media(prefers-reduced-motion:reduce){.recreateStartupOverlay{animation:none!important;\
          display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}}\
          .recreateStartupBlocking{position:fixed!important;inset:0!important;width:100vw!important;\
          height:100vh!important;max-width:100vw!important;max-height:100vh!important;\
-         overflow:hidden!important}\n",
+         overflow:hidden!important}.recreateStartupBody{overflow:visible!important}\n",
     );
-    for (state, node) in overlays {
-        let class = classes.entry(node.path.clone()).or_default();
-        if !class.contains("recreateStartupOverlay") {
-            class.push_str(" recreateStartupOverlay");
-        }
-        if node.rect.width * node.rect.height
-            >= f64::from(state.viewport.width * state.viewport.height) * 0.5
-            && !class.contains("recreateStartupBlocking")
-        {
-            class.push_str(" recreateStartupBlocking");
-        }
-    }
+}
+
+pub fn runtime(source: String, states: &[PageState]) -> String {
+    let durations = states
+        .iter()
+        .map(|state| state.startup_duration_ms.to_string())
+        .collect::<Vec<_>>()
+        .join(",");
+    let source = source.replace(
+        "const[state,setState]=useState(0);",
+        "const[state,setState]=useState(0);const[startupDone,setStartupDone]=useState(false);",
+    );
+    let source = source.replace(
+        "const View=baselineViews[viewport];const activate=",
+        &format!(
+            "const View=baselineViews[viewport];const startupDurations=[{durations}];\
+             useLayoutEffect(()=>{{const duration=startupDurations[viewport];\
+             if(startupDone||!duration)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){{\
+             setStartupDone(true);return}}document.body.classList.add('recreateStartupBody');\
+             const timer=setTimeout(()=>{{document.body.classList.remove('recreateStartupBody');\
+             setStartupDone(true)}},duration+500);return()=>{{clearTimeout(timer);\
+             document.body.classList.remove('recreateStartupBody')}}}},[viewport,startupDone]);\
+             const activate="
+        ),
+    );
+    source.replace(
+        "return <View activate={activate}/>",
+        "return <View activate={activate} showStartup={!startupDone}/>",
+    )
 }
 
 #[cfg(test)]
@@ -81,10 +92,15 @@ mod tests {
             asset_urls: Vec::new(),
             asset_data: Default::default(),
         };
-        let mut classes = BTreeMap::from([("startup".into(), "base".into())]);
         let mut css = String::new();
-        append(&[state], &mut classes, &mut css);
-        assert!(classes["startup"].contains("recreateStartupOverlay"));
+        append(std::slice::from_ref(&state), &mut css);
         assert!(css.contains("--recreate-startup-duration"));
+        assert!(
+            runtime(
+                "const View=baselineViews[viewport];const activate=".into(),
+                &[]
+            )
+            .contains("startupDone")
+        );
     }
 }

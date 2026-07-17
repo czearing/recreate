@@ -84,11 +84,19 @@ pub async fn wait_startup(
     for _ in 0..60 {
         if cdp
             .evaluate(
-                "Array.from(document.querySelectorAll('*')).some(element=>{\
-                 const rect=element.getBoundingClientRect(),style=getComputedStyle(element);\
-                 const z=Number(style.zIndex);return rect.width*rect.height>=innerWidth*innerHeight*.9&&\
+                "(async()=>{const blocking=element=>{const rect=element.getBoundingClientRect(),\
+                 style=getComputedStyle(element),z=Number(style.zIndex);return \
+                 rect.width*rect.height>=innerWidth*innerHeight*.9&&\
                  ['absolute','fixed'].includes(style.position)&&Number.isFinite(z)&&z>=50&&\
-                 style.pointerEvents!=='none'&&style.display!=='none'&&style.visibility!=='hidden'})",
+                 style.pointerEvents!=='none'&&style.display!=='none'&&style.visibility!=='hidden'};\
+                 const overlay=Array.from(document.querySelectorAll('*')).find(blocking);\
+                 if(!overlay)return false;const images=[...(overlay.matches('img')?[overlay]:[]),\
+                 ...overlay.querySelectorAll('img')];await Promise.race([Promise.all(\
+                 images.map(image=>image.complete?\
+                 (image.decode?image.decode().catch(()=>{}):Promise.resolve()):new Promise(resolve=>{\
+                 image.addEventListener('load',resolve,{once:true});\
+                 image.addEventListener('error',resolve,{once:true})}))),\
+                 new Promise(resolve=>setTimeout(resolve,2000))]);return blocking(overlay)})()",
             )
             .await?
             .as_bool()

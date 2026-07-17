@@ -1,7 +1,7 @@
 use super::{
     attribute_sequences, interaction_scroll, interactions,
     jsx_attrs::{all_attributes, dynamic_attributes, jsx_tag, quoted, static_attributes, void_tag},
-    jsx_variants, structural_tree,
+    jsx_variants, startup_overlays, structural_tree,
     tree::Components,
 };
 use crate::model::Specification;
@@ -30,14 +30,17 @@ pub fn app(
                 String::new()
             } else {
                 let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
-                jsx_variants::fragment(
+                let fragment = jsx_variants::fragment(
                     &startup,
                     assets,
                     state.startup_delay_ms,
                     state.startup_duration_ms,
-                )
+                );
+                format!("{{showStartup?createPortal({fragment},document.body):null}}")
             };
-            format!("function Baseline{index}({{activate}}){{return <>{page}{startup}</>}}\n")
+            format!(
+                "function Baseline{index}({{activate,showStartup}}){{return <>{page}{startup}</>}}\n"
+            )
         })
         .collect::<String>();
     let view_names = (0..specification.states.len())
@@ -75,7 +78,7 @@ pub fn app(
         state_imports,
         jsx_variants::selector(),
     );
-    attribute_sequences::runtime(output)
+    startup_overlays::runtime(attribute_sequences::runtime(output), &specification.states)
 }
 
 pub fn component(

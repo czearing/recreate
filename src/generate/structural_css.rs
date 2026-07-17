@@ -14,7 +14,7 @@ pub fn class_maps(
         .iter()
         .map(|state| {
             let mut classes = base.clone();
-            for node in &state.nodes {
+            for node in state.nodes.iter().chain(&state.startup_nodes) {
                 if node.tag == "#text" || classes.contains_key(&node.path) {
                     continue;
                 }

@@ -35,14 +35,6 @@ pub fn responsive_signatures(specification: &Specification) -> BTreeMap<String, 
         .collect()
 }
 
-pub fn style_signature(styles: &Styles) -> String {
-    styles
-        .iter()
-        .map(|(key, value)| format!("{key}:{value}"))
-        .collect::<Vec<_>>()
-        .join(";")
-}
-
 fn append_styles(signature: &mut Sha256, styles: &Styles) {
     for (key, value) in styles {
         signature.update(key.as_bytes());

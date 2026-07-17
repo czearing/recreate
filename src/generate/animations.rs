@@ -55,6 +55,19 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
     }
 }
 
+pub fn append_startup(
+    animations: &[Animation],
+    classes: &mut BTreeMap<String, String>,
+    css: &mut String,
+) {
+    let startup = animations
+        .iter()
+        .filter(|animation| animation.target.starts_with("startup>"))
+        .cloned()
+        .collect::<Vec<_>>();
+    append(&startup, classes, css);
+}
+
 fn animation_digest(animation: &Animation) -> String {
     let signature =
         serde_json::to_vec(&(&animation.keyframes, &animation.timing)).unwrap_or_default();

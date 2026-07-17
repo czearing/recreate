@@ -44,29 +44,10 @@ pub fn selector() -> &'static str {
 pub fn fragment(
     components: &tree::Components,
     assets: &BTreeMap<String, String>,
-    delay_ms: u64,
+    _delay_ms: u64,
     duration_ms: u64,
 ) -> String {
-    let handlers = components
-        .nodes
-        .values()
-        .filter(|node| {
-            node.parent
-                .as_deref()
-                .is_none_or(|parent| !components.nodes.contains_key(parent))
-        })
-        .map(|node| {
-            (
-                node.path.clone(),
-                format!(
-                    "data-recreate-startup=\"true\" style={{{{\
-                     \"--recreate-startup-delay\":\"{delay_ms}ms\",\
-                     \"--recreate-startup-duration\":\"{duration_ms}ms\"\
-                     }}}}"
-                ),
-            )
-        })
-        .collect();
+    let handlers = BTreeMap::new();
     let roots = components
         .nodes
         .values()
@@ -77,7 +58,13 @@ pub fn fragment(
         })
         .map(|node| jsx::render(&node.path, components, assets, 2, true, &handlers))
         .collect::<String>();
-    format!("<>{roots}</>")
+    format!(
+        "<div className=\"recreateStartupOverlay recreateStartupBlocking\" \
+         data-recreate-startup=\"true\" style={{{{\
+         \"--recreate-startup-delay\":\"0ms\",\
+         \"--recreate-startup-duration\":\"{duration_ms}ms\"\
+         }}}}>{roots}</div>"
+    )
 }
 
 pub fn widths(states: &[PageState]) -> String {

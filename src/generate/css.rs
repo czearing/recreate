@@ -2,7 +2,7 @@ use super::responsive;
 use super::{animations, interaction_scroll, interactions, startup_overlays, state_styles};
 use super::{
     css_layout,
-    css_values::{hash, responsive_signatures, style_signature},
+    css_values::{hash, responsive_signatures},
 };
 use crate::model::Specification;
 #[cfg(test)]
@@ -102,20 +102,6 @@ fn build_scoped(
         classes.insert(node.path.clone(), class);
     }
     timing("base");
-    for node in &base.startup_nodes {
-        if node.tag == "#text" {
-            continue;
-        }
-        let signature = style_signature(&node.style);
-        let class = format!("u{}", &hash(&signature)[..10]);
-        if emitted.insert(class.clone()) {
-            css.push_str(&format!(
-                ".{class}{{{}}}\n",
-                declarations(&node.style, assets)
-            ));
-        }
-        classes.insert(node.path.clone(), class);
-    }
     responsive::append(specification, assets, &classes, &mut css);
     timing("responsive");
     let mut interaction_classes = Vec::new();
@@ -158,7 +144,7 @@ fn build_scoped(
         timing(&format!("interaction_{}", index + 1));
     }
     animations::append(&base.animations, &mut classes, &mut css);
-    startup_overlays::append(&specification.states, &mut classes, &mut css);
+    startup_overlays::append(&specification.states, &mut css);
     let inherited = specification
         .interactions
         .iter()
