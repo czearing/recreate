@@ -4,6 +4,9 @@ use std::collections::BTreeMap;
 
 pub const FOCUS_CSS: &str =
     "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\n";
+pub const REDUCED_MOTION_CSS: &str = "@media(prefers-reduced-motion:reduce){\
+*,*::before,*::after{animation:none!important;transition:none!important;\
+scroll-behavior:auto!important}}\n";
 
 pub fn base_handlers(specification: &Specification, state: &PageState) -> BTreeMap<String, String> {
     let nodes = nodes_by_path(state);

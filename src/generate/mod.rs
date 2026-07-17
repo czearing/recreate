@@ -81,6 +81,7 @@ pub async fn write_project(
     let mut styles = css::build(specification, &assets);
     timing("css");
     styles.css.push_str(interactions::FOCUS_CSS);
+    styles.css.push_str(interactions::REDUCED_MOTION_CSS);
     let components = tree::components(specification, &styles.classes);
     let mut structural_classes = std::collections::HashSet::new();
     let state_classes = structural_css::class_maps(
@@ -90,7 +91,6 @@ pub async fn write_project(
         &mut styles.css,
         &mut structural_classes,
     );
-    timing("baseline_structure");
     let interaction_state_classes = specification
         .interactions
         .iter()
