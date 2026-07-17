@@ -149,11 +149,28 @@ async fn set_motion(cdp: &mut crate::cdp::Cdp) -> Result<()> {
 }
 
 async fn clear_input_state(cdp: &mut crate::cdp::Cdp) -> Result<()> {
-    cdp.send(
-        "Input.dispatchMouseEvent",
-        json!({"type":"mouseMoved","x":-100,"y":-100}),
-    )
-    .await?;
+    let mut moved = false;
+    for _ in 0..2 {
+        match tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            cdp.send(
+                "Input.dispatchMouseEvent",
+                json!({"type":"mouseMoved","x":-100,"y":-100}),
+            ),
+        )
+        .await
+        {
+            Ok(result) => {
+                result?;
+                moved = true;
+                break;
+            }
+            Err(_) => continue,
+        }
+    }
+    if !moved {
+        anyhow::bail!("CDP pointer reset timed out after two attempts");
+    }
     cdp.evaluate("document.activeElement?.blur()").await?;
     Ok(())
 }
