@@ -60,7 +60,9 @@ pub fn fragment(
         .collect::<String>();
     format!(
         "<div className=\"recreateStartupOverlay recreateStartupBlocking\" \
-         data-recreate-startup=\"true\" style={{{{\
+         data-recreate-startup=\"true\" \
+         onAnimationEnd={{event=>{{if(event.target===event.currentTarget)onStartupDone()}}}} \
+         style={{{{\
          \"--recreate-startup-delay\":\"0ms\",\
          \"--recreate-startup-duration\":\"{duration_ms}ms\"\
          }}}}>{roots}</div>"

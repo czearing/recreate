@@ -32,8 +32,8 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("data-recreate-trigger"));
     assert!(app.contains("document.querySelector"));
     assert!(app.contains("event.key==='Escape'"));
-    assert!(app.contains("function Baseline0({activate,showStartup})"));
-    assert!(app.contains("return <View activate={activate} showStartup={!startupDone}/>"));
+    assert!(app.contains("function Baseline0({activate,showStartup,onStartupDone})"));
+    assert!(app.contains("onStartupDone={()=>setStartupDone(true)}"));
     let states = std::fs::read_to_string(root.join("src/states.jsx")).unwrap();
     assert!(states.contains("aria-expanded={\"true\"}"));
     assert!(states.contains("aria-modal={\"true\"}"));

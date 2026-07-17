@@ -50,7 +50,8 @@ pub fn runtime(source: String, states: &[PageState]) -> String {
     );
     source.replace(
         "return <View activate={activate}/>",
-        "return <View activate={activate} showStartup={!startupDone}/>",
+        "return <View activate={activate} showStartup={!startupDone} \
+         onStartupDone={()=>setStartupDone(true)}/>",
     )
 }
 

@@ -39,7 +39,7 @@ pub fn app(
                 format!("{{showStartup?createPortal({fragment},document.body):null}}")
             };
             format!(
-                "function Baseline{index}({{activate,showStartup}}){{return <>{page}{startup}</>}}\n"
+                "function Baseline{index}({{activate,showStartup,onStartupDone}}){{return <>{page}{startup}</>}}\n"
             )
         })
         .collect::<String>();
