@@ -42,21 +42,22 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             .or_default()
             .push(node.path.clone());
     }
-    let mut candidates: Vec<Vec<String>> = groups
+    let mut sizes = HashMap::new();
+    let mut candidates: Vec<(Vec<String>, usize)> = groups
         .into_values()
         .filter(|roots| roots.len() >= 2)
-        .filter(|roots| {
-            let size = subtree_size(&roots[0], &children);
-            (2..=120).contains(&size)
+        .filter_map(|roots| {
+            let size = subtree_size(&roots[0], &children, &mut sizes);
+            (2..=120).contains(&size).then_some((roots, size))
         })
         .collect();
-    candidates.sort_by_key(|roots| std::cmp::Reverse(subtree_size(&roots[0], &children)));
+    candidates.sort_by_key(|(_, size)| std::cmp::Reverse(*size));
     candidates.truncate(80);
     let mut names = HashMap::new();
     let items: Vec<Component> = candidates
         .into_iter()
         .enumerate()
-        .map(|(index, roots)| {
+        .map(|(index, (roots, _))| {
             let node = nodes.get(&roots[0]).copied();
             let base = node
                 .map(|node| names::for_node(node, index))
@@ -139,13 +140,22 @@ pub fn dynamic_attribute(name: &str) -> bool {
     !matches!(name, "class" | "style") && !name.starts_with("on")
 }
 
-fn subtree_size(path: &str, children: &BTreeMap<String, Vec<String>>) -> usize {
-    1 + children
+fn subtree_size(
+    path: &str,
+    children: &BTreeMap<String, Vec<String>>,
+    memo: &mut HashMap<String, usize>,
+) -> usize {
+    if let Some(size) = memo.get(path) {
+        return *size;
+    }
+    let size = 1 + children
         .get(path)
         .into_iter()
         .flatten()
-        .map(|child| subtree_size(child, children))
-        .sum::<usize>()
+        .map(|child| subtree_size(child, children, memo))
+        .sum::<usize>();
+    memo.insert(path.to_string(), size);
+    size
 }
 
 #[cfg(test)]

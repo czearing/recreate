@@ -33,7 +33,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             .interactions
             .get(index.saturating_sub(1))
             .with_context(|| format!("interaction {index} not found"))?;
-        (&interaction.states, Some(interaction.trigger_path.as_str()))
+        (&interaction.states, Some(interaction))
     } else {
         (&specification.states, None)
     };
@@ -68,7 +68,10 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         cdp.send(
             "Emulation.setEmulatedMedia",
             serde_json::json!({
-                "features":[{"name":"prefers-reduced-motion","value":"no-preference"}]
+                "features":[{
+                    "name":"prefers-reduced-motion",
+                    "value":if trigger.is_some() {"reduce"} else {"no-preference"}
+                }]
             }),
         )
         .await?;
@@ -80,9 +83,29 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         cdp.send("Page.reload", serde_json::json!({"ignoreCache":false}))
             .await?;
         let actual = if let Some(trigger) = trigger {
-            let _ = capture::capture_state(&mut cdp, expected.viewport.clone(), true).await?;
+            capture::prepare_state(&mut cdp, &expected.viewport, true).await?;
             cdp.evaluate("scrollTo(0,0)").await?;
-            interactions_input::click(&mut cdp, trigger).await?;
+            let activated = interactions_input::click_matching(
+                &mut cdp,
+                &trigger.trigger_path,
+                &trigger.trigger_tag,
+                &trigger.trigger_label,
+                true,
+            )
+            .await?;
+            if !activated {
+                let controls = cdp
+                    .evaluate(
+                        "Array.from(document.querySelectorAll('[data-recreate-control]')).map(\
+                         element=>({tag:element.tagName.toLowerCase(),\
+                         label:element.getAttribute('aria-label')||element.innerText||''}))",
+                    )
+                    .await?;
+                anyhow::bail!(
+                    "interaction trigger was not found: {} controls={controls}",
+                    trigger.trigger_label
+                );
+            }
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
             capture::read_state(&mut cdp, expected.viewport.clone()).await?
         } else {

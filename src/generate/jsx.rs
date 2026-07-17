@@ -16,13 +16,13 @@ pub fn app(
     if specification.states.is_empty() {
         return "export default function App(){return null}\n".into();
     }
-    let handlers = interactions::base_handlers(specification);
     let views = specification
         .states
         .iter()
         .zip(class_maps)
         .enumerate()
         .map(|(index, (state, classes))| {
+            let handlers = interactions::base_handlers(specification, state);
             let current = structural_tree::for_state(components, state, classes);
             let page = jsx_variants::page(state, &current, assets, &handlers);
             let startup = if state.startup_nodes.is_empty() {

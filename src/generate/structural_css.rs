@@ -1,13 +1,14 @@
 use super::{css::declarations, responsive};
 use crate::model::{Node, PageState};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 pub fn class_maps(
     states: &[PageState],
     base: &BTreeMap<String, String>,
     assets: &BTreeMap<String, String>,
     css: &mut String,
+    emitted: &mut HashSet<String>,
 ) -> Vec<BTreeMap<String, String>> {
     states
         .iter()
@@ -18,7 +19,7 @@ pub fn class_maps(
                     continue;
                 }
                 let class = class_name(node, &state.viewport, assets);
-                append_rule(&class, node, &state.viewport, assets, css);
+                append_rule(&class, node, &state.viewport, assets, css, emitted);
                 classes.insert(node.path.clone(), class);
             }
             classes
@@ -49,8 +50,9 @@ fn append_rule(
     viewport: &crate::model::Viewport,
     assets: &BTreeMap<String, String>,
     css: &mut String,
+    emitted: &mut HashSet<String>,
 ) {
-    if css.contains(&format!(".{class}{{")) {
+    if !emitted.insert(class.to_string()) {
         return;
     }
     css.push_str(&format!(

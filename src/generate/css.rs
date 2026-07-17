@@ -2,12 +2,12 @@ use super::responsive;
 use super::{animations, interaction_scroll, interactions, startup_overlays, state_styles};
 use super::{
     css_layout,
-    css_values::{hash, responsive_signature, style_signature},
+    css_values::{hash, responsive_signatures, style_signature},
 };
 use crate::model::Specification;
 #[cfg(test)]
 use crate::model::Styles;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub(super) use super::css_values::declarations;
 
@@ -27,6 +27,12 @@ fn build_scoped(
     prefix: &str,
     include_interactions: bool,
 ) -> CssOutput {
+    let started = std::time::Instant::now();
+    let timing = |phase: &str| {
+        if std::env::var_os("RECREATE_TIMING").is_some() && include_interactions {
+            eprintln!("css_{phase}={:.3}s", started.elapsed().as_secs_f64());
+        }
+    };
     let Some(base) = specification.states.first() else {
         return CssOutput {
             css: String::new(),
@@ -45,7 +51,9 @@ fn build_scoped(
         }
     }
     let mut signature_classes = HashMap::new();
+    let mut emitted = HashSet::new();
     let mut classes = BTreeMap::new();
+    let responsive_signatures = responsive_signatures(specification);
     let base_nodes: HashMap<_, _> = base
         .nodes
         .iter()
@@ -61,14 +69,17 @@ fn build_scoped(
             .and_then(|parent| base_nodes.get(parent).copied());
         let signature = format!(
             "{}|layout:{}",
-            responsive_signature(specification, &node.path),
+            responsive_signatures
+                .get(&node.path)
+                .map(String::as_str)
+                .unwrap_or_default(),
             css_layout::role(node, parent, &base.viewport)
         );
         let class = signature_classes
             .entry(signature.clone())
             .or_insert_with(|| format!("{prefix}{}", &hash(&signature)[..10]))
             .clone();
-        if !css.contains(&format!(".{class}{{")) {
+        if emitted.insert(class.clone()) {
             css.push_str(&format!(
                 ".{class}{{{}}}\n",
                 responsive::base_declarations(node, parent, &base.viewport, assets,)
@@ -90,13 +101,14 @@ fn build_scoped(
         }
         classes.insert(node.path.clone(), class);
     }
+    timing("base");
     for node in &base.startup_nodes {
         if node.tag == "#text" {
             continue;
         }
         let signature = style_signature(&node.style);
         let class = format!("u{}", &hash(&signature)[..10]);
-        if !css.contains(&format!(".{class}{{")) {
+        if emitted.insert(class.clone()) {
             css.push_str(&format!(
                 ".{class}{{{}}}\n",
                 declarations(&node.style, assets)
@@ -105,6 +117,7 @@ fn build_scoped(
         classes.insert(node.path.clone(), class);
     }
     responsive::append(specification, assets, &classes, &mut css);
+    timing("responsive");
     let mut interaction_classes = Vec::new();
     for (index, interaction) in specification.interactions.iter().enumerate() {
         let mut states = interaction.states.clone();
@@ -142,6 +155,7 @@ fn build_scoped(
         );
         css.push_str(&output.css);
         interaction_classes.push(output.classes);
+        timing(&format!("interaction_{}", index + 1));
     }
     animations::append(&base.animations, &mut classes, &mut css);
     startup_overlays::append(&specification.states, &mut classes, &mut css);
@@ -161,6 +175,7 @@ fn build_scoped(
         })
         .collect::<Vec<_>>();
     state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
+    timing("states");
     if !include_interactions {
         interaction_classes.clear();
     }

@@ -10,7 +10,6 @@ use anyhow::{Context, Result};
 use base64::Engine;
 use serde_json::json;
 use std::fs;
-
 pub async fn run(args: CaptureArgs) -> Result<()> {
     let viewports = probe::parse_viewports(&args.viewports)?;
     fs::create_dir_all(&args.out)?;
@@ -82,6 +81,14 @@ pub async fn capture_state(
     viewport: Viewport,
     reload: bool,
 ) -> Result<PageState> {
+    prepare_state(cdp, &viewport, reload).await?;
+    read_state(cdp, viewport).await
+}
+pub async fn prepare_state(
+    cdp: &mut crate::cdp::Cdp,
+    viewport: &Viewport,
+    reload: bool,
+) -> Result<()> {
     browser::set_viewport(cdp, viewport.width, viewport.height).await?;
     if reload {
         cdp.send("Page.reload", json!({ "ignoreCache": false }))
@@ -89,7 +96,7 @@ pub async fn capture_state(
     }
     clear_input_state(cdp).await?;
     wait_ready(cdp, true).await?;
-    read_state(cdp, viewport).await
+    Ok(())
 }
 
 async fn capture_state_with_startup(

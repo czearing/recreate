@@ -21,9 +21,35 @@ pub async fn focused_path(cdp: &mut Cdp) -> Result<Option<String>> {
     Ok(value.as_str().map(str::to_string))
 }
 
-pub async fn click(cdp: &mut Cdp, path: &str) -> Result<bool> {
+pub async fn click_matching(
+    cdp: &mut Cdp,
+    path: &str,
+    tag: &str,
+    label: &str,
+    require_control: bool,
+) -> Result<bool> {
+    let (matching, fallback) = if tag.is_empty() {
+        ("candidate=>candidate".into(), "null".into())
+    } else {
+        let tag = serde_json::to_string(tag)?;
+        let label = serde_json::to_string(label)?;
+        let control = if require_control {
+            "candidate.hasAttribute('data-recreate-control')&&"
+        } else {
+            ""
+        };
+        (
+            format!(
+                "candidate=>candidate&&{control}candidate.tagName.toLowerCase()==={tag}&&\
+                 (candidate.getAttribute('aria-label')||candidate.innerText||candidate.value||'')\
+                 .replace(/\\s+/g,' ').trim()==={label}"
+            ),
+            format!("Array.from(document.querySelectorAll({tag})).find(matches)"),
+        )
+    };
     let expression = format!(
-        "(() => {{ const element=document.querySelector({}); if(!element)return false; \
+        "(() => {{ const matches={matching};const exact=document.querySelector({});\
+         const element=matches(exact)?exact:({fallback});if(!element)return false; \
          const before=[scrollX,scrollY]; const ancestors=[]; \
          for(let node=element.parentElement;node&&node!==document.documentElement;node=node.parentElement) \
            ancestors.push([node,node.scrollLeft,node.scrollTop]); \

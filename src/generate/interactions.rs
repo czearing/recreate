@@ -1,23 +1,25 @@
+use super::interaction_labels::{matches_trigger, semantic_trigger};
 use crate::model::{Interaction, Node, PageState, Specification};
 use std::collections::BTreeMap;
 
 pub const FOCUS_CSS: &str =
     "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\n";
 
-pub fn base_handlers(specification: &Specification) -> BTreeMap<String, String> {
-    let nodes = specification
-        .states
-        .first()
-        .map(nodes_by_path)
-        .unwrap_or_default();
+pub fn base_handlers(specification: &Specification, state: &PageState) -> BTreeMap<String, String> {
+    let nodes = nodes_by_path(state);
     specification
         .interactions
         .iter()
         .enumerate()
         .map(|(index, interaction)| {
-            let node = nodes.get(interaction.trigger_path.as_str()).copied();
+            let node = nodes
+                .get(interaction.trigger_path.as_str())
+                .copied()
+                .filter(|node| matches_trigger(interaction, node, state))
+                .or_else(|| semantic_trigger(interaction, state));
             (
-                interaction.trigger_path.clone(),
+                node.map(|node| node.path.clone())
+                    .unwrap_or_else(|| interaction.trigger_path.clone()),
                 trigger_binding(
                     node,
                     &format!("event=>activate(event,{})", index + 1),
@@ -37,15 +39,8 @@ pub fn state_handlers(
     let trigger = nodes
         .get(interaction.trigger_path.as_str())
         .copied()
-        .or_else(|| {
-            state.nodes.iter().find(|node| {
-                node.tag == interaction.trigger_tag
-                    && node
-                        .attributes
-                        .get("aria-label")
-                        .is_some_and(|label| label == &interaction.trigger_label)
-            })
-        });
+        .filter(|node| matches_trigger(interaction, node, state))
+        .or_else(|| semantic_trigger(interaction, state));
     let trigger_path = trigger
         .map(|node| node.path.clone())
         .unwrap_or_else(|| interaction.trigger_path.clone());
@@ -175,8 +170,7 @@ fn append(handlers: &mut BTreeMap<String, String>, path: &str, value: &str) {
     handlers
         .entry(path.to_string())
         .and_modify(|binding| {
-            binding.push(' ');
-            binding.push_str(value);
+            binding.push_str(&format!(" {value}"));
         })
         .or_insert_with(|| value.to_string());
 }

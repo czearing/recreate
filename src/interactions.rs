@@ -1,4 +1,4 @@
-use crate::interactions_input::{click, focused_path};
+use crate::interactions_input::{click_matching, focused_path};
 use crate::{
     capture,
     cdp::Cdp,
@@ -106,7 +106,15 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         };
         let mut opened = None;
         for attempt in 0..2 {
-            if !click(cdp, &candidate.path).await? {
+            if !click_matching(
+                cdp,
+                &candidate.path,
+                &candidate.tag,
+                &candidate.label,
+                false,
+            )
+            .await?
+            {
                 break;
             }
             let settled = settle(cdp).await?;
@@ -130,7 +138,15 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         let mut states = vec![state];
         for baseline in baselines.iter().skip(1) {
             let fresh = restore(cdp, &baseline.viewport, &baseline.url).await?;
-            if !click(cdp, &candidate.path).await? {
+            if !click_matching(
+                cdp,
+                &candidate.path,
+                &candidate.tag,
+                &candidate.label,
+                false,
+            )
+            .await?
+            {
                 continue;
             }
             let settled = settle(cdp).await?;

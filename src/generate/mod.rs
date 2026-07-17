@@ -3,6 +3,7 @@ mod animation_order_tests;
 mod animation_timing;
 mod animations;
 mod assets;
+mod assets_remote;
 #[cfg(test)]
 mod authenticated_interaction_runtime_tests;
 mod css;
@@ -10,6 +11,7 @@ mod css_layout;
 mod css_values;
 #[cfg(test)]
 mod interaction_geometry_support;
+mod interaction_labels;
 #[cfg(test)]
 mod interaction_runtime_support;
 #[cfg(test)]
@@ -59,6 +61,12 @@ pub async fn write_project(
     out: &Path,
     cookies: &[BrowserCookie],
 ) -> Result<()> {
+    let started = std::time::Instant::now();
+    let timing = |phase: &str| {
+        if std::env::var_os("RECREATE_TIMING").is_some() {
+            eprintln!("{phase}={:.3}s", started.elapsed().as_secs_f64());
+        }
+    };
     let root = out.join("react");
     if root.exists() {
         fs::remove_dir_all(&root)?;
@@ -66,23 +74,38 @@ pub async fn write_project(
     let source = root.join("src");
     fs::create_dir_all(source.join("components"))?;
     let assets = assets::download(specification, &root, cookies).await?;
+    timing("assets");
     let mut styles = css::build(specification, &assets);
+    timing("css");
     styles.css.push_str(interactions::FOCUS_CSS);
     let components = tree::components(specification, &styles.classes);
+    timing("components");
+    let mut structural_classes = std::collections::HashSet::new();
     let state_classes = structural_css::class_maps(
         &specification.states,
         &styles.classes,
         &assets,
         &mut styles.css,
+        &mut structural_classes,
     );
+    timing("baseline_structure");
     let interaction_state_classes = specification
         .interactions
         .iter()
         .zip(&styles.interaction_classes)
         .map(|(interaction, classes)| {
-            structural_css::class_maps(&interaction.states, classes, &assets, &mut styles.css)
+            let output = structural_css::class_maps(
+                &interaction.states,
+                classes,
+                &assets,
+                &mut styles.css,
+                &mut structural_classes,
+            );
+            timing("interaction_structure");
+            output
         })
         .collect::<Vec<_>>();
+    timing("structure");
     let (html_class, body_class, root_class) = roots::classes(specification, &components);
     let has_root = specification.states.first().is_some_and(|state| {
         state.nodes.iter().any(|node| {
@@ -120,6 +143,7 @@ pub async fn write_project(
             &assets,
         ),
     )?;
+    timing("jsx");
     fs::write(
         source.join("main.jsx"),
         format!(

@@ -7,29 +7,32 @@ pub fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> Strin
         .iter()
         .filter(|(_, value)| !value.is_empty())
         .map(|(key, value)| {
-            let value = assets
-                .iter()
-                .fold(value.clone(), |text, (url, local)| text.replace(url, local));
+            let value = if value.contains("url(") {
+                assets
+                    .iter()
+                    .fold(value.clone(), |text, (url, local)| text.replace(url, local))
+            } else {
+                value.clone()
+            };
             format!("{key}:{value};")
         })
         .collect()
 }
 
-pub fn responsive_signature(specification: &Specification, path: &str) -> String {
-    specification
-        .states
-        .iter()
-        .filter_map(|state| state.nodes.iter().find(|node| node.path == path))
-        .map(|node| {
-            format!(
-                "{}|{}|{}",
-                style_signature(&node.style),
-                pseudo_signature(node.before.as_ref()),
-                pseudo_signature(node.after.as_ref())
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("||")
+pub fn responsive_signatures(specification: &Specification) -> BTreeMap<String, String> {
+    let mut signatures = BTreeMap::<String, Sha256>::new();
+    for state in &specification.states {
+        for node in &state.nodes {
+            let signature = signatures.entry(node.path.clone()).or_default();
+            append_styles(signature, &node.style);
+            append_pseudo(signature, node.before.as_ref());
+            append_pseudo(signature, node.after.as_ref());
+        }
+    }
+    signatures
+        .into_iter()
+        .map(|(path, signature)| (path, hex::encode(signature.finalize())))
+        .collect()
 }
 
 pub fn style_signature(styles: &Styles) -> String {
@@ -40,10 +43,21 @@ pub fn style_signature(styles: &Styles) -> String {
         .join(";")
 }
 
-fn pseudo_signature(pseudo: Option<&Pseudo>) -> String {
-    pseudo
-        .map(|pseudo| format!("{}:{}", pseudo.content, style_signature(&pseudo.style)))
-        .unwrap_or_default()
+fn append_styles(signature: &mut Sha256, styles: &Styles) {
+    for (key, value) in styles {
+        signature.update(key.as_bytes());
+        signature.update([0]);
+        signature.update(value.as_bytes());
+        signature.update([0xff]);
+    }
+}
+
+fn append_pseudo(signature: &mut Sha256, pseudo: Option<&Pseudo>) {
+    signature.update([0xfe]);
+    if let Some(pseudo) = pseudo {
+        signature.update(pseudo.content.as_bytes());
+        append_styles(signature, &pseudo.style);
+    }
 }
 
 pub fn hash(value: &str) -> String {
