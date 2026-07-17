@@ -38,7 +38,7 @@ pub fn page(
 }
 
 pub fn selector() -> &'static str {
-    "const selectViewport=(width,widths)=>{for(let index=0;index<widths.length;index++){if(width>=widths[index])return index}return widths.length-1};"
+    "const selectViewport=(width,widths)=>{for(let index=0;index<widths.length-1;index++){if(width>widths[index+1])return index}return widths.length-1};"
 }
 
 pub fn fragment(

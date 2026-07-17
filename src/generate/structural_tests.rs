@@ -128,3 +128,10 @@ async fn writes_exact_viewport_and_interaction_structures() {
         "mobile-only structure needs generated CSS"
     );
 }
+
+#[test]
+fn jsx_viewport_selector_matches_responsive_bands() {
+    let selector = super::jsx_variants::selector();
+    assert!(selector.contains("width>widths[index+1]"));
+    assert!(!selector.contains("width>=widths[index]"));
+}
