@@ -116,7 +116,7 @@ async fn writes_exact_viewport_and_interaction_structures() {
     assert!(app.contains("function Baseline0"));
     assert!(app.contains("function Baseline1"));
     assert!(app.contains("const viewportWidths=[1200,390]"));
-    assert!(app.contains("if(width>=widths[index])return index"));
+    assert!(app.contains("if(width>widths[index+1])return index"));
     assert!(app.contains("matchMedia(`(max-width:${width}px)`)"));
     assert!(app.contains("Desktop menu") && app.contains("Mobile menu"));
     assert!(interactions.contains("Interaction1View0"));
