@@ -17,3 +17,11 @@ fn preserves_dynamic_pseudo_element_selectors() {
     assert!(script.contains("target_pseudo: scoped"));
     assert!(script.contains("`${tailStates.join('')}${pseudoElement}`"));
 }
+
+#[test]
+fn captures_attribute_sequences() {
+    let script = source();
+    assert!(script.contains("window.__recreateAttributeMutations"));
+    assert!(script.contains("attribute_sequences: attributeSequences"));
+    assert!(script.contains("interval_ms"));
+}

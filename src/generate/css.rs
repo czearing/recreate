@@ -42,7 +42,7 @@ fn build_scoped(
     };
     let mut css = String::from("*{box-sizing:border-box}\n");
     for rule in &base.css_rules {
-        if rule.trim_start().starts_with("@font-face") {
+        if global_rule(rule) {
             let rule = assets
                 .iter()
                 .fold(rule.clone(), |text, (url, local)| text.replace(url, local));
@@ -184,6 +184,13 @@ fn build_scoped(
         classes,
         interaction_classes,
     }
+}
+
+fn global_rule(rule: &str) -> bool {
+    let rule = rule.trim_start();
+    rule.starts_with("@font-face")
+        || rule.starts_with("@keyframes")
+        || rule.starts_with("@-webkit-keyframes")
 }
 
 #[cfg(test)]

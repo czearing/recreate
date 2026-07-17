@@ -4,6 +4,7 @@ mod animation_timing;
 mod animations;
 mod assets;
 mod assets_remote;
+mod attribute_sequences;
 #[cfg(test)]
 mod authenticated_interaction_runtime_tests;
 mod css;
@@ -28,12 +29,14 @@ mod mount_tests;
 mod names;
 mod responsive;
 mod responsive_geometry;
+mod responsive_height;
 #[cfg(test)]
 mod responsive_runtime_support;
 #[cfg(test)]
 mod responsive_runtime_tests;
 mod roots;
 mod startup_overlays;
+mod state_style_maps;
 mod state_styles;
 mod structural_css;
 #[cfg(test)]
@@ -79,7 +82,6 @@ pub async fn write_project(
     timing("css");
     styles.css.push_str(interactions::FOCUS_CSS);
     let components = tree::components(specification, &styles.classes);
-    timing("components");
     let mut structural_classes = std::collections::HashSet::new();
     let state_classes = structural_css::class_maps(
         &specification.states,
@@ -105,7 +107,13 @@ pub async fn write_project(
             output
         })
         .collect::<Vec<_>>();
-    timing("structure");
+    state_style_maps::append(
+        specification,
+        &state_classes,
+        &interaction_state_classes,
+        &assets,
+        &mut styles.css,
+    );
     let (html_class, body_class, root_class) = roots::classes(specification, &components);
     let has_root = specification.states.first().is_some_and(|state| {
         state.nodes.iter().any(|node| {
@@ -143,7 +151,6 @@ pub async fn write_project(
             &assets,
         ),
     )?;
-    timing("jsx");
     fs::write(
         source.join("main.jsx"),
         format!(

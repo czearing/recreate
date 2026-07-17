@@ -97,6 +97,7 @@ fn state(width: u32) -> PageState {
             timing: json!({"duration":200}),
         }],
         state_styles: Vec::new(),
+        attribute_sequences: Vec::new(),
         css_rules: Vec::new(),
         asset_urls: Vec::new(),
         asset_data: Default::default(),

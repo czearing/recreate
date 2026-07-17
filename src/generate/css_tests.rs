@@ -1,6 +1,16 @@
 use super::*;
 
 #[test]
+fn preserves_global_font_and_keyframe_rules() {
+    assert!(global_rule("@font-face { font-family: Test; }"));
+    assert!(global_rule("@keyframes pulse { from { opacity: 0 } }"));
+    assert!(global_rule(
+        "@-webkit-keyframes pulse { from { opacity: 0 } }"
+    ));
+    assert!(!global_rule(".card { color: red; }"));
+}
+
+#[test]
 fn directional_border_contract_is_captured_and_generated() {
     let mut styles = Styles::new();
     for side in ["top", "right", "bottom", "left"] {

@@ -64,6 +64,14 @@ pub struct StateStyle {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct AttributeSequence {
+    pub target: String,
+    pub attribute: String,
+    pub values: Vec<String>,
+    pub interval_ms: u64,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PageState {
     pub url: String,
     pub title: String,
@@ -79,6 +87,8 @@ pub struct PageState {
     pub animations: Vec<Animation>,
     #[serde(default)]
     pub state_styles: Vec<StateStyle>,
+    #[serde(default)]
+    pub attribute_sequences: Vec<AttributeSequence>,
     pub css_rules: Vec<String>,
     pub asset_urls: Vec<String>,
     #[serde(default)]

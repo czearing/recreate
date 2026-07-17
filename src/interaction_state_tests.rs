@@ -37,6 +37,7 @@ fn state(nodes: usize) -> PageState {
             media: None,
             declarations: "outline:1px solid".into(),
         }],
+        attribute_sequences: Vec::new(),
         css_rules: vec!["body{margin:0}".into()],
         asset_urls: vec!["https://example.test/logo.svg".into()],
         asset_data: BTreeMap::from([("blob:logo".into(), "data:image/png;base64,AA==".into())]),

@@ -57,7 +57,12 @@ pub fn append(
     }
 }
 
-fn band(width: u32, smaller: Option<u32>, wider: u32, sparse: bool) -> (Option<u32>, u32) {
+pub(super) fn band(
+    width: u32,
+    smaller: Option<u32>,
+    wider: u32,
+    sparse: bool,
+) -> (Option<u32>, u32) {
     if sparse {
         return (None, wider.saturating_sub(1).max(width));
     }
@@ -155,7 +160,7 @@ fn changed_styles(base: &Styles, current: &Styles) -> Styles {
         .collect()
 }
 
-fn media_rule(minimum: Option<u32>, maximum: u32, rules: &str) -> String {
+pub(super) fn media_rule(minimum: Option<u32>, maximum: u32, rules: &str) -> String {
     match minimum {
         Some(minimum) => {
             format!("@media(min-width:{minimum}px) and (max-width:{maximum}px){{{rules}}}\n")

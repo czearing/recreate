@@ -1,4 +1,4 @@
-use super::{interactions, jsx_variants, structural_tree, tree};
+use super::{attribute_sequences, interactions, jsx_variants, structural_tree, tree};
 use crate::model::Specification;
 use std::collections::BTreeMap;
 
@@ -34,7 +34,8 @@ pub fn interaction_states(
                     .iter()
                     .find(|baseline| baseline.viewport.width == state.viewport.width)
                     .unwrap_or(&specification.states[0]);
-                let handlers = interactions::state_handlers(interaction, state, baseline);
+                let mut handlers = interactions::state_handlers(interaction, state, baseline);
+                attribute_sequences::append_handlers(baseline, &mut handlers);
                 let page = jsx_variants::page(state, &components, assets, &handlers);
                 format!(
                     "function Interaction{}View{state_index}({{onReset}}){{return {page}}}\n",

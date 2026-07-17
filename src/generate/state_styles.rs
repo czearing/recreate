@@ -1,7 +1,6 @@
 use crate::model::StateStyle;
 use std::collections::{BTreeMap, BTreeSet};
 
-#[cfg(test)]
 pub fn append(
     styles: &[StateStyle],
     classes: &BTreeMap<String, String>,

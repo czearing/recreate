@@ -3,6 +3,7 @@ pub const SOURCE: &str = r#"
   if (window.__recreateLifecycleInstalled) return;
   window.__recreateLifecycleInstalled = true;
   window.__recreateLifecycleAnimations = [];
+  window.__recreateAttributeMutations = [];
   window.__recreateLifecycleDone = false;
   window.__recreatePendingRequests = 0;
   const originalFetch = window.fetch;
@@ -51,6 +52,33 @@ pub const SOURCE: &str = r#"
       }
       return `html>${parts.reverse().join('>')}`;
     };
+    const trackedAttributes = new Set(['placeholder','title','aria-label','value']);
+    const lastAttribute = new Map();
+    new MutationObserver(mutations => {
+      const now = performance.now() - start;
+      for (const mutation of mutations) {
+        if (mutation.type !== 'attributes' || !trackedAttributes.has(mutation.attributeName)) continue;
+        const element = mutation.target;
+        const key = `${pathOf(element)}|${mutation.attributeName}`;
+        const current = element.getAttribute(mutation.attributeName) || '';
+        if (!lastAttribute.has(key) && mutation.oldValue) {
+          window.__recreateAttributeMutations.push({
+            target: pathOf(element), attribute: mutation.attributeName,
+            value: mutation.oldValue, time: now
+          });
+        }
+        if (lastAttribute.get(key) !== current) {
+          lastAttribute.set(key, current);
+          window.__recreateAttributeMutations.push({
+            target: pathOf(element), attribute: mutation.attributeName,
+            value: current, time: now
+          });
+        }
+      }
+    }).observe(document.documentElement, {
+      attributes: true, attributeOldValue: true, subtree: true,
+      attributeFilter: Array.from(trackedAttributes)
+    });
     const sample = () => {
       const now = performance.now();
       const animations = document.getAnimations({ subtree: true });

@@ -48,6 +48,7 @@ fn semantic_attributes(node: &crate::model::Node) -> Vec<(&str, &str)> {
 }
 
 pub fn compact(state: &mut PageState, baseline: &PageState, settled: bool) {
+    state.attribute_sequences.clear();
     if settled {
         state.animations.clear();
     } else {

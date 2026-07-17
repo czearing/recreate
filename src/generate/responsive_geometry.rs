@@ -9,6 +9,7 @@ pub fn normalize(
 ) {
     preserve_scrollbar_space(styles, node, base.map(|(node, _)| node), viewport);
     normalize_width(styles, node, viewport, base);
+    super::responsive_height::normalize(styles, node, viewport);
     if !is_root(node) && base.is_some_and(|(node, viewport)| centered(node, viewport)) {
         styles.insert("margin-left".into(), "0px".into());
         styles.insert("margin-right".into(), "0px".into());

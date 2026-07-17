@@ -76,6 +76,7 @@ mod tests {
             startup_duration_ms: 500,
             animations: Vec::new(),
             state_styles: Vec::new(),
+            attribute_sequences: Vec::new(),
             css_rules: Vec::new(),
             asset_urls: Vec::new(),
             asset_data: Default::default(),

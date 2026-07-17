@@ -107,6 +107,7 @@ const CAPTURE: &str = r#"
     ...(window.__recreateLifecycleAnimations || [])
   ].filter(meaningfulTransient);
 __STATE_STYLE_CAPTURE__
+__ATTRIBUTE_SEQUENCE_CAPTURE__
   const assets = new Set();
   document.querySelectorAll('img,video,source').forEach(element => {
     const url = element.currentSrc || element.src;
@@ -131,6 +132,7 @@ __ASSET_CAPTURE__
     nodes,
     animations,
     state_styles: stateStyles,
+    attribute_sequences: attributeSequences,
     css_rules: cssRules,
     asset_urls: Array.from(assets),
     asset_data: assetData
@@ -146,6 +148,10 @@ pub fn source() -> String {
             style_contract::DIRECTIONAL_BORDERS,
         )
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
+        .replace(
+            "__ATTRIBUTE_SEQUENCE_CAPTURE__",
+            crate::attribute_sequence_script::SOURCE,
+        )
         .replace("__ASSET_CAPTURE__", asset_script::SOURCE)
 }
 
