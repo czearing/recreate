@@ -21,6 +21,7 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
             .push((digest, name, animation));
     }
     let mut emitted_classes = BTreeSet::new();
+    let mut reduced_classes = Vec::new();
     for (target, rules) in targets {
         let signature = rules
             .iter()
@@ -37,10 +38,18 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
                 ".{class}{{{}}}\n",
                 super::animation_timing::declarations(&animations, &names)
             ));
+            reduced_classes.push(class.clone());
         }
         classes
             .entry(target.into())
             .and_modify(|value| append_class(value, &class));
+    }
+    if !reduced_classes.is_empty() {
+        css.push_str("@media (prefers-reduced-motion: reduce){");
+        for class in reduced_classes {
+            css.push_str(&format!(".{class}{{animation:none!important;}}"));
+        }
+        css.push_str("}\n");
     }
 }
 

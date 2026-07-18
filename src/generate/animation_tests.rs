@@ -35,7 +35,9 @@ fn preserves_animation_timing_controls() {
     assert!(css.contains("animation-direction:reverse"));
     assert!(css.contains("animation-fill-mode:both"));
     assert!(css.contains("animation-play-state:paused"));
-    assert!(!css.contains("prefers-reduced-motion"));
+    assert!(css.contains("@media (prefers-reduced-motion: reduce)"));
+    assert!(css.contains("animation:none!important"));
+    assert!(!css.contains("transition:none!important"));
 }
 
 #[test]
