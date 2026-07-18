@@ -96,21 +96,16 @@ pub const SOURCE: &str = r#"
         ? document.querySelectorAll('*')
         : new Set(active);
       for (const element of elements) {
-        const rect = element.getBoundingClientRect();
         const style = getComputedStyle(element);
         const value = {
           offset: Math.min(1, (now - start) / 2500),
           opacity: style.opacity,
-          transform: style.transform,
-          x: rect.x,
-          y: rect.y,
-          width: rect.width,
-          height: rect.height
+          transform: style.transform
         };
         const before = previous.get(element);
         previous.set(element, value);
         if (!before) continue;
-        const changed = ['opacity','transform','x','y','width','height']
+        const changed = ['opacity','transform']
           .some(key => before[key] !== value[key]);
         if (!changed) continue;
         const path = pathOf(element);

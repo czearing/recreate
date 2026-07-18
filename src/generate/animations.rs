@@ -7,7 +7,7 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
     let mut emitted_keyframes = BTreeSet::new();
     let mut targets: BTreeMap<&str, Vec<(String, String, &Animation)>> = BTreeMap::new();
     for animation in animations {
-        if animation.keyframes.len() < 2 {
+        if animation.keyframes.len() < 2 || sampled_layout_observation(animation) {
             continue;
         }
         let digest = animation_digest(animation);
@@ -21,7 +21,6 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
             .push((digest, name, animation));
     }
     let mut emitted_classes = BTreeSet::new();
-    let mut reduced_classes = Vec::new();
     for (target, rules) in targets {
         let signature = rules
             .iter()
@@ -38,20 +37,10 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
                 ".{class}{{{}}}\n",
                 super::animation_timing::declarations(&animations, &names)
             ));
-            reduced_classes.push(class.clone());
         }
         classes
             .entry(target.into())
             .and_modify(|value| append_class(value, &class));
-    }
-    if !reduced_classes.is_empty() {
-        css.push_str("@media (prefers-reduced-motion: reduce){");
-        for class in reduced_classes {
-            css.push_str(&format!(
-                ".{class}{{animation:none!important;transition:none!important;}}"
-            ));
-        }
-        css.push_str("}\n");
     }
 }
 
@@ -72,6 +61,32 @@ fn animation_digest(animation: &Animation) -> String {
     let signature =
         serde_json::to_vec(&(&animation.keyframes, &animation.timing)).unwrap_or_default();
     hex::encode(Sha256::digest(signature))
+}
+
+fn sampled_layout_observation(animation: &Animation) -> bool {
+    let has_geometry = animation.keyframes.iter().any(|frame| {
+        frame.as_object().is_some_and(|values| {
+            values
+                .keys()
+                .any(|key| matches!(key.as_str(), "x" | "y" | "width" | "height"))
+        })
+    });
+    let has_effect_metadata = animation.keyframes.iter().any(|frame| {
+        frame.as_object().is_some_and(|values| {
+            values
+                .keys()
+                .any(|key| matches!(key.as_str(), "computedOffset" | "composite" | "easing"))
+        })
+    });
+    let timing = animation.timing.as_object();
+    has_geometry
+        && !has_effect_metadata
+        && timing.is_some_and(|values| {
+            !values.contains_key("direction")
+                && !values.contains_key("fill")
+                && !values.contains_key("playState")
+                && !values.contains_key("playbackRate")
+        })
 }
 
 fn append_keyframes(animation: &Animation, name: &str, css: &mut String) {
