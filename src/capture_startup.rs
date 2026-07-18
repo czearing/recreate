@@ -56,9 +56,6 @@ pub async fn wait_ready(cdp: &mut Cdp, wait_for_startup: bool) -> Result<()> {
         let signature = value["signature"].as_str().unwrap_or_default();
         let startup_complete = !wait_for_startup || value["blocking"].as_bool() != Some(true);
         let ready = value["ready"].as_bool() == Some(true) && !signature.is_empty();
-        if ready && started.elapsed() >= Duration::from_secs(20) {
-            return Ok(());
-        }
         if ready && startup_complete && started.elapsed() >= Duration::from_secs(5) {
             return Ok(());
         }
@@ -74,6 +71,28 @@ pub async fn wait_ready(cdp: &mut Cdp, wait_for_startup: bool) -> Result<()> {
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
     anyhow::bail!("page did not become stable")
+}
+
+pub fn ensure_settled(state: &PageState) -> Result<()> {
+    let area = f64::from(state.viewport.width) * f64::from(state.viewport.height);
+    if state.nodes.iter().any(|node| {
+        let z = node
+            .style
+            .get("z-index")
+            .and_then(|value| value.parse::<i32>().ok());
+        node.rect.width * node.rect.height >= area * 0.9
+            && matches!(
+                node.style.get("position").map(String::as_str),
+                Some("absolute" | "fixed")
+            )
+            && z.is_some_and(|value| value >= 50)
+            && node.style.get("pointer-events").map(String::as_str) != Some("none")
+            && node.style.get("display").map(String::as_str) != Some("none")
+            && node.style.get("visibility").map(String::as_str) != Some("hidden")
+    }) {
+        anyhow::bail!("settled capture still contains a blocking overlay");
+    }
+    Ok(())
 }
 
 pub async fn wait_startup(

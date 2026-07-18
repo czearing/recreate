@@ -3,6 +3,8 @@ mod attribute_sequence_script;
 mod browser;
 mod capture;
 mod capture_startup;
+#[cfg(test)]
+mod capture_startup_tests;
 mod cdp;
 mod cli;
 mod compare;

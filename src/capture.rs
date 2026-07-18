@@ -1,6 +1,6 @@
 use crate::{
     browser,
-    capture_startup::{startup_nodes, wait_ready, wait_startup},
+    capture_startup::{ensure_settled, startup_nodes, wait_ready, wait_startup},
     cli::CaptureArgs,
     generate, interactions, lifecycle_script,
     model::{BrowserCookie, PageState, Specification, Viewport},
@@ -82,7 +82,9 @@ pub async fn capture_state(
     reload: bool,
 ) -> Result<PageState> {
     prepare_state(cdp, &viewport, reload).await?;
-    read_state(cdp, viewport).await
+    let state = read_state(cdp, viewport).await?;
+    ensure_settled(&state)?;
+    Ok(state)
 }
 pub async fn prepare_state(
     cdp: &mut crate::cdp::Cdp,
@@ -111,6 +113,7 @@ async fn capture_state_with_startup(
     let startup = wait_startup(cdp, &viewport, started).await?;
     wait_ready(cdp, startup.is_some()).await?;
     let mut state = read_state(cdp, viewport).await?;
+    ensure_settled(&state)?;
     if let Some((startup_state, delay)) = startup {
         let settled: std::collections::BTreeSet<_> =
             state.nodes.iter().map(|node| node.path.as_str()).collect();
