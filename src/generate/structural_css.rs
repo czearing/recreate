@@ -18,8 +18,8 @@ pub fn class_maps(
                 if node.tag == "#text" || classes.contains_key(&node.path) {
                     continue;
                 }
-                let class = class_name(node, &state.viewport, assets);
-                append_rule(&class, node, &state.viewport, assets, css, emitted);
+                let class = class_name(node, state, assets);
+                append_rule(&class, node, state, assets, css, emitted);
                 classes.insert(node.path.clone(), class);
             }
             classes
@@ -27,12 +27,9 @@ pub fn class_maps(
         .collect()
 }
 
-fn class_name(
-    node: &Node,
-    viewport: &crate::model::Viewport,
-    assets: &BTreeMap<String, String>,
-) -> String {
-    let mut signature = responsive::base_declarations(node, None, viewport, assets);
+fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>) -> String {
+    let mut signature =
+        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules);
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
         signature.push_str(&declarations(&before.style, assets));
@@ -47,7 +44,7 @@ fn class_name(
 fn append_rule(
     class: &str,
     node: &Node,
-    viewport: &crate::model::Viewport,
+    state: &PageState,
     assets: &BTreeMap<String, String>,
     css: &mut String,
     emitted: &mut HashSet<String>,
@@ -57,7 +54,7 @@ fn append_rule(
     }
     css.push_str(&format!(
         ".{class}{{{}}}\n",
-        responsive::base_declarations(node, None, viewport, assets)
+        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules,)
     ));
     if let Some(before) = &node.before {
         css.push_str(&format!(

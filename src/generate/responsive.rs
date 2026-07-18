@@ -32,7 +32,7 @@ pub fn append(
             else {
                 continue;
             };
-            append_node_rules(
+            rules.push_str(&append_node_rules(
                 base_node,
                 node,
                 node.parent
@@ -41,8 +41,8 @@ pub fn append(
                 (&base.viewport, &state.viewport),
                 class,
                 assets,
-                &mut rules,
-            );
+                &state.css_rules,
+            ));
         }
         if !rules.is_empty() {
             let wider = if index == 0 {
@@ -74,8 +74,10 @@ pub fn base_declarations(
     parent: Option<&Node>,
     viewport: &Viewport,
     assets: &BTreeMap<String, String>,
+    css_rules: &[String],
 ) -> String {
     let mut styles = node.style.clone();
+    super::authored_css::normalize(&mut styles, node, css_rules);
     super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     declarations(&styles, assets)
 }
@@ -87,10 +89,12 @@ fn append_node_rules(
     viewports: (&Viewport, &Viewport),
     class: &str,
     assets: &BTreeMap<String, String>,
-    rules: &mut String,
-) {
+    css_rules: &[String],
+) -> String {
+    let mut rules = String::new();
     let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
+    super::authored_css::normalize(&mut changed, node, css_rules);
     super::responsive_geometry::normalize(
         &mut changed,
         node,
@@ -108,7 +112,7 @@ fn append_node_rules(
         base.before.as_ref(),
         node.before.as_ref(),
         assets,
-        rules,
+        &mut rules,
     );
     append_pseudo_rule(
         class,
@@ -116,8 +120,9 @@ fn append_node_rules(
         base.after.as_ref(),
         node.after.as_ref(),
         assets,
-        rules,
+        &mut rules,
     );
+    rules
 }
 
 fn append_pseudo_rule(

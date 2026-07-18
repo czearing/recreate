@@ -2,8 +2,8 @@ use super::interaction_labels::{matches_trigger, semantic_trigger};
 use crate::model::{Interaction, Node, PageState, Specification};
 use std::collections::BTreeMap;
 
-pub const FOCUS_CSS: &str =
-    "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\n";
+pub const FOCUS_CSS: &str = "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\
+.recreateInteractionLayer{position:fixed;inset:0;z-index:2147480000;overflow:auto}\n";
 pub const REDUCED_MOTION_CSS: &str = "@media(prefers-reduced-motion:reduce){\
 *,*::before,*::after{animation:none!important;transition:none!important;\
 scroll-behavior:auto!important}}\n";
@@ -90,11 +90,25 @@ pub fn state_handlers(
     handlers
 }
 
-pub fn closable(interaction: &Interaction, baseline: &PageState) -> bool {
-    interaction
+pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
+    if interaction
         .states
-        .first()
-        .is_some_and(|state| closable_state(state, baseline))
+        .iter()
+        .any(|state| state.nodes.iter().any(is_popup))
+    {
+        return true;
+    }
+    let comparisons = interaction
+        .states
+        .iter()
+        .filter_map(|state| {
+            baselines
+                .iter()
+                .find(|baseline| baseline.viewport.width == state.viewport.width)
+                .map(|baseline| closable_state(state, baseline))
+        })
+        .collect::<Vec<_>>();
+    comparisons.iter().filter(|value| **value).count() * 2 > comparisons.len()
 }
 
 fn closable_state(state: &PageState, baseline: &PageState) -> bool {

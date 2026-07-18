@@ -35,10 +35,13 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("function Baseline0({activate,showStartup,onStartupDone})"));
     assert!(app.contains("onStartupDone={()=>setStartupDone(true)}"));
     let states = std::fs::read_to_string(root.join("src/states.jsx")).unwrap();
-    assert!(states.contains("aria-expanded={\"true\"}"));
+    assert!(app.contains("setAttribute('aria-expanded'"));
     assert!(states.contains("aria-modal={\"true\"}"));
     assert!(states.contains("autoFocus"));
-    assert!(states.contains("onClick={event=>onReset(event)}"));
+    assert!(states.contains("createPortal"));
+    assert!(app.contains("const overlay=state===1?"));
+    assert!(app.contains("mergeHorizontalScroll(captureScroll(event.currentTarget),captured)"));
+    assert!(app.contains("target.focus({preventScroll:true})"));
     let css = std::fs::read_to_string(root.join("src/styles.css")).unwrap();
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));
     assert!(css.contains("@media(min-width:391px) and (max-width:768px)"));

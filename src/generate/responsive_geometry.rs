@@ -8,9 +8,18 @@ pub fn normalize(
     base: Option<(&Node, &Viewport)>,
 ) {
     preserve_scrollbar_space(styles, node, base.map(|(node, _)| node), viewport);
-    normalize_width(styles, node, viewport, base);
+    normalize_width(styles, node, parent, viewport, base);
     super::responsive_height::normalize(styles, node, viewport);
-    if !is_root(node) && base.is_some_and(|(node, viewport)| centered(node, viewport)) {
+    let authored_centering = styles
+        .get("margin-left")
+        .is_some_and(|value| value == "auto")
+        && styles
+            .get("margin-right")
+            .is_some_and(|value| value == "auto");
+    if !is_root(node)
+        && !authored_centering
+        && base.is_some_and(|(node, viewport)| centered(node, viewport))
+    {
         styles.insert("margin-left".into(), "0px".into());
         styles.insert("margin-right".into(), "0px".into());
     }
@@ -71,9 +80,28 @@ fn px(styles: &Styles, key: &str) -> Option<f64> {
 fn normalize_width(
     styles: &mut Styles,
     node: &Node,
+    parent: Option<&Node>,
     viewport: &Viewport,
     base: Option<(&Node, &Viewport)>,
 ) {
+    if !is_root(node)
+        && parent.is_some_and(|parent| {
+            (node.rect.x - parent.rect.x).abs() <= 1.0
+                && (node.rect.width - parent.rect.width).abs() <= 1.0
+        })
+    {
+        if styles
+            .get("width")
+            .is_some_and(|width| width.ends_with("px"))
+        {
+            if base.is_some() {
+                styles.insert("width".into(), "auto".into());
+            } else {
+                styles.remove("width");
+            }
+        }
+        return;
+    }
     if !fills_viewport(node, viewport) {
         return;
     }
@@ -93,25 +121,26 @@ fn normalize_width(
         return;
     }
 
-    fn horizontal_padding(styles: &Styles) -> f64 {
-        let values: Vec<_> = styles
-            .get("padding")
-            .into_iter()
-            .flat_map(|value| value.split_whitespace())
-            .filter_map(|value| value.strip_suffix("px")?.parse::<f64>().ok())
-            .collect();
-        match values.as_slice() {
-            [all] => all * 2.0,
-            [_, horizontal] | [_, horizontal, _] => horizontal * 2.0,
-            [_, right, _, left] => right + left,
-            _ => 0.0,
-        }
-    }
     let fixed_base = base.is_some_and(|(node, viewport)| !fills_viewport(node, viewport));
     if fixed_base {
         styles.insert("width".into(), "auto".into());
     } else {
         styles.remove("width");
+    }
+}
+
+fn horizontal_padding(styles: &Styles) -> f64 {
+    let values: Vec<_> = styles
+        .get("padding")
+        .into_iter()
+        .flat_map(|value| value.split_whitespace())
+        .filter_map(|value| value.strip_suffix("px")?.parse::<f64>().ok())
+        .collect();
+    match values.as_slice() {
+        [all] => all * 2.0,
+        [_, horizontal] | [_, horizontal, _] => horizontal * 2.0,
+        [_, right, _, left] => right + left,
+        _ => 0.0,
     }
 }
 
@@ -121,6 +150,15 @@ fn normalize_centering(
     parent: Option<&Node>,
     viewport: &Viewport,
 ) {
+    if styles
+        .get("margin-left")
+        .is_some_and(|value| value == "auto")
+        && styles
+            .get("margin-right")
+            .is_some_and(|value| value == "auto")
+    {
+        return;
+    }
     if fills_viewport(node, viewport) {
         return;
     }

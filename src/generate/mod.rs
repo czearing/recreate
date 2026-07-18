@@ -7,6 +7,7 @@ mod assets_remote;
 mod attribute_sequences;
 #[cfg(test)]
 mod authenticated_interaction_runtime_tests;
+mod authored_css;
 mod css;
 mod css_layout;
 mod css_values;

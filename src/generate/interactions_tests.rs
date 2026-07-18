@@ -110,3 +110,33 @@ fn semantic_trigger_matches_descendant_text() {
         Some(&state.nodes[0].path)
     );
 }
+
+#[test]
+fn one_mismatched_baseline_does_not_turn_scroll_into_overlay() {
+    let mut baselines = Vec::new();
+    let mut states = Vec::new();
+    for width in [1920, 1440, 768] {
+        let mut baseline = state(vec![node("div")]);
+        baseline.viewport.width = width;
+        let mut captured = baseline.clone();
+        if width == 1920 {
+            for index in 0..8 {
+                let mut extra = node("span");
+                extra
+                    .path
+                    .push_str(&format!(">span:nth-of-type({})", index + 1));
+                captured.nodes.push(extra);
+            }
+        }
+        baselines.push(baseline);
+        states.push(captured);
+    }
+    let interaction = Interaction {
+        trigger_path: String::new(),
+        trigger_tag: "button".into(),
+        trigger_label: "More tasks".into(),
+        focused_path: None,
+        states,
+    };
+    assert!(!closable(&interaction, &baselines));
+}

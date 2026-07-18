@@ -82,7 +82,13 @@ fn build_scoped(
         if emitted.insert(class.clone()) {
             css.push_str(&format!(
                 ".{class}{{{}}}\n",
-                responsive::base_declarations(node, parent, &base.viewport, assets,)
+                responsive::base_declarations(
+                    node,
+                    parent,
+                    &base.viewport,
+                    assets,
+                    &base.css_rules,
+                )
             ));
         }
         if let Some(before) = &node.before {
@@ -107,7 +113,7 @@ fn build_scoped(
     let mut interaction_classes = Vec::new();
     for (index, interaction) in specification.interactions.iter().enumerate() {
         let mut states = interaction.states.clone();
-        if !interactions::closable(interaction, &specification.states[0]) {
+        if !interactions::closable(interaction, &specification.states) {
             for state in &mut states {
                 let Some(baseline) = specification
                     .states
@@ -172,7 +178,7 @@ fn build_scoped(
     }
 }
 
-fn global_rule(rule: &str) -> bool {
+pub(super) fn global_rule(rule: &str) -> bool {
     let rule = rule.trim_start();
     rule.starts_with("@font-face")
         || rule.starts_with("@keyframes")
