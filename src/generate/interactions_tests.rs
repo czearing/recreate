@@ -1,6 +1,12 @@
 use super::*;
 use crate::model::{Attributes, Rect, Styles, Viewport};
 
+#[test]
+fn reduced_motion_keeps_authored_transitions() {
+    assert!(REDUCED_MOTION_CSS.contains("animation:none!important"));
+    assert!(!REDUCED_MOTION_CSS.contains("transition:none"));
+}
+
 fn node(tag: &str) -> Node {
     Node {
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
