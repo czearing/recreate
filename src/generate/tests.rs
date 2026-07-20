@@ -1,12 +1,22 @@
 use super::*;
 
-#[path = "project_test_support.rs"]
-mod support;
+use super::project_test_support as support;
 
 #[tokio::test]
 async fn writes_semantic_component_project() {
     let directory = tempfile::tempdir().unwrap();
-    let specification = support::specification();
+    let mut specification = support::specification();
+    for state in &mut specification.states {
+        state
+            .attribute_sequences
+            .push(crate::model::AttributeSequence {
+                target: state.nodes[3].path.clone(),
+                attribute: "data-copy".into(),
+                values: vec!["First".into(), "Second".into()],
+                interval_ms: 100,
+                steps: Vec::new(),
+            });
+    }
     let components = super::tree::components(&specification, &Default::default());
     assert!(
         components
@@ -41,7 +51,19 @@ async fn writes_semantic_component_project() {
     assert!(states.contains("createPortal"));
     assert!(app.contains("const overlay=state===1?"));
     assert!(app.contains("mergeHorizontalScroll(captureScroll(event.currentTarget),captured)"));
-    assert!(app.contains("sequence.attribute==='textContent'?element.textContent="));
+    assert!(app.contains("live.get(path)?.[2]??0"));
+    assert!(!app.contains("live.get(path)?.[2]??top"));
+    assert!(app.contains("startSequences(document"));
+    assert!(app.contains("data-recreate-sequence=\"0\""));
+    assert!(app.contains("reduceInteraction({openSurface:state||null"));
+    assert!(app.contains("setState(command.surface)"));
+    assert!(app.contains("moveCarousel({offset:0,extent:offset},'forward')"));
+    assert!(app.contains("initialScrolls[viewport]"));
+    assert!(app.contains("data-recreate-active"));
+    assert!(app.contains("restoreFocus.current=trigger"));
+    assert!(app.contains("trigger.focus({preventScroll:true})"));
+    assert!(root.join("src/runtime/sequence.mjs").exists());
+    assert!(root.join("src/runtime/interaction.mjs").exists());
     assert!(app.contains("smooth:true"));
     assert!(app.contains("(now-started)/320"));
     assert!(app.contains("scrollEase(progress)"));

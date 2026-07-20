@@ -101,6 +101,7 @@ async fn writes_exact_viewport_and_interaction_structures() {
             trigger_path: trigger,
             trigger_tag: "button".into(),
             trigger_label: "Desktop menu".into(),
+            trigger_occurrence: None,
             focused_path: Some(focused),
             states: interaction_states,
         }],

@@ -1,5 +1,6 @@
 mod asset_script;
 mod attribute_sequence_script;
+mod behavior;
 mod browser;
 mod capture;
 mod capture_startup;

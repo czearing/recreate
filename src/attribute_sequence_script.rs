@@ -14,17 +14,23 @@ pub const SOURCE: &str = r#"
   }
   for (const group of mutationGroups.values()) {
     if (group.values.length < 3) continue;
-    const gaps = group.times.slice(1)
-      .map((time, index) => time - group.times[index])
-      .filter(value => value >= 250);
-    if (!gaps.length) continue;
+    const gaps = group.times.slice(1).map((time, index) =>
+      Math.max(0, time - group.times[index])
+    );
+    const stableGaps = gaps.filter(value => value >= 250);
+    if (!stableGaps.length) continue;
+    const fallback = Math.round(
+      stableGaps.reduce((sum, value) => sum + value, 0) / stableGaps.length
+    );
     attributeSequences.push({
       target: group.target,
       attribute: group.attribute,
       values: group.values,
-      interval_ms: Math.round(
-        gaps.reduce((sum, value) => sum + value, 0) / gaps.length
-      )
+      interval_ms: fallback,
+      steps: group.values.map((value, index) => ({
+        value,
+        delay_ms: Math.round(gaps[index] >= 250 ? gaps[index] : fallback)
+      }))
     });
   }
 "#;

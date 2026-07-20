@@ -26,17 +26,54 @@ pub fn javascript(specification: &Specification) -> String {
     let sequences = specification
         .states
         .iter()
-        .map(|state| &state.attribute_sequences)
+        .map(|state| {
+            state
+                .attribute_sequences
+                .iter()
+                .map(|sequence| {
+                    let steps: Vec<serde_json::Value> = if sequence.steps.is_empty() {
+                        sequence
+                            .values
+                            .iter()
+                            .map(|value| {
+                                serde_json::json!({
+                                    "value": value,
+                                    "delay_ms": sequence.interval_ms
+                                })
+                            })
+                            .collect()
+                    } else {
+                        sequence
+                            .steps
+                            .iter()
+                            .map(|step| {
+                                serde_json::json!({
+                                    "value": step.value,
+                                    "delay_ms": step.delay_ms
+                                })
+                            })
+                            .collect()
+                    };
+                    serde_json::json!({
+                        "target": sequence.target,
+                        "attribute": sequence.attribute,
+                        "steps": steps
+                    })
+                })
+                .collect::<Vec<_>>()
+        })
         .collect::<Vec<_>>();
     serde_json::to_string(&sequences).unwrap()
 }
 
 pub fn runtime(source: String) -> String {
     const LEGACY: &str = r#"useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence="${index}"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport,state]);"#;
-    const UPGRADED: &str = r#"useEffect(()=>{const apply=(element,sequence,value)=>{if(sequence.attribute==='textContent')element.textContent=value;else element.setAttribute(sequence.attribute,value)};const timers=[];for(const element of document.querySelectorAll('[data-recreate-sequence]')){for(const value of element.dataset.recreateSequence.split(',')){const sequence=(attributeSequences[viewport]||[])[Number(value)];if(!sequence||sequence.values.length<2)continue;let current=0;apply(element,sequence,sequence.values[current]);timers.push(setInterval(()=>{current=(current+1)%sequence.values.length;apply(element,sequence,sequence.values[current])},sequence.interval_ms))}}return()=>timers.forEach(clearInterval)},[viewport,state]);"#;
+    const UPGRADED: &str = "useEffect(()=>startSequences(document,attributeSequences[viewport]||[]),[viewport,state]);";
+    const PREVIOUS_UPGRADED: &str = r#"useEffect(()=>{const apply=(element,sequence,value)=>{if(sequence.attribute==='textContent')element.textContent=value;else element.setAttribute(sequence.attribute,value)};const timers=[];for(const element of document.querySelectorAll('[data-recreate-sequence]')){for(const value of element.dataset.recreateSequence.split(',')){const sequence=(attributeSequences[viewport]||[])[Number(value)];if(!sequence||sequence.values.length<2)continue;let current=0;apply(element,sequence,sequence.values[current]);timers.push(setInterval(()=>{current=(current+1)%sequence.values.length;apply(element,sequence,sequence.values[current])},sequence.interval_ms))}}return()=>timers.forEach(clearInterval)},[viewport,state]);"#;
     source
         .replace(CURRENT_RUNTIME, UPGRADED)
         .replace(LEGACY, UPGRADED)
+        .replace(PREVIOUS_UPGRADED, UPGRADED)
 }
 
 #[cfg(test)]
@@ -58,6 +95,7 @@ mod tests {
             attribute: "placeholder".into(),
             values: vec!["First".into(), "Second".into()],
             interval_ms: 4200,
+            steps: Vec::new(),
         });
         let mut handlers = BTreeMap::new();
         append_handlers(&state, &mut handlers);
@@ -71,14 +109,39 @@ mod tests {
     fn upgrades_runtime_for_multiple_sequences() {
         let source = "useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence=\"${index}\"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport,state]);".into();
         let output = runtime(source);
-        assert!(output.contains("dataset.recreateSequence.split(',')"));
-        assert!(output.contains("sequence.attribute==='textContent'"));
+        assert!(output.contains("startSequences(document"));
     }
 
     #[test]
     fn upgrades_current_runtime_dependency() {
         let source = CURRENT_RUNTIME.into();
         let output = runtime(source);
-        assert!(output.contains("dataset.recreateSequence.split(',')"));
+        assert!(output.contains("startSequences(document"));
+    }
+
+    #[test]
+    fn serializes_irregular_steps_without_averaging() {
+        let mut specification = crate::generate::project_test_support::specification();
+        specification.states[0]
+            .attribute_sequences
+            .push(AttributeSequence {
+                target: "html>body>div".into(),
+                attribute: "textContent".into(),
+                values: vec!["A".into(), "B".into()],
+                interval_ms: 99,
+                steps: vec![
+                    crate::model::SequenceStep {
+                        value: "A".into(),
+                        delay_ms: 4000,
+                    },
+                    crate::model::SequenceStep {
+                        value: "B".into(),
+                        delay_ms: 2750,
+                    },
+                ],
+            });
+        let output = javascript(&specification);
+        assert!(output.contains(r#""delay_ms":4000"#));
+        assert!(output.contains(r#""delay_ms":2750"#));
     }
 }

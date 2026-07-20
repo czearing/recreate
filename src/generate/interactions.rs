@@ -9,27 +9,51 @@ pub const REDUCED_MOTION_CSS: &str = "@media(prefers-reduced-motion:reduce){\
 
 pub fn base_handlers(specification: &Specification, state: &PageState) -> BTreeMap<String, String> {
     let nodes = nodes_by_path(state);
-    specification
+    let mut handlers = BTreeMap::new();
+    let shared_overflow = specification
         .interactions
         .iter()
-        .enumerate()
-        .map(|(index, interaction)| {
-            let node = nodes
-                .get(interaction.trigger_path.as_str())
-                .copied()
+        .filter(|interaction| {
+            interaction
+                .trigger_label
+                .eq_ignore_ascii_case("More options")
+        })
+        .count()
+        == 1;
+    for (index, interaction) in specification.interactions.iter().enumerate() {
+        let exact = nodes
+            .get(interaction.trigger_path.as_str())
+            .copied()
+            .filter(|node| matches_trigger(interaction, node, state));
+        let matches = if shared_overflow
+            && interaction.trigger_occurrence.is_none()
+            && interaction
+                .trigger_label
+                .eq_ignore_ascii_case("More options")
+        {
+            state
+                .nodes
+                .iter()
                 .filter(|node| matches_trigger(interaction, node, state))
-                .or_else(|| semantic_trigger(interaction, state));
-            (
-                node.map(|node| node.path.clone())
-                    .unwrap_or_else(|| interaction.trigger_path.clone()),
+                .collect::<Vec<_>>()
+        } else {
+            exact
+                .or_else(|| semantic_trigger(interaction, state))
+                .into_iter()
+                .collect()
+        };
+        for node in matches {
+            handlers.insert(
+                node.path.clone(),
                 trigger_binding(
-                    node,
+                    Some(node),
                     &format!("event=>activate(event,{})", index + 1),
                     Some(index + 1),
                 ),
-            )
-        })
-        .collect()
+            );
+        }
+    }
+    handlers
 }
 
 pub fn state_handlers(
@@ -43,15 +67,16 @@ pub fn state_handlers(
         .copied()
         .filter(|node| matches_trigger(interaction, node, state))
         .or_else(|| semantic_trigger(interaction, state));
-    let trigger_path = trigger
-        .map(|node| node.path.clone())
-        .unwrap_or_else(|| interaction.trigger_path.clone());
     let action = if closable_state(state, baseline) {
         "event=>onReset(event)"
     } else {
         "event=>event.preventDefault()"
     };
-    let mut handlers = BTreeMap::from([(trigger_path, trigger_binding(trigger, action, None))]);
+    let mut handlers = trigger
+        .map(|node| {
+            BTreeMap::from([(node.path.clone(), trigger_binding(Some(node), action, None))])
+        })
+        .unwrap_or_default();
     let popup = state.nodes.iter().find(|node| is_popup(node));
     let focused = interaction
         .focused_path
@@ -85,6 +110,9 @@ pub fn state_handlers(
         !compact || is_popup(node) || node.rect.width * node.rect.height < viewport_area * 0.8
     }) {
         append(&mut handlers, &node.path, "data-recreate-surface=\"true\"");
+    }
+    for root in crate::interaction_surface::roots(state, baseline) {
+        append(&mut handlers, &root, "data-recreate-surface=\"true\"");
     }
     handlers
 }

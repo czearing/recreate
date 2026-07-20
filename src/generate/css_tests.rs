@@ -81,3 +81,21 @@ fn rejects_ambiguous_custom_property_fallbacks() {
     );
     assert!(!css.contains(":root"));
 }
+
+#[test]
+fn clipped_text_keeps_responsive_captured_heights() {
+    let mut specification = crate::generate::project_test_support::specification();
+    let path = specification.states[0].nodes[3].path.clone();
+    for (index, state) in specification.states.iter_mut().enumerate() {
+        state.nodes[3].rect.height = 20.0 + index as f64 * 20.0;
+        state.nodes[3]
+            .style
+            .insert("overflow".into(), "hidden".into());
+    }
+    assert!(!fluid_height_paths(&specification).contains(&path));
+
+    for state in &mut specification.states {
+        state.nodes[3].style.remove("overflow");
+    }
+    assert!(fluid_height_paths(&specification).contains(&path));
+}

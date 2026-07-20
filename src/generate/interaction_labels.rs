@@ -1,10 +1,30 @@
-use crate::model::{Interaction, Node, PageState};
+use crate::{
+    behavior::{TriggerCandidate, TriggerKey, resolve_trigger},
+    model::{Interaction, Node, PageState},
+};
 
 pub fn semantic_trigger<'a>(interaction: &Interaction, state: &'a PageState) -> Option<&'a Node> {
-    state
+    let labeled = state
         .nodes
         .iter()
-        .find(|node| matches_trigger(interaction, node, state))
+        .map(|node| (node, label(node, state)))
+        .collect::<Vec<_>>();
+    let candidates = labeled
+        .iter()
+        .map(|(node, label)| TriggerCandidate {
+            path: &node.path,
+            tag: &node.tag,
+            label,
+        })
+        .collect::<Vec<_>>();
+    let key = TriggerKey {
+        path: interaction.trigger_path.clone(),
+        tag: interaction.trigger_tag.clone(),
+        label: interaction.trigger_label.clone(),
+        occurrence: interaction.trigger_occurrence,
+    };
+    let path = resolve_trigger(&key, &candidates)?;
+    state.nodes.iter().find(|node| node.path == path)
 }
 
 pub fn matches_trigger(interaction: &Interaction, node: &Node, state: &PageState) -> bool {

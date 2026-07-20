@@ -17,6 +17,7 @@ fn baseline_animation_rules_follow_interaction_base_styles() {
             trigger_path: TARGET.into(),
             trigger_tag: "div".into(),
             trigger_label: "Target".into(),
+            trigger_occurrence: None,
             focused_path: None,
             states: vec![state(false)],
         }],

@@ -12,6 +12,7 @@ mod css;
 mod css_layout;
 mod css_values;
 mod inherited_styles;
+mod initial_scroll;
 #[cfg(test)]
 mod interaction_geometry_support;
 mod interaction_labels;
@@ -29,6 +30,8 @@ mod jsx_variants;
 #[path = "mount_tests.rs"]
 mod mount_tests;
 mod names;
+#[cfg(test)]
+mod project_test_support;
 mod responsive;
 mod responsive_geometry;
 mod responsive_height;
@@ -37,6 +40,7 @@ mod responsive_runtime_support;
 #[cfg(test)]
 mod responsive_runtime_tests;
 mod roots;
+mod runtime_sources;
 mod startup_overlays;
 mod state_style_maps;
 mod state_styles;
@@ -65,7 +69,9 @@ pub async fn from_file(spec: &Path, out: &Path) -> Result<()> {
     };
     let mut bytes = fs::read(spec)?;
     timing("read");
-    let specification: Specification = simd_json::serde::from_slice(&mut bytes)?;
+    let mut specification: Specification = simd_json::serde::from_slice(&mut bytes)?;
+    crate::interactions::deduplicate(&mut specification.interactions);
+    crate::interaction_surface::normalize(&mut specification);
     timing("parse");
     write_project(&specification, out, &[]).await?;
     timing("write");
@@ -91,6 +97,7 @@ pub async fn write_project(
     }
     let source = root.join("src");
     fs::create_dir_all(source.join("components"))?;
+    runtime_sources::write(&source)?;
     let assets = assets::download(specification, &root, cookies).await?;
     timing("assets");
     let mut styles = css::build(specification, &assets);

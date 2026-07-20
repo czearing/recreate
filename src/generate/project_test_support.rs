@@ -134,7 +134,8 @@ pub fn specification() -> Specification {
         interactions: vec![Interaction {
             trigger_path: "html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(1)".into(),
             trigger_tag: "div".into(),
-            trigger_label: "Card".into(),
+            trigger_label: "Card 1".into(),
+            trigger_occurrence: None,
             focused_path: Some(
                 "html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(2)".into(),
             ),

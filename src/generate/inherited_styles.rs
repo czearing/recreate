@@ -7,6 +7,9 @@ pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules:
         return;
     };
     for property in PROPERTIES {
+        if disabled_control(node) && matches!(*property, "color" | "-webkit-text-fill-color") {
+            continue;
+        }
         if let Some(value) = authored_value(node, rules, property) {
             styles.insert((*property).into(), value);
         } else if styles.get(*property) == parent.style.get(*property)
@@ -17,6 +20,17 @@ pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules:
         {
             styles.remove(*property);
         }
+    }
+
+    fn disabled_control(node: &Node) -> bool {
+        matches!(
+            node.tag.as_str(),
+            "button" | "input" | "select" | "textarea"
+        ) && (node.attributes.contains_key("disabled")
+            || node
+                .attributes
+                .get("aria-disabled")
+                .is_some_and(|value| value == "true"))
     }
 }
 
@@ -130,5 +144,28 @@ mod tests {
         let mut styles = child.style.clone();
         normalize(&mut styles, &child, Some(&parent), &[]);
         assert_eq!(styles["color"], "rgb(36, 36, 36)");
+    }
+
+    #[test]
+    fn preserves_computed_disabled_control_paint() {
+        let parent = node("div", "", &[("color", "rgb(36, 36, 36)")]);
+        let mut child = node(
+            "button",
+            "send",
+            &[
+                ("color", "rgb(176, 176, 176)"),
+                ("-webkit-text-fill-color", "rgb(176, 176, 176)"),
+            ],
+        );
+        child.attributes.insert("disabled".into(), String::new());
+        let mut styles = child.style.clone();
+        normalize(
+            &mut styles,
+            &child,
+            Some(&parent),
+            &[".send{color:white;-webkit-text-fill-color:white;}".into()],
+        );
+        assert_eq!(styles["color"], "rgb(176, 176, 176)");
+        assert_eq!(styles["-webkit-text-fill-color"], "rgb(176, 176, 176)");
     }
 }

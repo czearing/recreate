@@ -64,11 +64,19 @@ pub struct StateStyle {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SequenceStep {
+    pub value: String,
+    pub delay_ms: u64,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AttributeSequence {
     pub target: String,
     pub attribute: String,
     pub values: Vec<String>,
     pub interval_ms: u64,
+    #[serde(default)]
+    pub steps: Vec<SequenceStep>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -110,6 +118,8 @@ pub struct Interaction {
     pub trigger_path: String,
     pub trigger_tag: String,
     pub trigger_label: String,
+    #[serde(default)]
+    pub trigger_occurrence: Option<usize>,
     #[serde(default)]
     pub focused_path: Option<String>,
     pub states: Vec<PageState>,

@@ -363,6 +363,22 @@ fn fluid_height_paths(specification: &Specification) -> HashSet<String> {
         .into_iter()
         .filter(|(path, values)| {
             !authored.contains(path)
+                && !specification.states.iter().any(|state| {
+                    state
+                        .nodes
+                        .iter()
+                        .find(|node| &node.path == path)
+                        .is_some_and(|node| {
+                            node.style
+                                .get("overflow")
+                                .is_some_and(|value| value == "hidden")
+                                || node
+                                    .style
+                                    .get("overflow-y")
+                                    .is_some_and(|value| value == "hidden")
+                                || node.style.contains_key("-webkit-line-clamp")
+                        })
+                })
                 && values
                     .iter()
                     .skip(1)

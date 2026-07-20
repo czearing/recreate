@@ -55,6 +55,7 @@ pub const SOURCE: &str = r#"
     const trackedAttributes = new Set(['placeholder','title','aria-label','value']);
     const lastAttribute = new Map();
     const lastText = new WeakMap();
+    const recordedText = new WeakSet();
     const textValue = element => (element.textContent || '').replace(/\s+/g, ' ').trim();
     const seedText = element => {
       if (!(element instanceof Element)) return;
@@ -80,9 +81,12 @@ pub const SOURCE: &str = r#"
       lastText.set(element, current);
       if (!before || before === current) return;
       const target = pathOf(element);
-      window.__recreateAttributeMutations.push({
-        target, attribute: 'textContent', value: before, time: now
-      });
+      if (!recordedText.has(element)) {
+        recordedText.add(element);
+        window.__recreateAttributeMutations.push({
+          target, attribute: 'textContent', value: before, time: 0
+        });
+      }
       window.__recreateAttributeMutations.push({
         target, attribute: 'textContent', value: current, time: now
       });
@@ -106,7 +110,7 @@ pub const SOURCE: &str = r#"
         if (!lastAttribute.has(key) && mutation.oldValue) {
           window.__recreateAttributeMutations.push({
             target: pathOf(element), attribute: mutation.attributeName,
-            value: mutation.oldValue, time: now
+            value: mutation.oldValue, time: 0
           });
         }
         if (lastAttribute.get(key) !== current) {

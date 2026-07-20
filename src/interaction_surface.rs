@@ -203,6 +203,7 @@ mod tests {
                 trigger_path: String::new(),
                 trigger_tag: "button".into(),
                 trigger_label: "More options".into(),
+                trigger_occurrence: None,
                 focused_path: None,
                 states: vec![state],
             }],
