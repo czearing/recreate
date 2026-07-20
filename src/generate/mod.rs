@@ -11,6 +11,7 @@ mod authored_css;
 mod css;
 mod css_layout;
 mod css_values;
+mod inherited_styles;
 #[cfg(test)]
 mod interaction_geometry_support;
 mod interaction_labels;
@@ -56,8 +57,21 @@ use anyhow::Result;
 use std::{fs, path::Path};
 
 pub async fn from_file(spec: &Path, out: &Path) -> Result<()> {
-    let specification: Specification = serde_json::from_slice(&fs::read(spec)?)?;
-    write_project(&specification, out, &[]).await
+    let started = std::time::Instant::now();
+    let timing = |phase: &str| {
+        if std::env::var_os("RECREATE_TIMING").is_some() {
+            eprintln!("generate_{phase}={:.3}s", started.elapsed().as_secs_f64());
+        }
+    };
+    let mut bytes = fs::read(spec)?;
+    timing("read");
+    let specification: Specification = simd_json::serde::from_slice(&mut bytes)?;
+    timing("parse");
+    write_project(&specification, out, &[]).await?;
+    timing("write");
+    std::mem::forget(specification);
+    std::mem::forget(bytes);
+    Ok(())
 }
 
 pub async fn write_project(
@@ -65,6 +79,12 @@ pub async fn write_project(
     out: &Path,
     cookies: &[BrowserCookie],
 ) -> Result<()> {
+    let started = std::time::Instant::now();
+    let timing = |phase: &str| {
+        if std::env::var_os("RECREATE_TIMING").is_some() {
+            eprintln!("project_{phase}={:.3}s", started.elapsed().as_secs_f64());
+        }
+    };
     let root = out.join("react");
     if root.exists() {
         fs::remove_dir_all(&root)?;
@@ -72,10 +92,13 @@ pub async fn write_project(
     let source = root.join("src");
     fs::create_dir_all(source.join("components"))?;
     let assets = assets::download(specification, &root, cookies).await?;
+    timing("assets");
     let mut styles = css::build(specification, &assets);
+    timing("css");
     styles.css.push_str(interactions::FOCUS_CSS);
     styles.css.push_str(interactions::REDUCED_MOTION_CSS);
     let components = tree::components(specification, &styles.classes);
+    timing("components");
     let mut structural_classes = std::collections::HashSet::new();
     let mut state_classes = structural_css::class_maps(
         &specification.states,
@@ -83,6 +106,7 @@ pub async fn write_project(
         &assets,
         &mut styles.css,
         &mut structural_classes,
+        None,
     );
     for (state, classes) in specification.states.iter().zip(&mut state_classes) {
         animations::append_startup(&state.animations, classes, &mut styles.css);
@@ -92,15 +116,26 @@ pub async fn write_project(
         .iter()
         .zip(&styles.interaction_classes)
         .map(|(interaction, classes)| {
+            if !interactions::closable(interaction, &specification.states) {
+                return Vec::new();
+            }
+            let surface_paths = interaction
+                .trigger_label
+                .eq_ignore_ascii_case("More options")
+                .then(|| {
+                    crate::interaction_surface::paths(&interaction.states, &specification.states)
+                });
             structural_css::class_maps(
                 &interaction.states,
                 classes,
                 &assets,
                 &mut styles.css,
                 &mut structural_classes,
+                surface_paths.as_ref(),
             )
         })
         .collect::<Vec<_>>();
+    timing("classes");
     state_style_maps::append(
         specification,
         &state_classes,
@@ -108,6 +143,7 @@ pub async fn write_project(
         &assets,
         &mut styles.css,
     );
+    timing("state_styles");
     let (html_class, body_class, root_class) = roots::classes(specification, &components);
     let has_root = specification.states.first().is_some_and(|state| {
         state.nodes.iter().any(|node| {
@@ -145,6 +181,7 @@ pub async fn write_project(
             &assets,
         ),
     )?;
+    timing("sources");
     fs::write(
         source.join("main.jsx"),
         format!(

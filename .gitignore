@@ -1,3 +1,5 @@
 /target/
 /recreate-output/
+/.cairn-harness/
+/review/
 *.log

@@ -26,11 +26,13 @@ pub async fn click_matching(
     path: &str,
     tag: &str,
     label: &str,
+    occurrence: Option<usize>,
     require_control: bool,
 ) -> Result<bool> {
     let (matching, fallback) = if tag.is_empty() {
         ("candidate=>candidate".into(), "null".into())
     } else {
+        let repeated = label.eq_ignore_ascii_case("More options");
         let tag = serde_json::to_string(tag)?;
         let label = serde_json::to_string(label)?;
         let control = if require_control {
@@ -38,13 +40,23 @@ pub async fn click_matching(
         } else {
             ""
         };
+        let fallback = if repeated {
+            occurrence.map_or_else(
+                || "null".into(),
+                |index| {
+                    format!("Array.from(document.querySelectorAll({tag})).filter(matches)[{index}]")
+                },
+            )
+        } else {
+            format!("Array.from(document.querySelectorAll({tag})).find(matches)")
+        };
         (
             format!(
                 "candidate=>candidate&&{control}candidate.tagName.toLowerCase()==={tag}&&\
                  (candidate.getAttribute('aria-label')||candidate.innerText||candidate.value||'')\
                  .replace(/\\s+/g,' ').trim()==={label}"
             ),
-            format!("Array.from(document.querySelectorAll({tag})).find(matches)"),
+            fallback,
         )
     };
     let expression = format!(
@@ -57,8 +69,12 @@ pub async fn click_matching(
          element.dataset.recreatePreserveScroll=String( \
            scrollX!==before[0]||scrollY!==before[1]|| \
            ancestors.some(([node,left,top])=>node.scrollLeft!==left||node.scrollTop!==top)); \
-         element.focus({{preventScroll:true}}); element.click(); \
-         delete element.dataset.recreatePreserveScroll; return true; }})()",
+         element.dispatchEvent(new PointerEvent('pointerover',{{bubbles:true}})); \
+         element.dispatchEvent(new MouseEvent('mouseover',{{bubbles:true}})); \
+         return new Promise(resolve=>requestAnimationFrame(()=>{{ \
+           element.focus({{preventScroll:true}}); element.click(); \
+           delete element.dataset.recreatePreserveScroll; resolve(true); \
+         }})); }})()",
         serde_json::to_string(path)?
     );
     Ok(cdp.evaluate(&expression).await?.as_bool() == Some(true))

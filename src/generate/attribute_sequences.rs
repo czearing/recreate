@@ -1,6 +1,8 @@
 use crate::model::{PageState, Specification};
 use std::collections::BTreeMap;
 
+const CURRENT_RUNTIME: &str = r#"useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence="${index}"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport]);"#;
+
 pub fn append_handlers(state: &PageState, handlers: &mut BTreeMap<String, String>) {
     let mut targets = BTreeMap::<&str, Vec<usize>>::new();
     for (index, sequence) in state.attribute_sequences.iter().enumerate() {
@@ -30,10 +32,11 @@ pub fn javascript(specification: &Specification) -> String {
 }
 
 pub fn runtime(source: String) -> String {
-    source.replace(
-        r#"useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence="${index}"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport,state]);"#,
-        r#"useEffect(()=>{const timers=[];for(const element of document.querySelectorAll('[data-recreate-sequence]')){for(const value of element.dataset.recreateSequence.split(',')){const sequence=(attributeSequences[viewport]||[])[Number(value)];if(!sequence||sequence.values.length<2)continue;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);timers.push(setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms))}}return()=>timers.forEach(clearInterval)},[viewport,state]);"#,
-    )
+    const LEGACY: &str = r#"useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence="${index}"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport,state]);"#;
+    const UPGRADED: &str = r#"useEffect(()=>{const apply=(element,sequence,value)=>{if(sequence.attribute==='textContent')element.textContent=value;else element.setAttribute(sequence.attribute,value)};const timers=[];for(const element of document.querySelectorAll('[data-recreate-sequence]')){for(const value of element.dataset.recreateSequence.split(',')){const sequence=(attributeSequences[viewport]||[])[Number(value)];if(!sequence||sequence.values.length<2)continue;let current=0;apply(element,sequence,sequence.values[current]);timers.push(setInterval(()=>{current=(current+1)%sequence.values.length;apply(element,sequence,sequence.values[current])},sequence.interval_ms))}}return()=>timers.forEach(clearInterval)},[viewport,state]);"#;
+    source
+        .replace(CURRENT_RUNTIME, UPGRADED)
+        .replace(LEGACY, UPGRADED)
 }
 
 #[cfg(test)]
@@ -67,6 +70,14 @@ mod tests {
     #[test]
     fn upgrades_runtime_for_multiple_sequences() {
         let source = "useEffect(()=>{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{const element=document.querySelector(`[data-recreate-sequence=\"${index}\"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])},sequence.interval_ms)});return()=>timers.forEach(timer=>timer&&clearInterval(timer))},[viewport,state]);".into();
+        let output = runtime(source);
+        assert!(output.contains("dataset.recreateSequence.split(',')"));
+        assert!(output.contains("sequence.attribute==='textContent'"));
+    }
+
+    #[test]
+    fn upgrades_current_runtime_dependency() {
+        let source = CURRENT_RUNTIME.into();
         let output = runtime(source);
         assert!(output.contains("dataset.recreateSequence.split(',')"));
     }

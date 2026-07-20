@@ -1,6 +1,6 @@
 use crate::model::{Pseudo, Specification, Styles};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 pub fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
     styles
@@ -19,10 +19,16 @@ pub fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> Strin
         .collect()
 }
 
-pub fn responsive_signatures(specification: &Specification) -> BTreeMap<String, String> {
+pub fn responsive_signatures_for(
+    specification: &Specification,
+    paths: Option<&HashSet<String>>,
+) -> BTreeMap<String, String> {
     let mut signatures = BTreeMap::<String, Sha256>::new();
     for state in &specification.states {
         for node in &state.nodes {
+            if paths.is_some_and(|paths| !paths.contains(&node.path)) {
+                continue;
+            }
             let signature = signatures.entry(node.path.clone()).or_default();
             append_styles(signature, &node.style);
             append_pseudo(signature, node.before.as_ref());

@@ -13,9 +13,11 @@ clap = { version = "4", features = ["derive"] }
 futures-util = "0.3"
 hex = "0.4"
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+rayon = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 self-replace = "1"
+simd-json = "0.15"
 sha2 = "0.10"
 tokio = { version = "1", features = ["macros", "process", "rt-multi-thread", "time"] }
 tokio-tungstenite = "0.28"
@@ -25,6 +27,5 @@ url = "2"
 tempfile = "3"
 
 [profile.release]
-codegen-units = 1
-lto = "thin"
+codegen-units = 16
 strip = true

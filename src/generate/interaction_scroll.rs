@@ -68,10 +68,6 @@ fn scroll_snapshot(baseline: &PageState, state: &PageState) -> String {
     )
 }
 
-pub fn owner_path<'a>(baseline: &'a PageState, state: &PageState) -> Option<&'a str> {
-    scroll_owner(baseline, state, anchor(state)?)
-}
-
 fn anchor(state: &PageState) -> Option<&Node> {
     state
         .nodes

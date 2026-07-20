@@ -1,12 +1,14 @@
 use super::css::declarations;
 use crate::model::{Node, Pseudo, Specification, Styles, Viewport};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
-pub fn append(
+pub fn append_filtered(
     specification: &Specification,
     assets: &BTreeMap<String, String>,
     classes: &BTreeMap<String, String>,
     css: &mut String,
+    paths: Option<&HashSet<String>>,
+    fluid_heights: &HashSet<String>,
 ) {
     let Some(base) = specification.states.first() else {
         return;
@@ -27,6 +29,9 @@ pub fn append(
             .map(|node| (node.path.as_str(), node))
             .collect();
         for node in &state.nodes {
+            if paths.is_some_and(|paths| !paths.contains(&node.path)) {
+                continue;
+            }
             let (Some(base_node), Some(class)) =
                 (base_nodes.get(node.path.as_str()), classes.get(&node.path))
             else {
@@ -42,6 +47,7 @@ pub fn append(
                 class,
                 assets,
                 &state.css_rules,
+                fluid_heights.contains(&node.path),
             ));
         }
         if !rules.is_empty() {
@@ -75,13 +81,37 @@ pub fn base_declarations(
     viewport: &Viewport,
     assets: &BTreeMap<String, String>,
     css_rules: &[String],
+    fluid_height: bool,
+    text_parent: bool,
 ) -> String {
     let mut styles = node.style.clone();
+    let authored_width = super::authored_css::has_property(node, css_rules, "width");
     super::authored_css::normalize(&mut styles, node, css_rules);
+    if !authored_width && intrinsic_flex_text(node, parent, text_parent) {
+        styles.remove("width");
+    }
+    if fluid_height {
+        styles.remove("height");
+    }
+    super::inherited_styles::normalize(&mut styles, node, parent, css_rules);
     super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     declarations(&styles, assets)
 }
 
+fn intrinsic_flex_text(node: &Node, parent: Option<&Node>, text_parent: bool) -> bool {
+    let Some(parent) = parent else {
+        return false;
+    };
+    text_parent
+        && matches!(node.tag.as_str(), "div" | "p" | "span")
+        && node.style.get("display").map(String::as_str) == Some("block")
+        && node.style.get("position").map(String::as_str) == Some("static")
+        && parent.style.get("display").map(String::as_str) == Some("flex")
+        && parent.style.get("flex-direction").map(String::as_str) == Some("column")
+        && node.rect.width < parent.rect.width - 12.0
+}
+
+#[allow(clippy::too_many_arguments)]
 fn append_node_rules(
     base: &Node,
     node: &Node,
@@ -90,11 +120,16 @@ fn append_node_rules(
     class: &str,
     assets: &BTreeMap<String, String>,
     css_rules: &[String],
+    fluid_height: bool,
 ) -> String {
     let mut rules = String::new();
     let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
     super::authored_css::normalize(&mut changed, node, css_rules);
+    if fluid_height {
+        changed.remove("height");
+    }
+    super::inherited_styles::normalize(&mut changed, node, parent, css_rules);
     super::responsive_geometry::normalize(
         &mut changed,
         node,

@@ -11,8 +11,14 @@ mod compare;
 mod compare_node;
 #[cfg(test)]
 mod compare_tests;
+mod fidelity;
+mod fidelity_responsive;
+mod fidelity_responsive_script;
+mod fidelity_script;
 mod generate;
+mod interaction_script;
 mod interaction_state;
+mod interaction_surface;
 mod interactions;
 mod interactions_input;
 mod lifecycle_script;
@@ -39,6 +45,7 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
         Command::Capture(args) => capture::run(args).await,
+        Command::Fidelity(args) => fidelity::run(args).await,
         Command::Generate(args) => generate::from_file(&args.spec, &args.out).await,
         Command::Install(args) => skill::install(args),
         Command::Open(args) => browser::open(args).await,

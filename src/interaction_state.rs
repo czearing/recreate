@@ -1,5 +1,5 @@
 use crate::model::PageState;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 #[cfg(test)]
 pub fn differs(left: &PageState, right: &PageState) -> bool {
@@ -22,6 +22,58 @@ pub fn content_differs(left: &PageState, right: &PageState) -> bool {
             .iter()
             .zip(&right.nodes)
             .any(|(left, right)| left.text != right.text)
+}
+
+pub fn surface_differs(left: &PageState, right: &PageState, trigger: &str, label: &str) -> bool {
+    let baseline: HashMap<_, _> = right
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect();
+    left.nodes.iter().any(|node| {
+        node.path != trigger
+            && visible(node)
+            && overlay(node, label)
+            && baseline
+                .get(node.path.as_str())
+                .is_none_or(|node| !visible(node))
+    })
+}
+
+fn visible(node: &crate::model::Node) -> bool {
+    node.rect.width > 0.0
+        && node.rect.height > 0.0
+        && node
+            .style
+            .get("display")
+            .is_none_or(|value| value != "none")
+        && node
+            .style
+            .get("visibility")
+            .is_none_or(|value| value != "hidden")
+        && node
+            .style
+            .get("opacity")
+            .and_then(|value| value.parse::<f64>().ok())
+            .is_none_or(|value| value > 0.01)
+}
+
+fn overlay(node: &crate::model::Node, label: &str) -> bool {
+    node.attributes.get("role").is_some_and(|role| {
+        matches!(
+            role.as_str(),
+            "dialog" | "listbox" | "menu" | "menuitem" | "option"
+        )
+    }) || node
+        .style
+        .get("position")
+        .is_some_and(|value| value == "fixed")
+        || (node
+            .style
+            .get("position")
+            .is_some_and(|value| value == "absolute")
+            && !node.text.trim().is_empty()
+            && !node.text.trim().eq_ignore_ascii_case(label))
 }
 
 fn semantic_attributes(node: &crate::model::Node) -> Vec<(&str, &str)> {

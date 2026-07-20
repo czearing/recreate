@@ -9,13 +9,17 @@ pub fn class_maps(
     assets: &BTreeMap<String, String>,
     css: &mut String,
     emitted: &mut HashSet<String>,
+    allowed_paths: Option<&HashSet<String>>,
 ) -> Vec<BTreeMap<String, String>> {
     states
         .iter()
         .map(|state| {
             let mut classes = base.clone();
             for node in state.nodes.iter().chain(&state.startup_nodes) {
-                if node.tag == "#text" || classes.contains_key(&node.path) {
+                if node.tag == "#text"
+                    || classes.contains_key(&node.path)
+                    || allowed_paths.is_some_and(|paths| !paths.contains(&node.path))
+                {
                     continue;
                 }
                 let class = class_name(node, state, assets);
@@ -28,8 +32,15 @@ pub fn class_maps(
 }
 
 fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>) -> String {
-    let mut signature =
-        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules);
+    let mut signature = responsive::base_declarations(
+        node,
+        None,
+        &state.viewport,
+        assets,
+        &state.css_rules,
+        false,
+        false,
+    );
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
         signature.push_str(&declarations(&before.style, assets));
@@ -54,7 +65,15 @@ fn append_rule(
     }
     css.push_str(&format!(
         ".{class}{{{}}}\n",
-        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules,)
+        responsive::base_declarations(
+            node,
+            None,
+            &state.viewport,
+            assets,
+            &state.css_rules,
+            false,
+            false,
+        )
     ));
     if let Some(before) = &node.before {
         css.push_str(&format!(

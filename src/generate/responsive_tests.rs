@@ -58,6 +58,170 @@ fn preserves_centered_fixed_width_root() {
 }
 
 #[test]
+fn preserves_compact_control_width_when_it_fills_its_parent() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let control = node("button", 0.0, 28.0);
+    let parent = node("div", 0.0, 28.0);
+    let css = base_declarations(
+        &control,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(css.contains("width:28px"));
+}
+
+#[test]
+fn preserves_intrinsic_svg_aspect_width() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let image = node("svg", 0.0, 174.5);
+    let parent = node("div", 0.0, 174.5);
+    let css = base_declarations(
+        &image,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(css.contains("width:174.5px"));
+}
+
+#[test]
+fn removes_measured_width_when_border_box_fills_parent_content() {
+    let viewport = Viewport {
+        width: 768,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut parent = node("parent", 4.0, 760.0);
+    parent.style.extend([
+        ("box-sizing".into(), "content-box".into()),
+        ("width".into(), "758px".into()),
+        ("border-left-width".into(), "1px".into()),
+        ("border-right-width".into(), "1px".into()),
+    ]);
+    let mut child = node("child", 5.0, 758.0);
+    child.style.extend([
+        ("box-sizing".into(), "content-box".into()),
+        ("width".into(), "714px".into()),
+        ("padding-left".into(), "22px".into()),
+        ("padding-right".into(), "22px".into()),
+    ]);
+
+    let css = base_declarations(
+        &child,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+
+    assert!(!css.contains("width:714px"));
+}
+
+#[test]
+fn removes_measured_height_for_evidence_backed_content_reflow() {
+    let viewport = Viewport {
+        width: 768,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut card = node("button", 0.0, 369.0);
+    card.style.insert("height".into(), "245px".into());
+    let css = base_declarations(
+        &card,
+        None,
+        &viewport,
+        &Default::default(),
+        &[],
+        true,
+        false,
+    );
+    assert!(!css.contains("height:245px"));
+}
+
+#[test]
+fn removes_measured_width_from_intrinsic_column_flex_text() {
+    let viewport = Viewport {
+        width: 768,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut parent = node("section", 0.0, 768.0);
+    parent.style.extend([
+        ("display".into(), "flex".into()),
+        ("flex-direction".into(), "column".into()),
+    ]);
+    let mut subtitle = node("div", 0.0, 475.765625);
+    subtitle.text = "Bring everyone together".into();
+    subtitle.style.extend([
+        ("display".into(), "block".into()),
+        ("position".into(), "static".into()),
+        ("width".into(), "475.765625px".into()),
+    ]);
+    let css = base_declarations(
+        &subtitle,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        true,
+    );
+    assert!(!css.contains("width:475.765625px"));
+}
+
+#[test]
+fn resets_captured_width_when_child_becomes_parent_filling() {
+    let wide = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let narrow = Viewport {
+        width: 768,
+        height: 900,
+        dpr: 1.0,
+    };
+    let base = node("child", 204.0, 1076.0);
+    let mut current = node("child", 5.0, 758.0);
+    current.style.insert("width".into(), "714px".into());
+    let mut parent = node("parent", 4.0, 760.0);
+    parent.style.extend([
+        ("box-sizing".into(), "content-box".into()),
+        ("width".into(), "758px".into()),
+        ("border-left-width".into(), "1px".into()),
+        ("border-right-width".into(), "1px".into()),
+    ]);
+    let mut changed = changed_styles(&base.style, &current.style);
+
+    crate::generate::responsive_geometry::normalize(
+        &mut changed,
+        &current,
+        Some(&parent),
+        &narrow,
+        Some((&base, &wide)),
+    );
+
+    assert_eq!(changed.get("width").map(String::as_str), Some("auto"));
+}
+
+#[test]
 fn writes_auto_when_centered_fixed_root_becomes_fluid() {
     let wide = Viewport {
         width: 1200,

@@ -54,9 +54,51 @@ pub const SOURCE: &str = r#"
     };
     const trackedAttributes = new Set(['placeholder','title','aria-label','value']);
     const lastAttribute = new Map();
+    const lastText = new WeakMap();
+    const textValue = element => (element.textContent || '').replace(/\s+/g, ' ').trim();
+    const seedText = element => {
+      if (!(element instanceof Element)) return;
+      const value = textValue(element);
+      if (element.childElementCount === 0 && value && value.length <= 160) {
+        lastText.set(element, value);
+      }
+      for (const child of element.querySelectorAll('*')) {
+        const childValue = textValue(child);
+        if (child.childElementCount === 0 && childValue && childValue.length <= 160) {
+          lastText.set(child, childValue);
+        }
+      }
+    };
+    for (const element of document.querySelectorAll('*')) {
+      if (element.parentElement === document.documentElement) seedText(element);
+    }
+    const recordText = (element, now) => {
+      if (!(element instanceof Element) || element.childElementCount !== 0) return;
+      const current = textValue(element);
+      if (!current || current.length > 160) return;
+      const before = lastText.get(element);
+      lastText.set(element, current);
+      if (!before || before === current) return;
+      const target = pathOf(element);
+      window.__recreateAttributeMutations.push({
+        target, attribute: 'textContent', value: before, time: now
+      });
+      window.__recreateAttributeMutations.push({
+        target, attribute: 'textContent', value: current, time: now
+      });
+    };
     new MutationObserver(mutations => {
       const now = performance.now() - start;
       for (const mutation of mutations) {
+        if (mutation.type === 'characterData') {
+          recordText(mutation.target.parentElement, now);
+          continue;
+        }
+        if (mutation.type === 'childList') {
+          recordText(mutation.target, now);
+          for (const node of mutation.addedNodes) seedText(node);
+          continue;
+        }
         if (mutation.type !== 'attributes' || !trackedAttributes.has(mutation.attributeName)) continue;
         const element = mutation.target;
         const key = `${pathOf(element)}|${mutation.attributeName}`;
@@ -76,8 +118,8 @@ pub const SOURCE: &str = r#"
         }
       }
     }).observe(document.documentElement, {
-      attributes: true, attributeOldValue: true, subtree: true,
-      attributeFilter: Array.from(trackedAttributes)
+      attributes: true, attributeOldValue: true, childList: true,
+      characterData: true, characterDataOldValue: true, subtree: true
     });
     const sample = () => {
       const now = performance.now();
@@ -134,3 +176,13 @@ pub const SOURCE: &str = r#"
   }
 })()
 "#;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn records_rotating_text_content() {
+        assert!(super::SOURCE.contains("attribute: 'textContent'"));
+        assert!(super::SOURCE.contains("mutation.type === 'characterData'"));
+        assert!(super::SOURCE.contains("for (const node of mutation.addedNodes) seedText(node)"));
+    }
+}

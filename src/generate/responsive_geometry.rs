@@ -84,12 +84,24 @@ fn normalize_width(
     viewport: &Viewport,
     base: Option<(&Node, &Viewport)>,
 ) {
-    if !is_root(node)
-        && parent.is_some_and(|parent| {
-            (node.rect.x - parent.rect.x).abs() <= 1.0
-                && (node.rect.width - parent.rect.width).abs() <= 1.0
-        })
-    {
+    if compact_control(node) || intrinsic_media(node) {
+        return;
+    }
+    if !is_root(node) && parent.is_some_and(|parent| fills_parent_content_box(node, parent)) {
+        if matches!(
+            node.tag.as_str(),
+            "button" | "input" | "select" | "textarea"
+        ) {
+            styles.insert("width".into(), "100%".into());
+            return;
+        }
+        if parent.is_some_and(|parent| {
+            parent.style.get("display").map(String::as_str) == Some("flex")
+                && parent.style.get("align-items").map(String::as_str) == Some("center")
+        }) {
+            styles.insert("width".into(), "100%".into());
+            return;
+        }
         if styles
             .get("width")
             .is_some_and(|width| width.ends_with("px"))
@@ -127,6 +139,38 @@ fn normalize_width(
     } else {
         styles.remove("width");
     }
+}
+
+fn fills_parent_content_box(node: &Node, parent: &Node) -> bool {
+    let left = px(&parent.style, "border-left-width").unwrap_or_default()
+        + px(&parent.style, "padding-left").unwrap_or_default();
+    let right = px(&parent.style, "border-right-width").unwrap_or_default()
+        + px(&parent.style, "padding-right").unwrap_or_default();
+    let content_width = if parent
+        .style
+        .get("box-sizing")
+        .is_some_and(|value| value == "border-box")
+    {
+        parent.rect.width - left - right
+    } else {
+        px(&parent.style, "width").unwrap_or(parent.rect.width - left - right)
+    };
+    (node.rect.x - parent.rect.x - left).abs() <= 1.0
+        && (node.rect.width - content_width).abs() <= 1.0
+}
+
+fn intrinsic_media(node: &Node) -> bool {
+    matches!(node.tag.as_str(), "canvas" | "img" | "svg" | "video")
+}
+
+fn compact_control(node: &Node) -> bool {
+    node.rect.width <= 48.0
+        && node.rect.height <= 48.0
+        && (matches!(node.tag.as_str(), "button" | "input" | "select")
+            || node
+                .attributes
+                .get("role")
+                .is_some_and(|role| role == "button"))
 }
 
 fn horizontal_padding(styles: &Styles) -> f64 {

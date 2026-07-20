@@ -11,11 +11,32 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Command {
     Capture(CaptureArgs),
+    Fidelity(FidelityArgs),
     Generate(GenerateArgs),
     Install(InstallArgs),
     Open(OpenArgs),
     Skill,
     Verify(VerifyArgs),
+}
+
+#[derive(Args, Clone)]
+pub struct FidelityArgs {
+    #[arg(long)]
+    pub source_target: String,
+    #[arg(long)]
+    pub candidate_target: String,
+    #[arg(long)]
+    pub label: String,
+    #[arg(long, default_value_t = 1440)]
+    pub width: u32,
+    #[arg(long, default_value_t = 900)]
+    pub height: u32,
+    #[arg(long, default_value = "320,390,480,600,768,960,1200,1440,1920")]
+    pub widths: String,
+    #[arg(long, default_value = "http://127.0.0.1:9223")]
+    pub cdp_url: String,
+    #[arg(long)]
+    pub output: Option<PathBuf>,
 }
 
 #[derive(Args, Clone)]

@@ -90,11 +90,38 @@ pub fn state_handlers(
 }
 
 pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
-    if interaction
-        .states
-        .iter()
-        .any(|state| state.nodes.iter().any(is_popup))
+    let label = interaction.trigger_label.to_ascii_lowercase();
+    if (label == "more options" || label.contains("menu") || label.contains("launcher"))
+        && interaction.states.iter().any(|state| {
+            baselines
+                .iter()
+                .find(|baseline| baseline.viewport.width == state.viewport.width)
+                .is_some_and(|baseline| {
+                    if label == "more options" {
+                        !crate::interaction_surface::roots(state, baseline).is_empty()
+                    } else {
+                        crate::interaction_state::surface_differs(
+                            state,
+                            baseline,
+                            &interaction.trigger_path,
+                            &interaction.trigger_label,
+                        )
+                    }
+                })
+        })
     {
+        return true;
+    }
+    if baselines.iter().any(|baseline| {
+        baseline
+            .nodes
+            .iter()
+            .find(|node| node.path == interaction.trigger_path)
+            .is_some_and(|node| {
+                node.attributes.contains_key("aria-haspopup")
+                    || node.attributes.contains_key("aria-expanded")
+            })
+    }) {
         return true;
     }
     let comparisons = interaction
@@ -104,10 +131,14 @@ pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
             baselines
                 .iter()
                 .find(|baseline| baseline.viewport.width == state.viewport.width)
-                .map(|baseline| closable_state(state, baseline))
+                .map(|baseline| (state, baseline))
         })
         .collect::<Vec<_>>();
-    comparisons.iter().filter(|value| **value).count() * 2 > comparisons.len()
+    let closable = comparisons
+        .iter()
+        .map(|(state, baseline)| closable_state(state, baseline))
+        .collect::<Vec<_>>();
+    closable.iter().filter(|value| **value).count() * 2 > closable.len()
 }
 
 fn closable_state(state: &PageState, baseline: &PageState) -> bool {

@@ -13,17 +13,18 @@ pub const SOURCE: &str = r#"
     mutationGroups.set(key, group);
   }
   for (const group of mutationGroups.values()) {
-    if (group.values.length < 2) continue;
+    if (group.values.length < 3) continue;
     const gaps = group.times.slice(1)
       .map((time, index) => time - group.times[index])
       .filter(value => value >= 250);
+    if (!gaps.length) continue;
     attributeSequences.push({
       target: group.target,
       attribute: group.attribute,
       values: group.values,
       interval_ms: Math.round(
         gaps.reduce((sum, value) => sum + value, 0) / gaps.length
-      ) || 1000
+      )
     });
   }
 "#;

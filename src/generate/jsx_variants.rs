@@ -83,11 +83,5 @@ fn render_children(
     assets: &BTreeMap<String, String>,
     handlers: &BTreeMap<String, String>,
 ) -> String {
-    components
-        .children
-        .get(root)
-        .into_iter()
-        .flatten()
-        .map(|path| jsx::render(path, components, assets, 2, true, handlers))
-        .collect()
+    jsx::render_children(root, components, assets, 2, handlers)
 }

@@ -68,6 +68,27 @@ fn ignores_focus_only_style_changes_for_interaction_discovery() {
 }
 
 #[test]
+fn detects_newly_visible_fixed_surfaces() {
+    let mut baseline = state(2);
+    baseline.nodes[1]
+        .style
+        .insert("position".into(), "fixed".into());
+    baseline.nodes[1]
+        .style
+        .insert("display".into(), "none".into());
+    let mut opened = baseline.clone();
+    opened.nodes[1]
+        .style
+        .insert("display".into(), "block".into());
+    assert!(surface_differs(
+        &opened,
+        &baseline,
+        "html>body>button:nth-of-type(1)",
+        "More options"
+    ));
+}
+
+#[test]
 fn detects_persistent_content_actions() {
     let baseline = state(1);
     let mut changed = baseline.clone();

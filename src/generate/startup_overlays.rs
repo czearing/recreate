@@ -36,11 +36,12 @@ pub fn runtime(source: String, states: &[PageState]) -> String {
         "const[state,setState]=useState(0);const[startupDone,setStartupDone]=useState(false);",
     );
     let source = source.replace(
-        "const View=baselineViews[viewport];const activate=",
+        "const activate=",
         &format!(
-            "const View=baselineViews[viewport];const startupDurations=[{durations}];\
+            "const startupDurations=[{durations}];\
              useLayoutEffect(()=>{{const duration=startupDurations[viewport];\
-             if(startupDone||!duration)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){{\
+             if(startupDone)return;if(!duration){{setStartupDone(true);return}}\
+             if(matchMedia('(prefers-reduced-motion: reduce)').matches){{\
              setStartupDone(true);return}}document.body.classList.add('recreateStartupBody');\
              const timer=setTimeout(()=>{{document.body.classList.remove('recreateStartupBody');\
              setStartupDone(true)}},duration+500);return()=>{{clearTimeout(timer);\
@@ -97,11 +98,8 @@ mod tests {
         append(std::slice::from_ref(&state), &mut css);
         assert!(css.contains("--recreate-startup-duration"));
         assert!(
-            runtime(
-                "const View=baselineViews[viewport];const activate=".into(),
-                &[]
-            )
-            .contains("startupDone")
+            runtime("const View=baselineViews[0];const activate=".into(), &[])
+                .contains("startupDone")
         );
     }
 }

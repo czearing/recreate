@@ -28,7 +28,48 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
         styles.insert("margin-left".into(), "auto".into());
         styles.insert("margin-right".into(), "auto".into());
     }
+    if !authored.contains_key("width") && flexible(&authored) {
+        styles.remove("width");
+    }
     styles.extend(authored);
+}
+
+pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool {
+    let classes: Vec<_> = node
+        .attributes
+        .get("class")
+        .into_iter()
+        .flat_map(|value| value.split_whitespace())
+        .collect();
+    rules
+        .iter()
+        .filter_map(|rule| rule.split_once('{'))
+        .any(|(selector, declarations)| {
+            !selector.starts_with('@')
+                && !selector.contains(':')
+                && classes
+                    .iter()
+                    .any(|class| directly_targets(selector, class))
+                && declarations
+                    .split(';')
+                    .filter_map(|declaration| declaration.split_once(':'))
+                    .any(|(name, _)| name.trim() == property)
+        })
+}
+
+fn flexible(styles: &Styles) -> bool {
+    if styles
+        .get("flex-grow")
+        .and_then(|value| value.parse::<f64>().ok())
+        .is_some_and(|value| value > 0.0)
+    {
+        return true;
+    }
+    styles
+        .get("flex")
+        .and_then(|value| value.split_whitespace().next())
+        .and_then(|value| value.parse::<f64>().ok())
+        .is_some_and(|value| value > 0.0)
 }
 
 fn declarations(node: &Node, rules: &[String]) -> Styles {
@@ -65,8 +106,42 @@ fn declarations(node: &Node, rules: &[String]) -> Styles {
                 .iter()
                 .all(|value| value == first)
                 .then(|| (name, first.clone()))
+                .filter(|(name, value)| resolved_matches(node, name, value))
         })
         .collect()
+}
+
+fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
+    if matches!(name, "width" | "height") && value == "auto" {
+        return node
+            .style
+            .get(name)
+            .is_none_or(|computed| computed == value);
+    }
+    if !matches!(
+        name,
+        "align-content"
+            | "align-items"
+            | "align-self"
+            | "column-gap"
+            | "display"
+            | "flex-direction"
+            | "flex-flow"
+            | "flex-wrap"
+            | "gap"
+            | "justify-content"
+            | "justify-items"
+            | "justify-self"
+            | "order"
+            | "position"
+            | "row-gap"
+            | "white-space"
+    ) {
+        return true;
+    }
+    node.style
+        .get(name)
+        .is_none_or(|computed| computed == value)
 }
 
 fn directly_targets(selectors: &str, class: &str) -> bool {
@@ -209,7 +284,10 @@ mod tests {
                 width: 253.0,
                 height: 236.0,
             },
-            style: Styles::from([("width".into(), "253px".into())]),
+            style: Styles::from([
+                ("width".into(), "253px".into()),
+                ("height".into(), "185px".into()),
+            ]),
             before: None,
             after: None,
         };
@@ -218,10 +296,74 @@ mod tests {
         normalize(
             &mut node.style,
             &captured,
-            &[".card { flex: 0 0 auto; transition: box-shadow .2s; }".into()],
+            &[".card { flex: 0 0 auto; height: auto; transition: box-shadow .2s; }".into()],
         );
         assert_eq!(node.style["width"], "253px");
+        assert_eq!(node.style["height"], "185px");
         assert_eq!(node.style["flex"], "0 0 auto");
+    }
+
+    #[test]
+    fn removes_measured_width_from_growing_flex_items() {
+        let mut node = Node {
+            path: "article>div".into(),
+            parent: Some("article".into()),
+            tag: "div".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 320.0,
+                height: 80.0,
+            },
+            style: Styles::from([("width".into(), "320px".into())]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "content".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".content { flex: 1 1 0%; min-width: 0; }".into()],
+        );
+        assert!(!node.style.contains_key("width"));
+        assert_eq!(node.style["flex"], "1 1 0%");
+        assert_eq!(node.style["min-width"], "0");
+    }
+
+    #[test]
+    fn rejects_authored_layout_values_from_inactive_media_rules() {
+        let mut node = Node {
+            path: "header".into(),
+            parent: None,
+            tag: "div".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 100.0,
+                height: 40.0,
+            },
+            style: Styles::from([
+                ("display".into(), "flex".into()),
+                ("flex-direction".into(), "row".into()),
+                ("gap".into(), "normal".into()),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "header".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".header { flex-direction: column; gap: 4px; }".into()],
+        );
+        assert_eq!(node.style["flex-direction"], "row");
+        assert_eq!(node.style["gap"], "normal");
     }
 
     #[test]

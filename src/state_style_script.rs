@@ -1,6 +1,34 @@
 pub const SOURCE: &str = r#"
   const cssRules = [], stateStyles = [], stateStyleKeys = new Set();
   const dynamicState = /:(hover|focus-visible|focus-within|focus|active)\b/g;
+  const stateShorthands = [
+    'animation','background','border','border-color','border-radius','border-style',
+    'border-width','flex','font','gap','grid','inset','margin','mask','padding',
+    'transition'
+  ];
+  const resolveVariables = (style, element) => {
+    const computed = getComputedStyle(element);
+    const resolveValue = value => {
+      let resolved = value;
+      for (let pass = 0; pass < 5 && resolved.includes('var('); pass++) {
+        resolved = resolved.replace(
+          /var\((--[\w-]+)(?:,\s*([^)]*))?\)/g,
+          (_, name, fallback = '') => computed.getPropertyValue(name).trim() || fallback.trim()
+        );
+      }
+      return resolved;
+    };
+    const names = new Set(Array.from(style));
+    for (const name of stateShorthands) {
+      if (style.getPropertyValue(name).trim()) names.add(name);
+    }
+    return Array.from(names).map(name => {
+      const priority = style.getPropertyPriority(name);
+      const value = resolveValue(style.getPropertyValue(name));
+      if (!value) return '';
+      return `${name}: ${value}${priority ? ` !${priority}` : ''};`;
+    }).filter(Boolean).join(' ');
+  };
   const visitRules = (rules, media = null) => {
     for (const rule of Array.from(rules || [])) {
       cssRules.push(rule.cssText);
@@ -34,7 +62,7 @@ pub const SOURCE: &str = r#"
                   ? `${tailStates.join('')}${pseudoElement}`
                   : null,
                 media,
-                declarations: rule.style.cssText
+                declarations: resolveVariables(rule.style, element)
               };
               const key = JSON.stringify(captured);
               if (!stateStyleKeys.has(key)) {
@@ -57,3 +85,14 @@ pub const SOURCE: &str = r#"
     try { visitRules(sheet.cssRules); } catch {}
   }
 "#;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn resolves_custom_properties_in_dynamic_state_rules() {
+        assert!(super::SOURCE.contains("computed.getPropertyValue(name)"));
+        assert!(super::SOURCE.contains("declarations: resolveVariables(rule.style, element)"));
+        assert!(super::SOURCE.contains("'background'"));
+        assert!(super::SOURCE.contains("if (!value) return ''"));
+    }
+}

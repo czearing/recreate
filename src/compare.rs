@@ -27,7 +27,8 @@ pub(crate) struct Report {
 }
 
 pub async fn run(args: VerifyArgs) -> Result<()> {
-    let specification: Specification = serde_json::from_slice(&fs::read(&args.spec)?)?;
+    let mut bytes = fs::read(&args.spec)?;
+    let specification: Specification = simd_json::serde::from_slice(&mut bytes)?;
     let (states, trigger) = if let Some(index) = args.interaction {
         let interaction = specification
             .interactions
@@ -90,6 +91,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
                 &trigger.trigger_path,
                 &trigger.trigger_tag,
                 &trigger.trigger_label,
+                None,
                 true,
             )
             .await?;
@@ -125,6 +127,8 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
     if !totals.passed {
         anyhow::bail!("generated page does not match captured evidence");
     }
+    std::mem::forget(specification);
+    std::mem::forget(bytes);
     Ok(())
 }
 

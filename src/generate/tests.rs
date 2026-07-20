@@ -41,6 +41,10 @@ async fn writes_semantic_component_project() {
     assert!(states.contains("createPortal"));
     assert!(app.contains("const overlay=state===1?"));
     assert!(app.contains("mergeHorizontalScroll(captureScroll(event.currentTarget),captured)"));
+    assert!(app.contains("sequence.attribute==='textContent'?element.textContent="));
+    assert!(app.contains("smooth:true"));
+    assert!(app.contains("(now-started)/320"));
+    assert!(app.contains("scrollEase(progress)"));
     assert!(app.contains("target.focus({preventScroll:true})"));
     let css = std::fs::read_to_string(root.join("src/styles.css")).unwrap();
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));
