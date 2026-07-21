@@ -1,0 +1,50 @@
+{
+  "name": "recreate-cli",
+  "version": "0.6.0",
+  "private": false,
+  "description": "Capture any interface. Keep every detail.",
+  "type": "module",
+  "bin": {
+    "recreate": "npm/cli.mjs",
+    "recreate-cli": "npm/cli.mjs",
+    "site-spec": "npm/cli.mjs"
+  },
+  "files": [
+    "npm/cli.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/czearing/recreate.git"
+  },
+  "homepage": "https://github.com/czearing/recreate#readme",
+  "bugs": {
+    "url": "https://github.com/czearing/recreate/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "license": "MIT",
+  "keywords": [
+    "browser",
+    "cli",
+    "design-tools",
+    "frontend",
+    "interface",
+    "reconstruction",
+    "responsive-design",
+    "web-development"
+  ],
+  "scripts": {
+    "check": "node npm/check-package.mjs",
+    "test": "node --test npm/*.test.mjs",
+    "ci": "npm run check && npm test",
+    "pack:check": "npm pack --dry-run",
+    "prepublishOnly": "npm run ci"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -20,6 +20,17 @@ evidence, animation data, interaction states, and clean React components.
 
 ## Install
 
+### npm
+
+```bash
+npm install --global recreate-cli
+recreate install
+```
+
+The npm command installs a small launcher that downloads the validated native
+binary for the current platform. The native CLI then keeps itself updated from
+the `recreate-main` release.
+
 ### Windows
 
 ```powershell

@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
@@ -65,6 +66,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v4
         with:
           pattern: recreate-*
@@ -79,3 +81,20 @@ jobs:
               --notes "Latest validated main build."
           gh release upload recreate-main --repo "$GITHUB_REPOSITORY" \
             artifacts/* --clobber
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm run ci
+      - id: npm-version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "recreate-cli@$version" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: ${{ steps.npm-version.outputs.publish == 'true' }}
+        run: npm publish --tag latest --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
