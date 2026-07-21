@@ -132,6 +132,8 @@ async fn validate_fixture(
         url: Some(url::Url::from_file_path(fixture).unwrap().to_string()),
         reuse: false,
         reload: false,
+        baseline_only: false,
+        spec_only: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),

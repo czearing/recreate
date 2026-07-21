@@ -1,5 +1,5 @@
 pub const PROPERTIES: &str = concat!(
-    "'display','position','inset','top','right','bottom','left','box-sizing',",
+    "'display','position','float','inset','top','right','bottom','left','box-sizing',",
     "'width','height','min-width','max-width','min-height','max-height',",
     "'margin','margin-top','margin-right','margin-bottom','margin-left',",
     "'padding','padding-top','padding-right','padding-bottom','padding-left',",
@@ -13,7 +13,7 @@ pub const PROPERTIES: &str = concat!(
     "'z-index','color','background-color','background-image','background-size',",
     "'background-position','background-repeat','background-clip','background-origin',",
     "'background-blend-mode','-webkit-background-clip','-webkit-text-fill-color',",
-    "'border','border-radius',",
+    "'border','border-radius','fill','stroke','stroke-width',",
     "'box-shadow','opacity','filter','transform','transform-origin',",
     "'font-family','font-size','font-weight','font-style','line-height',",
     "'font-stretch','font-kerning','font-feature-settings','font-variation-settings',",

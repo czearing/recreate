@@ -15,6 +15,8 @@ mod compare_tests;
 mod fidelity;
 mod fidelity_responsive;
 mod fidelity_responsive_script;
+#[cfg(test)]
+mod fidelity_responsive_tests;
 mod fidelity_script;
 mod generate;
 mod interaction_script;

@@ -74,6 +74,10 @@ pub struct CaptureArgs {
     #[arg(long)]
     pub reload: bool,
     #[arg(long)]
+    pub baseline_only: bool,
+    #[arg(long)]
+    pub spec_only: bool,
+    #[arg(long)]
     pub target: Option<String>,
     #[arg(long, default_value = "http://127.0.0.1:9222")]
     pub cdp_url: String,
@@ -124,6 +128,24 @@ mod tests {
             args.viewports,
             "1920x1080,1440x900,768x1024,390x844,320x568"
         );
+    }
+
+    #[test]
+    fn parses_fast_baseline_spec_capture() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "capture",
+            "--baseline-only",
+            "--spec-only",
+            "--viewports",
+            "1440x900",
+        ])
+        .unwrap();
+        let Command::Capture(args) = cli.command else {
+            panic!("expected capture");
+        };
+        assert!(args.baseline_only);
+        assert!(args.spec_only);
     }
 
     #[test]

@@ -7,7 +7,9 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
         return;
     }
     for property in ["animation", "transition"] {
-        styles.remove(property);
+        if authored.contains_key(property) {
+            styles.remove(property);
+        }
     }
     let intrinsic_reveal = authored
         .get("max-width")
@@ -283,6 +285,42 @@ mod tests {
         assert_eq!(node.style["height"], "28px");
         assert_eq!(node.style["transition"], "opacity .2s, max-width .3s");
         assert_eq!(node.style["max-width"], "0");
+    }
+
+    #[test]
+    fn keeps_resolved_motion_when_authored_variables_are_filtered() {
+        let mut node = Node {
+            path: "div".into(),
+            parent: None,
+            tag: "div".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 230.0,
+                height: 180.0,
+            },
+            style: Styles::from([
+                ("position".into(), "relative".into()),
+                (
+                    "transition".into(),
+                    "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                ),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "card".into());
+        let rules = [".card { position: relative; transition: transform var(--slow); }".into()];
+        let captured = node.clone();
+
+        normalize(&mut node.style, &captured, &rules);
+
+        assert_eq!(
+            node.style["transition"],
+            "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+        );
     }
 
     #[test]

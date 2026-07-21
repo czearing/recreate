@@ -85,13 +85,18 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
-    let interactions_started = std::time::Instant::now();
-    let mut interaction_states = interactions::capture(&mut cdp, &states).await?;
-    interactions::deduplicate(&mut interaction_states);
-    eprintln!(
-        "captured interactions in {:.2}s",
-        interactions_started.elapsed().as_secs_f64()
-    );
+    let interaction_states = if args.baseline_only {
+        Vec::new()
+    } else {
+        let interactions_started = std::time::Instant::now();
+        let mut captured = interactions::capture(&mut cdp, &states).await?;
+        interactions::deduplicate(&mut captured);
+        eprintln!(
+            "captured interactions in {:.2}s",
+            interactions_started.elapsed().as_secs_f64()
+        );
+        captured
+    };
     let mut specification = Specification {
         schema_version: 1,
         requested_url,
@@ -104,6 +109,17 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         args.out.join("spec.json"),
         serde_json::to_vec_pretty(&specification)?,
     )?;
+    if args.spec_only {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&json!({
+                "states": specification.states.len(),
+                "interactions": specification.interactions.len(),
+                "spec": args.out.join("spec.json"),
+            }))?
+        );
+        return Ok(());
+    }
     let cookies = browser_cookies(&mut cdp).await;
     generate::write_project(&specification, &args.out, &cookies).await?;
     let acceptance = validate::validate(&specification, &args.out)?;

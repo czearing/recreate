@@ -36,6 +36,61 @@ fn directional_border_contract_is_captured_and_generated() {
 }
 
 #[test]
+fn float_contract_is_captured_and_generated() {
+    assert!(crate::style_contract::contains("float"));
+    let styles = Styles::from([("float".into(), "right".into())]);
+    assert_eq!(declarations(&styles, &BTreeMap::new()), "float:right;");
+}
+
+#[test]
+fn svg_paint_contract_is_captured_and_generated() {
+    let styles = Styles::from([
+        ("fill".into(), "rgb(198, 225, 255)".into()),
+        ("stroke".into(), "rgba(0, 0, 0, 0.427)".into()),
+        ("stroke-width".into(), "1px".into()),
+    ]);
+    for name in styles.keys() {
+        assert!(crate::style_contract::contains(name));
+    }
+    let css = declarations(&styles, &BTreeMap::new());
+    assert!(css.contains("fill:rgb(198, 225, 255);"));
+    assert!(css.contains("stroke:rgba(0, 0, 0, 0.427);"));
+    assert!(css.contains("stroke-width:1px;"));
+}
+
+#[test]
+fn emits_custom_properties_referenced_only_by_attributes() {
+    let mut specification = crate::generate::project_test_support::specification();
+    specification.states[0].nodes[1]
+        .attributes
+        .insert("fill".into(), "var(--card-fill)".into());
+    specification.states[0].css_rules = vec![":root { --card-fill: rgb(198, 225, 255); }".into()];
+
+    let output = build(&specification, &BTreeMap::new());
+
+    assert!(
+        output
+            .css
+            .contains(":root{--card-fill:rgb(198, 225, 255);}")
+    );
+}
+
+#[test]
+fn infers_missing_right_float_from_captured_geometry() {
+    let mut parent =
+        crate::generate::project_test_support::specification().states[0].nodes[1].clone();
+    parent.rect.x = 20.0;
+    parent.rect.width = 190.0;
+    parent.style.insert("display".into(), "block".into());
+    let mut node = parent.clone();
+    node.rect.x = 210.0;
+    node.rect.width = 0.0;
+    node.style.insert("position".into(), "static".into());
+
+    assert_eq!(visual_float(&node, Some(&parent)), Some("right"));
+}
+
+#[test]
 fn grid_item_contract_is_captured_and_generated() {
     let mut styles = Styles::new();
     for (name, value) in [

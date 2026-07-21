@@ -54,6 +54,7 @@ pub const SNAPSHOT: &str = r#"(() => {
       tag:element.tagName.toLowerCase(),
       className:typeof element.className==='string'?element.className:
         element.getAttribute('class')||'',
+      text:element.childElementCount===0?(element.textContent||''):'',
       rect:[rect.x,rect.y,rect.width,rect.height],
       style:{
         opacity:style.opacity,transform:style.transform,color:style.color,

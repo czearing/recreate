@@ -21,6 +21,7 @@ struct NodeSnapshot {
     path: String,
     tag: String,
     class_name: String,
+    text: String,
     rect: [f64; 4],
     style: BTreeMap<String, String>,
 }
@@ -61,6 +62,8 @@ struct Report {
 }
 
 pub async fn run(args: FidelityArgs) -> Result<()> {
+    reset(&args, &args.source_target).await?;
+    reset(&args, &args.candidate_target).await?;
     let source = trace(&args, &args.source_target).await?;
     let candidate = trace(&args, &args.candidate_target).await?;
     let text_lock = fidelity_responsive::text_map(&args, &args.source_target).await?;
@@ -100,6 +103,31 @@ pub async fn run(args: FidelityArgs) -> Result<()> {
     );
     anyhow::ensure!(report.passed, "hover fidelity mismatch");
     Ok(())
+}
+
+async fn reset(args: &FidelityArgs, target_id: &str) -> Result<()> {
+    let target = browser::list(&args.cdp_url)
+        .await?
+        .into_iter()
+        .find(|value| value.id == target_id)
+        .with_context(|| format!("target not found: {target_id}"))?;
+    let mut cdp = Cdp::connect(&target.websocket_url).await?;
+    cdp.enable(&["Page", "Runtime"]).await?;
+    cdp.send("Page.reload", json!({})).await?;
+    for _ in 0..80 {
+        let ready = cdp
+            .evaluate(
+                "document.readyState==='complete'&&document.body&&document.body.children.length>0",
+            )
+            .await?
+            .as_bool()
+            .unwrap_or(false);
+        if ready {
+            return Ok(());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(25)).await;
+    }
+    anyhow::bail!("target did not reload: {target_id}")
 }
 
 async fn trace(args: &FidelityArgs, target: &str) -> Result<Trace> {
@@ -145,16 +173,19 @@ async fn trace(args: &FidelityArgs, target: &str) -> Result<Trace> {
             }
         }
     }
-    let x = descriptor["x"].as_f64().with_context(|| {
+    descriptor["x"].as_f64().with_context(|| {
         format!(
             "hover target {:?} not found on {} ({})",
             args.label, target.id, target.url,
         ) + &format!(": {descriptor}")
     })?;
-    let y = descriptor["y"].as_f64().context("hover target missing y")?;
-    settle(&mut cdp, 20).await;
+    descriptor["y"].as_f64().context("hover target missing y")?;
+    wait_interactable(&mut cdp).await?;
+    descriptor = cdp.evaluate(&fidelity_script::prepare(&args.label)).await?;
+    descriptor["x"].as_f64().context("hover target missing x")?;
+    descriptor["y"].as_f64().context("hover target missing y")?;
     let mut hover = vec![frame(&mut cdp, 0).await?];
-    move_pointer(&mut cdp, x, y).await?;
+    activate_hover(&mut cdp).await?;
     sample(&mut cdp, &mut hover, &[0, 16, 16, 32, 56, 80, 120]).await?;
     move_pointer(&mut cdp, -100.0, -100.0).await?;
     let mut leave = Vec::new();
@@ -164,6 +195,53 @@ async fn trace(args: &FidelityArgs, target: &str) -> Result<Trace> {
         hover,
         leave,
     })
+}
+
+async fn activate_hover(cdp: &mut Cdp) -> Result<()> {
+    for _ in 0..40 {
+        let point = cdp
+            .evaluate(
+                "(()=>{const root=window.__recreateFidelityRoot;\
+                 const rect=root.getBoundingClientRect();return {\
+                 x:rect.x+rect.width/2,y:rect.y+rect.height/2}})()",
+            )
+            .await?;
+        move_pointer(
+            cdp,
+            point["x"].as_f64().context("hover point missing x")?,
+            point["y"].as_f64().context("hover point missing y")?,
+        )
+        .await?;
+        if cdp
+            .evaluate("window.__recreateFidelityRoot.matches(':hover')")
+            .await?
+            .as_bool()
+            .unwrap_or(false)
+        {
+            return Ok(());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+    }
+    anyhow::bail!("fidelity hover did not activate")
+}
+
+async fn wait_interactable(cdp: &mut Cdp) -> Result<()> {
+    for _ in 0..480 {
+        let interactable = cdp
+            .evaluate(
+                "(()=>{const root=window.__recreateFidelityRoot;if(!root)return false;\
+                 const rect=root.getBoundingClientRect();const hit=document.elementFromPoint(\
+                 rect.x+rect.width/2,rect.y+rect.height/2);return !!hit&&root.contains(hit)})()",
+            )
+            .await?
+            .as_bool()
+            .unwrap_or(false);
+        if interactable {
+            return Ok(());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(25)).await;
+    }
+    anyhow::bail!("fidelity target remained covered")
 }
 
 async fn sample(cdp: &mut Cdp, frames: &mut Vec<Frame>, delays: &[u64]) -> Result<()> {
@@ -447,13 +525,38 @@ fn compare_frame(
                 expected.path, source.elapsed_ms
             ));
         }
-        for property in active_styles.get(&expected.path).into_iter().flatten() {
+        let mut compared = BTreeSet::from([
+            "opacity",
+            "color",
+            "backgroundColor",
+            "boxShadow",
+            "fill",
+            "stroke",
+            "borderTopColor",
+            "borderRightColor",
+            "borderBottomColor",
+            "borderLeftColor",
+        ]);
+        compared.extend(
+            active_styles
+                .get(&expected.path)
+                .into_iter()
+                .flatten()
+                .map(String::as_str),
+        );
+        for property in compared {
             if expected.style.get(property) != node.style.get(property) {
                 details.push(format!(
                     "{name}: style {} {property} at {}ms",
                     expected.path, source.elapsed_ms
                 ));
             }
+        }
+        if expected.text != node.text {
+            details.push(format!(
+                "{name}: text {} at {}ms source={:?} candidate={:?}",
+                expected.path, source.elapsed_ms, expected.text, node.text
+            ));
         }
     }
     if source.snapshot.document != candidate.snapshot.document {

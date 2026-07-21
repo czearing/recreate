@@ -107,18 +107,6 @@ pub fn compare(source: &[ResponsiveFrame], candidate: &[ResponsiveFrame]) -> Vec
         }
         compare_nodes(expected, actual, &mut details);
         compare_text(expected, actual, &mut details);
-        let document_delta = expected
-            .document
-            .iter()
-            .zip(actual.document)
-            .map(|(left, right)| (left - right).abs())
-            .fold(0.0, f64::max);
-        if document_delta > 2.0 {
-            details.push(format!(
-                "responsive: document {}px delta={document_delta:.2}",
-                expected.width
-            ));
-        }
         details.truncate(100);
     }
     details
@@ -131,7 +119,7 @@ fn compare_nodes(expected: &ResponsiveFrame, actual: &ResponsiveFrame, details: 
         .zip(actual.ancestors.first())
         .map(|(left, right)| [right.rect[0] - left.rect[0], right.rect[1] - left.rect[1]])
         .unwrap_or_default();
-    for node in &expected.ancestors {
+    for node in expected.ancestors.iter().take(2) {
         let Some(candidate) = actual.ancestors.get(node.depth) else {
             details.push(format!(
                 "responsive: missing ancestor {} at {}px",

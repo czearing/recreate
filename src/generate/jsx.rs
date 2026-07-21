@@ -285,7 +285,12 @@ pub(super) fn render_children(
     if let Some(extent) = leading_placeholder_extent(path, &children, components) {
         output.push_str(&leading_placeholder(depth, extent));
     }
+    let mut previous_text = None;
     for child in &children {
+        let node = &components.nodes[child];
+        if previous_text.is_some_and(|previous| needs_text_space(previous, node)) {
+            output.push_str(&format!("{}{{\" \"}}\n", "  ".repeat(depth)));
+        }
         if let Some((tag, index)) = sibling_index(child) {
             let previous = indexes.entry(tag.to_string()).or_default();
             let missing = index.saturating_sub(*previous + 1);
@@ -296,8 +301,25 @@ pub(super) fn render_children(
             *previous = index;
         }
         output.push_str(&render(child, components, assets, depth, true, handlers));
+        previous_text = (node.tag == "#text").then_some(node);
     }
     output
+}
+
+fn needs_text_space(previous: &crate::model::Node, current: &crate::model::Node) -> bool {
+    if current.tag != "#text"
+        || previous
+            .text
+            .chars()
+            .next_back()
+            .is_some_and(char::is_whitespace)
+        || current.text.chars().next().is_some_and(char::is_whitespace)
+    {
+        return false;
+    }
+    let same_line = (previous.rect.y - current.rect.y).abs() <= 1.0;
+    let gap = current.rect.x - (previous.rect.x + previous.rect.width);
+    same_line && gap > 0.5 && gap <= 12.0
 }
 
 fn placeholder_extent(
@@ -419,3 +441,7 @@ fn event(path: &str, handlers: &BTreeMap<String, String>) -> String {
         .map(|value| format!(" {value}"))
         .unwrap_or_default()
 }
+
+#[cfg(test)]
+#[path = "jsx_tests.rs"]
+mod tests;

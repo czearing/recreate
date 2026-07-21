@@ -108,7 +108,6 @@ fn normalize_width(
     }
     if stretches_across_grid_track(node, parent) {
         styles.remove("width");
-        styles.insert("min-width".into(), "0px".into());
         return;
     }
     if !is_root(node) && parent.is_some_and(|parent| fills_parent_content_box(node, parent)) {

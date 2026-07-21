@@ -49,6 +49,31 @@ fn visual_flex_direction(
     }
 }
 
+fn visual_float(
+    node: &crate::model::Node,
+    parent: Option<&crate::model::Node>,
+) -> Option<&'static str> {
+    let parent = parent?;
+    let missing_float = node.style.get("float").is_none_or(|value| value == "none");
+    let right_edge = parent.rect.x + parent.rect.width;
+    (missing_float
+        && parent
+            .style
+            .get("display")
+            .is_some_and(|value| value == "block")
+        && node
+            .style
+            .get("display")
+            .is_some_and(|value| value == "block")
+        && node
+            .style
+            .get("position")
+            .is_some_and(|value| value == "static")
+        && node.rect.width <= 0.5
+        && (node.rect.x - right_edge).abs() <= 1.0)
+        .then_some("right")
+}
+
 pub fn build(specification: &Specification, assets: &BTreeMap<String, String>) -> CssOutput {
     build_scoped(specification, assets, "r", true, None, None, None)
 }
@@ -158,17 +183,19 @@ fn build_scoped(
                 .map(Vec::as_slice)
                 .unwrap_or_default(),
         );
+        let visual_float = visual_float(node, parent);
         let contextual_width = contextual_widths
             .contains(&node.path)
             .then_some(node.rect.width);
         let signature = format!(
-            "{}|layout:{}|visual-flex:{}|contextual-width:{}",
+            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}",
             responsive_signatures
                 .get(&node.path)
                 .map(String::as_str)
                 .unwrap_or_default(),
             css_layout::role(node, parent, &base.viewport),
             visual_flex.unwrap_or_default(),
+            visual_float.unwrap_or_default(),
             contextual_width
                 .map(|width| width.to_string())
                 .unwrap_or_default()
@@ -190,6 +217,9 @@ fn build_scoped(
             );
             if let Some(direction) = visual_flex {
                 base_css.push_str(&format!("flex-direction:{direction};"));
+            }
+            if let Some(value) = visual_float {
+                base_css.push_str(&format!("float:{value};"));
             }
             if let Some(width) = contextual_width {
                 base_css.push_str(&format!("width:{width}px;"));
@@ -380,7 +410,7 @@ fn build_scoped(
         })
         .collect::<Vec<_>>();
     state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
-    append_custom_property_fallbacks(&base.css_rules, &mut css);
+    append_custom_property_fallbacks_for_spec(specification, &base.css_rules, &mut css);
     timing("states");
     if !include_interactions {
         interaction_classes.clear();
@@ -548,8 +578,42 @@ fn fluid_height_paths(specification: &Specification) -> HashSet<String> {
         .collect()
 }
 
+#[cfg(test)]
 fn append_custom_property_fallbacks(rules: &[String], css: &mut String) {
     let references = custom_property_references(css);
+    append_custom_property_values(rules, references, css);
+}
+
+fn append_custom_property_fallbacks_for_spec(
+    specification: &Specification,
+    rules: &[String],
+    css: &mut String,
+) {
+    let mut references = custom_property_references(css);
+    for state in &specification.states {
+        for node in state.nodes.iter().chain(&state.startup_nodes) {
+            for value in node.attributes.values() {
+                references.extend(custom_property_references(value));
+            }
+        }
+    }
+    for interaction in &specification.interactions {
+        for state in &interaction.states {
+            for node in state.nodes.iter().chain(&state.startup_nodes) {
+                for value in node.attributes.values() {
+                    references.extend(custom_property_references(value));
+                }
+            }
+        }
+    }
+    append_custom_property_values(rules, references, css);
+}
+
+fn append_custom_property_values(
+    rules: &[String],
+    references: std::collections::BTreeSet<String>,
+    css: &mut String,
+) {
     let mut declarations = String::new();
     for name in references {
         let values = rules

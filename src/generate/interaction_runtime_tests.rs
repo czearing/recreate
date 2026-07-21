@@ -131,6 +131,8 @@ async fn connect(url: &str, endpoint: &str) -> Result<crate::cdp::Cdp> {
         url: Some(url.into()),
         reuse: false,
         reload: false,
+        baseline_only: false,
+        spec_only: false,
         target: None,
         cdp_url: endpoint.into(),
         out: Default::default(),

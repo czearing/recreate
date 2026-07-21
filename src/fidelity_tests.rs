@@ -8,6 +8,7 @@ fn frame(path: &str, properties: &[&str]) -> Frame {
                 path: path.into(),
                 tag: "span".into(),
                 class_name: "target".into(),
+                text: "Card".into(),
                 rect: [0.0, 0.0, 20.0, 20.0],
                 style: BTreeMap::from([
                     ("opacity".into(), "1".into()),
@@ -63,4 +64,40 @@ fn accepts_matching_motion_and_geometry() {
         leave: Vec::new(),
     };
     assert!(compare(&trace, &trace).is_empty());
+}
+
+#[test]
+fn rejects_baseline_paint_mismatch_without_motion() {
+    let source = Trace {
+        label: "card".into(),
+        hover: vec![frame(".", &[])],
+        leave: Vec::new(),
+    };
+    let mut candidate = source.clone();
+    candidate.hover[0].snapshot.nodes[0]
+        .style
+        .insert("fill".into(), "rgb(0, 0, 0)".into());
+
+    assert!(
+        compare(&source, &candidate)
+            .iter()
+            .any(|detail| detail.contains("style . fill"))
+    );
+}
+
+#[test]
+fn rejects_leaf_text_spacing_mismatch() {
+    let source = Trace {
+        label: "card".into(),
+        hover: vec![frame(".", &[])],
+        leave: Vec::new(),
+    };
+    let mut candidate = source.clone();
+    candidate.hover[0].snapshot.nodes[0].text = "0items".into();
+
+    assert!(
+        compare(&source, &candidate)
+            .iter()
+            .any(|detail| detail.contains("text ."))
+    );
 }

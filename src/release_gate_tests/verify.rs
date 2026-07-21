@@ -21,6 +21,8 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
         url: Some(server.url()),
         reuse: false,
         reload: false,
+        baseline_only: false,
+        spec_only: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),
