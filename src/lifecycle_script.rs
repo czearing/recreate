@@ -33,7 +33,8 @@ pub const SOURCE: &str = r#"
     const tracks = new Map();
     const safe = new Set([
       'offset','easing','composite','computedOffset',
-      'opacity','transform','filter','clipPath'
+      'opacity','transform','transformOrigin','translate','rotate','scale',
+      'filter','clipPath','maskImage','backgroundColor','backgroundImage','color'
     ]);
     let fullSample = true;
     new MutationObserver(() => {
@@ -54,19 +55,26 @@ pub const SOURCE: &str = r#"
     };
     const trackedAttributes = new Set(['placeholder','title','aria-label','value']);
     const lastAttribute = new Map();
-    const lastText = new WeakMap();
-    const recordedText = new WeakSet();
+    const lastText = new Map();
+    const recordedText = new Set();
     const textValue = element => (element.textContent || '').replace(/\s+/g, ' ').trim();
+    const trackableText = element => {
+      if (!(element instanceof Element)) return '';
+      const value = textValue(element);
+      if (!value || value.length > 160 || element.childElementCount > 6) return '';
+      if (element.querySelector('a,button,input,textarea,select,svg,img,video')) return '';
+      return value;
+    };
     const seedText = element => {
       if (!(element instanceof Element)) return;
-      const value = textValue(element);
-      if (element.childElementCount === 0 && value && value.length <= 160) {
-        lastText.set(element, value);
+      const value = trackableText(element);
+      if (value) {
+        lastText.set(pathOf(element), value);
       }
       for (const child of element.querySelectorAll('*')) {
-        const childValue = textValue(child);
-        if (child.childElementCount === 0 && childValue && childValue.length <= 160) {
-          lastText.set(child, childValue);
+        const childValue = trackableText(child);
+        if (childValue) {
+          lastText.set(pathOf(child), childValue);
         }
       }
     };
@@ -74,15 +82,14 @@ pub const SOURCE: &str = r#"
       if (element.parentElement === document.documentElement) seedText(element);
     }
     const recordText = (element, now) => {
-      if (!(element instanceof Element) || element.childElementCount !== 0) return;
-      const current = textValue(element);
-      if (!current || current.length > 160) return;
-      const before = lastText.get(element);
-      lastText.set(element, current);
-      if (!before || before === current) return;
+      const current = trackableText(element);
+      if (!current) return false;
       const target = pathOf(element);
-      if (!recordedText.has(element)) {
-        recordedText.add(element);
+      const before = lastText.get(target);
+      lastText.set(target, current);
+      if (!before || before === current) return false;
+      if (!recordedText.has(target)) {
+        recordedText.add(target);
         window.__recreateAttributeMutations.push({
           target, attribute: 'textContent', value: before, time: 0
         });
@@ -90,6 +97,7 @@ pub const SOURCE: &str = r#"
       window.__recreateAttributeMutations.push({
         target, attribute: 'textContent', value: current, time: now
       });
+      return true;
     };
     new MutationObserver(mutations => {
       const now = performance.now() - start;
@@ -99,8 +107,12 @@ pub const SOURCE: &str = r#"
           continue;
         }
         if (mutation.type === 'childList') {
-          recordText(mutation.target, now);
-          for (const node of mutation.addedNodes) seedText(node);
+          if (recordText(mutation.target, now)) continue;
+          for (const node of mutation.addedNodes) {
+            if (!(node instanceof Element)) continue;
+            recordText(node, now);
+            for (const child of node.querySelectorAll('*')) recordText(child, now);
+          }
           continue;
         }
         if (mutation.type !== 'attributes' || !trackedAttributes.has(mutation.attributeName)) continue;
@@ -143,15 +155,34 @@ pub const SOURCE: &str = r#"
         : new Set(active);
       for (const element of elements) {
         const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
         const value = {
-          offset: Math.min(1, (now - start) / 2500),
+          offset: Math.min(1, (now - start) / 12000),
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
           opacity: style.opacity,
-          transform: style.transform
+          transform: style.transform,
+          transformOrigin: style.transformOrigin,
+          translate: style.translate,
+          rotate: style.rotate,
+          scale: style.scale,
+          clipPath: style.clipPath,
+          filter: style.filter,
+          maskImage: style.maskImage,
+          backgroundColor: style.backgroundColor,
+          backgroundImage: style.backgroundImage,
+          color: style.color
         };
         const before = previous.get(element);
         previous.set(element, value);
         if (!before) continue;
-        const changed = ['opacity','transform']
+        const changed = [
+          'x','y','width','height','opacity','transform','transformOrigin',
+          'translate','rotate','scale','clipPath','filter','maskImage',
+          'backgroundColor','backgroundImage','color'
+        ]
           .some(key => before[key] !== value[key]);
         if (!changed) continue;
         const path = pathOf(element);
@@ -160,7 +191,7 @@ pub const SOURCE: &str = r#"
         tracks.set(path, frames);
       }
       fullSample = false;
-      if (now - start < 2500) {
+      if (now - start < 12000) {
         requestAnimationFrame(sample);
       } else {
         window.__recreateLifecycleAnimations = Array.from(tracks, ([target, keyframes]) => ({
@@ -186,7 +217,30 @@ mod tests {
     #[test]
     fn records_rotating_text_content() {
         assert!(super::SOURCE.contains("attribute: 'textContent'"));
+        assert!(super::SOURCE.contains("const lastText = new Map()"));
+        assert!(super::SOURCE.contains("const trackableText = element"));
+        assert!(super::SOURCE.contains("if (recordText(mutation.target, now)) continue"));
+        assert!(
+            super::SOURCE.contains("for (const child of node.querySelectorAll('*')) recordText")
+        );
         assert!(super::SOURCE.contains("mutation.type === 'characterData'"));
-        assert!(super::SOURCE.contains("for (const node of mutation.addedNodes) seedText(node)"));
+        assert!(super::SOURCE.contains("for (const node of mutation.addedNodes)"));
+    }
+
+    #[test]
+    fn records_full_recurring_visual_trajectory() {
+        for property in [
+            "backgroundColor",
+            "clipPath",
+            "filter",
+            "height",
+            "maskImage",
+            "scale",
+            "transformOrigin",
+            "width",
+        ] {
+            assert!(super::SOURCE.contains(property), "missing {property}");
+        }
+        assert!(super::SOURCE.contains("now - start < 12000"));
     }
 }

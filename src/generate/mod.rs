@@ -8,6 +8,7 @@ mod attribute_sequences;
 #[cfg(test)]
 mod authenticated_interaction_runtime_tests;
 mod authored_css;
+mod authored_media;
 mod css;
 mod css_layout;
 mod css_values;
@@ -25,6 +26,7 @@ mod interactions;
 mod jsx;
 mod jsx_attrs;
 mod jsx_states;
+mod jsx_text_entry;
 mod jsx_variants;
 #[cfg(test)]
 #[path = "mount_tests.rs"]
@@ -33,6 +35,7 @@ mod names;
 #[cfg(test)]
 mod project_test_support;
 mod responsive;
+mod responsive_attributes;
 mod responsive_geometry;
 mod responsive_height;
 #[cfg(test)]
@@ -123,7 +126,7 @@ pub async fn write_project(
         .iter()
         .zip(&styles.interaction_classes)
         .map(|(interaction, classes)| {
-            if !interactions::closable(interaction, &specification.states) {
+            if !interactions::rendered(interaction, &specification.states) {
                 return Vec::new();
             }
             let surface_paths = interaction

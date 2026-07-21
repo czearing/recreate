@@ -17,6 +17,7 @@ async fn writes_semantic_component_project() {
                 steps: Vec::new(),
             });
     }
+
     let components = super::tree::components(&specification, &Default::default());
     assert!(
         components
@@ -77,4 +78,24 @@ async fn writes_semantic_component_project() {
     assert!(css.contains("content:none;"));
     assert!(css.contains("@keyframes"));
     assert!(css.contains("[data-recreate-control]:focus-visible"));
+}
+
+#[tokio::test]
+async fn text_entry_state_preserves_the_mounted_control() {
+    let directory = tempfile::tempdir().unwrap();
+    write_project(&support::text_entry_specification(), directory.path(), &[])
+        .await
+        .unwrap();
+    let source = directory.path().join("react/src");
+    let app = std::fs::read_to_string(source.join("App.jsx")).unwrap();
+    let states = std::fs::read_to_string(source.join("states.jsx")).unwrap();
+
+    assert!(app.contains("inputActive===true&&state===next)return"));
+    assert!(app.contains("closableStates=[false,false]"));
+    assert!(app.contains("statefulStates=[false,true]"));
+    assert!(app.contains("replacementStates=[false,false]"));
+    assert!(states.contains("<ExistingSurface"), "{states}");
+    assert!(states.contains("<InsertedSurface"));
+    assert!(states.contains("hidden={"));
+    assert!(!states.contains("<ReplacementSurface path={\"html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(1)>textarea"));
 }

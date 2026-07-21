@@ -79,3 +79,45 @@ pub async fn click_matching(
     );
     Ok(cdp.evaluate(&expression).await?.as_bool() == Some(true))
 }
+
+pub async fn submit_text_matching(
+    cdp: &mut Cdp,
+    path: &str,
+    tag: &str,
+    label: &str,
+    occurrence: Option<usize>,
+) -> Result<bool> {
+    let tag_json = serde_json::to_string(tag)?;
+    let label_json = serde_json::to_string(label)?;
+    let fallback = occurrence.map_or_else(
+        || format!("Array.from(document.querySelectorAll({tag_json})).find(matches)"),
+        |index| {
+            format!("Array.from(document.querySelectorAll({tag_json})).filter(matches)[{index}]")
+        },
+    );
+    let expression = format!(
+        r#"(() => {{
+          const labelOf=candidate=>(candidate.getAttribute('aria-label')||
+            candidate.getAttribute('placeholder')||candidate.innerText||
+            candidate.value||'').replace(/\s+/g,' ').trim();
+          const matches=candidate=>candidate&&
+            candidate.tagName.toLowerCase()==={tag_json}&&labelOf(candidate)==={label_json};
+          const exact=document.querySelector({});
+          const element=matches(exact)?exact:({fallback});
+          if(!element)return false;
+          element.scrollIntoView({{block:'center',inline:'center',behavior:'instant'}});
+          element.focus({{preventScroll:true}});
+          const value='recreate probe';
+          const prototype=element instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+          Object.getOwnPropertyDescriptor(prototype,'value').set.call(element,value);
+          element.dispatchEvent(new InputEvent('input',{{
+            bubbles:true,inputType:'insertText',data:value
+          }}));
+          element.dispatchEvent(new Event('change',{{bubbles:true}}));
+          return true;
+        }})()"#,
+        serde_json::to_string(path)?
+    );
+    Ok(cdp.evaluate(&expression).await?.as_bool() == Some(true))
+}

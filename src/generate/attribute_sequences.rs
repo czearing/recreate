@@ -31,7 +31,7 @@ pub fn javascript(specification: &Specification) -> String {
                 .attribute_sequences
                 .iter()
                 .map(|sequence| {
-                    let steps: Vec<serde_json::Value> = if sequence.steps.is_empty() {
+                    let mut steps: Vec<serde_json::Value> = if sequence.steps.is_empty() {
                         sequence
                             .values
                             .iter()
@@ -54,6 +54,14 @@ pub fn javascript(specification: &Specification) -> String {
                             })
                             .collect()
                     };
+                    if sequence.attribute == "textContent"
+                        && let Some(captured) = captured_text(state, &sequence.target)
+                        && let Some(index) = steps
+                            .iter()
+                            .position(|step| step["value"].as_str() == Some(captured.as_str()))
+                    {
+                        steps.rotate_left(index);
+                    }
                     serde_json::json!({
                         "target": sequence.target,
                         "attribute": sequence.attribute,
@@ -64,6 +72,27 @@ pub fn javascript(specification: &Specification) -> String {
         })
         .collect::<Vec<_>>();
     serde_json::to_string(&sequences).unwrap()
+}
+
+fn captured_text(state: &PageState, target: &str) -> Option<String> {
+    let direct = state
+        .nodes
+        .iter()
+        .find(|node| node.path == target)
+        .map(|node| node.text.trim())
+        .filter(|text| !text.is_empty());
+    let value = direct.map(str::to_string).unwrap_or_else(|| {
+        let prefix = format!("{target}>");
+        state
+            .nodes
+            .iter()
+            .filter(|node| node.path.starts_with(&prefix))
+            .map(|node| node.text.trim())
+            .filter(|text| !text.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ")
+    });
+    (!value.is_empty()).then(|| value.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 pub fn runtime(source: String) -> String {
@@ -143,5 +172,34 @@ mod tests {
         let output = javascript(&specification);
         assert!(output.contains(r#""delay_ms":4000"#));
         assert!(output.contains(r#""delay_ms":2750"#));
+    }
+
+    #[test]
+    fn text_sequences_start_from_the_captured_phrase() {
+        let mut specification = crate::generate::project_test_support::specification();
+        let target = specification.states[0].nodes[3].path.clone();
+        specification.states[0].nodes[3].text = "Complete phrase".into();
+        specification.states[0]
+            .attribute_sequences
+            .push(AttributeSequence {
+                target,
+                attribute: "textContent".into(),
+                values: vec!["Partial".into(), "Complete phrase".into()],
+                interval_ms: 100,
+                steps: vec![
+                    crate::model::SequenceStep {
+                        value: "Partial".into(),
+                        delay_ms: 20,
+                    },
+                    crate::model::SequenceStep {
+                        value: "Complete phrase".into(),
+                        delay_ms: 900,
+                    },
+                ],
+            });
+
+        let output = javascript(&specification);
+
+        assert!(output.find("Complete phrase").unwrap() < output.find("Partial").unwrap());
     }
 }

@@ -7,52 +7,68 @@ use anyhow::Result;
 use std::time::Duration;
 
 pub async fn wait_ready(cdp: &mut Cdp, wait_for_startup: bool) -> Result<()> {
+    wait_ready_mode(cdp, wait_for_startup, true).await
+}
+
+pub async fn wait_ready_without_lifecycle(cdp: &mut Cdp, wait_for_startup: bool) -> Result<()> {
+    wait_ready_mode(cdp, wait_for_startup, false).await
+}
+
+async fn wait_ready_mode(
+    cdp: &mut Cdp,
+    wait_for_startup: bool,
+    wait_for_lifecycle: bool,
+) -> Result<()> {
     let started = std::time::Instant::now();
     let mut previous = String::new();
     let mut stable = 0;
     for _ in 0..120 {
-        let value = cdp
-            .evaluate(
-                r#"(() => {
-                  const visible = Array.from(document.querySelectorAll('*'))
-                    .filter(element => {
-                      const rect = element.getBoundingClientRect();
-                      const style = getComputedStyle(element);
-                      return rect.width > 0 && rect.height > 0 &&
-                        style.display !== 'none' && style.visibility !== 'hidden' &&
-                        Number(style.opacity || 1) > 0;
-                    })
-                    .slice(0, 80)
-                    .map(element => {
-                      const rect = element.getBoundingClientRect();
-                      const style = getComputedStyle(element);
-                      return [
-                        element.tagName, Math.round(rect.x), Math.round(rect.y),
-                        Math.round(rect.width), Math.round(rect.height),
-                        style.display
-                      ].join(':');
-                    }).join('|');
-                  return {
-                  ready: document.readyState === 'complete' &&
-                    document.fonts.status === 'loaded' &&
-                    window.__recreateLifecycleDone === true &&
-                    (window.__recreatePendingRequests || 0) === 0,
-                  signature: visible,
-                  blocking: Array.from(document.querySelectorAll('*')).some(element => {
-                    const rect = element.getBoundingClientRect();
-                    const style = getComputedStyle(element);
-                    const area = rect.width * rect.height;
-                    const z = Number(style.zIndex);
-                    return area >= innerWidth * innerHeight * 0.9 &&
-                      ['absolute','fixed'].includes(style.position) &&
-                      Number.isFinite(z) && z >= 50 &&
-                      style.pointerEvents !== 'none' &&
-                      style.display !== 'none' && style.visibility !== 'hidden';
-                  })
-                };
-                })()"#,
-            )
-            .await?;
+        let lifecycle = if wait_for_lifecycle {
+            "window.__recreateLifecycleDone === true &&"
+        } else {
+            ""
+        };
+        let source = format!(
+            r#"(() => {{
+              const visible = Array.from(document.querySelectorAll('*'))
+                .filter(element => {{
+                  const rect = element.getBoundingClientRect();
+                  const style = getComputedStyle(element);
+                  return rect.width > 0 && rect.height > 0 &&
+                    style.display !== 'none' && style.visibility !== 'hidden' &&
+                    Number(style.opacity || 1) > 0;
+                }})
+                .slice(0, 80)
+                .map(element => {{
+                  const rect = element.getBoundingClientRect();
+                  const style = getComputedStyle(element);
+                  return [
+                    element.tagName, Math.round(rect.x), Math.round(rect.y),
+                    Math.round(rect.width), Math.round(rect.height),
+                    style.display
+                  ].join(':');
+                }}).join('|');
+              return {{
+              ready: document.readyState === 'complete' &&
+                document.fonts.status === 'loaded' &&
+                {lifecycle}
+                (window.__recreatePendingRequests || 0) === 0,
+              signature: visible,
+              blocking: Array.from(document.querySelectorAll('*')).some(element => {{
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                const area = rect.width * rect.height;
+                const z = Number(style.zIndex);
+                return area >= innerWidth * innerHeight * 0.9 &&
+                  ['absolute','fixed'].includes(style.position) &&
+                  Number.isFinite(z) && z >= 50 &&
+                  style.pointerEvents !== 'none' &&
+                  style.display !== 'none' && style.visibility !== 'hidden';
+              }})
+            }};
+            }})()"#
+        );
+        let value = cdp.evaluate(&source).await?;
         let signature = value["signature"].as_str().unwrap_or_default();
         let startup_complete = !wait_for_startup || value["blocking"].as_bool() != Some(true);
         let ready = value["ready"].as_bool() == Some(true) && !signature.is_empty();

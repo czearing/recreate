@@ -95,6 +95,14 @@ fn build_scoped(
     let changed_paths = path_override
         .cloned()
         .or_else(|| reuse.map(|(baselines, _)| changed_paths(specification, baselines)));
+    let contextual_widths = reuse
+        .and_then(|(baselines, _)| {
+            baselines
+                .iter()
+                .find(|baseline| baseline.viewport.width == base.viewport.width)
+        })
+        .map(|baseline| contextual_width_paths(base, baseline))
+        .unwrap_or_default();
     let fluid_heights = fluid_height_paths(specification);
     if std::env::var_os("RECREATE_TIMING").is_some()
         && let Some(paths) = &changed_paths
@@ -150,14 +158,20 @@ fn build_scoped(
                 .map(Vec::as_slice)
                 .unwrap_or_default(),
         );
+        let contextual_width = contextual_widths
+            .contains(&node.path)
+            .then_some(node.rect.width);
         let signature = format!(
-            "{}|layout:{}|visual-flex:{}",
+            "{}|layout:{}|visual-flex:{}|contextual-width:{}",
             responsive_signatures
                 .get(&node.path)
                 .map(String::as_str)
                 .unwrap_or_default(),
             css_layout::role(node, parent, &base.viewport),
-            visual_flex.unwrap_or_default()
+            visual_flex.unwrap_or_default(),
+            contextual_width
+                .map(|width| width.to_string())
+                .unwrap_or_default()
         );
         let class = cache
             .signature_classes
@@ -176,6 +190,9 @@ fn build_scoped(
             );
             if let Some(direction) = visual_flex {
                 base_css.push_str(&format!("flex-direction:{direction};"));
+            }
+            if let Some(width) = contextual_width {
+                base_css.push_str(&format!("width:{width}px;"));
             }
             css.push_str(&format!(".{class}{{{base_css}}}\n"));
         }
@@ -204,11 +221,23 @@ fn build_scoped(
         changed_paths.as_ref(),
         &fluid_heights,
     );
+    let mut authored_media = HashSet::new();
+    for node in &base.nodes {
+        let Some(class) = classes.get(&node.path) else {
+            continue;
+        };
+        for rule in super::authored_media::rules(node, class, &base.css_rules) {
+            if authored_media.insert(rule.clone()) {
+                css.push_str(&rule);
+                css.push('\n');
+            }
+        }
+    }
     timing("responsive");
     let mut interaction_classes = Vec::new();
     let mut interaction_cache = ScopeCache::default();
     for (index, interaction) in specification.interactions.iter().enumerate() {
-        if !interactions::closable(interaction, &specification.states) {
+        if !interactions::rendered(interaction, &specification.states) {
             interaction_classes.push(BTreeMap::new());
             timing(&format!("interaction_{}", index + 1));
             continue;
@@ -228,38 +257,52 @@ fn build_scoped(
                         .find(|baseline| baseline.viewport.width == state.viewport.width)
                         .unwrap_or(&specification.states[0]);
                     let roots = crate::interaction_surface::roots(state, baseline);
-                    crate::model::PageState {
-                        url: state.url.clone(),
-                        title: state.title.clone(),
-                        viewport: state.viewport.clone(),
-                        nodes: state
-                            .nodes
-                            .iter()
-                            .filter(|node| {
-                                roots.iter().any(|root| {
-                                    node.path == *root
-                                        || node
-                                            .path
-                                            .strip_prefix(root)
-                                            .is_some_and(|suffix| suffix.starts_with('>'))
+                    with_baseline_css(
+                        crate::model::PageState {
+                            url: state.url.clone(),
+                            title: state.title.clone(),
+                            viewport: state.viewport.clone(),
+                            nodes: state
+                                .nodes
+                                .iter()
+                                .filter(|node| {
+                                    roots.iter().any(|root| {
+                                        node.path == *root
+                                            || node
+                                                .path
+                                                .strip_prefix(root)
+                                                .is_some_and(|suffix| suffix.starts_with('>'))
+                                    })
                                 })
-                            })
-                            .cloned()
-                            .collect(),
-                        startup_nodes: Vec::new(),
-                        startup_delay_ms: 0,
-                        startup_duration_ms: 0,
-                        animations: Vec::new(),
-                        state_styles: state.state_styles.clone(),
-                        attribute_sequences: Vec::new(),
-                        css_rules: state.css_rules.clone(),
-                        asset_urls: Vec::new(),
-                        asset_data: Default::default(),
-                    }
+                                .cloned()
+                                .collect(),
+                            startup_nodes: Vec::new(),
+                            startup_delay_ms: 0,
+                            startup_duration_ms: 0,
+                            animations: Vec::new(),
+                            state_styles: state.state_styles.clone(),
+                            attribute_sequences: Vec::new(),
+                            css_rules: state.css_rules.clone(),
+                            asset_urls: Vec::new(),
+                            asset_data: Default::default(),
+                        },
+                        baseline,
+                    )
                 })
                 .collect()
         } else {
-            interaction.states.clone()
+            interaction
+                .states
+                .iter()
+                .map(|state| {
+                    let baseline = specification
+                        .states
+                        .iter()
+                        .find(|baseline| baseline.viewport.width == state.viewport.width)
+                        .unwrap_or(&specification.states[0]);
+                    with_baseline_css(state.clone(), baseline)
+                })
+                .collect()
         };
         let interaction_spec = Specification {
             schema_version: specification.schema_version,
@@ -301,15 +344,19 @@ fn build_scoped(
                     .flat_map(|baseline| &baseline.nodes)
                     .map(|node| (node.path.as_str(), node))
                     .collect();
+                let contextual = baseline
+                    .map(|baseline| contextual_width_paths(state, baseline))
+                    .unwrap_or_default();
                 state
                     .nodes
                     .iter()
                     .filter(move |node| {
-                        nodes.get(node.path.as_str()).is_none_or(|baseline| {
-                            node.style != baseline.style
-                                || node.before != baseline.before
-                                || node.after != baseline.after
-                        })
+                        contextual.contains(&node.path)
+                            || nodes.get(node.path.as_str()).is_none_or(|baseline| {
+                                node.style != baseline.style
+                                    || node.before != baseline.before
+                                    || node.after != baseline.after
+                            })
                     })
                     .map(|node| node.path.clone())
             })
@@ -343,6 +390,119 @@ fn build_scoped(
         classes,
         interaction_classes,
     }
+}
+
+fn topology_changed_paths(
+    state: &crate::model::PageState,
+    baseline: &crate::model::PageState,
+) -> HashSet<String> {
+    fn children(state: &crate::model::PageState) -> HashMap<&str, HashSet<&str>> {
+        let mut children = HashMap::<_, HashSet<_>>::new();
+        for node in &state.nodes {
+            if let Some(parent) = node.parent.as_deref() {
+                children
+                    .entry(parent)
+                    .or_default()
+                    .insert(node.path.as_str());
+            }
+        }
+        children
+    }
+
+    let current = children(state);
+    let captured = children(baseline);
+    let baseline_nodes = baseline
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<HashMap<_, _>>();
+    let changed_parents = state
+        .nodes
+        .iter()
+        .filter_map(|node| {
+            let parent = node.parent.as_deref()?;
+            let changed = baseline_nodes
+                .get(node.path.as_str())
+                .is_none_or(|baseline| {
+                    node.rect.width != baseline.rect.width
+                        || node.rect.height != baseline.rect.height
+                        || node.style != baseline.style
+                });
+            (changed || current.get(parent) != captured.get(parent)).then_some(parent)
+        })
+        .collect::<HashSet<_>>();
+    state
+        .nodes
+        .iter()
+        .filter(|node| {
+            node.parent
+                .as_deref()
+                .is_some_and(|parent| changed_parents.contains(parent))
+        })
+        .map(|node| node.path.clone())
+        .collect()
+}
+
+fn contextual_width_paths(
+    state: &crate::model::PageState,
+    baseline: &crate::model::PageState,
+) -> HashSet<String> {
+    let baseline_nodes = baseline
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<HashMap<_, _>>();
+    topology_changed_paths(state, baseline)
+        .into_iter()
+        .filter(|path| {
+            let Some(node) = state.nodes.iter().find(|node| node.path == *path) else {
+                return false;
+            };
+            baseline_nodes.get(path.as_str()).is_some_and(|original| {
+                let mut generated = original.style.clone();
+                super::authored_css::normalize(&mut generated, original, &baseline.css_rules);
+                let parent = original
+                    .parent
+                    .as_deref()
+                    .and_then(|parent| baseline_nodes.get(parent).copied());
+                super::inherited_styles::normalize(
+                    &mut generated,
+                    original,
+                    parent,
+                    &baseline.css_rules,
+                );
+                super::responsive_geometry::normalize(
+                    &mut generated,
+                    original,
+                    parent,
+                    &baseline.viewport,
+                    None,
+                );
+                let relative_width = generated
+                    .get("width")
+                    .is_some_and(|width| width.ends_with('%'));
+                node.rect.width == original.rect.width
+                    && node.rect.height == original.rect.height
+                    && node.style == original.style
+                    && node.rect.x != original.rect.x
+                    && relative_width
+            })
+        })
+        .collect()
+}
+
+fn with_baseline_css(
+    mut state: crate::model::PageState,
+    baseline: &crate::model::PageState,
+) -> crate::model::PageState {
+    let mut rules = baseline.css_rules.clone();
+    for rule in std::mem::take(&mut state.css_rules) {
+        if !rules.contains(&rule) {
+            rules.push(rule);
+        }
+    }
+    state.css_rules = rules;
+    state
 }
 
 fn fluid_height_paths(specification: &Specification) -> HashSet<String> {

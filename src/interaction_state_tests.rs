@@ -89,6 +89,58 @@ fn detects_newly_visible_fixed_surfaces() {
 }
 
 #[test]
+fn ignores_newly_visible_content_inside_the_trigger() {
+    let mut baseline = state(2);
+    baseline.nodes[1].path = format!("{}>span:nth-of-type(1)", baseline.nodes[0].path);
+    baseline.nodes[1]
+        .style
+        .insert("position".into(), "absolute".into());
+    baseline.nodes[1]
+        .style
+        .insert("display".into(), "none".into());
+    let mut changed = baseline.clone();
+    changed.nodes[1]
+        .style
+        .insert("display".into(), "block".into());
+
+    assert!(!surface_differs(
+        &changed,
+        &baseline,
+        &baseline.nodes[0].path,
+        "Open account menu"
+    ));
+}
+
+#[test]
+fn ignores_replaced_text_inside_absolute_content() {
+    let baseline = state(1);
+    let mut changed = baseline.clone();
+    changed.nodes.push(Node {
+        path: "html>body>prompt>#text(2)".into(),
+        parent: Some("html>body>prompt".into()),
+        tag: "#text".into(),
+        text: "Rotating prompt".into(),
+        attributes: BTreeMap::new(),
+        rect: Rect {
+            x: 0.0,
+            y: 0.0,
+            width: 100.0,
+            height: 20.0,
+        },
+        style: BTreeMap::from([("position".into(), "absolute".into())]),
+        before: None,
+        after: None,
+    });
+
+    assert!(!surface_differs(
+        &changed,
+        &baseline,
+        "html>body>avatar",
+        "Open account menu"
+    ));
+}
+
+#[test]
 fn detects_persistent_content_actions() {
     let baseline = state(1);
     let mut changed = baseline.clone();

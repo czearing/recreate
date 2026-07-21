@@ -3,7 +3,9 @@ use crate::model::{Interaction, Node, PageState, Specification};
 use std::collections::BTreeMap;
 
 pub const FOCUS_CSS: &str = "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\
-.recreateInteractionLayer{position:fixed;inset:0;z-index:2147480000;overflow:auto}\n";
+.recreateInteractionLayer{position:fixed;inset:0;z-index:2147480000;overflow:auto}\
+.recreateAnchoredSurface{position:absolute;right:0;top:calc(100% + 8px);z-index:2147480000}\
+.recreateAnchoredSurface>[data-recreate-surface]{position:static!important;inset:auto!important;transform:none!important}\n";
 pub const REDUCED_MOTION_CSS: &str = "@media(prefers-reduced-motion:reduce){\
 *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}\n";
 
@@ -26,7 +28,6 @@ pub fn base_handlers(specification: &Specification, state: &PageState) -> BTreeM
             .copied()
             .filter(|node| matches_trigger(interaction, node, state));
         let matches = if shared_overflow
-            && interaction.trigger_occurrence.is_none()
             && interaction
                 .trigger_label
                 .eq_ignore_ascii_case("More options")
@@ -187,11 +188,26 @@ fn closable_state(state: &PageState, baseline: &PageState) -> bool {
 }
 
 fn trigger_binding(node: Option<&Node>, action: &str, marker: Option<usize>) -> String {
+    if node.is_some_and(text_entry_control) {
+        let marker = marker
+            .map(|value| format!(" data-recreate-trigger=\"{value}\""))
+            .unwrap_or_default();
+        let action = action.strip_prefix("event=>").unwrap_or(action);
+        let action = action.strip_suffix(')').map_or_else(
+            || action.to_string(),
+            |prefix| format!("{prefix},event.currentTarget.value.length>0)"),
+        );
+        return format!(
+            "data-recreate-control=\"true\"{marker} \
+             onInput={{event=>{{{action}}}}}"
+        );
+    }
     let native = node.is_some_and(native_control);
     let mut binding = format!("data-recreate-control=\"true\" onClick={{{action}}}");
     if let Some(marker) = marker {
         binding.push_str(&format!(" data-recreate-trigger=\"{marker}\""));
     }
+
     if !native {
         if !node.is_some_and(|node| node.attributes.contains_key("role")) {
             binding.push_str(" role=\"button\"");
@@ -204,6 +220,25 @@ fn trigger_binding(node: Option<&Node>, action: &str, marker: Option<usize>) -> 
         ));
     }
     binding
+}
+
+pub fn rendered(interaction: &Interaction, baselines: &[PageState]) -> bool {
+    text_entry_interaction(interaction) || closable(interaction, baselines)
+}
+
+pub fn text_entry_interaction(interaction: &Interaction) -> bool {
+    interaction.trigger_tag == "textarea"
+        || (interaction.trigger_tag == "input"
+            && !interaction.trigger_label.eq_ignore_ascii_case("Search"))
+}
+
+fn text_entry_control(node: &Node) -> bool {
+    node.tag == "textarea"
+        || (node.tag == "input"
+            && node
+                .attributes
+                .get("type")
+                .is_none_or(|value| value.eq_ignore_ascii_case("text")))
 }
 
 fn native_control(node: &Node) -> bool {

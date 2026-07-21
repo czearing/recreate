@@ -1,6 +1,8 @@
 use crate::{
     browser,
-    capture_startup::{ensure_settled, startup_nodes, wait_ready, wait_startup},
+    capture_startup::{
+        ensure_settled, startup_nodes, wait_ready, wait_ready_without_lifecycle, wait_startup,
+    },
     cli::CaptureArgs,
     generate, interactions, lifecycle_script,
     model::{BrowserCookie, PageState, Specification, Viewport},
@@ -84,7 +86,8 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
     let interactions_started = std::time::Instant::now();
-    let interaction_states = interactions::capture(&mut cdp, &states).await?;
+    let mut interaction_states = interactions::capture(&mut cdp, &states).await?;
+    interactions::deduplicate(&mut interaction_states);
     eprintln!(
         "captured interactions in {:.2}s",
         interactions_started.elapsed().as_secs_f64()
@@ -160,6 +163,21 @@ pub async fn prepare_state(
     Ok(())
 }
 
+pub async fn prepare_interaction_state(
+    cdp: &mut crate::cdp::Cdp,
+    viewport: &Viewport,
+    reload: bool,
+) -> Result<()> {
+    browser::set_viewport(cdp, viewport.width, viewport.height).await?;
+    if reload {
+        cdp.send("Page.reload", json!({ "ignoreCache": false }))
+            .await?;
+    }
+    clear_input_state(cdp).await?;
+    wait_ready_without_lifecycle(cdp, true).await?;
+    Ok(())
+}
+
 async fn capture_state_with_startup(
     cdp: &mut crate::cdp::Cdp,
     viewport: Viewport,
@@ -174,7 +192,7 @@ async fn capture_state_with_startup(
     wait_ready(cdp, startup.is_some()).await?;
     let startup_elapsed = started.elapsed().as_millis() as u64;
     if observe_dynamic {
-        tokio::time::sleep(std::time::Duration::from_millis(9_000)).await;
+        tokio::time::sleep(std::time::Duration::from_millis(12_000)).await;
     }
     let mut state = read_state(cdp, viewport).await?;
     ensure_settled(&state)?;

@@ -31,7 +31,10 @@ pub const SOURCE: &str = r#"
   };
   const visitRules = (rules, media = null) => {
     for (const rule of Array.from(rules || [])) {
-      cssRules.push(rule.cssText);
+      const activeMedia = !media || matchMedia(media).matches;
+      if (activeMedia || rule.type === CSSRule.MEDIA_RULE) {
+        cssRules.push(rule.cssText);
+      }
       const reduced = media?.includes('prefers-reduced-motion') || false;
       if (rule.selectorText && rule.style) {
         for (const selector of rule.selectorText.split(',')) {

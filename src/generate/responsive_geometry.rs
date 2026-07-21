@@ -102,6 +102,15 @@ fn normalize_width(
     if compact_control(node) || intrinsic_media(node) {
         return;
     }
+    if stretches_between_horizontal_edges(node, parent) {
+        styles.remove("width");
+        return;
+    }
+    if stretches_across_grid_track(node, parent) {
+        styles.remove("width");
+        styles.insert("min-width".into(), "0px".into());
+        return;
+    }
     if !is_root(node) && parent.is_some_and(|parent| fills_parent_content_box(node, parent)) {
         if matches!(
             node.tag.as_str(),
@@ -156,10 +165,42 @@ fn normalize_width(
     }
 }
 
+fn stretches_across_grid_track(node: &Node, parent: Option<&Node>) -> bool {
+    parent.is_some_and(|parent| {
+        parent.style.get("display").map(String::as_str) == Some("grid")
+            && !matches!(
+                node.style.get("position").map(String::as_str),
+                Some("absolute" | "fixed")
+            )
+            && node
+                .style
+                .get("justify-self")
+                .is_none_or(|value| matches!(value.as_str(), "auto" | "normal" | "stretch"))
+    })
+}
+
+fn stretches_between_horizontal_edges(node: &Node, parent: Option<&Node>) -> bool {
+    let Some(parent) = parent else {
+        return false;
+    };
+    if !matches!(
+        node.style.get("position").map(String::as_str),
+        Some("absolute" | "fixed")
+    ) {
+        return false;
+    }
+    let left = node.rect.x - parent.rect.x;
+    let right = parent.rect.x + parent.rect.width - node.rect.x - node.rect.width;
+    (0.0..=64.0).contains(&left)
+        && (0.0..=64.0).contains(&right)
+        && node.style.get("left").is_some_and(|value| value != "auto")
+        && node.style.get("right").is_some_and(|value| value != "auto")
+}
+
 fn fills_parent_content_box(node: &Node, parent: &Node) -> bool {
-    let left = px(&parent.style, "border-left-width").unwrap_or_default()
+    let left = border_px(&parent.style, "border-left-width", "border-left")
         + px(&parent.style, "padding-left").unwrap_or_default();
-    let right = px(&parent.style, "border-right-width").unwrap_or_default()
+    let right = border_px(&parent.style, "border-right-width", "border-right")
         + px(&parent.style, "padding-right").unwrap_or_default();
     let content_width = if parent
         .style
@@ -172,6 +213,17 @@ fn fills_parent_content_box(node: &Node, parent: &Node) -> bool {
     };
     (node.rect.x - parent.rect.x - left).abs() <= 1.0
         && (node.rect.width - content_width).abs() <= 1.0
+}
+
+fn border_px(styles: &Styles, width: &str, side: &str) -> f64 {
+    styles
+        .get(width)
+        .or_else(|| styles.get(side))
+        .or_else(|| styles.get("border"))
+        .and_then(|value| value.split_whitespace().next())
+        .and_then(|value| value.strip_suffix("px"))
+        .and_then(|value| value.parse().ok())
+        .unwrap_or_default()
 }
 
 fn intrinsic_media(node: &Node) -> bool {

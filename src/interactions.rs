@@ -1,4 +1,4 @@
-use crate::interactions_input::{click_matching, focused_path};
+use crate::interactions_input::{click_matching, focused_path, submit_text_matching};
 use crate::{
     browser, capture,
     cdp::Cdp,
@@ -19,6 +19,7 @@ const CANDIDATES: &str = r#"
         : [node];
       parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
     }
+
     return `html>${parts.reverse().join('>')}`;
   };
   const visible = element => {
@@ -29,6 +30,7 @@ const CANDIDATES: &str = r#"
   };
   const labelOf = element => (
     element.getAttribute('aria-label') ||
+    element.getAttribute('placeholder') ||
     element.innerText ||
     element.value ||
     ''
@@ -41,7 +43,8 @@ const CANDIDATES: &str = r#"
     return owner ? visible(owner) : false;
   };
   const controls = Array.from(document.querySelectorAll(
-    'button,[role="button"],[aria-haspopup],[aria-expanded],summary,input[type="checkbox"],input[type="radio"]'
+    'a[href],button,[role="button"],[aria-haspopup],[aria-expanded],summary,' +
+    'input:not([type="hidden"]),textarea,select'
   ));
   return controls.filter(element =>
     candidateVisible(element) &&
@@ -63,6 +66,8 @@ const CANDIDATES: &str = r#"
       (/^more options$/i.test(label) ? 16 : 0) +
       (/^more tasks$/i.test(label) ? 12 : 0) +
       (/^(upload sources|use voice)$/i.test(label) ? 4 : 0) +
+      ((element.matches('textarea,input[type="text"],input:not([type])') &&
+        !element.matches('[role="combobox"],[aria-haspopup]')) ? 18 : 0) +
       (element.hasAttribute('aria-haspopup') ? 8 : 0) +
       (element.hasAttribute('aria-expanded') ? 4 : 0) +
       (element.tagName === 'SUMMARY' ? 1 : 0)
@@ -105,6 +110,12 @@ struct Candidate {
     occurrence: usize,
 }
 
+impl Candidate {
+    fn uses_text_entry(&self) -> bool {
+        self.tag == "textarea" || self.tag == "input"
+    }
+}
+
 pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Interaction>> {
     let Some(first) = baselines.first() else {
         return Ok(Vec::new());
@@ -135,19 +146,11 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         };
         let mut opened = None;
         for attempt in 0..2 {
-            let clicked = click_matching(
-                cdp,
-                &candidate.path,
-                &candidate.tag,
-                &candidate.label,
-                Some(candidate.occurrence),
-                false,
-            )
-            .await?;
+            let clicked = activate(cdp, &candidate).await?;
             if !clicked {
                 break;
             }
-            let settled = settle(cdp).await?;
+            let settled = settle(cdp, candidate.uses_text_entry()).await?;
             let focused = focused_path(cdp).await?;
             if cdp.evaluate("location.href").await?.as_str() != Some(first.url.as_str()) {
                 break;
@@ -168,22 +171,15 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         };
         interaction_state::compact(&mut state, &fresh, settled);
         let mut states = vec![state];
-        for baseline in responsive_baselines(&candidate.label, baselines) {
+        for baseline in
+            responsive_baselines(&candidate.label, candidate.uses_text_entry(), baselines)
+        {
             let fresh = restore(cdp, baseline, !reuse_page).await?;
-            if !click_matching(
-                cdp,
-                &candidate.path,
-                &candidate.tag,
-                &candidate.label,
-                Some(candidate.occurrence),
-                false,
-            )
-            .await?
-            {
+            if !activate(cdp, &candidate).await? {
                 continue;
             }
 
-            let settled = settle(cdp).await?;
+            let settled = settle(cdp, candidate.uses_text_entry()).await?;
             let mut state = capture::read_interaction_state(cdp, baseline.viewport.clone()).await?;
             if discovery_differs(&candidate.label, &candidate.path, &state, baseline) {
                 interaction_state::compact(&mut state, &fresh, settled);
@@ -236,6 +232,14 @@ pub fn deduplicate(interactions: &mut Vec<Interaction>) {
             unique.push(interaction);
         }
     }
+    for interaction in &mut unique {
+        if interaction
+            .trigger_label
+            .eq_ignore_ascii_case("More options")
+        {
+            interaction.trigger_occurrence = None;
+        }
+    }
     *interactions = unique;
 }
 
@@ -251,21 +255,63 @@ fn captures_visual_state(label: &str) -> bool {
     label.eq_ignore_ascii_case("More options") || label.eq_ignore_ascii_case("More tasks")
 }
 
-fn responsive_baselines<'a>(_label: &str, _baselines: &'a [PageState]) -> Vec<&'a PageState> {
-    Vec::new()
+fn responsive_baselines<'a>(
+    label: &str,
+    text_entry: bool,
+    baselines: &'a [PageState],
+) -> Vec<&'a PageState> {
+    if text_entry
+        || ["Search", "Open account menu", "App launcher"]
+            .iter()
+            .any(|value| label.eq_ignore_ascii_case(value))
+    {
+        baselines.iter().skip(1).collect()
+    } else {
+        Vec::new()
+    }
 }
 
 fn discovery_differs(label: &str, trigger: &str, left: &PageState, right: &PageState) -> bool {
     if label.eq_ignore_ascii_case("More tasks") {
         interaction_state::content_differs(left, right)
+    } else if ["Search", "Open account menu", "App launcher"]
+        .iter()
+        .any(|value| label.eq_ignore_ascii_case(value))
+    {
+        interaction_state::surface_differs(left, right, trigger, label)
     } else {
         interaction_state::meaningfully_differs(left, right)
             || interaction_state::surface_differs(left, right, trigger, label)
     }
 }
 
-async fn settle(cdp: &mut Cdp) -> Result<bool> {
-    Ok(cdp.evaluate(SETTLE).await?.as_bool() == Some(true))
+async fn activate(cdp: &mut Cdp, candidate: &Candidate) -> Result<bool> {
+    if candidate.uses_text_entry() {
+        submit_text_matching(
+            cdp,
+            &candidate.path,
+            &candidate.tag,
+            &candidate.label,
+            Some(candidate.occurrence),
+        )
+        .await
+    } else {
+        click_matching(
+            cdp,
+            &candidate.path,
+            &candidate.tag,
+            &candidate.label,
+            Some(candidate.occurrence),
+            false,
+        )
+        .await
+    }
+}
+
+async fn settle(cdp: &mut Cdp, text_entry: bool) -> Result<bool> {
+    let timeout = if text_entry { 1_500 } else { 500 };
+    let source = SETTLE.replace(">= 500", &format!(">= {timeout}"));
+    Ok(cdp.evaluate(&source).await?.as_bool() == Some(true))
 }
 
 async fn restore(cdp: &mut Cdp, baseline: &PageState, reload: bool) -> Result<PageState> {
@@ -286,7 +332,7 @@ async fn restore(cdp: &mut Cdp, baseline: &PageState, reload: bool) -> Result<Pa
         }
     }
     if same_url {
-        capture::prepare_state(cdp, &baseline.viewport, true).await?;
+        capture::prepare_interaction_state(cdp, &baseline.viewport, true).await?;
     } else {
         cdp.send("Page.navigate", serde_json::json!({"url":baseline.url}))
             .await?;
@@ -315,7 +361,7 @@ mod tests {
     }
 
     #[test]
-    fn interactions_capture_once_and_anchor_responsively_at_runtime() {
+    fn interactions_capture_every_recorded_viewport() {
         let mut baselines = Vec::new();
         for width in [1920, 1440, 768, 390, 320] {
             let mut state = crate::model::PageState {
@@ -336,8 +382,21 @@ mod tests {
             state.viewport.width = width;
             baselines.push(state);
         }
-        assert!(super::responsive_baselines("Open account menu", &baselines).is_empty());
-        assert!(super::responsive_baselines("More tasks", &baselines).is_empty());
+
+        let responsive = super::responsive_baselines("Open account menu", false, &baselines);
+        assert_eq!(responsive.len(), 4);
+        assert_eq!(responsive[0].viewport.width, 1440);
+        assert_eq!(responsive[3].viewport.width, 320);
+        assert!(super::responsive_baselines("More options", false, &baselines).is_empty());
+        assert_eq!(
+            super::responsive_baselines(
+                "Ask Copilot or describe what you want to create",
+                true,
+                &baselines
+            )
+            .len(),
+            4
+        );
     }
 
     #[test]
@@ -348,11 +407,32 @@ mod tests {
     }
 
     #[test]
+    fn discovers_text_entry_controls() {
+        assert!(super::CANDIDATES.contains("input:not([type=\"hidden\"])"));
+        assert!(super::CANDIDATES.contains("textarea,select"));
+        assert!(super::CANDIDATES.contains("? 18 : 0"));
+    }
+
+    #[test]
     fn incomplete_interaction_teardown_requires_reload() {
         let baseline = state_with_paths(&["html>body", "html>body>main"]);
         let restored = state_with_paths(&["html>body", "html>body>search"]);
         assert!(restoration_requires_reload(&restored, &baseline));
         assert!(!restoration_requires_reload(&baseline, &baseline));
+    }
+
+    #[test]
+    fn rotating_prompt_text_does_not_fake_an_account_surface() {
+        let baseline = state_with_paths(&["html>body", "html>body>prompt"]);
+        let mut changed = baseline.clone();
+        changed.nodes[1].text = "A different rotating prompt".into();
+
+        assert!(!super::discovery_differs(
+            "Open account menu",
+            "html>body>avatar",
+            &changed,
+            &baseline,
+        ));
     }
 
     #[test]
@@ -381,6 +461,7 @@ mod tests {
         };
         let mut rich = sparse.clone();
         rich.trigger_path = "other-card>button".into();
+        rich.trigger_occurrence = Some(7);
         rich.states[0].nodes.push(crate::model::Node {
             path: "menu".into(),
             parent: None,
@@ -402,6 +483,7 @@ mod tests {
         deduplicate(&mut values);
         assert_eq!(values.len(), 1);
         assert_eq!(values[0].trigger_path, "other-card>button");
+        assert_eq!(values[0].trigger_occurrence, None);
         assert_eq!(values[0].states[0].nodes.len(), 1);
     }
 

@@ -84,7 +84,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         cdp.send("Page.reload", serde_json::json!({"ignoreCache":false}))
             .await?;
         let actual = if let Some(trigger) = trigger {
-            capture::prepare_state(&mut cdp, &expected.viewport, true).await?;
+            capture::prepare_interaction_state(&mut cdp, &expected.viewport, true).await?;
             cdp.evaluate("scrollTo(0,0)").await?;
             let activated = interactions_input::click_matching(
                 &mut cdp,

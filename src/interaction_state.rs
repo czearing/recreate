@@ -31,13 +31,20 @@ pub fn surface_differs(left: &PageState, right: &PageState, trigger: &str, label
         .map(|node| (node.path.as_str(), node))
         .collect();
     left.nodes.iter().any(|node| {
-        node.path != trigger
+        !is_trigger_node(node.path.as_str(), trigger)
             && visible(node)
             && overlay(node, label)
             && baseline
                 .get(node.path.as_str())
                 .is_none_or(|node| !visible(node))
     })
+}
+
+fn is_trigger_node(path: &str, trigger: &str) -> bool {
+    path == trigger
+        || path
+            .strip_prefix(trigger)
+            .is_some_and(|suffix| suffix.starts_with('>'))
 }
 
 fn visible(node: &crate::model::Node) -> bool {
@@ -59,21 +66,22 @@ fn visible(node: &crate::model::Node) -> bool {
 }
 
 fn overlay(node: &crate::model::Node, label: &str) -> bool {
-    node.attributes.get("role").is_some_and(|role| {
-        matches!(
-            role.as_str(),
-            "dialog" | "listbox" | "menu" | "menuitem" | "option"
-        )
-    }) || node
-        .style
-        .get("position")
-        .is_some_and(|value| value == "fixed")
-        || (node
+    node.tag != "#text"
+        && (node.attributes.get("role").is_some_and(|role| {
+            matches!(
+                role.as_str(),
+                "dialog" | "listbox" | "menu" | "menuitem" | "option"
+            )
+        }) || node
             .style
             .get("position")
-            .is_some_and(|value| value == "absolute")
-            && !node.text.trim().is_empty()
-            && !node.text.trim().eq_ignore_ascii_case(label))
+            .is_some_and(|value| value == "fixed")
+            || (node
+                .style
+                .get("position")
+                .is_some_and(|value| value == "absolute")
+                && !node.text.trim().is_empty()
+                && !node.text.trim().eq_ignore_ascii_case(label)))
 }
 
 fn semantic_attributes(node: &crate::model::Node) -> Vec<(&str, &str)> {

@@ -31,6 +31,13 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
     if !authored.contains_key("width") && flexible(&authored) {
         styles.remove("width");
     }
+    if matches!(
+        authored.get("display").map(String::as_str),
+        Some("grid" | "inline-grid")
+    ) && !authored.contains_key("grid-template-rows")
+    {
+        styles.remove("grid-template-rows");
+    }
     if !authored.contains_key("height")
         && authored.contains_key("min-height")
         && matches!(
@@ -110,12 +117,11 @@ fn declarations(node: &Node, rules: &[String]) -> Styles {
     values
         .into_iter()
         .filter_map(|(name, values)| {
-            let first = values.first()?;
             values
                 .iter()
-                .all(|value| value == first)
-                .then(|| (name, first.clone()))
-                .filter(|(name, value)| resolved_matches(node, name, value))
+                .rev()
+                .find(|value| resolved_matches(node, &name, value))
+                .map(|value| (name, value.clone()))
         })
         .collect()
 }
@@ -153,7 +159,7 @@ fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
         .is_none_or(|computed| computed == value)
 }
 
-fn directly_targets(selectors: &str, class: &str) -> bool {
+pub(super) fn directly_targets(selectors: &str, class: &str) -> bool {
     selectors.split(',').any(|selector| {
         let compound = selector
             .trim()
@@ -377,6 +383,40 @@ mod tests {
     }
 
     #[test]
+    fn removes_resolved_grid_rows_without_authored_tracks() {
+        let mut node = Node {
+            path: "main>section".into(),
+            parent: Some("main".into()),
+            tag: "section".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 389.0,
+                height: 536.0,
+            },
+            style: Styles::from([
+                ("display".into(), "grid".into()),
+                ("grid-template-columns".into(), "389px".into()),
+                ("grid-template-rows".into(), "168px 164px 164px".into()),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "cards".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".cards { display: grid; grid-template-columns: 1fr; gap: 20px; }".into()],
+        );
+
+        assert!(!node.style.contains_key("grid-template-rows"));
+        assert_eq!(node.style["grid-template-columns"], "1fr");
+    }
+
+    #[test]
     fn rejects_authored_layout_values_from_inactive_media_rules() {
         let mut node = Node {
             path: "header".into(),
@@ -481,7 +521,7 @@ mod tests {
     }
 
     #[test]
-    fn leaves_conflicting_responsive_declarations_captured() {
+    fn keeps_the_last_active_responsive_declaration() {
         let mut node = Node {
             path: "section".into(),
             parent: None,
@@ -509,6 +549,6 @@ mod tests {
             ],
         );
         assert_eq!(node.style["display"], "grid");
-        assert_eq!(node.style["grid-template-columns"], "372px 372px");
+        assert_eq!(node.style["grid-template-columns"], "1fr");
     }
 }

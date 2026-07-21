@@ -16,7 +16,7 @@ pub fn interaction_states(
         .collect::<Vec<_>>()
         .join(", ");
     let mut output = format!(
-        "import React,{{useLayoutEffect}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{anchorParent}} from './runtime/anchor.mjs';\nimport {{ {imports} }} from './components/index.js';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nfunction ExistingSurface({{entries,roots}}){{useLayoutEffect(()=>{{const restore=[];for(const[path,className]of entries){{const element=document.querySelector(path);if(!element)continue;restore.push([element,element.getAttribute('class')]);element.setAttribute('class',className)}}for(const path of roots){{const element=document.querySelector(path);if(element)element.dataset.recreateSurface='true'}}return()=>{{for(const[element,className]of restore)className===null?element.removeAttribute('class'):element.setAttribute('class',className);for(const path of roots)document.querySelector(path)?.removeAttribute('data-recreate-surface')}}}},[entries,roots]);return null}}\nfunction ReplacementSurface({{path,className,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{const existing=document.querySelector(path);if(!existing)return;const previousClass=existing.getAttribute('class');const previousChildren=Array.from(existing.childNodes);existing.replaceChildren();existing.setAttribute('class',className);existing.dataset.recreateSurface='true';setTarget(existing);return()=>{{setTarget(null);previousClass===null?existing.removeAttribute('class'):existing.setAttribute('class',previousClass);existing.removeAttribute('data-recreate-surface');existing.replaceChildren(...previousChildren)}}}},[path,className]);return target?createPortal(children,target):null}}\nfunction InsertedSurface({{parentPath,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{setTarget(document.querySelector(parentPath))}},[parentPath]);return target?createPortal(children,target):null}}\nfunction SuppressPortals(){{useLayoutEffect(()=>{{const entries=Array.from(document.querySelectorAll('body>[data-portal-node]')).map(element=>[element,element.nextSibling]);for(const[element]of entries)element.remove();return()=>{{for(const[element,next]of entries)document.body.insertBefore(element,next?.parentNode===document.body?next:null)}}}},[]);return null}}\n{}\n",
+        "import React,{{useLayoutEffect}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{anchorParent}} from './runtime/anchor.mjs';\nimport {{ {imports} }} from './components/index.js';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nfunction ExistingSurface({{entries,roots,hidden}}){{useLayoutEffect(()=>{{const restore=[];const restoreHidden=[];for(const[path,className]of entries){{const element=document.querySelector(path);if(!element)continue;restore.push([element,element.getAttribute('class')]);element.setAttribute('class',className)}}for(const path of hidden){{const element=document.querySelector(path);if(!element)continue;restoreHidden.push([element,element.style.display]);element.style.display='none'}}for(const path of roots){{const element=document.querySelector(path);if(element)element.dataset.recreateSurface='true'}}return()=>{{for(const[element,className]of restore)className===null?element.removeAttribute('class'):element.setAttribute('class',className);for(const[element,display]of restoreHidden)element.style.display=display;for(const path of roots)document.querySelector(path)?.removeAttribute('data-recreate-surface')}}}},[entries,roots,hidden]);return null}}\nfunction ReplacementSurface({{path,className,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{const existing=document.querySelector(path);if(!existing)return;const previousClass=existing.getAttribute('class');const previousChildren=Array.from(existing.childNodes);existing.replaceChildren();existing.setAttribute('class',className);existing.dataset.recreateSurface='true';setTarget(existing);return()=>{{setTarget(null);previousClass===null?existing.removeAttribute('class'):existing.setAttribute('class',previousClass);existing.removeAttribute('data-recreate-surface');existing.replaceChildren(...previousChildren)}}}},[path,className]);return target?createPortal(children,target):null}}\nfunction InsertedSurface({{parentPath,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{setTarget(document.querySelector(parentPath))}},[parentPath]);return target?createPortal(children,target):null}}\nfunction SuppressPortals(){{useLayoutEffect(()=>{{const entries=Array.from(document.querySelectorAll('body>[data-portal-node]')).map(element=>[element,element.nextSibling]);for(const[element]of entries)element.remove();return()=>{{for(const[element,next]of entries)document.body.insertBefore(element,next?.parentNode===document.body?next:null)}}}},[]);return null}}\n{}\n",
         jsx_variants::selector()
     );
     let interactions = specification
@@ -24,7 +24,7 @@ pub fn interaction_states(
         .par_iter()
         .enumerate()
         .map(|(index, interaction)| {
-        if !interactions::closable(interaction, &specification.states) {
+        if !interactions::rendered(interaction, &specification.states) {
             return format!(
                 "export function Interaction{}(){{return null}}\n",
                 index + 1
@@ -61,8 +61,9 @@ pub fn interaction_states(
                     .iter()
                     .find(|baseline| baseline.viewport.width == state.viewport.width)
                     .unwrap_or(&specification.states[0]);
-                let full_replacement = state.nodes.len() * 4 < baseline.nodes.len() * 3
-                    || structural_surface_replacement(state, baseline);
+                let full_replacement = !interactions::text_entry_interaction(interaction)
+                    && (state.nodes.len() * 4 < baseline.nodes.len() * 3
+                        || structural_surface_replacement(state, baseline));
                 let surface_roots = if full_replacement {
                     Default::default()
                 } else if overflow {
@@ -86,6 +87,8 @@ pub fn interaction_states(
                     } else {
                         roots
                     }
+                } else if interactions::text_entry_interaction(interaction) {
+                    super::jsx_text_entry::surface_roots(state, baseline)
                 } else {
                     newly_visible_roots(state, baseline)
                 };
@@ -168,6 +171,7 @@ pub fn interaction_states(
                         assets,
                         &handlers,
                         (!surface_roots.is_empty()).then_some(&surface_roots),
+                        !interactions::text_entry_interaction(interaction),
                     )
                 };
                 format!(
@@ -327,6 +331,7 @@ fn overlay(
     assets: &BTreeMap<String, String>,
     handlers: &BTreeMap<String, String>,
     known_surface_roots: Option<&std::collections::HashSet<String>>,
+    include_changed_existing: bool,
 ) -> String {
     if let Some(surface_roots) = known_surface_roots {
         let baseline_paths = baseline
@@ -354,8 +359,10 @@ fn overlay(
             .cloned()
             .collect::<std::collections::HashSet<_>>();
         let mut activated = existing.clone();
-        activated.extend(changed_existing_paths(state, baseline, &replacements));
-        let activation = existing_surface(state, components, &activated);
+        if include_changed_existing {
+            activated.extend(changed_existing_paths(state, baseline, &replacements));
+        }
+        let activation = existing_surface(state, baseline, components, &activated);
         let added = state
             .nodes
             .iter()
@@ -451,6 +458,7 @@ fn changed_existing_paths(
 
 fn existing_surface(
     state: &crate::model::PageState,
+    baseline: &crate::model::PageState,
     components: &tree::Components,
     roots: &std::collections::HashSet<String>,
 ) -> String {
@@ -476,10 +484,38 @@ fn existing_surface(
                 .map(|class| (&node.path, class))
         })
         .collect::<Vec<_>>();
+    let state_paths = state
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<BTreeSet<_>>();
+    let mut hidden = baseline
+        .nodes
+        .iter()
+        .filter(|node| node.tag != "#text" && !state_paths.contains(node.path.as_str()))
+        .filter(|node| {
+            roots.iter().any(|root| {
+                node.path
+                    .strip_prefix(root)
+                    .is_some_and(|suffix| suffix.starts_with('>'))
+            })
+        })
+        .map(|node| node.path.clone())
+        .collect::<BTreeSet<_>>();
+    let hidden_paths = hidden.clone();
+    hidden.retain(|path| {
+        !hidden_paths.iter().any(|parent| {
+            parent != path
+                && path
+                    .strip_prefix(parent)
+                    .is_some_and(|suffix| suffix.starts_with('>'))
+        })
+    });
     format!(
-        "<ExistingSurface entries={{{}}} roots={{{}}}/>",
+        "<ExistingSurface entries={{{}}} roots={{{}}} hidden={{{}}}/>",
         serde_json::to_string(&entries).expect("surface classes should serialize"),
-        serde_json::to_string(&roots).expect("surface roots should serialize")
+        serde_json::to_string(&roots).expect("surface roots should serialize"),
+        serde_json::to_string(&hidden).expect("hidden paths should serialize")
     )
 }
 
@@ -559,7 +595,9 @@ fn trigger_portals(
         .into_iter()
         .map(|node| {
             let content = jsx::render(&node.path, components, assets, 2, true, handlers);
-            format!("{{createPortal(<>{content}</>,anchorParent(document,{trigger}))}}")
+            format!(
+                "{{createPortal(<div className=\"recreateAnchoredSurface\">{content}</div>,anchorParent(document,{trigger}))}}"
+            )
         })
         .collect::<String>();
     format!("<>{portals}</>")

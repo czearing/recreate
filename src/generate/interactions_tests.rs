@@ -60,6 +60,28 @@ fn native_controls_keep_browser_keyboard_behavior() {
 }
 
 #[test]
+fn text_entry_captures_the_safe_input_state() {
+    let binding = trigger_binding(Some(&node("textarea")), "event=>activate(event,1)", Some(1));
+    assert!(binding.contains("activate(event,1,event.currentTarget.value.length>0)"));
+    assert!(!binding.contains("onClick"));
+    assert!(!binding.contains("onKeyDown"));
+}
+
+#[test]
+fn text_entry_states_render_without_becoming_dismissible_popups() {
+    let interaction = Interaction {
+        trigger_path: String::new(),
+        trigger_tag: "textarea".into(),
+        trigger_label: "Ask Copilot".into(),
+        trigger_occurrence: None,
+        focused_path: None,
+        states: Vec::new(),
+    };
+    assert!(rendered(&interaction, &[]));
+    assert!(!closable(&interaction, &[]));
+}
+
+#[test]
 fn listbox_gets_deliberate_programmatic_focus() {
     let mut listbox = node("div");
     listbox.attributes.insert("role".into(), "listbox".into());
@@ -122,7 +144,7 @@ fn missing_semantic_trigger_does_not_bind_the_stale_path() {
 }
 
 #[test]
-fn legacy_repeated_controls_all_receive_the_shared_surface_handler() {
+fn repeated_controls_all_receive_the_shared_surface_handler() {
     let mut first = node("button");
     first
         .attributes
@@ -133,7 +155,7 @@ fn legacy_repeated_controls_all_receive_the_shared_surface_handler() {
         trigger_path: first.path.clone(),
         trigger_tag: "button".into(),
         trigger_label: "More options".into(),
-        trigger_occurrence: None,
+        trigger_occurrence: Some(0),
         focused_path: None,
         states: Vec::new(),
     };

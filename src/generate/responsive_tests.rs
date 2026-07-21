@@ -79,6 +79,63 @@ fn preserves_compact_control_width_when_it_fills_its_parent() {
 }
 
 #[test]
+fn stretches_absolute_content_between_captured_edges() {
+    let viewport = Viewport {
+        width: 390,
+        height: 844,
+        dpr: 1.0,
+    };
+    let parent = node("card", 40.0, 300.0);
+    let mut title = node("p", 60.0, 260.0);
+    title.style.extend([
+        ("position".into(), "absolute".into()),
+        ("left".into(), "20px".into()),
+        ("right".into(), "20px".into()),
+    ]);
+    let css = base_declarations(
+        &title,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+
+    assert!(!css.contains("width:260px"));
+    assert!(css.contains("left:20px"));
+    assert!(css.contains("right:20px"));
+}
+
+#[test]
+fn stretches_grid_items_across_responsive_tracks() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut parent = node("grid", 242.0, 946.0);
+    parent.style.insert("display".into(), "grid".into());
+    let mut card = node("article", 242.0, 212.0);
+    card.style.extend([
+        ("display".into(), "flex".into()),
+        ("position".into(), "static".into()),
+        ("justify-self".into(), "normal".into()),
+    ]);
+    let css = base_declarations(
+        &card,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+
+    assert!(!css.contains("width:212px"));
+}
+
+#[test]
 fn anchors_fixed_surfaces_to_the_nearest_viewport_edge() {
     let viewport = Viewport {
         width: 1920,
@@ -159,6 +216,40 @@ fn removes_measured_width_when_border_box_fills_parent_content() {
     );
 
     assert!(!css.contains("width:714px"));
+}
+
+#[test]
+fn removes_measured_width_when_parent_uses_border_shorthand() {
+    let viewport = Viewport {
+        width: 1920,
+        height: 1080,
+        dpr: 1.0,
+    };
+    let mut parent = node("parent", 465.0, 980.0);
+    parent.style.extend([
+        ("box-sizing".into(), "border-box".into()),
+        ("width".into(), "980px".into()),
+        ("border".into(), "1px solid rgb(0, 0, 0)".into()),
+    ]);
+    let mut child = node("child", 466.0, 978.0);
+    child.style.extend([
+        ("box-sizing".into(), "border-box".into()),
+        ("width".into(), "978px".into()),
+        ("padding-left".into(), "16px".into()),
+        ("padding-right".into(), "16px".into()),
+    ]);
+
+    let css = base_declarations(
+        &child,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+
+    assert!(!css.contains("width:978px"));
 }
 
 #[test]

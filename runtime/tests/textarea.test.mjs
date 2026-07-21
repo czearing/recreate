@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { replayControlValue, setControlValue, submitIntent } from '../textarea.mjs';
+import {
+  replayControlValue,
+  setControlValue,
+  submitIntent,
+} from '../textarea.mjs';
 import { FakeElement } from './support.mjs';
 
 class FakeTextArea extends FakeElement {}

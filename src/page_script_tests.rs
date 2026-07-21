@@ -25,3 +25,10 @@ fn captures_attribute_sequences() {
     assert!(script.contains("attribute_sequences: attributeSequences"));
     assert!(script.contains("interval_ms"));
 }
+
+#[test]
+fn keeps_only_active_media_children_as_direct_authored_rules() {
+    let script = source();
+    assert!(script.contains("const activeMedia = !media || matchMedia(media).matches"));
+    assert!(script.contains("activeMedia || rule.type === CSSRule.MEDIA_RULE"));
+}

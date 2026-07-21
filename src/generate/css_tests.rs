@@ -92,10 +92,156 @@ fn clipped_text_keeps_responsive_captured_heights() {
             .style
             .insert("overflow".into(), "hidden".into());
     }
+
     assert!(!fluid_height_paths(&specification).contains(&path));
 
     for state in &mut specification.states {
         state.nodes[3].style.remove("overflow");
     }
     assert!(fluid_height_paths(&specification).contains(&path));
+}
+
+#[test]
+fn compact_interaction_states_keep_baseline_authored_css() {
+    let mut baseline = crate::generate::project_test_support::specification()
+        .states
+        .remove(0);
+    baseline.css_rules = vec![".composer { width: 100%; }".into()];
+    let mut interaction = baseline.clone();
+    interaction.css_rules.clear();
+
+    let merged = with_baseline_css(interaction, &baseline);
+
+    assert_eq!(merged.css_rules, baseline.css_rules);
+}
+
+#[test]
+fn sibling_topology_changes_rebuild_existing_child_classes() {
+    let baseline = crate::generate::project_test_support::specification()
+        .states
+        .remove(0);
+    let parent = baseline
+        .nodes
+        .iter()
+        .filter_map(|node| node.parent.as_deref())
+        .find(|parent| {
+            baseline
+                .nodes
+                .iter()
+                .filter(|node| node.parent.as_deref() == Some(*parent))
+                .count()
+                > 1
+        })
+        .unwrap();
+    let existing = baseline
+        .nodes
+        .iter()
+        .find(|node| node.parent.as_deref() == Some(parent))
+        .unwrap()
+        .clone();
+    let mut state = baseline.clone();
+    let mut inserted = existing.clone();
+    inserted.path.push_str(">button:nth-of-type(99)");
+    state.nodes.push(inserted);
+
+    let changed = topology_changed_paths(&state, &baseline);
+
+    assert!(changed.contains(&existing.path));
+}
+
+#[test]
+fn sibling_geometry_changes_rebuild_existing_child_classes() {
+    let baseline = crate::generate::project_test_support::specification()
+        .states
+        .remove(0);
+    let parent = baseline
+        .nodes
+        .iter()
+        .filter_map(|node| node.parent.as_deref())
+        .find(|parent| {
+            baseline
+                .nodes
+                .iter()
+                .filter(|node| node.parent.as_deref() == Some(*parent))
+                .count()
+                > 1
+        })
+        .unwrap();
+    let existing = baseline
+        .nodes
+        .iter()
+        .find(|node| node.parent.as_deref() == Some(parent))
+        .unwrap()
+        .clone();
+    let sibling = baseline
+        .nodes
+        .iter()
+        .find(|node| node.parent == existing.parent && node.path != existing.path)
+        .unwrap()
+        .clone();
+    let mut state = baseline.clone();
+    state
+        .nodes
+        .iter_mut()
+        .find(|node| node.path == sibling.path)
+        .unwrap()
+        .rect
+        .width += 20.0;
+    state
+        .nodes
+        .iter_mut()
+        .find(|node| node.path == existing.path)
+        .unwrap()
+        .rect
+        .x += 20.0;
+
+    let changed = topology_changed_paths(&state, &baseline);
+
+    assert!(changed.contains(&existing.path));
+}
+
+#[test]
+fn contextual_widths_do_not_reuse_fluid_cache_entries() {
+    let mut specification = crate::generate::project_test_support::text_entry_specification();
+    let parent = specification.states[0]
+        .nodes
+        .iter()
+        .find(|node| node.path == specification.interactions[0].trigger_path)
+        .and_then(|node| node.parent.clone())
+        .unwrap();
+    let mut wrapper = specification.states[0].nodes[5].clone();
+    wrapper.path = format!("{parent}>div:nth-of-type(3)");
+    wrapper.parent = Some(parent);
+    wrapper.rect.width = 36.0;
+    wrapper.rect.height = 36.0;
+    wrapper.style.insert("width".into(), "100%".into());
+    wrapper.style.insert("position".into(), "static".into());
+    specification.states[0].nodes.push(wrapper.clone());
+    specification.interactions[0].states[0]
+        .nodes
+        .push(wrapper.clone());
+    specification.interactions[0].states[0]
+        .nodes
+        .last_mut()
+        .unwrap()
+        .rect
+        .x += 44.0;
+    let mut prior = specification.interactions[0].clone();
+    prior.states = vec![specification.states[0].clone()];
+    specification.interactions.insert(0, prior);
+
+    let output = build(&specification, &BTreeMap::new());
+    let fluid = &output.interaction_classes[0][&wrapper.path];
+    let contextual = &output.interaction_classes[1][&wrapper.path];
+    let declaration = output
+        .css
+        .split(&format!(".{contextual}{{"))
+        .nth(1)
+        .unwrap()
+        .split('}')
+        .next()
+        .unwrap();
+
+    assert_ne!(fluid, contextual);
+    assert!(declaration.contains("width:36px;"));
 }
