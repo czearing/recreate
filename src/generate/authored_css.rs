@@ -31,6 +31,15 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
     if !authored.contains_key("width") && flexible(&authored) {
         styles.remove("width");
     }
+    if !authored.contains_key("height")
+        && authored.contains_key("min-height")
+        && matches!(
+            authored.get("display").map(String::as_str),
+            Some("flex" | "inline-flex" | "grid" | "inline-grid")
+        )
+    {
+        styles.remove("height");
+    }
     styles.extend(authored);
 }
 
@@ -331,6 +340,40 @@ mod tests {
         assert!(!node.style.contains_key("width"));
         assert_eq!(node.style["flex"], "1 1 0%");
         assert_eq!(node.style["min-width"], "0");
+    }
+
+    #[test]
+    fn removes_sampled_height_from_intrinsic_flex_cards() {
+        let mut node = Node {
+            path: "article>button".into(),
+            parent: Some("article".into()),
+            tag: "button".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 369.0,
+                height: 245.0,
+            },
+            style: Styles::from([
+                ("display".into(), "flex".into()),
+                ("height".into(), "245px".into()),
+                ("overflow".into(), "hidden".into()),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "task-card".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".task-card { display: flex; min-height: 132px; overflow: hidden; }".into()],
+        );
+        assert!(!node.style.contains_key("height"));
+        assert_eq!(node.style["min-height"], "132px");
+        assert_eq!(node.style["overflow"], "hidden");
     }
 
     #[test]

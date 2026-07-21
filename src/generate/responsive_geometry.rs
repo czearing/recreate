@@ -25,6 +25,21 @@ pub fn normalize(
     }
 
     normalize_centering(styles, node, parent, viewport);
+    normalize_fixed_edge(styles, node, viewport);
+}
+
+fn normalize_fixed_edge(styles: &mut Styles, node: &Node, viewport: &Viewport) {
+    if node.style.get("position").map(String::as_str) != Some("fixed")
+        || node.rect.width >= f64::from(viewport.width) * 0.8
+    {
+        return;
+    }
+    let right = f64::from(viewport.width) - node.rect.x - node.rect.width;
+    if !(-1.0..=32.0).contains(&right) {
+        return;
+    }
+    styles.insert("left".into(), "auto".into());
+    styles.insert("right".into(), format!("{}px", right.max(0.0)));
 }
 
 fn preserve_scrollbar_space(

@@ -109,7 +109,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
     let Some(first) = baselines.first() else {
         return Ok(Vec::new());
     };
-    let mut initial = Some(restore(cdp, &first.viewport, &first.url, false).await?);
+    let mut initial = Some(restore(cdp, first, false).await?);
     let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
     let mut interactions = Vec::new();
     for candidate in candidates {
@@ -131,7 +131,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         let reuse_page = true;
         let mut fresh = match initial.take() {
             Some(state) => state,
-            None => restore(cdp, &first.viewport, &first.url, !reuse_page).await?,
+            None => restore(cdp, first, !reuse_page).await?,
         };
         let mut opened = None;
         for attempt in 0..2 {
@@ -160,7 +160,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
                 break;
             }
             if attempt == 0 {
-                fresh = restore(cdp, &first.viewport, &first.url, !reuse_page).await?;
+                fresh = restore(cdp, first, !reuse_page).await?;
             }
         }
         let Some((mut state, fresh, settled, focused_path)) = opened else {
@@ -169,7 +169,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         interaction_state::compact(&mut state, &fresh, settled);
         let mut states = vec![state];
         for baseline in responsive_baselines(&candidate.label, baselines) {
-            let fresh = restore(cdp, &baseline.viewport, &baseline.url, !reuse_page).await?;
+            let fresh = restore(cdp, baseline, !reuse_page).await?;
             if !click_matching(
                 cdp,
                 &candidate.path,
@@ -268,13 +268,8 @@ async fn settle(cdp: &mut Cdp) -> Result<bool> {
     Ok(cdp.evaluate(SETTLE).await?.as_bool() == Some(true))
 }
 
-async fn restore(
-    cdp: &mut Cdp,
-    viewport: &crate::model::Viewport,
-    url: &str,
-    reload: bool,
-) -> Result<PageState> {
-    let same_url = cdp.evaluate("location.href").await?.as_str() == Some(url);
+async fn restore(cdp: &mut Cdp, baseline: &PageState, reload: bool) -> Result<PageState> {
+    let same_url = cdp.evaluate("location.href").await?.as_str() == Some(baseline.url.as_str());
     if same_url && !reload {
         cdp.evaluate(
             "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));\
@@ -283,25 +278,32 @@ async fn restore(
              }scrollTo(0,0);document.activeElement?.blur()",
         )
         .await?;
-        browser::set_viewport(cdp, viewport.width, viewport.height).await?;
+        browser::set_viewport(cdp, baseline.viewport.width, baseline.viewport.height).await?;
         tokio::time::sleep(std::time::Duration::from_millis(300)).await;
-        return capture::read_interaction_state(cdp, viewport.clone()).await;
+        let restored = capture::read_interaction_state(cdp, baseline.viewport.clone()).await?;
+        if !restoration_requires_reload(&restored, baseline) {
+            return Ok(restored);
+        }
     }
     if same_url {
-        capture::prepare_state(cdp, viewport, true).await?;
+        capture::prepare_state(cdp, &baseline.viewport, true).await?;
     } else {
-        cdp.send("Page.navigate", serde_json::json!({"url":url}))
+        cdp.send("Page.navigate", serde_json::json!({"url":baseline.url}))
             .await?;
-        let _ = capture::capture_state(cdp, viewport.clone(), false).await?;
+        let _ = capture::capture_state(cdp, baseline.viewport.clone(), false).await?;
     }
     cdp.evaluate("scrollTo(0,0)").await?;
     tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-    capture::read_interaction_state(cdp, viewport.clone()).await
+    capture::read_interaction_state(cdp, baseline.viewport.clone()).await
+}
+
+fn restoration_requires_reload(restored: &PageState, baseline: &PageState) -> bool {
+    interaction_state::meaningfully_differs(restored, baseline)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::deduplicate;
+    use super::{deduplicate, restoration_requires_reload};
     use crate::model::Interaction;
 
     #[test]
@@ -343,6 +345,14 @@ mod tests {
         assert!(super::captures_visual_state("More options"));
         assert!(super::captures_visual_state("More tasks"));
         assert!(!super::captures_visual_state("Search"));
+    }
+
+    #[test]
+    fn incomplete_interaction_teardown_requires_reload() {
+        let baseline = state_with_paths(&["html>body", "html>body>main"]);
+        let restored = state_with_paths(&["html>body", "html>body>search"]);
+        assert!(restoration_requires_reload(&restored, &baseline));
+        assert!(!restoration_requires_reload(&baseline, &baseline));
     }
 
     #[test]
@@ -393,5 +403,43 @@ mod tests {
         assert_eq!(values.len(), 1);
         assert_eq!(values[0].trigger_path, "other-card>button");
         assert_eq!(values[0].states[0].nodes.len(), 1);
+    }
+
+    fn state_with_paths(paths: &[&str]) -> crate::model::PageState {
+        let mut state = crate::model::PageState {
+            url: String::new(),
+            title: String::new(),
+            viewport: crate::model::Viewport::default(),
+            nodes: Vec::new(),
+            startup_nodes: Vec::new(),
+            startup_delay_ms: 0,
+            startup_duration_ms: 0,
+            animations: Vec::new(),
+            state_styles: Vec::new(),
+            attribute_sequences: Vec::new(),
+            css_rules: Vec::new(),
+            asset_urls: Vec::new(),
+            asset_data: Default::default(),
+        };
+        state.nodes = paths
+            .iter()
+            .map(|path| crate::model::Node {
+                path: (*path).into(),
+                parent: None,
+                tag: "div".into(),
+                text: String::new(),
+                attributes: Default::default(),
+                rect: crate::model::Rect {
+                    x: 0.0,
+                    y: 0.0,
+                    width: 1.0,
+                    height: 1.0,
+                },
+                style: Default::default(),
+                before: None,
+                after: None,
+            })
+            .collect();
+        state
     }
 }

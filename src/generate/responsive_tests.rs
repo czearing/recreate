@@ -79,6 +79,33 @@ fn preserves_compact_control_width_when_it_fills_its_parent() {
 }
 
 #[test]
+fn anchors_fixed_surfaces_to_the_nearest_viewport_edge() {
+    let viewport = Viewport {
+        width: 1920,
+        height: 1080,
+        dpr: 1.0,
+    };
+    let mut surface = node("div", 1360.0, 548.0);
+    surface.style.extend([
+        ("position".into(), "fixed".into()),
+        ("left".into(), "1360px".into()),
+        ("right".into(), "12px".into()),
+        ("inset".into(), "44px 12px 470px 1360px".into()),
+    ]);
+    let css = base_declarations(
+        &surface,
+        None,
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(css.contains("left:auto"));
+    assert!(css.contains("right:12px"));
+}
+
+#[test]
 fn preserves_intrinsic_svg_aspect_width() {
     let viewport = Viewport {
         width: 1440,
