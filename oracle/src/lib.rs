@@ -27,3 +27,4 @@ pub mod replay;
 pub mod report;
 pub mod scenario;
 mod source_self;
+mod trace_qualification;

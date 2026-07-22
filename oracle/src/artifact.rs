@@ -13,6 +13,10 @@ pub fn seal(mut artifact: Artifact) -> anyhow::Result<Artifact> {
 }
 
 pub fn verify(artifact: &Artifact) -> anyhow::Result<()> {
+    verify_with(artifact, false)
+}
+
+fn verify_with(artifact: &Artifact, allow_incomplete: bool) -> anyhow::Result<()> {
     let expected = artifact.payload_digest.clone();
     let actual = seal(artifact.clone())?.payload_digest;
     anyhow::ensure!(expected == actual, "artifact digest mismatch");
@@ -70,14 +74,16 @@ pub fn verify(artifact: &Artifact) -> anyhow::Result<()> {
         );
     }
     for obligation in &artifact.obligations {
-        anyhow::ensure!(
-            matches!(
-                obligation.status,
-                ObligationStatus::Qualified | ObligationStatus::UnreachableProven
-            ),
-            "unqualified obligation: {}",
-            obligation.id
-        );
+        if !allow_incomplete {
+            anyhow::ensure!(
+                matches!(
+                    obligation.status,
+                    ObligationStatus::Qualified | ObligationStatus::UnreachableProven
+                ),
+                "unqualified obligation: {}",
+                obligation.id
+            );
+        }
         anyhow::ensure!(
             obligation
                 .scenarios
@@ -99,18 +105,28 @@ pub fn verify(artifact: &Artifact) -> anyhow::Result<()> {
             );
         }
     }
-    anyhow::ensure!(
-        artifact.coverage.incomplete.is_empty(),
-        "artifact coverage is incomplete: {}",
-        artifact.coverage.incomplete.join(", ")
-    );
+    if !allow_incomplete {
+        anyhow::ensure!(
+            artifact.coverage.incomplete.is_empty(),
+            "artifact coverage is incomplete: {}",
+            artifact.coverage.incomplete.join(", ")
+        );
+    }
     Ok(())
 }
 
 pub fn read(path: &Path) -> anyhow::Result<Artifact> {
+    read_with(path, false)
+}
+
+pub fn read_diagnostic(path: &Path) -> anyhow::Result<Artifact> {
+    read_with(path, true)
+}
+
+fn read_with(path: &Path, allow_incomplete: bool) -> anyhow::Result<Artifact> {
     let bytes = fs::read(path).with_context(|| format!("read {}", path.display()))?;
     let artifact = serde_json::from_slice(&bytes).context("parse oracle artifact")?;
-    verify(&artifact)?;
+    verify_with(&artifact, allow_incomplete)?;
     Ok(artifact)
 }
 

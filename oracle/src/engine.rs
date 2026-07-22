@@ -1,3 +1,4 @@
+pub use crate::collector::collect;
 use crate::{
     artifact, checkpoint,
     cli::{Cli, Command, CompareArgs, RecordArgs},
@@ -6,9 +7,6 @@ use crate::{
     qualification, scenario, source_self,
 };
 use std::{fs, time::Instant};
-
-pub use crate::collector::collect;
-
 pub async fn run(cli: Cli) -> anyhow::Result<()> {
     match cli.command {
         Command::Record(args) => record(args).await,
@@ -17,21 +15,26 @@ pub async fn run(cli: Cli) -> anyhow::Result<()> {
         Command::Benchmark(args) => crate::benchmark::run(args).await,
     }
 }
-
 pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
     let mut scenarios = scenario::responsive(&args.widths, args.browser.height)?;
     let mut browser = crate::browser_factory::start(&args.browser).await?;
     browser.prepare().await?;
     let environment = browser.environment().await?;
     let trace_width = args.widths.iter().copied().min().unwrap_or(1280);
-    let discovered = discovery::run(
+    let mut discovered = discovery::run(
         &mut browser,
         &args.source,
         (trace_width, args.browser.height),
     )
     .await?;
+    if args.diagnostic {
+        discovered
+            .scenarios
+            .retain(|scenario| scenario.id.starts_with("interaction-"));
+    }
     insert_before_async(&mut scenarios, discovered.scenarios);
     let checkpoints = collect(&mut browser, &args.source, &scenarios).await?;
+    let mut incomplete = Vec::new();
     let clean = checkpoints
         .iter()
         .find(|checkpoint| {
@@ -39,37 +42,51 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
                 && checkpoint.viewport.width == trace_width
         })
         .ok_or_else(|| anyhow::anyhow!("trace qualification checkpoint is missing"))?;
-    anyhow::ensure!(
-        trace_matches_clean(&discovered.traced_checkpoint, clean),
-        "discovery instrumentation perturbed clean browser output"
-    );
-    source_self::verify(
-        &mut browser,
-        &args.source,
-        &scenarios,
-        &environment,
-        &discovered.obligations,
-        &checkpoints,
-        &args.out,
-    )
-    .await?;
+    if let Some((domain, path, traced, clean)) =
+        crate::trace_qualification::difference(&discovered.traced_checkpoint, clean)
+    {
+        if !args.diagnostic {
+            anyhow::bail!(
+                "discovery instrumentation perturbed {domain} at {path}: \
+                 traced={traced} clean={clean}"
+            );
+        }
+        incomplete.push(format!("diagnostic-trace-instability:{domain}:{path}"));
+    }
+    if args.diagnostic {
+        incomplete.push("diagnostic-source-self-unverified".into());
+        incomplete.push("diagnostic-discovered-responsive-motion-skipped".into());
+    } else {
+        source_self::verify(
+            &mut browser,
+            &args.source,
+            &scenarios,
+            &environment,
+            &discovered.obligations,
+            &checkpoints,
+            &args.out,
+        )
+        .await?;
+    }
     browser.close().await;
     let widths_observed = checkpoints
         .iter()
         .filter(|item| item.scenario.starts_with("responsive-"))
         .count();
     let widths_required = responsive_width_count(&scenarios);
-    let mut incomplete = discovered
-        .obligations
-        .iter()
-        .filter(|item| {
-            !matches!(
-                item.status,
-                ObligationStatus::Qualified | ObligationStatus::UnreachableProven
-            )
-        })
-        .map(|item| item.id.clone())
-        .collect::<Vec<_>>();
+    incomplete.extend(
+        discovered
+            .obligations
+            .iter()
+            .filter(|item| {
+                !matches!(
+                    item.status,
+                    ObligationStatus::Qualified | ObligationStatus::UnreachableProven
+                )
+            })
+            .map(|item| item.id.clone())
+            .collect::<Vec<_>>(),
+    );
     if checkpoints.iter().any(has_ambiguous_nodes) {
         incomplete.push("ambiguous-node-assignment".into());
     }
@@ -106,24 +123,6 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
     println!("{}", serde_json::to_string_pretty(&artifact.coverage)?);
     Ok(())
 }
-
-pub fn trace_matches_clean(
-    traced: &crate::model::Checkpoint,
-    clean: &crate::model::Checkpoint,
-) -> bool {
-    [
-        "interaction",
-        "structure",
-        "accessibility",
-        "motion",
-        "geometry",
-        "style",
-        "compositor",
-    ]
-    .iter()
-    .all(|domain| traced.domains[*domain].digest == clean.domains[*domain].digest)
-}
-
 pub(crate) fn responsive_width_count(scenarios: &[crate::model::Scenario]) -> usize {
     scenarios
         .iter()
@@ -136,7 +135,6 @@ pub(crate) fn responsive_width_count(scenarios: &[crate::model::Scenario]) -> us
         })
         .sum()
 }
-
 fn insert_before_async(
     scenarios: &mut Vec<crate::model::Scenario>,
     discovered: Vec<crate::model::Scenario>,
@@ -147,9 +145,12 @@ fn insert_before_async(
     scenarios.extend(discovered);
     scenarios.extend(async_scenario);
 }
-
 pub async fn compare_command(args: CompareArgs) -> anyhow::Result<()> {
-    let expected = artifact::read(&args.artifact)?;
+    let expected = if args.diagnostic {
+        artifact::read_diagnostic(&args.artifact)?
+    } else {
+        artifact::read(&args.artifact)?
+    };
     let mut browser = crate::browser_factory::start(&args.browser).await?;
     browser.prepare().await?;
     let actual_environment = browser.environment().await?;
@@ -169,13 +170,11 @@ pub async fn compare_command(args: CompareArgs) -> anyhow::Result<()> {
     anyhow::ensure!(report.certified, "candidate is not certified");
     Ok(())
 }
-
 fn has_ambiguous_nodes(checkpoint: &crate::model::Checkpoint) -> bool {
     checkpoint.domains["structure"].value["ambiguous"]
         .as_array()
         .is_some_and(|items| !items.is_empty())
 }
-
 fn has_network_evidence(checkpoint: &crate::model::Checkpoint) -> bool {
     let asynchronous = &checkpoint.domains["async"].value;
     asynchronous["network"]

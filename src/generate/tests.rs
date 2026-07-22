@@ -64,6 +64,7 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("setState(command.surface)"));
     assert!(app.contains("const carouselPrevious="));
     assert!(app.contains("const carouselNext="));
+    assert!(app.contains("if(!carouselState||!carouselPrevious||!carouselNext)return"));
     assert!(app.contains("initialScrolls[viewport]"));
     assert!(app.contains("data-recreate-active"));
     assert!(app.contains("restoreFocus.current=trigger"));

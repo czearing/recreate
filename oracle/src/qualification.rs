@@ -60,7 +60,7 @@ pub async fn run(args: QualifyArgs) -> anyhow::Result<()> {
         .find(|checkpoint| checkpoint.scenario == "responsive-ascending")
         .expect("clean trace checkpoint");
     anyhow::ensure!(
-        engine::trace_matches_clean(&discovered.traced_checkpoint, clean),
+        crate::trace_qualification::matches_clean(&discovered.traced_checkpoint, clean),
         "discovery instrumentation perturbed authoritative output"
     );
     let expected = artifact::seal(Artifact {

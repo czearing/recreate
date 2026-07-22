@@ -33,6 +33,8 @@ pub struct RecordArgs {
     pub source: String,
     #[arg(long)]
     pub out: PathBuf,
+    #[arg(long)]
+    pub diagnostic: bool,
     #[arg(long, value_delimiter = ',', default_value = "320,390,768,1280,1440")]
     pub widths: Vec<u32>,
     #[command(flatten)]
@@ -45,6 +47,8 @@ pub struct CompareArgs {
     pub candidate: String,
     #[arg(long)]
     pub out: Option<PathBuf>,
+    #[arg(long)]
+    pub diagnostic: bool,
     #[command(flatten)]
     pub browser: BrowserArgs,
 }

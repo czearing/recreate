@@ -1,26 +1,41 @@
 pub const DISCOVER: &str = r#"(() => {
-  const controls = [...document.querySelectorAll('a[href],button,input,select,textarea,[role="button"],[tabindex]')]
+  const meaningful = e => {
+    const r=e.getBoundingClientRect(), role=e.getAttribute('role') || '';
+    const stateful=role==='tab'||e.hasAttribute('aria-pressed')||
+      e.hasAttribute('aria-selected');
+    const popup=e.hasAttribute('aria-haspopup')||e.hasAttribute('aria-expanded');
+    const header=e.localName==='button'&&e.hasAttribute('aria-label')&&r.top<120;
+    const entry=/^(input|select|textarea)$/.test(e.localName);
+    return stateful||popup||header||entry;
+  };
+  const controls = [...document.querySelectorAll('button,input,select,textarea,[role="button"],[role="tab"]')]
     .filter(e => {
       const s = getComputedStyle(e), r = e.getBoundingClientRect();
       const active = e.getAttribute('aria-pressed') === 'true' ||
         e.getAttribute('aria-selected') === 'true';
-      return !active && s.display !== 'none' && s.visibility !== 'hidden' &&
+      return meaningful(e) && !active && s.display !== 'none' && s.visibility !== 'hidden' &&
         r.width > 0 && r.height > 0;
     }).sort((a,b) => {
       const ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
       return ar.y-br.y || ar.x-br.x;
     });
   const occurrences = new Map();
-  const persistent = [];
-  const anchors = controls.map(e => {
+  const rows = controls.map(e => {
     const key = [e.getAttribute('role') || '', e.getAttribute('aria-label') || '',
       e.children.length ? '' : (e.textContent || '').replace(/\s+/g,' ').trim(), e.localName].join('|');
     const occurrence = occurrences.get(key) || 0;
     occurrences.set(key, occurrence + 1);
-    persistent.push(e.getAttribute('role') === 'tab' ||
-      e.hasAttribute('aria-pressed') || e.hasAttribute('aria-selected'));
-    return key + '@' + occurrence;
+    return {anchor:key+'@'+occurrence,key,persistent:e.getAttribute('role') === 'tab' ||
+      e.hasAttribute('aria-pressed') || e.hasAttribute('aria-selected')};
   });
+  const groups = new Map();
+  for (const row of rows) {
+    const group=groups.get(row.key)||[]; group.push(row); groups.set(row.key,group);
+  }
+  const selected=[...groups.values()].flatMap(group =>
+    group.length<=2?group:[group[0],group[group.length-1]]);
+  const anchors=selected.map(row=>row.anchor);
+  const persistent=selected.map(row=>row.persistent);
   const source = document.documentElement.outerHTML;
   const opaque = [
     'eval(', 'WebAssembly', 'getContext("webgl', "getContext('webgl", 'new Worker(',
@@ -69,10 +84,20 @@ pub const DISCOVER: &str = r#"(() => {
 })()"#;
 
 pub const FIND_ANCHOR: &str = r#"anchor => {
-  const controls = [...document.querySelectorAll('a[href],button,input,select,textarea,[role="button"],[tabindex]')]
+  const meaningful = e => {
+    const r=e.getBoundingClientRect(), role=e.getAttribute('role') || '';
+    const stateful=role==='tab'||e.hasAttribute('aria-pressed')||
+      e.hasAttribute('aria-selected');
+    const popup=e.hasAttribute('aria-haspopup')||e.hasAttribute('aria-expanded');
+    const header=e.localName==='button'&&e.hasAttribute('aria-label')&&r.top<120;
+    const entry=/^(input|select|textarea)$/.test(e.localName);
+    return stateful||popup||header||entry;
+  };
+  const controls = [...document.querySelectorAll('button,input,select,textarea,[role="button"],[role="tab"]')]
     .filter(e => {
       const s=getComputedStyle(e),r=e.getBoundingClientRect();
-      return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
+      return meaningful(e)&&s.display!=='none'&&s.visibility!=='hidden'&&
+        r.width>0&&r.height>0;
     }).sort((a,b) => {
       const ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();
       return ar.y-br.y||ar.x-br.x;
