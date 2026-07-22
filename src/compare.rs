@@ -1,8 +1,7 @@
 use crate::{
     browser, capture,
     cli::{CaptureArgs, VerifyArgs},
-    compare_node::compare,
-    interactions_input, lifecycle_script,
+    compare_node, interactions_input, lifecycle_script,
     model::Specification,
 };
 use anyhow::{Context, Result};
@@ -53,6 +52,12 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
         style_mismatches: 0,
         details: Vec::new(),
     };
+    let shared_assets = specification
+        .states
+        .iter()
+        .flat_map(|state| state.asset_data.iter())
+        .map(|(url, data)| (url.clone(), data.clone()))
+        .collect();
     for expected in states {
         let capture_args = CaptureArgs {
             url: Some(args.url.clone()),
@@ -73,7 +78,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             serde_json::json!({
                 "features":[{
                     "name":"prefers-reduced-motion",
-                    "value":if trigger.is_some() {"reduce"} else {"no-preference"}
+                    "value":"no-preference"
                 }]
             }),
         )
@@ -83,20 +88,36 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             serde_json::json!({ "source": lifecycle_script::SOURCE }),
         )
         .await?;
+        cdp.send(
+            "Page.addScriptToEvaluateOnNewDocument",
+            serde_json::json!({ "source": "window.__recreateFreezeSequences=true" }),
+        )
+        .await?;
         cdp.send("Page.reload", serde_json::json!({"ignoreCache":false}))
             .await?;
         let actual = if let Some(trigger) = trigger {
             capture::prepare_interaction_state(&mut cdp, &expected.viewport, true).await?;
             cdp.evaluate("scrollTo(0,0)").await?;
-            let activated = interactions_input::click_matching(
-                &mut cdp,
-                &trigger.trigger_path,
-                &trigger.trigger_tag,
-                &trigger.trigger_label,
-                None,
-                true,
-            )
-            .await?;
+            let activated = if interactions_input::text_entry(&trigger.trigger_tag) {
+                interactions_input::submit_text_matching(
+                    &mut cdp,
+                    &trigger.trigger_path,
+                    &trigger.trigger_tag,
+                    &trigger.trigger_label,
+                    trigger.trigger_occurrence,
+                )
+                .await?
+            } else {
+                interactions_input::click_matching(
+                    &mut cdp,
+                    &trigger.trigger_path,
+                    &trigger.trigger_tag,
+                    &trigger.trigger_label,
+                    trigger.trigger_occurrence,
+                    true,
+                )
+                .await?
+            };
             if !activated {
                 let controls = cdp
                     .evaluate(
@@ -111,11 +132,18 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
                 );
             }
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-            capture::read_state(&mut cdp, expected.viewport.clone()).await?
+            capture::read_interaction_state(&mut cdp, expected.viewport.clone()).await?
         } else {
             capture::capture_state(&mut cdp, expected.viewport.clone(), true).await?
         };
-        merge(&mut totals, compare(expected, &actual));
+        let mut report = compare_node::compare_with_assets(expected, &actual, &shared_assets);
+        for detail in &mut report.details {
+            *detail = format!(
+                "{}x{} {detail}",
+                expected.viewport.width, expected.viewport.height
+            );
+        }
+        merge(&mut totals, report);
     }
     totals.passed = totals.missing == 0
         && totals.unexpected == 0

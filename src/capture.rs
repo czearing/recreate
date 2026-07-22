@@ -107,7 +107,7 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
     crate::interaction_surface::normalize(&mut specification);
     fs::write(
         args.out.join("spec.json"),
-        serde_json::to_vec_pretty(&specification)?,
+        serde_json::to_vec(&specification)?,
     )?;
     if args.spec_only {
         println!(

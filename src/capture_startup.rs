@@ -30,41 +30,35 @@ async fn wait_ready_mode(
         };
         let source = format!(
             r#"(() => {{
-              const visible = Array.from(document.querySelectorAll('*'))
-                .filter(element => {{
-                  const rect = element.getBoundingClientRect();
-                  const style = getComputedStyle(element);
-                  return rect.width > 0 && rect.height > 0 &&
-                    style.display !== 'none' && style.visibility !== 'hidden' &&
-                    Number(style.opacity || 1) > 0;
-                }})
-                .slice(0, 80)
-                .map(element => {{
-                  const rect = element.getBoundingClientRect();
-                  const style = getComputedStyle(element);
-                  return [
+              const visible = [];
+              let blocking = false;
+              for (const element of document.querySelectorAll('*')) {{
+                const rect = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                const shown = rect.width > 0 && rect.height > 0 &&
+                  style.display !== 'none' && style.visibility !== 'hidden' &&
+                  Number(style.opacity || 1) > 0;
+                if (shown && visible.length < 80) {{
+                  visible.push([
                     element.tagName, Math.round(rect.x), Math.round(rect.y),
                     Math.round(rect.width), Math.round(rect.height),
                     style.display
-                  ].join(':');
-                }}).join('|');
+                  ].join(':'));
+                }}
+                const area = rect.width * rect.height;
+                const z = Number(style.zIndex);
+                blocking ||= area >= innerWidth * innerHeight * 0.9 &&
+                  ['absolute','fixed'].includes(style.position) &&
+                  Number.isFinite(z) && z >= 50 &&
+                  style.pointerEvents !== 'none' && shown;
+              }}
               return {{
               ready: document.readyState === 'complete' &&
                 document.fonts.status === 'loaded' &&
                 {lifecycle}
                 (window.__recreatePendingRequests || 0) === 0,
-              signature: visible,
-              blocking: Array.from(document.querySelectorAll('*')).some(element => {{
-                const rect = element.getBoundingClientRect();
-                const style = getComputedStyle(element);
-                const area = rect.width * rect.height;
-                const z = Number(style.zIndex);
-                return area >= innerWidth * innerHeight * 0.9 &&
-                  ['absolute','fixed'].includes(style.position) &&
-                  Number.isFinite(z) && z >= 50 &&
-                  style.pointerEvents !== 'none' &&
-                  style.display !== 'none' && style.visibility !== 'hidden';
-              }})
+              signature: visible.join('|'),
+              blocking
             }};
             }})()"#
         );
@@ -72,7 +66,7 @@ async fn wait_ready_mode(
         let signature = value["signature"].as_str().unwrap_or_default();
         let startup_complete = !wait_for_startup || value["blocking"].as_bool() != Some(true);
         let ready = value["ready"].as_bool() == Some(true) && !signature.is_empty();
-        if ready && startup_complete && started.elapsed() >= Duration::from_secs(5) {
+        if ready && startup_complete && started.elapsed() >= Duration::from_secs(1) {
             return Ok(());
         }
         if ready && startup_complete && signature == previous {

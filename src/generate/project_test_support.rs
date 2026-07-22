@@ -84,6 +84,8 @@ fn state(width: u32) -> PageState {
             height: 800,
             dpr: 1.0,
         },
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes,
         startup_nodes: Vec::new(),
         startup_delay_ms: 0,
@@ -190,7 +192,7 @@ pub fn text_entry_specification() -> Specification {
     active.nodes[5].rect.height = 20.0;
     active.nodes.pop();
     let action_path = format!("{container_path}>button:nth-of-type(1)");
-    let mut action = node(&action_path, Some(container_path), "Create notebook", None);
+    let mut action = node(&action_path, Some(container_path), "Create item", None);
     action.tag = "button".into();
     active.nodes.push(action);
     Specification {

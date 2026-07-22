@@ -15,8 +15,15 @@ pub enum Command {
     Generate(GenerateArgs),
     Install(InstallArgs),
     Open(OpenArgs),
+    Oracle(OracleArgs),
     Skill,
     Verify(VerifyArgs),
+}
+
+#[derive(Args, Clone)]
+pub struct OracleArgs {
+    #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+    pub args: Vec<std::ffi::OsString>,
 }
 
 #[derive(Args, Clone)]
@@ -52,6 +59,8 @@ pub struct GenerateArgs {
     pub spec: PathBuf,
     #[arg(long)]
     pub out: PathBuf,
+    #[arg(long)]
+    pub oracle: Option<PathBuf>,
 }
 
 #[derive(Args, Clone)]
@@ -156,5 +165,23 @@ mod tests {
         };
         assert_eq!(args.url, "https://example.com");
         assert_eq!(args.cdp_url, "http://127.0.0.1:9223");
+    }
+
+    #[test]
+    fn forwards_independent_oracle_arguments() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "oracle",
+            "compare",
+            "source.json",
+            "https://candidate.example",
+            "--out",
+            "report.json",
+        ])
+        .unwrap();
+        let Command::Oracle(args) = cli.command else {
+            panic!("expected oracle");
+        };
+        assert_eq!(args.args.len(), 5);
     }
 }

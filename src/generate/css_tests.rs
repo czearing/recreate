@@ -11,6 +11,27 @@ fn preserves_global_font_and_keyframe_rules() {
 }
 
 #[test]
+fn rewrites_longer_protocol_relative_asset_urls_first() {
+    let assets = BTreeMap::from([
+        (
+            "https://cdn.example/font.woff".to_string(),
+            "/assets/font.woff".to_string(),
+        ),
+        (
+            "https://cdn.example/font.woff2".to_string(),
+            "/assets/font.woff2".to_string(),
+        ),
+    ]);
+    assert_eq!(
+        rewrite_rule_assets(
+            r#"src:url("//cdn.example/font.woff2"),url("//cdn.example/font.woff")"#,
+            &assets,
+        ),
+        r#"src:url("/assets/font.woff2"),url("/assets/font.woff")"#
+    );
+}
+
+#[test]
 fn directional_border_contract_is_captured_and_generated() {
     let mut styles = Styles::new();
     for side in ["top", "right", "bottom", "left"] {

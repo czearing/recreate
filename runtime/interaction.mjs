@@ -4,8 +4,14 @@ export const closedInteraction = Object.freeze({
 });
 
 export function reduceInteraction(state, event) {
-  if (event.type === 'activate' && !event.closable) {
+  if (event.type === 'activate' && !event.stateful) {
     return [state, { type: 'invoke', surface: event.surface, trigger: event.trigger }];
+  }
+  if (event.type === 'activate' && !event.closable) {
+    return [
+      { openSurface: event.surface, activeTrigger: event.trigger },
+      { type: 'open', surface: event.surface, trigger: event.trigger },
+    ];
   }
   if (event.type === 'activate') {
     if (state.openSurface === event.surface && state.activeTrigger === event.trigger) {

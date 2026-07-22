@@ -1,0 +1,6 @@
+<!doctype html><html><title>Oracle fixture</title><style>body{margin:0}</style>
+<main><h1>Independent oracle</h1><p>Missing cards</p>
+<button type="button" aria-label="Run comparison">Compare</button></main>
+<script>fetch("data:application/json,%7B%22ok%22%3Atrue%7D").then(r=>r.json()).then(v=>document.body.dataset.network=String(v.ok));
+new ResizeObserver(e=>document.body.dataset.resize=String(Math.round(e[0].contentRect.width))).observe(document.querySelector("main"));
+setTimeout(()=>document.querySelector("h1").textContent="Independent oracle ready",50000)</script></html>

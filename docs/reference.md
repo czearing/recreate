@@ -22,9 +22,11 @@ recreate capture <url>
 recreate capture --reuse --reload --target <target-id>
 recreate open <url>
 recreate generate --spec <spec.json> --out <directory>
+recreate generate --spec <spec.json> --out <directory> --oracle <artifact.json>
 recreate verify --spec <spec.json> --url <generated-url>
 recreate verify --spec <spec.json> --url <generated-url> --interaction 1
 recreate install [--copilot | --claude | --all]
+recreate oracle <record|compare|qualify|benchmark> ...
 recreate skill
 ```
 
@@ -82,6 +84,29 @@ The retained platform evidence artifacts record built generated-project parity a
 browser console and network errors; capture, build, and browser runtime;
 generated source and build size; keyboard activation and focus restoration; and
 reduced-motion behavior.
+
+## Independent oracle
+
+`recreate-oracle` is a separate workspace binary with no imports from
+Recreate's capture, generation, or verification implementation:
+
+```text
+recreate-oracle record <source-url> --out <artifact.json> --widths 320,768,1440
+recreate-oracle compare <artifact.json> <candidate-url> --out <report.json>
+recreate-oracle qualify --fixtures oracle/fixtures --holdouts oracle/holdouts
+recreate-oracle benchmark <artifact.json> <candidate-url> --iterations 20
+```
+
+Its integrity-sealed artifact pins the browser and environment, immutable source
+scenarios, obligation ledger, responsive width tapes, motion frame tapes, and
+typed checkpoint roots. Certification requires complete coverage and exact
+equality in interaction, async, structure, accessibility, motion, geometry,
+complete computed style, and decoded compositor pixels.
+
+Discovery is source-only and perturbation-qualified. Unsupported generated
+code, live external ordering, unbounded motion, ambiguous nodes, incomplete
+responsive domains, environment drift, corruption, browser errors, surviving
+mutations, and any unequal critical observable fail closed.
 
 ## Authenticated reference proof
 

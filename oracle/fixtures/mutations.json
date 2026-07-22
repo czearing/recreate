@@ -1,0 +1,9 @@
+[
+  {"file":"async.html","expected_domain":"structure"},
+  {"file":"motion.html","expected_domain":"motion"},
+  {"file":"network.html","expected_domain":"async"},
+  {"file":"observer.html","expected_domain":"async"},
+  {"file":"paint.html","expected_domain":"style"},
+  {"file":"responsive.html","expected_domain":"geometry"},
+  {"file":"structure.html","expected_domain":"async"}
+]

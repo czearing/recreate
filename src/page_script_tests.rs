@@ -32,3 +32,23 @@ fn keeps_only_active_media_children_as_direct_authored_rules() {
     assert!(script.contains("const activeMedia = !media || matchMedia(media).matches"));
     assert!(script.contains("activeMedia || rule.type === CSSRule.MEDIA_RULE"));
 }
+
+#[test]
+fn captures_physical_dom_and_complete_computed_styles() {
+    let script = source();
+    assert!(script.contains("scan(document.documentElement)"));
+    assert!(script.contains("element.shadowRoot"));
+    assert!(script.contains("physical_parent"));
+    assert!(script.contains("assigned_slot"));
+    assert!(script.contains("client_rects"));
+    assert!(script.contains("computed_style_dictionary"));
+    assert!(!script.contains("'HEAD'"));
+}
+
+#[test]
+fn caches_dom_paths_and_sibling_indexes() {
+    let script = source();
+    assert!(script.contains("const pathCache = new WeakMap"));
+    assert!(script.contains("const siblingIndexes = new WeakMap"));
+    assert!(!script.contains("peers.indexOf"));
+}

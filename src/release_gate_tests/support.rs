@@ -23,7 +23,10 @@ pub fn selected_fixtures<'a>(fixtures: &'a [&str]) -> Vec<&'a str> {
 }
 
 pub fn selected_viewports(viewports: &[(u32, u32)]) -> Vec<(u32, u32)> {
-    if std::env::var_os("RECREATE_GATE_FIXTURE").is_some() && !viewports.is_empty() {
+    if std::env::var_os("RECREATE_GATE_FIXTURE").is_some()
+        && std::env::var_os("RECREATE_GATE_ALL_VIEWPORTS").is_none()
+        && !viewports.is_empty()
+    {
         return vec![viewports[0]];
     }
     viewports.to_vec()
@@ -43,6 +46,10 @@ pub fn collect_errors(cdp: &mut crate::cdp::Cdp) -> (usize, usize) {
                 let file_probe = event["params"]["type"] == "Other"
                     && event["params"]["blockedReason"] == "origin";
                 if !file_probe {
+                    eprintln!(
+                        "network loading failure: {} {}",
+                        event["params"]["errorText"], event["params"]["type"]
+                    );
                     network += 1;
                 }
             }
@@ -51,6 +58,10 @@ pub fn collect_errors(cdp: &mut crate::cdp::Cdp) -> (usize, usize) {
                     .as_f64()
                     .is_some_and(|status| status >= 400.0) =>
             {
+                eprintln!(
+                    "network response failure: {} {}",
+                    event["params"]["response"]["status"], event["params"]["response"]["url"]
+                );
                 network += 1
             }
             _ => {}

@@ -2,36 +2,20 @@ use super::interaction_labels::{matches_trigger, semantic_trigger};
 use crate::model::{Interaction, Node, PageState, Specification};
 use std::collections::BTreeMap;
 
-pub const FOCUS_CSS: &str = "[data-recreate-control]:focus-visible{outline:2px solid currentColor;outline-offset:2px}\
-.recreateInteractionLayer{position:fixed;inset:0;z-index:2147480000;overflow:auto}\
-.recreateAnchoredSurface{position:absolute;right:0;top:calc(100% + 8px);z-index:2147480000}\
-.recreateAnchoredSurface>[data-recreate-surface]{position:static!important;inset:auto!important;transform:none!important}\n";
+pub const FOCUS_CSS: &str = ".recreateInteractionLayer{position:fixed;inset:0;overflow:auto}\
+.recreateAnchoredSurface{display:contents}\n";
 pub const REDUCED_MOTION_CSS: &str = "@media(prefers-reduced-motion:reduce){\
 *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}\n";
 
 pub fn base_handlers(specification: &Specification, state: &PageState) -> BTreeMap<String, String> {
     let nodes = nodes_by_path(state);
     let mut handlers = BTreeMap::new();
-    let shared_overflow = specification
-        .interactions
-        .iter()
-        .filter(|interaction| {
-            interaction
-                .trigger_label
-                .eq_ignore_ascii_case("More options")
-        })
-        .count()
-        == 1;
     for (index, interaction) in specification.interactions.iter().enumerate() {
         let exact = nodes
             .get(interaction.trigger_path.as_str())
             .copied()
             .filter(|node| matches_trigger(interaction, node, state));
-        let matches = if shared_overflow
-            && interaction
-                .trigger_label
-                .eq_ignore_ascii_case("More options")
-        {
+        let matches = if shared_trigger(interaction, std::slice::from_ref(state)) {
             state
                 .nodes
                 .iter()
@@ -119,27 +103,8 @@ pub fn state_handlers(
 }
 
 pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
-    let label = interaction.trigger_label.to_ascii_lowercase();
-    if (label == "more options" || label.contains("menu") || label.contains("launcher"))
-        && interaction.states.iter().any(|state| {
-            baselines
-                .iter()
-                .find(|baseline| baseline.viewport.width == state.viewport.width)
-                .is_some_and(|baseline| {
-                    if label == "more options" {
-                        !crate::interaction_surface::roots(state, baseline).is_empty()
-                    } else {
-                        crate::interaction_state::surface_differs(
-                            state,
-                            baseline,
-                            &interaction.trigger_path,
-                            &interaction.trigger_label,
-                        )
-                    }
-                })
-        })
-    {
-        return true;
+    if state_control(interaction, baselines) {
+        return false;
     }
     if baselines.iter().any(|baseline| {
         baseline
@@ -153,6 +118,7 @@ pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
     }) {
         return true;
     }
+
     let comparisons = interaction
         .states
         .iter()
@@ -168,6 +134,36 @@ pub fn closable(interaction: &Interaction, baselines: &[PageState]) -> bool {
         .map(|(state, baseline)| closable_state(state, baseline))
         .collect::<Vec<_>>();
     closable.iter().filter(|value| **value).count() * 2 > closable.len()
+}
+
+pub fn shared_trigger(interaction: &Interaction, baselines: &[PageState]) -> bool {
+    interaction.trigger_occurrence.is_none()
+        && baselines.iter().any(|baseline| {
+            baseline
+                .nodes
+                .iter()
+                .filter(|node| matches_trigger(interaction, node, baseline))
+                .count()
+                > 1
+        })
+}
+
+pub fn state_control(interaction: &Interaction, baselines: &[PageState]) -> bool {
+    baselines.iter().any(|baseline| {
+        baseline
+            .nodes
+            .iter()
+            .find(|node| node.path == interaction.trigger_path)
+            .is_some_and(|node| {
+                !node.attributes.contains_key("aria-haspopup")
+                    && (node
+                        .attributes
+                        .get("role")
+                        .is_some_and(|role| role == "tab")
+                        || node.attributes.contains_key("aria-pressed")
+                        || node.attributes.contains_key("aria-selected"))
+            })
+    })
 }
 
 fn closable_state(state: &PageState, baseline: &PageState) -> bool {
@@ -223,7 +219,9 @@ fn trigger_binding(node: Option<&Node>, action: &str, marker: Option<usize>) -> 
 }
 
 pub fn rendered(interaction: &Interaction, baselines: &[PageState]) -> bool {
-    text_entry_interaction(interaction) || closable(interaction, baselines)
+    text_entry_interaction(interaction)
+        || state_control(interaction, baselines)
+        || closable(interaction, baselines)
 }
 
 pub fn text_entry_interaction(interaction: &Interaction) -> bool {

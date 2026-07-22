@@ -71,6 +71,8 @@ mod tests {
             url: String::new(),
             title: String::new(),
             viewport: Default::default(),
+            dom: Default::default(),
+            capture_blockers: Vec::new(),
             nodes: vec![
                 node("html", None, 100.0),
                 node("html>body", Some("html"), 100.0),

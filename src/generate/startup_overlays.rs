@@ -83,6 +83,8 @@ mod tests {
             url: String::new(),
             title: String::new(),
             viewport: Viewport::default(),
+            dom: Default::default(),
+            capture_blockers: Vec::new(),
             nodes: Vec::new(),
             startup_nodes: vec![root],
             startup_delay_ms: 100,

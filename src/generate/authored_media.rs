@@ -2,12 +2,6 @@ use crate::model::Node;
 use std::collections::HashSet;
 
 pub fn rules(node: &Node, generated_class: &str, rules: &[String]) -> Vec<String> {
-    let classes = node
-        .attributes
-        .get("class")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .collect::<Vec<_>>();
     let mut output = Vec::new();
     let mut seen = HashSet::new();
     for rule in rules {
@@ -25,10 +19,7 @@ pub fn rules(node: &Node, generated_class: &str, rules: &[String]) -> Vec<String
                 continue;
             };
             let selector = selector.trim();
-            if selector.contains(':')
-                || !classes
-                    .iter()
-                    .any(|class| super::authored_css::directly_targets(selector, class))
+            if selector.contains(':') || !super::authored_css::directly_targets_node(selector, node)
             {
                 continue;
             }

@@ -25,6 +25,18 @@ pub fn targets(specification: &Specification) -> String {
     format!("[null,{interactions}]")
 }
 
+pub fn moves_horizontally(
+    interaction: &crate::model::Interaction,
+    baselines: &[PageState],
+) -> bool {
+    interaction.states.iter().any(|state| {
+        baselines
+            .iter()
+            .find(|baseline| baseline.viewport.width == state.viewport.width)
+            .is_some_and(|baseline| horizontal_scroll(baseline, state).is_some())
+    })
+}
+
 fn scroll_snapshot(baseline: &PageState, state: &PageState) -> String {
     let vertical = anchor(state).and_then(|current| {
         let baseline_node = baseline

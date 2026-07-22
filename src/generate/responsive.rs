@@ -28,10 +28,27 @@ pub fn append_filtered(
             .iter()
             .map(|node| (node.path.as_str(), node))
             .collect();
+        let shrunk_roots = state
+            .nodes
+            .iter()
+            .filter(|node| {
+                base_nodes.get(node.path.as_str()).is_some_and(|base| {
+                    shrunk_flex_item(
+                        base,
+                        node,
+                        node.parent
+                            .as_deref()
+                            .and_then(|parent| state_nodes.get(parent).copied()),
+                    )
+                })
+            })
+            .map(|node| node.path.as_str())
+            .collect::<HashSet<_>>();
         for node in &state.nodes {
             if paths.is_some_and(|paths| !paths.contains(&node.path)) {
                 continue;
             }
+
             let (Some(base_node), Some(class)) =
                 (base_nodes.get(node.path.as_str()), classes.get(&node.path))
             else {
@@ -48,6 +65,7 @@ pub fn append_filtered(
                 assets,
                 &state.css_rules,
                 fluid_heights.contains(&node.path),
+                constrained_by_flex_chain(node, &shrunk_roots, &state_nodes),
             ));
         }
         if !rules.is_empty() {
@@ -61,6 +79,29 @@ pub fn append_filtered(
             css.push_str(&media_rule(minimum, maximum, &rules));
         }
     }
+}
+
+fn constrained_by_flex_chain(
+    node: &Node,
+    roots: &HashSet<&str>,
+    nodes: &HashMap<&str, &Node>,
+) -> bool {
+    let mut parent = node.parent.as_deref();
+    while let Some(path) = parent {
+        if roots.contains(path) {
+            return true;
+        }
+        let Some(node) = nodes.get(path) else {
+            return false;
+        };
+        if node.style.get("display").map(String::as_str) != Some("flex")
+            || node.style.get("flex-direction").map(String::as_str) != Some("row")
+        {
+            return false;
+        }
+        parent = node.parent.as_deref();
+    }
+    false
 }
 
 pub(super) fn band(
@@ -87,7 +128,9 @@ pub fn base_declarations(
     let mut styles = node.style.clone();
     let authored_width = super::authored_css::has_property(node, css_rules, "width");
     super::authored_css::normalize(&mut styles, node, css_rules);
-    if !authored_width && intrinsic_flex_text(node, parent, text_parent) {
+    if !authored_width
+        && (intrinsic_flex_text(node, parent, text_parent) || fluid_flex_item(node, parent))
+    {
         styles.remove("width");
     }
     if fluid_height {
@@ -111,6 +154,46 @@ fn intrinsic_flex_text(node: &Node, parent: Option<&Node>, text_parent: bool) ->
         && node.rect.width < parent.rect.width - 12.0
 }
 
+fn fluid_flex_item(node: &Node, parent: Option<&Node>) -> bool {
+    parent.is_some_and(|parent| {
+        let flexible_main_axis = ["flex-grow", "flex-shrink"].into_iter().any(|name| {
+            node.style
+                .get(name)
+                .and_then(|value| value.parse::<f64>().ok())
+                .is_some_and(|value| value > 0.0)
+        });
+        parent.style.get("display").map(String::as_str) == Some("flex")
+            && (parent
+                .style
+                .get("flex-direction")
+                .map(String::as_str)
+                .is_none_or(|direction| direction.starts_with("row"))
+                && flexible_main_axis
+                || (parent
+                    .style
+                    .get("align-items")
+                    .map(String::as_str)
+                    .is_none_or(|alignment| matches!(alignment, "normal" | "stretch"))
+                    && node
+                        .style
+                        .get("align-self")
+                        .map(String::as_str)
+                        .is_none_or(|alignment| {
+                            matches!(alignment, "auto" | "normal" | "stretch")
+                        })))
+            && !matches!(
+                node.style.get("position").map(String::as_str),
+                Some("absolute" | "fixed")
+            )
+            && node.attributes.get("role").is_none_or(|role| role != "img")
+            && !(node.rect.width <= 32.0 && node.rect.height <= 32.0)
+            && !matches!(
+                node.tag.as_str(),
+                "button" | "canvas" | "img" | "input" | "select" | "svg" | "textarea" | "video"
+            )
+    })
+}
+
 #[allow(clippy::too_many_arguments)]
 fn append_node_rules(
     base: &Node,
@@ -121,11 +204,32 @@ fn append_node_rules(
     assets: &BTreeMap<String, String>,
     css_rules: &[String],
     fluid_height: bool,
+    constrained_by_flex: bool,
 ) -> String {
     let mut rules = String::new();
     let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
     super::authored_css::normalize(&mut changed, node, css_rules);
+    if constrained_by_flex
+        && node
+            .style
+            .get("flex-shrink")
+            .and_then(|value| value.parse::<f64>().ok())
+            .is_some_and(|value| value > 0.0)
+        && node.rect.width + 1.0 < base.rect.width
+    {
+        changed.remove("width");
+        changed.remove("inline-size");
+    }
+    if !super::authored_css::has_property(node, css_rules, "width") && fluid_flex_item(node, parent)
+    {
+        if shrunk_flex_item(base, node, parent) {
+            changed.insert("width".into(), "100%".into());
+            changed.insert("max-width".into(), format!("{}px", node.rect.width));
+        } else {
+            changed.remove("width");
+        }
+    }
     if fluid_height {
         changed.remove("height");
     }
@@ -158,6 +262,19 @@ fn append_node_rules(
         &mut rules,
     );
     rules
+}
+
+fn shrunk_flex_item(base: &Node, node: &Node, parent: Option<&Node>) -> bool {
+    parent.is_some_and(|parent| {
+        parent.style.get("display").map(String::as_str) == Some("flex")
+            && parent.style.get("flex-direction").map(String::as_str) == Some("row")
+            && node
+                .style
+                .get("flex-shrink")
+                .and_then(|value| value.parse::<f64>().ok())
+                .is_some_and(|value| value > 0.0)
+            && node.rect.width + 1.0 < base.rect.width
+    })
 }
 
 fn append_pseudo_rule(
@@ -213,10 +330,11 @@ pub(super) fn media_rule(minimum: Option<u32>, maximum: u32, rules: &str) -> Str
 fn normalize_viewport_width(
     styles: &mut Styles,
     node: &Node,
+    parent: Option<&Node>,
     viewport: &Viewport,
     base: Option<(&Node, &Viewport)>,
 ) {
-    super::responsive_geometry::normalize(styles, node, None, viewport, base);
+    super::responsive_geometry::normalize(styles, node, parent, viewport, base);
 }
 
 #[cfg(test)]

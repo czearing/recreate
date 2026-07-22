@@ -35,6 +35,8 @@ fn state() -> PageState {
             height: 1080,
             dpr: 1.0,
         },
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes: vec![node("html>body>main")],
         startup_nodes: Vec::new(),
         startup_delay_ms: 0,

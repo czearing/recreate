@@ -3,10 +3,7 @@ use std::collections::{HashMap, HashSet};
 
 pub fn normalize(specification: &mut Specification) {
     for interaction in &mut specification.interactions {
-        if !interaction
-            .trigger_label
-            .eq_ignore_ascii_case("More options")
-        {
+        if !repeated_trigger(interaction, &specification.states) {
             continue;
         }
         for state in &mut interaction.states {
@@ -21,6 +18,7 @@ pub fn normalize(specification: &mut Specification) {
             if roots.is_empty() {
                 continue;
             }
+
             let baseline_paths: HashSet<_> = baseline
                 .nodes
                 .iter()
@@ -39,6 +37,46 @@ pub fn normalize(specification: &mut Specification) {
                 false
             });
         }
+    }
+
+    fn repeated_trigger(
+        interaction: &crate::model::Interaction,
+        baselines: &[crate::model::PageState],
+    ) -> bool {
+        interaction.trigger_occurrence.is_none()
+            && baselines.iter().any(|baseline| {
+                baseline
+                    .nodes
+                    .iter()
+                    .filter(|node| {
+                        node.tag == interaction.trigger_tag
+                            && node_label(node, baseline) == interaction.trigger_label
+                    })
+                    .count()
+                    > 1
+            })
+    }
+
+    fn node_label(node: &Node, state: &crate::model::PageState) -> String {
+        node.attributes
+            .get("aria-label")
+            .or_else(|| node.attributes.get("value"))
+            .cloned()
+            .unwrap_or_else(|| {
+                let prefix = format!("{}>", node.path);
+                state
+                    .nodes
+                    .iter()
+                    .filter(|candidate| {
+                        candidate.tag == "#text" && candidate.path.starts_with(&prefix)
+                    })
+                    .map(|candidate| candidate.text.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            })
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ")
     }
 }
 
@@ -162,12 +200,28 @@ mod tests {
     #[test]
     fn removes_stale_hidden_overflow_surfaces() {
         let baseline = node("html>body", Some("html"), "", true);
+        let mut first_trigger = node(
+            "html>body>button:nth-of-type(1)",
+            Some("html>body"),
+            "",
+            true,
+        );
+        first_trigger.tag = "button".into();
+        first_trigger
+            .attributes
+            .insert("aria-label".into(), "Open actions".into());
+        let mut second_trigger = first_trigger.clone();
+        second_trigger.path = "html>body>button:nth-of-type(2)".into();
         let state = PageState {
             url: String::new(),
             title: String::new(),
             viewport: Viewport::default(),
+            dom: Default::default(),
+            capture_blockers: Vec::new(),
             nodes: vec![
                 baseline.clone(),
+                first_trigger.clone(),
+                second_trigger.clone(),
                 node(
                     "html>body>div:nth-of-type(1)",
                     Some("html>body"),
@@ -196,22 +250,22 @@ mod tests {
             requested_url: String::new(),
             captured_url: String::new(),
             states: vec![PageState {
-                nodes: vec![baseline],
+                nodes: vec![baseline, first_trigger, second_trigger],
                 ..state.clone()
             }],
             interactions: vec![Interaction {
                 trigger_path: String::new(),
                 trigger_tag: "button".into(),
-                trigger_label: "More options".into(),
+                trigger_label: "Open actions".into(),
                 trigger_occurrence: None,
                 focused_path: None,
                 states: vec![state],
             }],
         };
         normalize(&mut specification);
-        assert_eq!(specification.interactions[0].states[0].nodes.len(), 2);
+        assert_eq!(specification.interactions[0].states[0].nodes.len(), 4);
         assert!(
-            specification.interactions[0].states[0].nodes[1]
+            specification.interactions[0].states[0].nodes[3]
                 .path
                 .ends_with("div:nth-of-type(2)")
         );

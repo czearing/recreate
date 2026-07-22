@@ -19,6 +19,7 @@ pub fn launch_browser(path: &Path, profile: &Path, port: u16) -> Child {
             "--disable-gpu",
             "--no-first-run",
             "--no-default-browser-check",
+            "--force-device-scale-factor=1",
             &format!("--remote-debugging-port={port}"),
             &format!("--user-data-dir={}", profile.display()),
             "about:blank",

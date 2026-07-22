@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Oracle fixture</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:16px/1.4 Arial,sans-serif;color:rgb(20,20,24)}
+main{width:min(90%,960px);margin:24px auto;display:grid;gap:16px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+article{min-height:80px;padding:12px;border:1px solid rgb(90,90,100);border-radius:8px}
+button{width:120px;height:36px;background:rgb(20,90,220);color:white;border:0}
+.pulse{width:20px;height:20px;background:rgb(220,50,70);animation:pulse 50ms linear infinite paused}
+@keyframes pulse{from{transform:translateX(0)}to{transform:translateX(40px)}}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+</style><main><h1>Independent oracle</h1><section class="cards" aria-label="Features">
+<article>Responsive</article><article>Async</article><article>Motion</article></section>
+<button type="button" aria-label="Run comparison">Compare</button>
+<div class="pulse" aria-label="Motion sample"></div></main>
+<script>fetch("data:application/json,%7B%22ok%22%3Atrue%7D").then(r=>r.json()).then(v=>document.body.dataset.network=String(v.ok));
+new ResizeObserver(e=>document.body.dataset.resize=String(Math.round(e[0].contentRect.width))).observe(document.querySelector("main"));
+setTimeout(()=>document.querySelector("h1").textContent="Independent oracle ready",50000)</script></html>

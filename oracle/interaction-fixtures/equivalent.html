@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Interaction oracle fixture</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:rgb(255,255,255);color:rgb(25,25,30);font:16px/1.4 Arial,sans-serif}
+main{width:720px;margin:32px auto;display:grid;gap:20px}
+.toolbar,.tabs,.views{display:flex;gap:8px;position:relative}
+button{min-width:96px;height:36px;border:1px solid rgb(80,80,90);background:white;color:inherit}
+.menu{position:absolute;left:0;top:40px;width:160px;padding:8px;border:1px solid rgb(80,80,90);background:white;z-index:2}
+.menu[hidden]{display:none}
+.panel{min-height:72px;padding:16px;border:1px solid rgb(120,120,130)}
+.items{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.items.list{grid-template-columns:1fr}
+.item{min-height:64px;padding:12px;border:1px solid rgb(120,120,130)}
+</style>
+<main>
+  <div class="toolbar">
+    <button type="button" aria-label="Open actions">Actions</button>
+    <div class="menu" role="menu" hidden><button role="menuitem">Rename</button></div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true">Overview</button><button role="tab" aria-selected="false">Activity</button>
+  </div>
+  <section class="panel" aria-label="Selected panel">Overview content</section>
+  <div class="views">
+    <button type="button" aria-label="Grid view" aria-pressed="true">Grid</button>
+    <button type="button" aria-label="List view" aria-pressed="false">List</button>
+  </div>
+  <section class="items" aria-label="Items">
+    <article class="item">Alpha</article><article class="item">Beta</article><article class="item">Gamma</article>
+  </section>
+</main>
+<script>
+const menu=document.querySelector('.menu');
+document.querySelector('[aria-label="Open actions"]').onclick=()=>menu.hidden=!menu.hidden;
+document.addEventListener('keydown',event=>{if(event.key==='Escape')menu.hidden=true});
+const panel=document.querySelector('.panel');
+const tabs=[...document.querySelectorAll('[role="tab"]')];
+tabs.forEach(tab=>tab.onclick=()=>{tabs.forEach(value=>value.setAttribute('aria-selected',value===tab));panel.textContent=tab.textContent+' content'});
+const items=document.querySelector('.items');
+const grid=document.querySelector('[aria-label="Grid view"]');
+const list=document.querySelector('[aria-label="List view"]');
+const view=active=>{items.classList.toggle('list',active===list);grid.setAttribute('aria-pressed',active===grid);list.setAttribute('aria-pressed',active===list)};
+grid.onclick=()=>view(grid);
+list.onclick=()=>view(list);
+</script>
+</html>

@@ -15,16 +15,26 @@ const SOURCE: &str = r#"
     }
     return values;
   };
+  const pathCache = new WeakMap([[document.documentElement, 'html']]);
+  const siblingIndexes = new WeakMap();
   const pathOf = element => {
-    if (element === document.documentElement) return 'html';
-    const parts = [];
-    for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
-      const peers = node.parentElement
-        ? [...node.parentElement.children].filter(child => child.tagName === node.tagName)
-        : [node];
-      parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
+    const cached = pathCache.get(element);
+    if (cached) return cached;
+    const parent = element.parentElement;
+    let indexes = siblingIndexes.get(parent);
+    if (!indexes) {
+      indexes = new WeakMap();
+      const counts = new Map();
+      for (const child of parent.children) {
+        const count = (counts.get(child.tagName) || 0) + 1;
+        counts.set(child.tagName, count);
+        indexes.set(child, count);
+      }
+      siblingIndexes.set(parent, indexes);
     }
-    return `html>${parts.reverse().join('>')}`;
+    const path = `${pathOf(parent)}>${element.tagName.toLowerCase()}:nth-of-type(${indexes.get(element)})`;
+    pathCache.set(element, path);
+    return path;
   };
   const visible = element => {
     const rect = element.getBoundingClientRect();
@@ -37,6 +47,14 @@ const SOURCE: &str = r#"
   const roots = [...document.querySelectorAll(
     '[role="dialog"],[role="listbox"],[role="menu"]'
   )].filter(visible);
+  for (const portal of document.querySelectorAll('body>[data-portal-node]')) {
+    if (visible(portal) || [...portal.querySelectorAll('*')].some(visible)) roots.push(portal);
+  }
+  for (const element of document.querySelectorAll('body *')) {
+    const rect = element.getBoundingClientRect();
+    if (visible(element) && getComputedStyle(element).position === 'fixed' &&
+        rect.width * rect.height >= 400) roots.push(element);
+  }
   for (const button of document.querySelectorAll('button,[role="button"]')) {
     if (!/^(pin|delete|duplicate)$/i.test((button.innerText || '').trim())) continue;
     for (let parent = button.parentElement; parent; parent = parent.parentElement) {
@@ -55,9 +73,6 @@ const SOURCE: &str = r#"
     }
     roots.push(root);
   }
-  for (const animation of document.getAnimations({ subtree: true })) {
-    if (animation.effect?.target instanceof Element) roots.push(animation.effect.target);
-  }
   for (const root of roots) {
     selected.add(root);
     root.querySelectorAll('*').forEach(element => selected.add(element));
@@ -67,6 +82,7 @@ const SOURCE: &str = r#"
   }
   const nodes = [];
   const capture = element => {
+    if (element.matches('script,noscript,[data-recreate-startup],.recreateAnchoredSurface')) return;
     const path = pathOf(element);
     const rect = element.getBoundingClientRect();
     nodes.push({
@@ -84,10 +100,13 @@ const SOURCE: &str = r#"
       after: null
     });
     let textIndex = 0;
-    for (const child of element.childNodes) {
+    const textChildren = element.matches('textarea,input') && element.value.trim()
+      ? [document.createTextNode(element.value)]
+      : element.childNodes;
+    for (const child of textChildren) {
       if (child.nodeType !== Node.TEXT_NODE || !child.textContent.trim()) continue;
       const range = document.createRange();
-      range.selectNodeContents(child);
+      if (child.parentNode) range.selectNodeContents(child);
       const value = range.getBoundingClientRect();
       textIndex++;
       nodes.push({
@@ -106,6 +125,19 @@ const SOURCE: &str = r#"
   for (const element of document.querySelectorAll('*')) {
     if (selected.has(element)) capture(element);
   }
+  const assets = new Set();
+  for (const element of selected) {
+    if (element.matches?.('img,video,source')) {
+      const url = element.currentSrc || element.src;
+      if (url) assets.add(url);
+    }
+  }
+  for (const node of nodes) {
+    for (const match of node.style['background-image'].matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+      assets.add(new URL(match[1], location.href).href);
+    }
+  }
+__ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,
     title: document.title,
@@ -114,8 +146,8 @@ const SOURCE: &str = r#"
     state_styles: [],
     attribute_sequences: [],
     css_rules: [],
-    asset_urls: [],
-    asset_data: {}
+    asset_urls: Array.from(assets),
+    asset_data: assetData
   });
 })()
 "#;
@@ -127,4 +159,40 @@ pub fn source() -> String {
             "__DIRECTIONAL_BORDERS__",
             style_contract::DIRECTIONAL_BORDERS,
         )
+        .replace("__ASSET_CAPTURE__", crate::asset_script::SOURCE)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn captures_portal_and_fixed_menu_roots() {
+        assert!(super::SOURCE.contains("body>[data-portal-node]"));
+        assert!(super::SOURCE.contains("position === 'fixed'"));
+    }
+
+    #[test]
+    fn excludes_non_rendered_runtime_nodes() {
+        assert!(
+            super::SOURCE
+                .contains("script,noscript,[data-recreate-startup],.recreateAnchoredSurface")
+        );
+    }
+
+    #[test]
+    fn selection_does_not_depend_on_generated_animations() {
+        assert!(!super::SOURCE.contains("document.getAnimations"));
+    }
+
+    #[test]
+    fn captures_selected_surface_assets() {
+        let source = super::source();
+        assert!(source.contains("const assetData = {}"));
+        assert!(source.contains("asset_data: assetData"));
+    }
+
+    #[test]
+    fn canonicalizes_control_values_as_text_evidence() {
+        assert!(super::SOURCE.contains("element.matches('textarea,input')"));
+        assert!(super::SOURCE.contains("document.createTextNode(element.value)"));
+    }
 }

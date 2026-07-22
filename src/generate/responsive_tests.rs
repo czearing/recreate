@@ -26,7 +26,7 @@ fn node(tag: &str, x: f64, width: f64) -> Node {
 
 fn filtered_width(node: Node, viewport: &Viewport) -> Option<String> {
     let mut styles = node.style.clone();
-    normalize_viewport_width(&mut styles, &node, viewport, None);
+    normalize_viewport_width(&mut styles, &node, None, viewport, None);
     styles.get("width").cloned()
 }
 
@@ -79,6 +79,133 @@ fn preserves_compact_control_width_when_it_fills_its_parent() {
 }
 
 #[test]
+fn detects_responsive_flex_shrink() {
+    let base = node("group", 0.0, 180.0);
+    let mut current = node("group", 0.0, 162.0);
+    current.style.insert("flex-shrink".into(), "1".into());
+    let mut parent = node("parent", 0.0, 206.0);
+    parent.style.insert("display".into(), "flex".into());
+    parent.style.insert("flex-direction".into(), "row".into());
+
+    assert!(shrunk_flex_item(&base, &current, Some(&parent)));
+}
+
+#[test]
+fn constrains_only_descendants_in_the_same_flex_chain() {
+    let mut root = node("root", 0.0, 162.0);
+    root.path = "root".into();
+    let mut button = node("button", 0.0, 121.0);
+    button.path = "root>button".into();
+    button.parent = Some(root.path.clone());
+    button.style.insert("display".into(), "flex".into());
+    button.style.insert("flex-direction".into(), "row".into());
+    let mut icon = node("svg", 0.0, 16.0);
+    icon.path = "root>button>svg".into();
+    icon.parent = Some(button.path.clone());
+    let nodes = HashMap::from([
+        (root.path.as_str(), &root),
+        (button.path.as_str(), &button),
+        (icon.path.as_str(), &icon),
+    ]);
+    let roots = HashSet::from([root.path.as_str()]);
+
+    assert!(constrained_by_flex_chain(&button, &roots, &nodes));
+    assert!(constrained_by_flex_chain(&icon, &roots, &nodes));
+}
+
+#[test]
+fn does_not_constrain_descendants_below_a_non_flex_container() {
+    let mut root = node("root", 0.0, 162.0);
+    root.path = "root".into();
+    let mut card = node("card", 0.0, 140.0);
+    card.path = "root>card".into();
+    card.parent = Some(root.path.clone());
+    card.style.insert("display".into(), "block".into());
+    let mut icon = node("svg", 0.0, 16.0);
+    icon.path = "root>card>svg".into();
+    icon.parent = Some(card.path.clone());
+    let nodes = HashMap::from([
+        (root.path.as_str(), &root),
+        (card.path.as_str(), &card),
+        (icon.path.as_str(), &icon),
+    ]);
+    let roots = HashSet::from([root.path.as_str()]);
+
+    assert!(!constrained_by_flex_chain(&icon, &roots, &nodes));
+}
+
+#[test]
+fn preserves_compact_role_image_width_when_it_fills_its_parent() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut avatar = node("span", 0.0, 28.0);
+    avatar.attributes.insert("role".into(), "img".into());
+    let parent = node("div", 0.0, 28.0);
+    let css = base_declarations(
+        &avatar,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(css.contains("width:28px"));
+}
+
+#[test]
+fn removes_sampled_width_from_fluid_flex_items() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let child = node("div", 0.0, 600.0);
+    let mut parent = node("div", 0.0, 1200.0);
+    parent.style.insert("display".into(), "flex".into());
+    let css = base_declarations(
+        &child,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(!css.contains("width:600px"));
+}
+
+#[test]
+fn preserves_fixed_width_inside_centered_column_flex() {
+    let viewport = Viewport {
+        width: 1440,
+        height: 900,
+        dpr: 1.0,
+    };
+    let mut child = node("div", 0.0, 48.0);
+    child.style.insert("align-self".into(), "auto".into());
+    let mut parent = node("button", 0.0, 104.0);
+    parent.style.extend([
+        ("display".into(), "flex".into()),
+        ("flex-direction".into(), "column".into()),
+        ("align-items".into(), "center".into()),
+    ]);
+    let css = base_declarations(
+        &child,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        &[],
+        false,
+        false,
+    );
+    assert!(css.contains("width:48px"));
+}
+
+#[test]
 fn stretches_absolute_content_between_captured_edges() {
     let viewport = Viewport {
         width: 390,
@@ -105,6 +232,44 @@ fn stretches_absolute_content_between_captured_edges() {
     assert!(!css.contains("width:260px"));
     assert!(css.contains("left:20px"));
     assert!(css.contains("right:20px"));
+}
+
+#[test]
+fn resets_frozen_width_when_responsive_edges_take_over() {
+    let wide = Viewport {
+        width: 1920,
+        height: 1080,
+        dpr: 1.0,
+    };
+    let narrow = Viewport {
+        width: 320,
+        height: 568,
+        dpr: 1.0,
+    };
+    let narrow_parent = node("body", 0.0, 320.0);
+    let mut base = node("section", 384.0, 1152.0);
+    base.style.extend([
+        ("position".into(), "fixed".into()),
+        ("left".into(), "384px".into()),
+        ("right".into(), "384px".into()),
+    ]);
+    let mut current = node("section", 64.0, 192.0);
+    current.style.extend([
+        ("position".into(), "fixed".into()),
+        ("left".into(), "64px".into()),
+        ("right".into(), "64px".into()),
+    ]);
+    let mut changed = changed_styles(&base.style, &current.style);
+
+    normalize_viewport_width(
+        &mut changed,
+        &current,
+        Some(&narrow_parent),
+        &narrow,
+        Some((&base, &wide)),
+    );
+    assert_eq!(changed.get("width").map(String::as_str), Some("auto"));
+    assert_eq!(changed.get("width").map(String::as_str), Some("auto"));
 }
 
 #[test]
@@ -354,7 +519,7 @@ fn writes_auto_when_centered_fixed_root_becomes_fluid() {
     let base = node("root", 200.0, 800.0);
     let current = node("root", 0.0, 600.0);
     let mut changed = changed_styles(&base.style, &current.style);
-    normalize_viewport_width(&mut changed, &current, &narrow, Some((&base, &wide)));
+    normalize_viewport_width(&mut changed, &current, None, &narrow, Some((&base, &wide)));
     assert_eq!(changed.get("width").map(String::as_str), Some("auto"));
 }
 
@@ -374,7 +539,7 @@ fn writes_auto_when_fluid_root_matches_fixed_base_width() {
     let current = node("root", 0.0, 720.0);
     let mut changed = changed_styles(&base.style, &current.style);
     assert!(!changed.contains_key("width"));
-    normalize_viewport_width(&mut changed, &current, &narrow, Some((&base, &wide)));
+    normalize_viewport_width(&mut changed, &current, None, &narrow, Some((&base, &wide)));
     assert_eq!(changed.get("width").map(String::as_str), Some("auto"));
 }
 

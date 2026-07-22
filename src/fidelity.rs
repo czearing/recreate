@@ -156,13 +156,6 @@ async fn trace(args: &FidelityArgs, target: &str) -> Result<Trace> {
     press_escape(&mut cdp).await?;
     settle(&mut cdp, 50).await;
     let mut descriptor = cdp.evaluate(&fidelity_script::prepare(&args.label)).await?;
-    if descriptor["x"].as_f64().is_none()
-        && let Some((x, y)) = control_point(&mut cdp, "App launcher").await?
-    {
-        click_pointer(&mut cdp, x, y).await?;
-        settle(&mut cdp, 100).await;
-        descriptor = cdp.evaluate(&fidelity_script::prepare(&args.label)).await?;
-    }
     if descriptor["x"].as_f64().is_none() {
         cdp.send("Page.reload", json!({})).await?;
         for _ in 0..20 {
@@ -268,18 +261,6 @@ async fn move_pointer(cdp: &mut Cdp, x: f64, y: f64) -> Result<()> {
     )
     .await?;
     Ok(())
-}
-
-async fn control_point(cdp: &mut Cdp, label: &str) -> Result<Option<(f64, f64)>> {
-    let script = format!(
-        "(() => {{ const element=[...document.querySelectorAll('button,[role=\"button\"]')]\
-         .find(value=>(value.getAttribute('aria-label')||'')==={});\
-         if(!element)return null;const rect=element.getBoundingClientRect();\
-         return {{x:rect.x+rect.width/2,y:rect.y+rect.height/2}}; }})()",
-        serde_json::to_string(label)?
-    );
-    let value = cdp.evaluate(&script).await?;
-    Ok(value["x"].as_f64().zip(value["y"].as_f64()))
 }
 
 async fn click_pointer(cdp: &mut Cdp, x: f64, y: f64) -> Result<()> {

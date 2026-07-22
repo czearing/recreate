@@ -2,4 +2,5 @@
 /recreate-output/
 /.cairn-harness/
 /review/
+/node_modules/
 *.log

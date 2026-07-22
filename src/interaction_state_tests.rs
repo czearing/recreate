@@ -7,6 +7,8 @@ fn state(nodes: usize) -> PageState {
         url: "https://example.test".into(),
         title: "Fixture".into(),
         viewport: Viewport::default(),
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes: (0..nodes)
             .map(|index| Node {
                 path: format!("html>body>div:nth-of-type({index})"),
@@ -84,7 +86,52 @@ fn detects_newly_visible_fixed_surfaces() {
         &opened,
         &baseline,
         "html>body>button:nth-of-type(1)",
-        "More options"
+        "Open actions"
+    ));
+}
+
+#[test]
+fn detects_newly_inserted_portal_roots() {
+    let baseline = state(1);
+    let mut opened = baseline.clone();
+    let mut portal = opened.nodes[0].clone();
+    portal.path = "html>body>div:nth-of-type(2)".into();
+    portal
+        .attributes
+        .insert("data-portal-node".into(), "true".into());
+    portal.text = "Command panel".into();
+    opened.nodes.push(portal);
+
+    assert!(surface_differs(
+        &opened,
+        &baseline,
+        "html>body>button:nth-of-type(1)",
+        "Command panel"
+    ));
+}
+
+#[test]
+fn detects_visible_descendants_of_zero_size_portals() {
+    let baseline = state(1);
+    let mut opened = baseline.clone();
+    let mut portal = opened.nodes[0].clone();
+    portal.path = "html>body>div:nth-of-type(2)".into();
+    portal.rect.width = 0.0;
+    portal.rect.height = 0.0;
+    portal
+        .attributes
+        .insert("data-portal-node".into(), "true".into());
+    let mut child = opened.nodes[0].clone();
+    child.path = format!("{}>iframe:nth-of-type(1)", portal.path);
+    child.parent = Some(portal.path.clone());
+    child.tag = "iframe".into();
+    opened.nodes.extend([portal, child]);
+
+    assert!(surface_differs(
+        &opened,
+        &baseline,
+        "html>body>button:nth-of-type(1)",
+        "Command panel"
     ));
 }
 
@@ -107,7 +154,7 @@ fn ignores_newly_visible_content_inside_the_trigger() {
         &changed,
         &baseline,
         &baseline.nodes[0].path,
-        "Open account menu"
+        "Open profile"
     ));
 }
 
@@ -136,7 +183,7 @@ fn ignores_replaced_text_inside_absolute_content() {
         &changed,
         &baseline,
         "html>body>avatar",
-        "Open account menu"
+        "Open profile"
     ));
 }
 

@@ -75,6 +75,8 @@ mod tests {
             url: String::new(),
             title: String::new(),
             viewport: Viewport::default(),
+            dom: Default::default(),
+            capture_blockers: Vec::new(),
             nodes,
             startup_nodes: Vec::new(),
             startup_delay_ms: 0,

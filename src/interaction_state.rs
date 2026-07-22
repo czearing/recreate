@@ -15,6 +15,7 @@ pub fn meaningfully_differs(left: &PageState, right: &PageState) -> bool {
         })
 }
 
+#[cfg(test)]
 pub fn content_differs(left: &PageState, right: &PageState) -> bool {
     meaningfully_differs(left, right)
         || left
@@ -24,16 +25,43 @@ pub fn content_differs(left: &PageState, right: &PageState) -> bool {
             .any(|(left, right)| left.text != right.text)
 }
 
-pub fn surface_differs(left: &PageState, right: &PageState, trigger: &str, label: &str) -> bool {
+pub fn selected_differs(left: &PageState, right: &PageState) -> bool {
     let baseline: HashMap<_, _> = right
         .nodes
         .iter()
         .map(|node| (node.path.as_str(), node))
         .collect();
     left.nodes.iter().any(|node| {
+        baseline.get(node.path.as_str()).is_none_or(|baseline| {
+            node.tag != baseline.tag || semantic_attributes(node) != semantic_attributes(baseline)
+        })
+    })
+}
+
+pub fn surface_differs(left: &PageState, right: &PageState, trigger: &str, label: &str) -> bool {
+    let baseline: HashMap<_, _> = right
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect();
+    let added_portals = left
+        .nodes
+        .iter()
+        .filter(|node| {
+            node.attributes.contains_key("data-portal-node")
+                && !baseline.contains_key(node.path.as_str())
+        })
+        .map(|node| node.path.as_str())
+        .collect::<Vec<_>>();
+    left.nodes.iter().any(|node| {
         !is_trigger_node(node.path.as_str(), trigger)
             && visible(node)
-            && overlay(node, label)
+            && (overlay(node, label)
+                || added_portals.iter().any(|root| {
+                    node.path
+                        .strip_prefix(root)
+                        .is_some_and(|suffix| suffix.starts_with('>'))
+                }))
             && baseline
                 .get(node.path.as_str())
                 .is_none_or(|node| !visible(node))
@@ -67,15 +95,17 @@ fn visible(node: &crate::model::Node) -> bool {
 
 fn overlay(node: &crate::model::Node, label: &str) -> bool {
     node.tag != "#text"
-        && (node.attributes.get("role").is_some_and(|role| {
-            matches!(
-                role.as_str(),
-                "dialog" | "listbox" | "menu" | "menuitem" | "option"
-            )
-        }) || node
-            .style
-            .get("position")
-            .is_some_and(|value| value == "fixed")
+        && (node.attributes.contains_key("data-portal-node")
+            || node.attributes.get("role").is_some_and(|role| {
+                matches!(
+                    role.as_str(),
+                    "dialog" | "listbox" | "menu" | "menuitem" | "option"
+                )
+            })
+            || node
+                .style
+                .get("position")
+                .is_some_and(|value| value == "fixed")
             || (node
                 .style
                 .get("position")

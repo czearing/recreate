@@ -134,6 +134,12 @@ fn serve(listener: TcpListener, root: &Path) {
         if path == "/__shutdown" {
             break;
         }
+        if path == "/favicon.ico" {
+            let _ = stream.write_all(
+                b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+            );
+            continue;
+        }
         let path = asset_path(root, &path);
         let (status, body) = match fs::read(&path) {
             Ok(body) => ("200 OK", body),

@@ -12,6 +12,9 @@ mod authored_media;
 mod css;
 mod css_layout;
 mod css_values;
+mod custom_properties;
+mod custom_property_diff;
+mod document;
 mod inherited_styles;
 mod initial_scroll;
 #[cfg(test)]
@@ -129,9 +132,7 @@ pub async fn write_project(
             if !interactions::rendered(interaction, &specification.states) {
                 return Vec::new();
             }
-            let surface_paths = interaction
-                .trigger_label
-                .eq_ignore_ascii_case("More options")
+            let surface_paths = interactions::shared_trigger(interaction, &specification.states)
                 .then(|| {
                     crate::interaction_surface::paths(&interaction.states, &specification.states)
                 });
@@ -155,6 +156,31 @@ pub async fn write_project(
     );
     timing("state_styles");
     let (html_class, body_class, root_class) = roots::classes(specification, &components);
+    let baseline = specification.states.first();
+    let authored_class = |tag: &str| {
+        baseline
+            .and_then(|state| state.nodes.iter().find(|node| node.tag == tag))
+            .and_then(|node| node.attributes.get("class"))
+            .is_some_and(|value| !value.is_empty())
+    };
+    let mut root_aliases = std::collections::BTreeMap::<String, Vec<&str>>::new();
+    if !authored_class("html") {
+        root_aliases
+            .entry(html_class.clone())
+            .or_default()
+            .push("html");
+    }
+    if !authored_class("body") {
+        root_aliases
+            .entry(body_class.clone())
+            .or_default()
+            .push("body");
+    }
+    root_aliases.remove("");
+    let root_aliases = root_aliases
+        .into_iter()
+        .map(|(class_name, elements)| (class_name, elements.join(",")))
+        .collect::<Vec<_>>();
     let has_root = specification.states.first().is_some_and(|state| {
         state.nodes.iter().any(|node| {
             node.attributes
@@ -195,17 +221,30 @@ pub async fn write_project(
     fs::write(
         source.join("main.jsx"),
         format!(
-            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport './styles.css';\nimport App from './App.jsx';\ndocument.documentElement.className={};\ndocument.body.className={};\n{mount_source}\n",
-            serde_json::to_string(&html_class)?,
-            serde_json::to_string(&body_class)?,
+            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport generatedCss from './styles.css?inline';\nimport App from './App.jsx';\nconst rootAliases={};\nconst semanticCss=rootAliases.reduce((css,[className,elements])=>css.replaceAll(`.${{className}}{{`,`.${{className}},${{elements}}{{`),generatedCss);\nconst generatedSheet=new CSSStyleSheet();generatedSheet.replaceSync(semanticCss);document.adoptedStyleSheets=[...document.adoptedStyleSheets,generatedSheet];\ndocument.querySelector('script[data-recreate-entry]')?.remove();\nconst capturedBase=document.querySelector('base[data-recreate-base-href]');if(capturedBase){{capturedBase.href=capturedBase.dataset.recreateBaseHref;delete capturedBase.dataset.recreateBaseHref}}\n{}\n{}\n{mount_source}\n",
+            serde_json::to_string(&root_aliases)?,
+            if authored_class("html") {
+                format!(
+                    "document.documentElement.className={};",
+                    serde_json::to_string(&html_class)?
+                )
+            } else {
+                "document.documentElement.removeAttribute('class');".into()
+            },
+            if authored_class("body") {
+                format!(
+                    "document.body.className={};",
+                    serde_json::to_string(&body_class)?
+                )
+            } else {
+                "document.body.removeAttribute('class');".into()
+            },
         ),
     )?;
-    let title = specification
-        .states
-        .first()
-        .map(|state| state.title.as_str())
-        .unwrap_or("Recreate");
-    fs::write(root.join("index.html"), document(title, mount_markup))?;
+    fs::write(
+        root.join("index.html"),
+        document::render(specification.states.first(), mount_markup, &styles.classes),
+    )?;
     fs::write(
         root.join("package.json"),
         r#"{"private":true,"scripts":{"dev":"vite","build":"vite build"},"dependencies":{"vite":"^8.1.0","react":"^19.2.0","react-dom":"^19.2.0"}}"#,
@@ -224,18 +263,4 @@ fn mount(has_root: bool, root_class: &str) -> Result<(String, &'static str)> {
         ),
         "<div id=\"root\"></div>",
     ))
-}
-
-fn document(title: &str, mount_markup: &str) -> String {
-    format!(
-        "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>{}</title></head><body>{mount_markup}<script type=\"module\" src=\"/src/main.jsx\"></script></body></html>",
-        escape_html(title),
-    )
-}
-
-fn escape_html(value: &str) -> String {
-    value
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
 }

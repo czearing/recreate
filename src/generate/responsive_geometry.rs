@@ -99,11 +99,15 @@ fn normalize_width(
     viewport: &Viewport,
     base: Option<(&Node, &Viewport)>,
 ) {
-    if compact_control(node) || intrinsic_media(node) {
+    if compact_control(node) || compact_role_image(node) || intrinsic_media(node) {
         return;
     }
     if stretches_between_horizontal_edges(node, parent) {
-        styles.remove("width");
+        if base.is_some() {
+            styles.insert("width".into(), "auto".into());
+        } else {
+            styles.remove("width");
+        }
         return;
     }
     if stretches_across_grid_track(node, parent) {
@@ -237,6 +241,15 @@ fn compact_control(node: &Node) -> bool {
                 .attributes
                 .get("role")
                 .is_some_and(|role| role == "button"))
+}
+
+fn compact_role_image(node: &Node) -> bool {
+    node.rect.width <= 80.0
+        && node.rect.height <= 80.0
+        && node
+            .attributes
+            .get("role")
+            .is_some_and(|role| role == "img")
 }
 
 fn horizontal_padding(styles: &Styles) -> f64 {

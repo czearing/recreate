@@ -2,7 +2,14 @@ use crate::model::{Node, Styles};
 use std::collections::BTreeMap;
 
 pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
-    let authored = declarations(node, rules);
+    let mut authored = declarations(node, rules);
+    if node.tag == "textarea"
+        && authored
+            .get("height")
+            .is_some_and(|value| value.ends_with('%'))
+    {
+        authored.remove("height");
+    }
     if authored.is_empty() {
         return;
     }
@@ -33,6 +40,9 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
     if !authored.contains_key("width") && flexible(&authored) {
         styles.remove("width");
     }
+    if node.tag != "textarea" && !authored.contains_key("height") && flexible(&authored) {
+        styles.remove("height");
+    }
     if matches!(
         authored.get("display").map(String::as_str),
         Some("grid" | "inline-grid")
@@ -53,21 +63,13 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
 }
 
 pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool {
-    let classes: Vec<_> = node
-        .attributes
-        .get("class")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .collect();
     rules
         .iter()
         .filter_map(|rule| rule.split_once('{'))
         .any(|(selector, declarations)| {
             !selector.starts_with('@')
                 && !selector.contains(':')
-                && classes
-                    .iter()
-                    .any(|class| directly_targets(selector, class))
+                && directly_targets_node(selector, node)
                 && declarations
                     .split(';')
                     .filter_map(|declaration| declaration.split_once(':'))
@@ -83,6 +85,7 @@ fn flexible(styles: &Styles) -> bool {
     {
         return true;
     }
+
     styles
         .get("flex")
         .and_then(|value| value.split_whitespace().next())
@@ -91,20 +94,12 @@ fn flexible(styles: &Styles) -> bool {
 }
 
 fn declarations(node: &Node, rules: &[String]) -> Styles {
-    let classes: Vec<_> = node
-        .attributes
-        .get("class")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .collect();
     let mut values: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for declarations in rules.iter().filter_map(|rule| {
         let (selector, declarations) = rule.split_once('{')?;
         (!selector.starts_with('@')
             && !selector.contains(':')
-            && classes
-                .iter()
-                .any(|class| directly_targets(selector, class)))
+            && directly_targets_node(selector, node))
         .then_some(declarations)
     }) {
         for (name, value) in declarations
@@ -161,25 +156,50 @@ fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
         .is_none_or(|computed| computed == value)
 }
 
-pub(super) fn directly_targets(selectors: &str, class: &str) -> bool {
+pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
+    let classes = node
+        .attributes
+        .get("class")
+        .into_iter()
+        .flat_map(|value| value.split_whitespace())
+        .collect::<std::collections::HashSet<_>>();
     selectors.split(',').any(|selector| {
-        let compound = selector
-            .trim()
-            .rsplit(|character: char| {
-                character.is_whitespace() || matches!(character, '>' | '+' | '~')
-            })
-            .find(|part| !part.is_empty())
-            .unwrap_or_default();
-        let needle = format!(".{class}");
-        compound.match_indices(&needle).any(|(index, _)| {
-            compound[index + needle.len()..]
-                .chars()
-                .next()
-                .is_none_or(|character| {
-                    !character.is_ascii_alphanumeric() && !matches!(character, '-' | '_')
-                })
-        })
+        let compound = terminal_compound(selector);
+        let required = compound_classes(compound);
+        !required.is_empty()
+            && required
+                .iter()
+                .all(|class| classes.contains(class.as_str()))
     })
+}
+
+fn terminal_compound(selector: &str) -> &str {
+    selector
+        .trim()
+        .rsplit(|character: char| character.is_whitespace() || matches!(character, '>' | '+' | '~'))
+        .find(|part| !part.is_empty())
+        .unwrap_or_default()
+}
+
+fn compound_classes(compound: &str) -> Vec<String> {
+    let mut classes = Vec::new();
+    let mut remaining = compound;
+    while let Some(index) = remaining.find('.') {
+        remaining = &remaining[index + 1..];
+        let length = remaining
+            .chars()
+            .take_while(|character| {
+                character.is_ascii_alphanumeric() || matches!(character, '-' | '_')
+            })
+            .map(char::len_utf8)
+            .sum();
+        if length == 0 {
+            break;
+        }
+        classes.push(remaining[..length].to_string());
+        remaining = &remaining[length..];
+    }
+    classes
 }
 
 fn retained(name: &str) -> bool {
@@ -249,8 +269,33 @@ fn retained(name: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::normalize;
+    use super::{directly_targets_node, normalize};
     use crate::model::{Node, Rect, Styles};
+
+    #[test]
+    fn compound_modifier_rules_require_every_class() {
+        let mut node = Node {
+            path: "section".into(),
+            parent: None,
+            tag: "section".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 1.0,
+                height: 1.0,
+            },
+            style: Styles::new(),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "items".into());
+        assert!(directly_targets_node(".items", &node));
+        assert!(!directly_targets_node(".items.list", &node));
+        node.attributes.insert("class".into(), "items list".into());
+        assert!(directly_targets_node(".items.list", &node));
+    }
 
     #[test]
     fn restores_authored_intrinsic_motion() {
@@ -384,6 +429,71 @@ mod tests {
         assert!(!node.style.contains_key("width"));
         assert_eq!(node.style["flex"], "1 1 0%");
         assert_eq!(node.style["min-width"], "0");
+    }
+
+    #[test]
+    fn removes_measured_height_from_growing_flex_items() {
+        let mut node = Node {
+            path: "form>div".into(),
+            parent: Some("form".into()),
+            tag: "div".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 320.0,
+                height: 34.0,
+            },
+            style: Styles::from([
+                ("width".into(), "320px".into()),
+                ("height".into(), "34px".into()),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "editor".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".editor { flex: 1 1 0%; min-height: 0; }".into()],
+        );
+        assert!(!node.style.contains_key("height"));
+        assert_eq!(node.style["flex"], "1 1 0%");
+        assert_eq!(node.style["min-height"], "0");
+    }
+
+    #[test]
+    fn keeps_used_height_for_percentage_sized_textareas() {
+        let mut node = Node {
+            path: "form>textarea".into(),
+            parent: Some("form".into()),
+            tag: "textarea".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 320.0,
+                height: 48.0,
+            },
+            style: Styles::from([
+                ("width".into(), "320px".into()),
+                ("height".into(), "48px".into()),
+            ]),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("class".into(), "editor".into());
+        let captured = node.clone();
+        normalize(
+            &mut node.style,
+            &captured,
+            &[".editor { flex: 1 1 0%; width: 100%; height: 100%; }".into()],
+        );
+        assert_eq!(node.style["width"], "100%");
+        assert_eq!(node.style["height"], "48px");
     }
 
     #[test]

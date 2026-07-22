@@ -1,0 +1,23 @@
+{
+  "label": "equivalent-within-pinned-contract",
+  "source": "source.html",
+  "equivalent": "equivalent.html",
+  "behaviors": [
+    "trusted pointer and keyboard input",
+    "timer and microtask completion",
+    "Fetch completion",
+    "ResizeObserver delivery",
+    "media-query boundary transitions",
+    "finite Web Animations timing",
+    "accessibility and focus",
+    "decoded compositor pixels"
+  ],
+  "standards_basis": [
+    "HTML event loop",
+    "CSSOM View",
+    "Resize Observer",
+    "Web Animations",
+    "Fetch",
+    "WAI-ARIA"
+  ]
+}

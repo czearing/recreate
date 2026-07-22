@@ -29,9 +29,14 @@ jobs:
       - run: cargo test --all-targets --locked
         env:
           RECREATE_BROWSER: /usr/bin/google-chrome
+      - run: cargo run -p recreate-oracle --release --locked -- qualify --fixtures oracle/fixtures --holdouts oracle/holdouts --out target/oracle-qualification.json
+        env:
+          RECREATE_BROWSER: /usr/bin/google-chrome
       - run: cargo build --release --locked
       - uses: actions/upload-artifact@v4
         with:
           name: release-gate-evidence
-          path: target/release-gate/evidence.json
+          path: |
+            target/release-gate/evidence.json
+            target/oracle-qualification.json
           if-no-files-found: error

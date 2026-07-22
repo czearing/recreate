@@ -73,6 +73,8 @@ fn state(width: u32, mobile: bool, expanded: bool) -> PageState {
             height: 800,
             dpr: 1.0,
         },
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes,
         startup_nodes: Vec::new(),
         startup_delay_ms: 0,

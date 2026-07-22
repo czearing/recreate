@@ -41,6 +41,8 @@ fn state(animated: bool) -> PageState {
             height: 600,
             dpr: 1.0,
         },
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes: vec![
             node("html", None, style.clone()),
             node(TARGET, Some("html"), style),

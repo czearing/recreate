@@ -22,14 +22,18 @@ pub fn page(
         .map(|node| node.path.as_str())
         .unwrap_or("html");
     let content = render_children(root, components, assets, handlers);
-    let portals = components
-        .children
-        .get(body)
-        .into_iter()
-        .flatten()
-        .filter(|path| path.as_str() != root)
-        .map(|path| jsx::render(path, components, assets, 2, true, handlers))
-        .collect::<String>();
+    let portals = if root == body {
+        String::new()
+    } else {
+        components
+            .children
+            .get(body)
+            .into_iter()
+            .flatten()
+            .filter(|path| path.as_str() != root)
+            .map(|path| jsx::render(path, components, assets, 2, true, handlers))
+            .collect()
+    };
     if portals.is_empty() {
         format!("<>{content}</>")
     } else {

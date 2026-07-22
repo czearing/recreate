@@ -44,6 +44,27 @@ pub struct Pseudo {
     pub style: Styles,
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
+pub struct DomNode {
+    pub namespace: String,
+    pub node_type: u16,
+    pub tree_scope: String,
+    pub physical_parent: Option<String>,
+    pub assigned_slot: Option<String>,
+    pub shadow_root_mode: Option<String>,
+    pub client_rects: Vec<Rect>,
+    pub scroll_left: f64,
+    pub scroll_top: f64,
+    pub scroll_width: f64,
+    pub scroll_height: f64,
+    pub client_width: f64,
+    pub client_height: f64,
+    pub computed_style_properties: Vec<String>,
+    pub computed_style_dictionary: Vec<String>,
+    pub computed_style_values: Vec<u32>,
+    pub custom_properties: Styles,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Animation {
     pub target: String,
@@ -86,6 +107,10 @@ pub struct PageState {
     #[serde(default)]
     pub viewport: Viewport,
     pub nodes: Vec<Node>,
+    #[serde(default)]
+    pub dom: BTreeMap<String, DomNode>,
+    #[serde(default)]
+    pub capture_blockers: Vec<String>,
     #[serde(default)]
     pub startup_nodes: Vec<Node>,
     #[serde(default)]

@@ -1,6 +1,10 @@
 use crate::cdp::Cdp;
 use anyhow::Result;
 
+pub fn text_entry(tag: &str) -> bool {
+    tag.eq_ignore_ascii_case("textarea") || tag.eq_ignore_ascii_case("input")
+}
+
 pub async fn focused_path(cdp: &mut Cdp) -> Result<Option<String>> {
     let value = cdp
         .evaluate(
@@ -32,7 +36,6 @@ pub async fn click_matching(
     let (matching, fallback) = if tag.is_empty() {
         ("candidate=>candidate".into(), "null".into())
     } else {
-        let repeated = label.eq_ignore_ascii_case("More options");
         let tag = serde_json::to_string(tag)?;
         let label = serde_json::to_string(label)?;
         let control = if require_control {
@@ -40,16 +43,12 @@ pub async fn click_matching(
         } else {
             ""
         };
-        let fallback = if repeated {
-            occurrence.map_or_else(
-                || "null".into(),
-                |index| {
-                    format!("Array.from(document.querySelectorAll({tag})).filter(matches)[{index}]")
-                },
-            )
-        } else {
-            format!("Array.from(document.querySelectorAll({tag})).find(matches)")
-        };
+        let fallback = occurrence.map_or_else(
+            || format!("Array.from(document.querySelectorAll({tag})).find(matches)"),
+            |index| {
+                format!("Array.from(document.querySelectorAll({tag})).filter(matches)[{index}]")
+            },
+        );
         (
             format!(
                 "candidate=>candidate&&{control}candidate.tagName.toLowerCase()==={tag}&&\
@@ -72,12 +71,36 @@ pub async fn click_matching(
          element.dispatchEvent(new PointerEvent('pointerover',{{bubbles:true}})); \
          element.dispatchEvent(new MouseEvent('mouseover',{{bubbles:true}})); \
          return new Promise(resolve=>requestAnimationFrame(()=>{{ \
-           element.focus({{preventScroll:true}}); element.click(); \
-           delete element.dataset.recreatePreserveScroll; resolve(true); \
+           element.focus({{preventScroll:true}}); \
+           const rect=element.getBoundingClientRect(); \
+           resolve([rect.x+rect.width/2,rect.y+rect.height/2]); \
          }})); }})()",
         serde_json::to_string(path)?
     );
-    Ok(cdp.evaluate(&expression).await?.as_bool() == Some(true))
+    let position = cdp.evaluate(&expression).await?;
+    let Some(position) = position.as_array() else {
+        return Ok(false);
+    };
+    let (Some(x), Some(y)) = (
+        position.first().and_then(serde_json::Value::as_f64),
+        position.get(1).and_then(serde_json::Value::as_f64),
+    ) else {
+        return Ok(false);
+    };
+    for event_type in ["mouseMoved", "mousePressed", "mouseReleased"] {
+        let mut params = serde_json::json!({"type":event_type,"x":x,"y":y});
+        if event_type != "mouseMoved" {
+            params["button"] = serde_json::json!("left");
+            params["clickCount"] = serde_json::json!(1);
+        }
+        cdp.send("Input.dispatchMouseEvent", params).await?;
+    }
+    cdp.evaluate(&format!(
+        "document.querySelector({})?.removeAttribute('data-recreate-preserve-scroll')",
+        serde_json::to_string(path)?
+    ))
+    .await?;
+    Ok(true)
 }
 
 pub async fn submit_text_matching(

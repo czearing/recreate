@@ -86,6 +86,17 @@ recreate verify --spec recreate-output/spec.json --url http://127.0.0.1:5173
 
 See [the reference](docs/reference.md) for the full command surface.
 
+## Independent fidelity oracle
+
+The workspace includes `recreate-oracle`, a dependency-isolated
+browser-authoritative certification engine. It records immutable source
+checkpoints and compares candidates across structure, geometry, computed style,
+accessibility, interaction, async state, motion, and exact in-memory compositor
+hashes. See [`oracle/README.md`](oracle/README.md) for its contract and commands.
+The installed `recreate` binary exposes the same engine through
+`recreate oracle <record|compare|qualify|benchmark> ...`; the dependency remains
+one-way, so oracle truth code cannot import Recreate generation logic.
+
 ## License
 
 [MIT](LICENSE)

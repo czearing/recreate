@@ -32,6 +32,7 @@ test('local behavior fixture wires routing, anchoring, copy, and carousel', () =
     type: 'activate',
     trigger: avatar,
     surface: 2,
+    stateful: true,
     closable: true,
   });
   assert.equal(account.openSurface, 2);
@@ -39,6 +40,7 @@ test('local behavior fixture wires routing, anchoring, copy, and carousel', () =
     type: 'activate',
     trigger: search,
     surface: 1,
+    stateful: true,
     closable: true,
   });
   assert.equal(searchState.activeTrigger, search);
@@ -53,11 +55,11 @@ test('local behavior fixture wires routing, anchoring, copy, and carousel', () =
     attribute: 'textContent',
     steps: [
       { value: 'Launch plan', delay_ms: 4000 },
-      { value: 'Across your notebooks', delay_ms: 3500 },
+      { value: 'Browse recent items', delay_ms: 3500 },
     ],
   }, clock);
   clock.tick(4000);
-  assert.equal(prompt.textContent, 'Across your notebooks');
+  assert.equal(prompt.textContent, 'Browse recent items');
   stop();
 
   assert.equal(moveCarousel({ offset: 0, extent: 1096 }, 'forward').offset, 1096);

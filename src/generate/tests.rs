@@ -44,31 +44,38 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("document.querySelector"));
     assert!(app.contains("event.key==='Escape'"));
     assert!(app.contains("function Baseline0({activate,showStartup,onStartupDone})"));
-    assert!(app.contains("onStartupDone={()=>setStartupDone(true)}"));
+    assert!(app.contains("baselineViews[viewport]({activate,showStartup:!startupDone"));
+    assert!(app.contains("onStartupDone:()=>setStartupDone(true)"));
     let states = std::fs::read_to_string(root.join("src/states.jsx")).unwrap();
     assert!(app.contains("setAttribute('aria-expanded'"));
     assert!(states.contains("aria-modal={\"true\"}"));
     assert!(states.contains("autoFocus"));
     assert!(states.contains("createPortal"));
+    assert!(!states.contains("<ReplacementSurface"));
     assert!(app.contains("const overlay=state===1?"));
+    assert!(app.contains("replacementStates=[false,false]"));
     assert!(app.contains("mergeHorizontalScroll(captureScroll(event.currentTarget),captured)"));
     assert!(app.contains("live.get(path)?.[2]??0"));
     assert!(!app.contains("live.get(path)?.[2]??top"));
     assert!(app.contains("startSequences(document"));
     assert!(app.contains("data-recreate-sequence=\"0\""));
     assert!(app.contains("reduceInteraction({openSurface:state||null"));
+    assert!(app.contains("stateful:statefulStates[next],closable:closableStates[next]"));
     assert!(app.contains("setState(command.surface)"));
-    assert!(app.contains("moveCarousel({offset:0,extent:offset},'forward')"));
+    assert!(app.contains("const carouselPrevious="));
+    assert!(app.contains("const carouselNext="));
     assert!(app.contains("initialScrolls[viewport]"));
     assert!(app.contains("data-recreate-active"));
     assert!(app.contains("restoreFocus.current=trigger"));
     assert!(app.contains("trigger.focus({preventScroll:true})"));
+    assert!(app.contains("requestAnimationFrame(()=>requestAnimationFrame(()=>{trigger.focus"));
     assert!(root.join("src/runtime/sequence.mjs").exists());
     assert!(root.join("src/runtime/interaction.mjs").exists());
     assert!(app.contains("smooth:true"));
     assert!(app.contains("(now-started)/320"));
     assert!(app.contains("scrollEase(progress)"));
     assert!(app.contains("target.focus({preventScroll:true})"));
+    assert!(app.contains("const focusedTargets=[null,"));
     let css = std::fs::read_to_string(root.join("src/styles.css")).unwrap();
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));
     assert!(css.contains("@media(min-width:391px) and (max-width:768px)"));
@@ -77,7 +84,7 @@ async fn writes_semantic_component_project() {
     assert!(css.contains("content:\"mobile\";color:blue;"));
     assert!(css.contains("content:none;"));
     assert!(css.contains("@keyframes"));
-    assert!(css.contains("[data-recreate-control]:focus-visible"));
+    assert!(!css.contains("[data-recreate-control]:focus-visible"));
 }
 
 #[tokio::test]
@@ -97,5 +104,8 @@ async fn text_entry_state_preserves_the_mounted_control() {
     assert!(states.contains("<ExistingSurface"), "{states}");
     assert!(states.contains("<InsertedSurface"));
     assert!(states.contains("hidden={"));
+    assert!(states.contains("attributes={"));
+    assert!(states.contains("detach={true}"));
+    assert!(!states.contains("SuppressPortals"));
     assert!(!states.contains("<ReplacementSurface path={\"html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(1)>textarea"));
 }

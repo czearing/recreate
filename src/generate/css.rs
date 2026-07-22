@@ -100,16 +100,10 @@ fn build_scoped(
             interaction_classes: Vec::new(),
         };
     };
-    let mut css = if include_interactions {
-        String::from("*{box-sizing:border-box}\n")
-    } else {
-        String::new()
-    };
+    let mut css = String::new();
     for rule in &base.css_rules {
         if global_rule(rule) {
-            let rule = assets
-                .iter()
-                .fold(rule.clone(), |text, (url, local)| text.replace(url, local));
+            let rule = rewrite_rule_assets(rule, assets);
             css.push_str(&rule);
             css.push('\n');
         }
@@ -273,10 +267,8 @@ fn build_scoped(
             continue;
         }
 
-        let overflow_menu = interaction
-            .trigger_label
-            .eq_ignore_ascii_case("More options");
-        let states = if overflow_menu {
+        let shared_surface = interactions::shared_trigger(interaction, &specification.states);
+        let states = if shared_surface {
             interaction
                 .states
                 .iter()
@@ -306,6 +298,20 @@ fn build_scoped(
                                 })
                                 .cloned()
                                 .collect(),
+                            dom: state
+                                .dom
+                                .iter()
+                                .filter(|(path, _)| {
+                                    roots.iter().any(|root| {
+                                        *path == root
+                                            || path
+                                                .strip_prefix(root)
+                                                .is_some_and(|suffix| suffix.starts_with('>'))
+                                    })
+                                })
+                                .map(|(path, node)| (path.clone(), node.clone()))
+                                .collect(),
+                            capture_blockers: state.capture_blockers.clone(),
                             startup_nodes: Vec::new(),
                             startup_delay_ms: 0,
                             startup_duration_ms: 0,
@@ -341,7 +347,7 @@ fn build_scoped(
             states,
             interactions: Vec::new(),
         };
-        let surface_paths = overflow_menu.then(|| {
+        let surface_paths = shared_surface.then(|| {
             crate::interaction_surface::paths(&interaction_spec.states, &specification.states)
         });
         let output = build_scoped(
@@ -411,6 +417,7 @@ fn build_scoped(
         .collect::<Vec<_>>();
     state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
     append_custom_property_fallbacks_for_spec(specification, &base.css_rules, &mut css);
+    super::custom_properties::append_responsive(&specification.states, &mut css);
     timing("states");
     if !include_interactions {
         interaction_classes.clear();
@@ -661,6 +668,18 @@ pub(super) fn global_rule(rule: &str) -> bool {
     rule.starts_with("@font-face")
         || rule.starts_with("@keyframes")
         || rule.starts_with("@-webkit-keyframes")
+}
+
+fn rewrite_rule_assets(rule: &str, assets: &BTreeMap<String, String>) -> String {
+    let mut replacements: Vec<_> = assets.iter().collect();
+    replacements.sort_by_key(|(url, _)| std::cmp::Reverse(url.len()));
+    replacements
+        .into_iter()
+        .fold(rule.to_string(), |text, (url, local)| {
+            let text = text.replace(url, local);
+            url.strip_prefix("https:")
+                .map_or(text.clone(), |relative| text.replace(relative, local))
+        })
 }
 
 #[cfg(test)]

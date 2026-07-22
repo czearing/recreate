@@ -7,6 +7,12 @@ fn reduced_motion_keeps_authored_transitions() {
     assert!(!REDUCED_MOTION_CSS.contains("transition:none"));
 }
 
+#[test]
+fn interaction_layers_do_not_substitute_extreme_z_indexes_for_dom_hierarchy() {
+    assert!(!FOCUS_CSS.contains("214748"));
+    assert!(FOCUS_CSS.contains(".recreateAnchoredSurface{display:contents}"));
+}
+
 fn node(tag: &str) -> Node {
     Node {
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
@@ -31,6 +37,8 @@ fn state(nodes: Vec<Node>) -> PageState {
         url: String::new(),
         title: String::new(),
         viewport: Viewport::default(),
+        dom: Default::default(),
+        capture_blockers: Vec::new(),
         nodes,
         startup_nodes: Vec::new(),
         startup_delay_ms: 0,
@@ -72,13 +80,30 @@ fn text_entry_states_render_without_becoming_dismissible_popups() {
     let interaction = Interaction {
         trigger_path: String::new(),
         trigger_tag: "textarea".into(),
-        trigger_label: "Ask Copilot".into(),
+        trigger_label: "Enter a prompt".into(),
         trigger_occurrence: None,
         focused_path: None,
         states: Vec::new(),
     };
     assert!(rendered(&interaction, &[]));
     assert!(!closable(&interaction, &[]));
+}
+
+#[test]
+fn semantic_state_controls_render_without_becoming_dismissible() {
+    let mut trigger = node("button");
+    trigger.attributes.insert("role".into(), "tab".into());
+    let interaction = Interaction {
+        trigger_path: trigger.path.clone(),
+        trigger_tag: trigger.tag.clone(),
+        trigger_label: "Activity".into(),
+        trigger_occurrence: None,
+        focused_path: None,
+        states: Vec::new(),
+    };
+    let baselines = [state(vec![trigger])];
+    assert!(rendered(&interaction, &baselines));
+    assert!(!closable(&interaction, &baselines));
 }
 
 #[test]
@@ -96,7 +121,7 @@ fn semantic_trigger_ignores_same_path_wrong_control() {
     let mut wrong = node("button");
     wrong
         .attributes
-        .insert("aria-label".into(), "My Notebook".into());
+        .insert("aria-label".into(), "Primary item".into());
     let mut search = node("button");
     search.path.push_str(">button:nth-of-type(1)");
     search
@@ -128,7 +153,7 @@ fn missing_semantic_trigger_does_not_bind_the_stale_path() {
     let interaction = Interaction {
         trigger_path: wrong.path.clone(),
         trigger_tag: "button".into(),
-        trigger_label: "Open account menu".into(),
+        trigger_label: "Open profile".into(),
         trigger_occurrence: None,
         focused_path: None,
         states: Vec::new(),
@@ -148,14 +173,14 @@ fn repeated_controls_all_receive_the_shared_surface_handler() {
     let mut first = node("button");
     first
         .attributes
-        .insert("aria-label".into(), "More options".into());
+        .insert("aria-label".into(), "Open actions".into());
     let mut second = first.clone();
     second.path = "html>body:nth-of-type(1)>div:nth-of-type(2)".into();
     let interaction = Interaction {
         trigger_path: first.path.clone(),
         trigger_tag: "button".into(),
-        trigger_label: "More options".into(),
-        trigger_occurrence: Some(0),
+        trigger_label: "Open actions".into(),
+        trigger_occurrence: None,
         focused_path: None,
         states: Vec::new(),
     };
@@ -193,7 +218,7 @@ fn overflow_menu_root_is_marked_as_a_surface() {
     let interaction = Interaction {
         trigger_path: String::new(),
         trigger_tag: "button".into(),
-        trigger_label: "More options".into(),
+        trigger_label: "Open actions".into(),
         trigger_occurrence: None,
         focused_path: None,
         states: vec![captured.clone()],
@@ -212,11 +237,11 @@ fn semantic_trigger_matches_descendant_text() {
     let mut text = node("#text");
     text.path = format!("{}>#text(1)", button.path);
     text.parent = Some(button.path.clone());
-    text.text = "  More   tasks ".into();
+    text.text = "  Next   items ".into();
     let interaction = Interaction {
         trigger_path: "missing".into(),
         trigger_tag: "button".into(),
-        trigger_label: "More tasks".into(),
+        trigger_label: "Next items".into(),
         trigger_occurrence: None,
         focused_path: None,
         states: Vec::new(),
@@ -236,14 +261,14 @@ fn semantic_trigger_requires_occurrence_for_repeated_controls() {
     let mut first_text = node("#text");
     first_text.path = format!("{}>#text(1)", first.path);
     first_text.parent = Some(first.path.clone());
-    first_text.text = "More options".into();
+    first_text.text = "Open actions".into();
     let mut second_text = first_text.clone();
     second_text.path = format!("{}>#text(1)", second.path);
     second_text.parent = Some(second.path.clone());
     let mut interaction = Interaction {
         trigger_path: "missing".into(),
         trigger_tag: "button".into(),
-        trigger_label: "More options".into(),
+        trigger_label: "Open actions".into(),
         trigger_occurrence: None,
         focused_path: None,
         states: Vec::new(),
@@ -280,7 +305,7 @@ fn one_mismatched_baseline_does_not_turn_scroll_into_overlay() {
     let interaction = Interaction {
         trigger_path: String::new(),
         trigger_tag: "button".into(),
-        trigger_label: "More tasks".into(),
+        trigger_label: "Next items".into(),
         trigger_occurrence: None,
         focused_path: None,
         states,
