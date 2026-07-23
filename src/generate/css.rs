@@ -23,6 +23,50 @@ struct ScopeCache {
     emitted: HashSet<String>,
 }
 
+fn child_nodes(nodes: &[crate::model::Node]) -> HashMap<&str, Vec<&crate::model::Node>> {
+    let mut children = HashMap::new();
+    for node in nodes {
+        if let Some(parent) = node.parent.as_deref() {
+            children.entry(parent).or_insert_with(Vec::new).push(node);
+        }
+    }
+    children
+}
+
+fn multiline_text_box(node: &crate::model::Node) -> bool {
+    node.style
+        .get("line-height")
+        .and_then(|value| value.strip_suffix("px"))
+        .and_then(|value| value.parse::<f64>().ok())
+        .is_some_and(|line_height| node.rect.height > line_height * 1.5)
+}
+
+fn important_interaction_paint(css: &str) -> String {
+    css.split_inclusive(';')
+        .map(|declaration| {
+            let property = declaration
+                .split_once(':')
+                .map(|(property, _)| property)
+                .unwrap_or_default();
+            if (matches!(
+                property,
+                "background-color"
+                    | "border"
+                    | "color"
+                    | "fill"
+                    | "stroke"
+                    | "-webkit-text-fill-color"
+            ) || property.starts_with("border-"))
+                && !declaration.contains("!important")
+            {
+                format!("{}!important;", declaration.trim_end_matches(';'))
+            } else {
+                declaration.to_string()
+            }
+        })
+        .collect()
+}
+
 fn visual_flex_direction(
     node: &crate::model::Node,
     children: &[&crate::model::Node],
@@ -134,12 +178,7 @@ fn build_scoped(
         .iter()
         .map(|node| (node.path.as_str(), node))
         .collect();
-    let mut child_nodes = HashMap::<&str, Vec<&crate::model::Node>>::new();
-    for node in &base.nodes {
-        if let Some(parent) = node.parent.as_deref() {
-            child_nodes.entry(parent).or_default().push(node);
-        }
-    }
+    let base_children = child_nodes(&base.nodes);
     let text_parents: HashSet<_> = base
         .nodes
         .iter()
@@ -172,7 +211,7 @@ fn build_scoped(
             .and_then(|parent| base_nodes.get(parent).copied());
         let visual_flex = visual_flex_direction(
             node,
-            child_nodes
+            base_children
                 .get(node.path.as_str())
                 .map(Vec::as_slice)
                 .unwrap_or_default(),
@@ -218,7 +257,45 @@ fn build_scoped(
             if let Some(width) = contextual_width {
                 base_css.push_str(&format!("width:{width}px;"));
             }
-            css.push_str(&format!(".{class}{{{base_css}}}\n"));
+            let line_clamp = node
+                .style
+                .get("-webkit-line-clamp")
+                .is_some_and(|value| value != "none" && value != "0");
+            let authored_line_clamp = (!line_clamp && multiline_text_box(node))
+                .then(|| {
+                    super::authored_css::positive_integer_property(
+                        node,
+                        &base.css_rules,
+                        "-webkit-line-clamp",
+                    )
+                })
+                .flatten();
+            if line_clamp
+                && (node
+                    .style
+                    .get("-webkit-box-orient")
+                    .is_some_and(|value| value == "vertical")
+                    || super::authored_css::has_property(
+                        node,
+                        &base.css_rules,
+                        "-webkit-box-orient",
+                    ))
+                || authored_line_clamp.is_some()
+            {
+                base_css.push_str("display:-webkit-box;");
+                if let Some(lines) = authored_line_clamp {
+                    base_css.push_str(&format!(
+                        "-webkit-box-orient:vertical;-webkit-line-clamp:{lines};"
+                    ));
+                }
+            }
+
+            if include_interactions {
+                css.push_str(&format!(".{class}{{{base_css}}}\n"));
+            } else {
+                let base_css = important_interaction_paint(&base_css);
+                css.push_str(&format!(".{class}{{{base_css}}}\n"));
+            }
         }
         if let Some(before) = &node.before {
             css.push_str(&format!(
@@ -380,6 +457,10 @@ fn build_scoped(
                     .flat_map(|baseline| &baseline.nodes)
                     .map(|node| (node.path.as_str(), node))
                     .collect();
+                let current_children = child_nodes(&state.nodes);
+                let baseline_children = baseline
+                    .map(|baseline| child_nodes(&baseline.nodes))
+                    .unwrap_or_default();
                 let contextual = baseline
                     .map(|baseline| contextual_width_paths(state, baseline))
                     .unwrap_or_default();
@@ -392,6 +473,19 @@ fn build_scoped(
                                 node.style != baseline.style
                                     || node.before != baseline.before
                                     || node.after != baseline.after
+                                    || visual_flex_direction(
+                                        node,
+                                        current_children
+                                            .get(node.path.as_str())
+                                            .map(Vec::as_slice)
+                                            .unwrap_or_default(),
+                                    ) != visual_flex_direction(
+                                        baseline,
+                                        baseline_children
+                                            .get(node.path.as_str())
+                                            .map(Vec::as_slice)
+                                            .unwrap_or_default(),
+                                    )
                             })
                     })
                     .map(|node| node.path.clone())

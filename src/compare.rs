@@ -1,7 +1,7 @@
 use crate::{
-    browser, capture,
+    browser,
     cli::{CaptureArgs, VerifyArgs},
-    compare_node, interactions_input, lifecycle_script,
+    compare_capture, compare_node,
     model::Specification,
 };
 use anyhow::{Context, Result};
@@ -70,73 +70,23 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             out: PathBuf::new(),
             viewports: String::new(),
         };
-        let (_, mut cdp) = browser::target(&capture_args).await?;
-        cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
-            .await?;
-        cdp.send(
-            "Emulation.setEmulatedMedia",
-            serde_json::json!({
-                "features":[{
-                    "name":"prefers-reduced-motion",
-                    "value":"no-preference"
-                }]
-            }),
-        )
-        .await?;
-        cdp.send(
-            "Page.addScriptToEvaluateOnNewDocument",
-            serde_json::json!({ "source": lifecycle_script::SOURCE }),
-        )
-        .await?;
-        cdp.send(
-            "Page.addScriptToEvaluateOnNewDocument",
-            serde_json::json!({ "source": "window.__recreateFreezeSequences=true" }),
-        )
-        .await?;
-        cdp.send("Page.reload", serde_json::json!({"ignoreCache":false}))
-            .await?;
-        let actual = if let Some(trigger) = trigger {
-            capture::prepare_interaction_state(&mut cdp, &expected.viewport, true).await?;
-            cdp.evaluate("scrollTo(0,0)").await?;
-            let activated = if interactions_input::text_entry(&trigger.trigger_tag) {
-                interactions_input::submit_text_matching(
-                    &mut cdp,
-                    &trigger.trigger_path,
-                    &trigger.trigger_tag,
-                    &trigger.trigger_label,
-                    trigger.trigger_occurrence,
-                )
-                .await?
-            } else {
-                interactions_input::click_matching(
-                    &mut cdp,
-                    &trigger.trigger_path,
-                    &trigger.trigger_tag,
-                    &trigger.trigger_label,
-                    trigger.trigger_occurrence,
-                    true,
-                )
-                .await?
-            };
-            if !activated {
-                let controls = cdp
-                    .evaluate(
-                        "Array.from(document.querySelectorAll('[data-recreate-control]')).map(\
-                         element=>({tag:element.tagName.toLowerCase(),\
-                         label:element.getAttribute('aria-label')||element.innerText||''}))",
-                    )
-                    .await?;
-                anyhow::bail!(
-                    "interaction trigger was not found: {} controls={controls}",
-                    trigger.trigger_label
-                );
-            }
-            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-            capture::read_interaction_state(&mut cdp, expected.viewport.clone()).await?
-        } else {
-            capture::capture_state(&mut cdp, expected.viewport.clone(), true).await?
-        };
-        let mut report = compare_node::compare_with_assets(expected, &actual, &shared_assets);
+        let (target, mut cdp) = browser::target(&capture_args).await?;
+        let result = compare_capture::state(&mut cdp, expected, trigger).await;
+        drop(cdp);
+        let close = recreate_browser::close(&args.cdp_url, &target.id).await;
+        let actual = result?;
+        close?;
+        let animation_state = specification
+            .states
+            .iter()
+            .find(|state| state.viewport == expected.viewport)
+            .unwrap_or(expected);
+        let mut report = compare_node::compare_with_animation_assets(
+            expected,
+            &actual,
+            animation_state,
+            &shared_assets,
+        );
         for detail in &mut report.details {
             *detail = format!(
                 "{}x{} {detail}",

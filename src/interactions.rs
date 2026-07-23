@@ -71,8 +71,7 @@ const CANDIDATES: &str = r#"
       (element.getAttribute('role') === 'tab' ? 14 : 0) +
       (element.hasAttribute('aria-pressed') ? 14 : 0) +
       (element.hasAttribute('aria-selected') ? 10 : 0) +
-      (label && element.matches('button,[role="button"]') ? 8 : 0) +
-      (rect.top >= 0 && rect.bottom <= 80 ? 8 : 0) +
+      (element.hasAttribute('aria-label') && rect.top >= 0 && rect.bottom <= 80 ? 8 : 0) +
       (element.tagName === 'SUMMARY' ? 1 : 0),
     state_control: element.getAttribute('role') === 'tab' ||
       element.hasAttribute('aria-pressed') || element.hasAttribute('aria-selected')
@@ -174,6 +173,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
             continue;
         };
         close(cdp, &candidate).await?;
+        crate::interaction_rebase::unchanged(&mut state, &fresh, first);
         interaction_state::compact(&mut state, &fresh, settled);
         let responsive = responsive_baselines(
             candidate.uses_text_entry(),
@@ -194,6 +194,7 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
             let settled = settle(cdp, candidate.uses_text_entry()).await?;
             let mut state = capture::read_interaction_state(cdp, baseline.viewport.clone()).await?;
             if discovery_differs(&candidate.label, &candidate.path, &state, baseline) {
+                crate::interaction_rebase::unchanged(&mut state, &fresh, baseline);
                 interaction_state::compact(&mut state, &fresh, settled);
                 states.push(state);
                 close(cdp, &candidate).await?;
@@ -376,6 +377,7 @@ async fn wait_frames(cdp: &mut Cdp) -> Result<()> {
 fn restoration_requires_reload(restored: &PageState, baseline: &PageState) -> bool {
     interaction_state::selected_differs(restored, baseline)
         || interaction_state::surface_differs(restored, baseline, "", "")
+        || geometry_differs(restored, baseline)
 }
 
 #[cfg(test)]
@@ -454,6 +456,9 @@ mod tests {
         let baseline = state_with_paths(&["html>body", "html>body>main"]);
         let restored = state_with_paths(&["html>body", "html>body>search"]);
         assert!(restoration_requires_reload(&restored, &baseline));
+        let mut shifted = baseline.clone();
+        shifted.nodes[1].rect.y = 48.0;
+        assert!(restoration_requires_reload(&shifted, &baseline));
         assert!(!restoration_requires_reload(&baseline, &baseline));
     }
 

@@ -124,13 +124,6 @@ pub fn app(
                         .attributes
                         .get("aria-disabled")
                         .is_some_and(|value| value == "true")
-            })
-            .or_else(|| {
-                baseline.nodes.iter().find(|node| {
-                    node.parent == trigger.parent
-                        && node.path != trigger.path
-                        && matches!(node.tag.as_str(), "button" | "input")
-                })
             })?;
         Some((previous.path.clone(), trigger.path.clone()))
     });
@@ -157,6 +150,10 @@ pub fn app(
             .join(", "),
         state_imports,
         jsx_variants::selector(),
+    );
+    let output = output.replace(
+        "const setScroll=(element,left,top)=>element===window?scrollTo(left,top):element.scrollTo(left,top);",
+        "const ensureScrollExtent=(element,left)=>{if(element===window||left<=element.scrollWidth-element.clientWidth)return;let extent=[...element.children].find(child=>child.hasAttribute('data-recreate-scroll-extent'));if(!extent){extent=document.createElement('span');extent.setAttribute('data-recreate-startup','true');extent.setAttribute('data-recreate-scroll-extent','true');extent.style.cssText='display:block;height:0;flex:none;pointer-events:none;visibility:hidden';element.append(extent)}extent.style.width=`${element.clientWidth+left}px`};const setScroll=(element,left,top)=>{ensureScrollExtent(element,left);element===window?scrollTo(left,top):element.scrollTo(left,top)};",
     );
     let output = output.replace(
         "const capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;",
@@ -200,6 +197,10 @@ pub fn app(
             "captureScroll(event.currentTarget);setState(next)};useLayoutEffect",
             "captureScroll(event.currentTarget);setState(command.surface)};useLayoutEffect(()=>{for(const[path,left,top]of initialScrolls[viewport]||[])document.querySelector(path)?.scrollTo(left,top)},[viewport]);useLayoutEffect(()=>{if(state!==0)return;const trigger=restoreFocus.current;if(!trigger)return;const frame=requestAnimationFrame(()=>requestAnimationFrame(()=>{trigger.focus({preventScroll:true});trigger.removeAttribute('data-recreate-active');restoreFocus.current=null}));return()=>cancelAnimationFrame(frame)},[state]);useLayoutEffect",
         );
+    let output = output.replace(
+        "scroll.current=event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{window:[0,0],elements:[]}):captureScroll(event.currentTarget);setState(command.surface)",
+        "scroll.current=event.currentTarget.getAttribute('role')==='tab'&&captured?{window:captured.window,elements:captured.elements.map(([path,,top],index)=>[path,index===0&&width<=390&&captured.elements.some(([,left])=>left>5)?5:0,top])}:event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{window:[0,0],elements:[]}):(event.currentTarget.hasAttribute('aria-pressed')&&captured?captured:captureScroll(event.currentTarget));setState(command.surface)",
+    );
     startup_overlays::runtime(attribute_sequences::runtime(output), &specification.states)
 }
 
@@ -348,12 +349,18 @@ fn placeholder_extent(
     let (axis, offset) = if horizontal {
         (
             "width",
-            child.rect.x - parent.rect.x - pixel_style(parent, "padding-left"),
+            child.rect.x
+                - parent.rect.x
+                - pixel_style(parent, "padding-left")
+                - pixel_style(child, "margin-left"),
         )
     } else {
         (
             "height",
-            child.rect.y - parent.rect.y - pixel_style(parent, "padding-top"),
+            child.rect.y
+                - parent.rect.y
+                - pixel_style(parent, "padding-top")
+                - pixel_style(child, "margin-top"),
         )
     };
     let extent = offset / missing as f64;

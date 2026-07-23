@@ -65,35 +65,49 @@ pub const INSTALL: &str = r#"(() => {
 
 pub const SNAPSHOT: &str = r#"(() => {
   const rounded = n => Math.round(Number(n) * 1000) / 1000;
+  const compact = value => {
+    value=String(value); if (value.length<=256) return value;
+    let hash=2166136261;
+    for (let index=0;index<value.length;index++) hash=Math.imul(hash^value.charCodeAt(index),16777619);
+    return `#${value.length}:${hash>>>0}`;
+  };
+  const styles = new WeakMap(), rects = new WeakMap(), paths = new WeakMap(), clipCache = new WeakMap();
+  const style = e => { if (!styles.has(e)) styles.set(e,getComputedStyle(e)); return styles.get(e); };
+  const frame=document.body.appendChild(document.createElement('iframe'));
+  frame.style.display='none';
+  const probe=frame.contentDocument.body.appendChild(frame.contentDocument.createElement('div'));
+  const styleNames=[...frame.contentWindow.getComputedStyle(probe)];
+  frame.remove();
+  const rect = e => { if (!rects.has(e)) rects.set(e,e.getBoundingClientRect()); return rects.get(e); };
   const visible = e => {
-    const s = getComputedStyle(e);
-    const r = e.getBoundingClientRect();
+    const s = style(e), r = rect(e);
     return s.display !== 'none' && s.visibility !== 'hidden' && r.width >= 0 && r.height >= 0;
   };
   const path = e => {
-    const parts = [];
-    while (e && e.nodeType === 1) {
-      let p = e.localName;
-      if (e.id) p += '#' + e.id;
-      else if (e.parentElement) p += ':nth-child(' + ([...e.parentElement.children].indexOf(e) + 1) + ')';
-      parts.unshift(p);
-      e = e.parentElement;
+    if (paths.has(e)) return paths.get(e);
+    let part=e.localName;
+    if (e.id) part+='#'+e.id;
+    else if (e.parentElement) {
+      let index=1; for (let sibling=e.previousElementSibling;sibling;sibling=sibling.previousElementSibling) index++;
+      part+=':nth-child('+index+')';
     }
-    return parts.join('>');
+    const value=e.parentElement?path(e.parentElement)+'>'+part:part;
+    paths.set(e,value); return value;
   };
   const clips = e => {
-    const values = [];
-    for (let p=e.parentElement;p;p=p.parentElement) {
-      const s=getComputedStyle(p);
+    if (clipCache.has(e)) return clipCache.get(e);
+    const p=e.parentElement, values=p?[...clips(p)]:[];
+    if (p) {
+      const s=style(p);
       if (/(hidden|clip|scroll|auto)/.test(s.overflow+s.overflowX+s.overflowY)) {
-        const r=p.getBoundingClientRect();
+        const r=rect(p);
         values.push([rounded(r.x),rounded(r.y),rounded(r.width),rounded(r.height)]);
       }
     }
-    return values;
+    clipCache.set(e,values); return values;
   };
   const semantic = e => {
-    const s = getComputedStyle(e);
+    const s = style(e);
     const control = /^(a|button|input|select|textarea|img|svg|canvas|video|audio)$/.test(e.localName);
     const named = e.hasAttribute('role') || e.hasAttribute('aria-label') || e.hasAttribute('alt');
     const leafText = !e.children.length && (e.textContent || '').trim();
@@ -103,8 +117,7 @@ pub const SNAPSHOT: &str = r#"(() => {
     return control || named || leafText || painted;
   };
   const nodes = [...document.querySelectorAll('*')].filter(e => visible(e) && semantic(e)).map(e => {
-    const r = e.getBoundingClientRect();
-    const s = getComputedStyle(e);
+    const r = rect(e), s = style(e);
     return {
       path: path(e), tag: e.localName, role: e.getAttribute('role') || '',
       name: e.getAttribute('aria-label') || e.getAttribute('alt') || '',
@@ -118,10 +131,11 @@ pub const SNAPSHOT: &str = r#"(() => {
       clips: clips(e),
       hit: document.elementFromPoint(r.x+r.width/2,r.y+r.height/2) === e,
       scroll: [e.scrollLeft,e.scrollTop,e.scrollWidth,e.scrollHeight],
-      style: Object.fromEntries([...s].map(k => [k, s.getPropertyValue(k)])),
+      style: Object.fromEntries(styleNames.map(k => [k, compact(s.getPropertyValue(k))])),
       pseudo: ['::before','::after'].map(p => {
         const ps=getComputedStyle(e,p);
-        return {kind:p,content:ps.content,display:ps.display,color:ps.color,background:ps.background};
+        return {kind:p,content:compact(ps.content),display:ps.display,
+          color:ps.color,background:compact(ps.background)};
       }),
       state: {
         disabled: !!e.disabled, checked: !!e.checked, value: e.value ?? null,
@@ -137,9 +151,13 @@ pub const SNAPSHOT: &str = r#"(() => {
     occurrences.set(key, occurrence + 1);
     node.anchor = key + '@' + occurrence;
   }
-  const ambiguous = nodes.filter((node, index) => nodes.some((other, otherIndex) =>
-    otherIndex !== index && node.anchor.split('@')[0] === other.anchor.split('@')[0] &&
-    JSON.stringify(node.rect) === JSON.stringify(other.rect))).map(node => node.anchor);
+  const locations = new Map();
+  for (const node of nodes) {
+    const key=node.anchor.split('@')[0]+'|'+node.rect.join(',');
+    locations.set(key,(locations.get(key)||0)+1);
+  }
+  const ambiguous = nodes.filter(node =>
+    locations.get(node.anchor.split('@')[0]+'|'+node.rect.join(','))>1).map(node => node.anchor);
   const animations = document.getAnimations().map(a => ({
     playState: a.playState, startTime: a.startTime, currentTime: a.currentTime,
     playbackRate: a.playbackRate, timing: a.effect?.getComputedTiming(),

@@ -77,6 +77,32 @@ pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool {
         })
 }
 
+pub fn positive_integer_property(node: &Node, rules: &[String], property: &str) -> Option<u32> {
+    rules
+        .iter()
+        .filter_map(|rule| rule.split_once('{'))
+        .filter(|(selector, _)| {
+            !selector.starts_with('@')
+                && !selector.contains(':')
+                && directly_targets_node(selector, node)
+        })
+        .flat_map(|(_, declarations)| declarations.split(';'))
+        .filter_map(|declaration| declaration.split_once(':'))
+        .filter(|(name, _)| name.trim() == property)
+        .map(|(_, value)| {
+            value
+                .trim()
+                .trim_end_matches('}')
+                .trim()
+                .trim_end_matches("!important")
+                .trim()
+        })
+        .next_back()?
+        .parse()
+        .ok()
+        .filter(|value| *value > 0)
+}
+
 fn flexible(styles: &Styles) -> bool {
     if styles
         .get("flex-grow")
@@ -269,7 +295,7 @@ fn retained(name: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{directly_targets_node, normalize};
+    use super::{directly_targets_node, normalize, positive_integer_property};
     use crate::model::{Node, Rect, Styles};
 
     #[test]
@@ -293,6 +319,14 @@ mod tests {
         node.attributes.insert("class".into(), "items".into());
         assert!(directly_targets_node(".items", &node));
         assert!(!directly_targets_node(".items.list", &node));
+        assert_eq!(
+            positive_integer_property(
+                &node,
+                &[".items{-webkit-line-clamp:2}".into()],
+                "-webkit-line-clamp"
+            ),
+            Some(2)
+        );
         node.attributes.insert("class".into(), "items list".into());
         assert!(directly_targets_node(".items.list", &node));
     }

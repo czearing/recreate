@@ -15,7 +15,7 @@ async fn qualifies_stateful_interaction_failures() {
     let mut browser = Browser::launch(None).await.unwrap();
     browser.prepare().await.unwrap();
     let environment = browser.environment().await.unwrap();
-    let discovered = discovery::run(&mut browser, &source, (1280, 800))
+    let discovered = discovery::run(&mut browser, &source, (1280, 800), false)
         .await
         .unwrap();
     let checkpoints = engine::collect(&mut browser, &source, &discovered.scenarios)

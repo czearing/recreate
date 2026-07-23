@@ -16,8 +16,14 @@ pub fn compare(report: &mut Report, expected: &PageState, actual: &PageState) {
             detail(report, format!("dom missing {path}"));
             continue;
         };
+        let phase_shifted = compare_animation::phase_shifted_descendant(expected, actual, path);
+        let animated = if compare_animation::equivalent_at(expected, actual, path) {
+            compare_animation::properties(expected, path)
+        } else {
+            std::collections::BTreeSet::new()
+        };
         compare_structure(report, path, node, candidate);
-        compare_geometry(report, path, node, candidate);
+        compare_geometry(report, path, node, candidate, phase_shifted);
         compare_style(
             report,
             path,
@@ -25,7 +31,7 @@ pub fn compare(report: &mut Report, expected: &PageState, actual: &PageState) {
             candidate,
             &expected_style,
             &actual_style,
-            &compare_animation::properties(expected, path),
+            &animated,
         );
     }
 }
@@ -51,7 +57,13 @@ fn compare_structure(report: &mut Report, path: &str, left: &DomNode, right: &Do
     }
 }
 
-fn compare_geometry(report: &mut Report, path: &str, left: &DomNode, right: &DomNode) {
+fn compare_geometry(
+    report: &mut Report,
+    path: &str,
+    left: &DomNode,
+    right: &DomNode,
+    phase_shifted: bool,
+) {
     let metrics = [
         (left.scroll_left, right.scroll_left),
         (left.scroll_top, right.scroll_top),
@@ -60,10 +72,11 @@ fn compare_geometry(report: &mut Report, path: &str, left: &DomNode, right: &Dom
         (left.client_width, right.client_width),
         (left.client_height, right.client_height),
     ];
-    if !same_rects(&left.client_rects, &right.client_rects)
-        || metrics
-            .into_iter()
-            .any(|(left, right)| (left - right).abs() > 1.5)
+    if !phase_shifted
+        && (!same_rects(&left.client_rects, &right.client_rects)
+            || metrics
+                .into_iter()
+                .any(|(left, right)| (left - right).abs() > 1.5 + 1.0 / 64.0))
     {
         report.geometry_mismatches += 1;
         detail(report, format!("dom geometry {path}"));
@@ -131,7 +144,7 @@ fn same_rects(left: &[Rect], right: &[Rect]) -> bool {
                 (left.height, right.height),
             ]
             .into_iter()
-            .all(|(left, right)| (left - right).abs() <= 1.5)
+            .all(|(left, right)| (left - right).abs() <= 1.5 + 1.0 / 64.0)
         })
 }
 

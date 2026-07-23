@@ -68,9 +68,7 @@ fn preserve_scrollbar_space(
         + px(&node.style, "padding-right").unwrap_or_default();
     let gutter = node.rect.width - expected;
     if gutter >= 6.0 {
-        styles.insert("border-right-width".into(), format!("{gutter}px"));
-        styles.insert("border-right-style".into(), "solid".into());
-        styles.insert("border-right-color".into(), "transparent".into());
+        styles.insert("width".into(), format!("{}px", width + gutter));
     } else if base.is_some_and(has_scrollbar_gutter) {
         styles.insert("border-right-width".into(), "0px".into());
         styles.insert("border-right-style".into(), "none".into());
@@ -230,7 +228,24 @@ fn border_px(styles: &Styles, width: &str, side: &str) -> f64 {
 }
 
 fn intrinsic_media(node: &Node) -> bool {
-    matches!(node.tag.as_str(), "canvas" | "img" | "svg" | "video")
+    matches!(
+        node.tag.as_str(),
+        "canvas"
+            | "circle"
+            | "ellipse"
+            | "foreignObject"
+            | "image"
+            | "img"
+            | "line"
+            | "path"
+            | "polygon"
+            | "polyline"
+            | "rect"
+            | "svg"
+            | "text"
+            | "use"
+            | "video"
+    )
 }
 
 fn compact_control(node: &Node) -> bool {

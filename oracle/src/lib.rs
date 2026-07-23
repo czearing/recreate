@@ -26,5 +26,6 @@ mod qualification_server;
 pub mod replay;
 pub mod report;
 pub mod scenario;
+mod snapshot_transfer;
 mod source_self;
 mod trace_qualification;

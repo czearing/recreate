@@ -10,9 +10,19 @@ pub(crate) fn compare(expected: &PageState, actual_state: &PageState) -> Report 
     compare_with_assets(expected, actual_state, &expected.asset_data)
 }
 
+#[cfg(test)]
 pub(crate) fn compare_with_assets(
     expected: &PageState,
     actual_state: &PageState,
+    shared_assets: &BTreeMap<String, String>,
+) -> Report {
+    compare_with_animation_assets(expected, actual_state, expected, shared_assets)
+}
+
+pub(crate) fn compare_with_animation_assets(
+    expected: &PageState,
+    actual_state: &PageState,
+    animation_state: &PageState,
     shared_assets: &BTreeMap<String, String>,
 ) -> Report {
     let actual: BTreeMap<_, _> = actual_state
@@ -38,6 +48,7 @@ pub(crate) fn compare_with_assets(
             candidate,
             expected,
             actual_state,
+            animation_state,
             shared_assets,
         );
     }
@@ -58,6 +69,7 @@ fn compare_node(
     actual: &Node,
     expected_state: &PageState,
     actual_state: &PageState,
+    animation_state: &PageState,
     shared_assets: &BTreeMap<String, String>,
 ) {
     report.matched += 1;
@@ -89,7 +101,9 @@ fn compare_node(
         report.text_mismatches += 1;
         detail(report, format!("text {}", expected.path));
     }
-    if !same_rect(expected, actual) {
+    let phase_shifted =
+        compare_animation::phase_shifted_descendant(animation_state, actual_state, &expected.path);
+    if !same_rect(expected, actual) && !phase_shifted {
         report.geometry_mismatches += 1;
         detail(
             report,
@@ -99,7 +113,19 @@ fn compare_node(
             ),
         );
     }
-    let animated = compare_animation::properties(expected_state, &expected.path);
+    let animated =
+        if compare_animation::equivalent_at(animation_state, actual_state, &expected.path) {
+            compare_animation::properties(animation_state, &expected.path)
+        } else if expected
+            .style
+            .get("animation")
+            .is_some_and(|value| value != "none")
+            && compare_animation::equivalent_anywhere(animation_state, actual_state, &expected.path)
+        {
+            compare_animation::properties(actual_state, &expected.path)
+        } else {
+            BTreeSet::new()
+        };
     let styles = style_differences(expected, actual, &animated);
     if !styles.is_empty() {
         report.style_mismatches += 1;
@@ -198,6 +224,7 @@ fn comparable_attribute(key: &str) -> bool {
 }
 
 pub(crate) fn same_rect(left: &Node, right: &Node) -> bool {
+    const TOLERANCE: f64 = 1.5 + 1.0 / 64.0;
     [
         (left.rect.x, right.rect.x),
         (left.rect.y, right.rect.y),
@@ -205,7 +232,7 @@ pub(crate) fn same_rect(left: &Node, right: &Node) -> bool {
         (left.rect.height, right.rect.height),
     ]
     .into_iter()
-    .all(|(left, right)| (left - right).abs() <= 1.5)
+    .all(|(left, right)| (left - right).abs() <= TOLERANCE)
 }
 
 fn style_differences(left: &Node, right: &Node, animated: &BTreeSet<String>) -> Vec<String> {

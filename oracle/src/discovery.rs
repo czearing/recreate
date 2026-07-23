@@ -1,6 +1,8 @@
 use crate::{
     browser::Browser,
-    checkpoint, discovery_obligations,
+    checkpoint,
+    collector_browser::{reload, resize, wait_rendered},
+    discovery_obligations,
     model::{Checkpoint, Obligation, ObligationStatus, Scenario, Step, Viewport},
     probe, probe_discovery,
 };
@@ -15,10 +17,11 @@ pub async fn run(
     browser: &mut Browser,
     url: &str,
     viewport: (u32, u32),
+    diagnostic: bool,
 ) -> anyhow::Result<Discovery> {
     let (width, height) = viewport;
-    browser.open(url).await?;
-    wait_body(browser).await?;
+    browser.open_or_reuse(url).await?;
+    wait_rendered(browser).await?;
     let script = browser
         .cdp
         .send(
@@ -26,24 +29,11 @@ pub async fn run(
             serde_json::json!({"source": probe::INSTALL}),
         )
         .await?;
-    browser
+    reload(browser).await?;
+    resize(browser, width, height).await?;
+    let value = browser
         .cdp
-        .send("Page.reload", serde_json::json!({}))
-        .await?;
-    wait_body(browser).await?;
-    let value = browser.cdp.evaluate(probe_discovery::DISCOVER).await?;
-    browser
-        .cdp
-        .send(
-            "Emulation.setDeviceMetricsOverride",
-            serde_json::json!({
-                "width":width,"height":height,"deviceScaleFactor":1,"mobile":false
-            }),
-        )
-        .await?;
-    browser
-        .cdp
-        .evaluate("new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))")
+        .evaluate(&format!("({})({diagnostic})", probe_discovery::DISCOVER))
         .await?;
     let traced_checkpoint = checkpoint::capture(
         &mut browser.cdp,
@@ -136,21 +126,4 @@ pub async fn run(
         obligations,
         traced_checkpoint,
     })
-}
-
-async fn wait_body(browser: &mut Browser) -> anyhow::Result<()> {
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-    for _ in 0..100 {
-        if browser
-            .cdp
-            .evaluate("!!document.body && document.readyState === 'complete'")
-            .await?
-            .as_bool()
-            == Some(true)
-        {
-            return Ok(());
-        }
-        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
-    }
-    anyhow::bail!("discovery page did not create a body")
 }

@@ -45,7 +45,8 @@ impl Browser {
         let job = ProcessJob::attach(child.id().context("browser process id unavailable")?)?;
         wait_ready(&endpoint, &mut child).await?;
         let target = recreate_browser::create(&endpoint, "about:blank").await?;
-        let cdp = Cdp::connect(&target.websocket_url).await?;
+        let mut cdp = Cdp::connect(&target.websocket_url).await?;
+        cdp.set_timeout(Duration::from_secs(120));
         Ok(Self {
             child: Some(child),
             cdp,
@@ -59,9 +60,11 @@ impl Browser {
 
     pub async fn attach(endpoint: String, target: Option<&str>) -> anyhow::Result<Self> {
         let target = recreate_browser::find_target(&endpoint, target).await?;
+        let mut cdp = Cdp::connect(&target.websocket_url).await?;
+        cdp.set_timeout(Duration::from_secs(120));
         Ok(Self {
             child: None,
-            cdp: Cdp::connect(&target.websocket_url).await?,
+            cdp,
             endpoint,
             profile: None,
             target_id: target.id,
@@ -123,12 +126,26 @@ no-first-run;no-default-browser-check;noerrdialogs",
     pub async fn open(&mut self, url: &str) -> anyhow::Result<()> {
         let target = recreate_browser::create(&self.endpoint, url).await?;
         self.cdp = Cdp::connect(&target.websocket_url).await?;
+        self.cdp.set_timeout(Duration::from_secs(120));
         let old_target = std::mem::replace(&mut self.target_id, target.id);
         if self.target_owned {
             let _ = recreate_browser::close(&self.endpoint, &old_target).await;
         }
         self.target_owned = true;
         self.prepare().await
+    }
+
+    pub async fn open_or_reuse(&mut self, url: &str) -> anyhow::Result<()> {
+        let current = self
+            .cdp
+            .evaluate("location.href")
+            .await
+            .ok()
+            .and_then(|value| value.as_str().map(str::to_owned));
+        if current.as_deref() == Some(url) {
+            return self.prepare().await;
+        }
+        self.open(url).await
     }
 
     pub async fn target_count(&self) -> anyhow::Result<usize> {

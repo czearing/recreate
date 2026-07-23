@@ -72,7 +72,7 @@ fn animation_digest(animation: &Animation) -> String {
     hex::encode(Sha256::digest(signature))
 }
 
-fn sampled_layout_observation(animation: &Animation) -> bool {
+pub(crate) fn sampled_layout_observation(animation: &Animation) -> bool {
     let has_geometry = animation.keyframes.iter().any(|frame| {
         frame.as_object().is_some_and(|values| {
             values
@@ -186,7 +186,7 @@ fn css_value(key: &str, value: &Value) -> Option<String> {
 }
 
 fn kebab(value: &str) -> String {
-    value.chars().fold(String::new(), |mut result, character| {
+    let result = value.chars().fold(String::new(), |mut result, character| {
         if character.is_uppercase() {
             result.push('-');
             result.extend(character.to_lowercase());
@@ -194,7 +194,11 @@ fn kebab(value: &str) -> String {
             result.push(character);
         }
         result
-    })
+    });
+    result
+        .strip_prefix("webkit-")
+        .map(|value| format!("-webkit-{value}"))
+        .unwrap_or(result)
 }
 
 #[cfg(test)]

@@ -16,7 +16,7 @@ pub fn interaction_states(
         .collect::<Vec<_>>()
         .join(", ");
     let mut output = format!(
-        "import React,{{useLayoutEffect}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {imports} }} from './components/index.js';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nfunction textNode(path){{const match=path.match(/^(.*)>#text\\((\\d+)\\)$/);if(!match)return null;const parent=document.querySelector(match[1]);return parent?[...parent.childNodes].filter(node=>node.nodeType===3&&node.textContent.trim())[Number(match[2])-1]||null:null}}\nfunction applySurface(entries,roots,hidden,styles,texts,attributes,detach){{const restore=[];const restoreHidden=[];const restoreStyles=[];const restoreTexts=[];const restoreAttributes=[];for(const[path,className]of entries){{const element=document.querySelector(path);if(!element)continue;restore.push([element,element.getAttribute('class')]);element.setAttribute('class',className)}}for(const[path,values]of styles){{const element=document.querySelector(path);if(!element)continue;for(const[name,value]of values){{restoreStyles.push([element,name,element.style.getPropertyValue(name),element.style.getPropertyPriority(name)]);element.style.setProperty(name,value)}}}}for(const[path,values]of attributes){{const element=document.querySelector(path);if(!element)continue;for(const[name,value]of values){{restoreAttributes.push([element,name,element.getAttribute(name)]);value===null?element.removeAttribute(name):element.setAttribute(name,value)}}}}for(const[path,value]of texts){{const node=textNode(path);if(!node)continue;restoreTexts.push([node,node.nodeValue]);node.nodeValue=value}}for(const path of hidden){{const element=document.querySelector(path);if(!element)continue;if(detach&&element.parentNode){{restoreHidden.push([element,element.parentNode,element.nextSibling,null]);element.remove()}}else{{restoreHidden.push([element,null,null,element.style.display]);element.style.display='none'}}}}for(const path of roots){{const element=document.querySelector(path);if(element)element.dataset.recreateSurface='true'}}return()=>{{for(const[node,value]of restoreTexts)node.nodeValue=value;for(const[element,name,value]of restoreAttributes)value===null?element.removeAttribute(name):element.setAttribute(name,value);for(const[element,name,value,priority]of restoreStyles)value?element.style.setProperty(name,value,priority):element.style.removeProperty(name);for(const[element,className]of restore)className===null?element.removeAttribute('class'):element.setAttribute('class',className);for(const[element,parent,next,display]of restoreHidden)parent?parent.insertBefore(element,next):element.style.display=display;for(const path of roots)document.querySelector(path)?.removeAttribute('data-recreate-surface')}}}}\nfunction ExistingSurface({{entries,roots,hidden,styles,texts,attributes,detach}}){{useLayoutEffect(()=>{{let restore=applySurface(entries,roots,hidden,styles,texts,attributes,detach);const refresh=()=>{{restore();restore=applySurface(entries,roots,hidden,styles,texts,attributes,detach)}};window.addEventListener('recreate-surface-inserted',refresh);return()=>{{window.removeEventListener('recreate-surface-inserted',refresh);restore()}}}},[entries,roots,hidden,styles,texts,attributes,detach]);return null}}\nfunction ReplacementSurface({{path,className,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{const existing=document.querySelector(path);if(!existing)return;const previousClass=existing.getAttribute('class');const previousChildren=Array.from(existing.childNodes);existing.replaceChildren();existing.setAttribute('class',className);existing.dataset.recreateSurface='true';setTarget(existing);return()=>{{setTarget(null);previousClass===null?existing.removeAttribute('class'):existing.setAttribute('class',previousClass);existing.removeAttribute('data-recreate-surface');existing.replaceChildren(...previousChildren)}}}},[path,className]);return target?createPortal(children,target):null}}\nfunction InsertedSurface({{parentPath,beforePath,children}}){{const target=document.querySelector(parentPath);const attach=React.useCallback(inserted=>{{if(!inserted||!target||!beforePath)return;const before=document.querySelector(beforePath);if(before?.parentElement===target&&inserted.parentElement===target&&before!==inserted)target.insertBefore(inserted,before);queueMicrotask(()=>window.dispatchEvent(new Event('recreate-surface-inserted')))}},[target,beforePath]);return target?createPortal(React.cloneElement(React.Children.only(children),{{ref:attach}}),target):null}}\nfunction AnchoredSurface({{trigger,children}}){{const wrapper=React.useRef(null);useLayoutEffect(()=>{{const active=document.querySelector('[data-recreate-active=\"true\"]');const fallback=document.querySelector(`[data-recreate-trigger=\"${{trigger}}\"]`);const surface=wrapper.current?.firstElementChild;if(!active||!fallback||!surface)return;const current=surface.style.translate;const a=active.getBoundingClientRect();const b=fallback.getBoundingClientRect();surface.style.translate=`${{a.right-b.right}}px ${{a.bottom-b.bottom}}px`;return()=>{{surface.style.translate=current}}}},[trigger]);return createPortal(<div ref={{wrapper}} className=\"recreateAnchoredSurface\">{{children}}</div>,document.body)}}\n{}\n",
+        "import React,{{useLayoutEffect}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{ {imports} }} from './components/index.js';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nfunction textNode(path){{const match=path.match(/^(.*)>#text\\((\\d+)\\)$/);if(!match)return null;const parent=document.querySelector(match[1]);return parent?[...parent.childNodes].filter(node=>node.nodeType===3&&node.textContent.trim())[Number(match[2])-1]||null:null}}\nfunction applySurface(entries,roots,hidden,styles,texts,attributes,detach){{const restore=[];const restoreHidden=[];const restoreStyles=[];const restoreTexts=[];const restoreAttributes=[];for(const[path,className]of entries){{const element=document.querySelector(path);if(!element)continue;restore.push([element,element.getAttribute('class')]);element.setAttribute('class',className)}}for(const[path,values]of styles){{const element=document.querySelector(path);if(!element)continue;for(const[name,value]of values){{restoreStyles.push([element,name,element.style.getPropertyValue(name),element.style.getPropertyPriority(name)]);element.style.setProperty(name,value,'important')}}}}for(const[path,values]of attributes){{const element=document.querySelector(path);if(!element)continue;for(const[name,value]of values){{restoreAttributes.push([element,name,element.getAttribute(name)]);value===null?element.removeAttribute(name):element.setAttribute(name,value)}}}}for(const[path,value]of texts){{const node=textNode(path);if(!node)continue;restoreTexts.push([node,node.nodeValue]);node.nodeValue=value}}for(const path of hidden){{const element=document.querySelector(path);if(!element)continue;if(detach&&element.parentNode){{restoreHidden.push([element,element.parentNode,element.nextSibling,null]);element.remove()}}else{{restoreHidden.push([element,null,null,element.style.display]);element.style.display='none'}}}}for(const path of roots){{const element=document.querySelector(path);if(element)element.dataset.recreateSurface='true'}}return()=>{{for(const[node,value]of restoreTexts)node.nodeValue=value;for(const[element,name,value]of restoreAttributes)value===null?element.removeAttribute(name):element.setAttribute(name,value);for(const[element,name,value,priority]of restoreStyles)value?element.style.setProperty(name,value,priority):element.style.removeProperty(name);for(const[element,className]of restore)className===null?element.removeAttribute('class'):element.setAttribute('class',className);for(const[element,parent,next,display]of restoreHidden)parent?parent.insertBefore(element,next):element.style.display=display;for(const path of roots)document.querySelector(path)?.removeAttribute('data-recreate-surface')}}}}\nfunction ExistingSurface({{entries,roots,hidden,styles,texts,attributes,detach}}){{useLayoutEffect(()=>{{let restore=applySurface(entries,roots,hidden,styles,texts,attributes,detach);const refresh=()=>{{restore();restore=applySurface(entries,roots,hidden,styles,texts,attributes,detach)}};window.addEventListener('recreate-surface-inserted',refresh);return()=>{{window.removeEventListener('recreate-surface-inserted',refresh);restore()}}}},[entries,roots,hidden,styles,texts,attributes,detach]);return null}}\nfunction ReplacementSurface({{path,className,children}}){{const[target,setTarget]=React.useState(null);useLayoutEffect(()=>{{const existing=document.querySelector(path);if(!existing)return;const previousClass=existing.getAttribute('class');const previousChildren=Array.from(existing.childNodes);existing.replaceChildren();existing.setAttribute('class',className);existing.dataset.recreateSurface='true';setTarget(existing);return()=>{{setTarget(null);previousClass===null?existing.removeAttribute('class'):existing.setAttribute('class',previousClass);existing.removeAttribute('data-recreate-surface');existing.replaceChildren(...previousChildren)}}}},[path,className]);return target?createPortal(children,target):null}}\nfunction InsertedSurface({{parentPath,beforePath,children}}){{const target=document.querySelector(parentPath);const attach=React.useCallback(inserted=>{{if(!inserted||!target||!beforePath)return;const before=document.querySelector(beforePath);if(before?.parentElement===target&&inserted.parentElement===target&&before!==inserted)target.insertBefore(inserted,before);queueMicrotask(()=>window.dispatchEvent(new Event('recreate-surface-inserted')))}},[target,beforePath]);return target?createPortal(React.cloneElement(React.Children.only(children),{{ref:attach}}),target):null}}\nfunction AnchoredSurface({{trigger,children}}){{const wrapper=React.useRef(null);useLayoutEffect(()=>{{const active=document.querySelector('[data-recreate-active=\"true\"]');const fallback=document.querySelector(`[data-recreate-trigger=\"${{trigger}}\"]`);const surface=wrapper.current?.firstElementChild;if(!active||!fallback||!surface)return;const current=surface.style.translate;const a=active.getBoundingClientRect();const b=fallback.getBoundingClientRect();surface.style.translate=`${{a.right-b.right}}px ${{a.bottom-b.bottom}}px`;return()=>{{surface.style.translate=current}}}},[trigger]);return createPortal(<div ref={{wrapper}} className=\"recreateAnchoredSurface\">{{children}}</div>,document.body)}}\n{}\n",
         jsx_variants::selector()
     );
     let interactions = specification
@@ -89,7 +89,11 @@ pub fn interaction_states(
                 } else if interactions::text_entry_interaction(interaction) {
                     super::jsx_text_entry::surface_roots(state, baseline)
                 } else {
-                    newly_visible_roots(state, baseline)
+                    let mut roots = newly_visible_roots(state, baseline);
+                    if state_control {
+                        roots.extend(changed_structure_roots(state, baseline));
+                    }
+                    roots
                 };
                 if shared_surface
                     && surface_roots.is_empty()
@@ -303,6 +307,55 @@ fn newly_visible_roots(
     roots
 }
 
+fn changed_structure_roots(
+    state: &crate::model::PageState,
+    baseline: &crate::model::PageState,
+) -> std::collections::HashSet<String> {
+    let baseline_nodes = baseline
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<std::collections::HashMap<_, _>>();
+    let state_nodes = state
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<std::collections::HashMap<_, _>>();
+    let mut roots = state
+        .nodes
+        .iter()
+        .filter(|node| {
+            !matches!(node.tag.as_str(), "html" | "body")
+                && node
+                    .parent
+                    .as_deref()
+                    .and_then(|path| state_nodes.get(path))
+                    .is_none_or(|parent| parent.tag != "body")
+                && baseline_nodes
+                    .get(node.path.as_str())
+                    .is_some_and(|baseline_node| {
+                        compatible_children(state, baseline, &node.path)
+                            || node.rect != baseline_node.rect
+                            || node.rect.width * node.rect.height
+                                < f64::from(state.viewport.width)
+                                    * f64::from(state.viewport.height)
+                                    * 0.8
+                    })
+        })
+        .map(|node| node.path.clone())
+        .collect::<std::collections::HashSet<_>>();
+    let all = roots.clone();
+    roots.retain(|root| {
+        !all.iter().any(|candidate| {
+            candidate != root
+                && root
+                    .strip_prefix(candidate)
+                    .is_some_and(|suffix| suffix.starts_with('>'))
+        })
+    });
+    roots
+}
+
 fn visible_surface(node: &crate::model::Node) -> bool {
     visible(node)
         && (node
@@ -513,7 +566,9 @@ fn changed_existing_paths(
             } else {
                 (node.style != previous.style
                     || node.attributes != previous.attributes
-                    || node.text != previous.text)
+                    || node.text != previous.text
+                    || node.before != previous.before
+                    || node.after != previous.after)
                     .then(|| node.path.clone())
             }
         })
@@ -532,6 +587,11 @@ fn existing_surface(
     if roots.is_empty() && delta_roots.is_empty() {
         return String::new();
     }
+    let baseline_nodes = baseline
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<std::collections::HashMap<_, _>>();
     let entries = state
         .nodes
         .iter()
@@ -548,6 +608,13 @@ fn existing_surface(
                         .strip_prefix(root)
                         .is_some_and(|suffix| suffix.starts_with('>'))
             })
+        })
+        .filter(|node| {
+            baseline_nodes
+                .get(node.path.as_str())
+                .is_some_and(|baseline| {
+                    node.before != baseline.before || node.after != baseline.after
+                })
         })
         .filter_map(|node| {
             components
@@ -566,7 +633,7 @@ fn existing_surface(
         .iter()
         .filter(|node| node.tag != "#text" && !state_paths.contains(node.path.as_str()))
         .filter(|node| {
-            roots.iter().any(|root| {
+            marked_roots.iter().any(|root| {
                 node.path
                     .strip_prefix(root)
                     .is_some_and(|suffix| suffix.starts_with('>'))
@@ -583,11 +650,6 @@ fn existing_surface(
                     .is_some_and(|suffix| suffix.starts_with('>'))
         })
     });
-    let baseline_nodes = baseline
-        .nodes
-        .iter()
-        .map(|node| (node.path.as_str(), node))
-        .collect::<std::collections::HashMap<_, _>>();
     let baseline_path = |path: &str| {
         shifted
             .iter()

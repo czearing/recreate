@@ -37,6 +37,10 @@ impl Cdp {
         })
     }
 
+    pub fn set_timeout(&mut self, timeout: std::time::Duration) {
+        self.timeout = timeout;
+    }
+
     pub async fn send(&mut self, method: &str, params: Value) -> anyhow::Result<Value> {
         self.next_id += 1;
         let id = self.next_id;

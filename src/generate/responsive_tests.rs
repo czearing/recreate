@@ -79,6 +79,36 @@ fn preserves_compact_control_width_when_it_fills_its_parent() {
 }
 
 #[test]
+fn preserves_svg_graphic_width_when_it_fills_its_parent() {
+    let viewport = Viewport {
+        width: 320,
+        height: 568,
+        dpr: 1.0,
+    };
+    let graphic = node("rect", 0.0, 120.0);
+    let parent = node("svg", 0.0, 120.0);
+    let mut styles = graphic.style.clone();
+    let base = node("rect", 0.0, 183.0);
+
+    normalize_viewport_width(
+        &mut styles,
+        &graphic,
+        Some(&parent),
+        &viewport,
+        Some((
+            &base,
+            &Viewport {
+                width: 1920,
+                height: 1080,
+                dpr: 1.0,
+            },
+        )),
+    );
+
+    assert_eq!(styles.get("width").map(String::as_str), Some("120px"));
+}
+
+#[test]
 fn detects_responsive_flex_shrink() {
     let base = node("group", 0.0, 180.0);
     let mut current = node("group", 0.0, 162.0);
@@ -88,6 +118,18 @@ fn detects_responsive_flex_shrink() {
     parent.style.insert("flex-direction".into(), "row".into());
 
     assert!(shrunk_flex_item(&base, &current, Some(&parent)));
+}
+
+#[test]
+fn does_not_constrain_intrinsic_content_overflowing_a_flex_parent() {
+    let base = node("label", 0.0, 154.0);
+    let mut current = node("label", 0.0, 59.0);
+    current.style.insert("flex-shrink".into(), "1".into());
+    let mut parent = node("parent", 0.0, 5.0);
+    parent.style.insert("display".into(), "flex".into());
+    parent.style.insert("flex-direction".into(), "row".into());
+
+    assert!(!shrunk_flex_item(&base, &current, Some(&parent)));
 }
 
 #[test]

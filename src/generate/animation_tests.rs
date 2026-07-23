@@ -26,6 +26,13 @@ fn converts_geometry_frames_to_css() {
 }
 
 #[test]
+fn preserves_webkit_animation_properties() {
+    let frame = json!({"webkitMaskPositionX":"50%, 28%"});
+    let css = declarations(frame.as_object(), (0.0, 0.0));
+    assert_eq!(css, "-webkit-mask-position-x:50%, 28%;");
+}
+
+#[test]
 fn preserves_animation_timing_controls() {
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();

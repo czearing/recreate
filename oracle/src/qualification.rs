@@ -45,7 +45,8 @@ pub async fn run(args: QualifyArgs) -> anyhow::Result<()> {
     let mut browser = crate::browser_factory::start(&args.browser).await?;
     browser.prepare().await?;
     let environment = browser.environment().await?;
-    let discovered = discovery::run(&mut browser, &source, (320, args.browser.height)).await?;
+    let discovered =
+        discovery::run(&mut browser, &source, (320, args.browser.height), false).await?;
     let async_scenario = scenarios.pop().expect("async scenario");
     scenarios.extend(discovered.scenarios);
     scenarios.push(async_scenario);

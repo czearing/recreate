@@ -25,6 +25,7 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
         &mut browser,
         &args.source,
         (trace_width, args.browser.height),
+        args.diagnostic,
     )
     .await?;
     if args.diagnostic {

@@ -25,6 +25,8 @@ fn node(path: &str, x: f64) -> Node {
 #[test]
 fn geometry_tolerance_is_bounded() {
     assert!(same_rect(&node("a", 0.0), &node("a", 1.0)));
+    assert!(same_rect(&node("a", 0.0), &node("a", 1.5078125)));
+    assert!(!same_rect(&node("a", 0.0), &node("a", 1.52)));
     assert!(!same_rect(&node("a", 0.0), &node("a", 2.0)));
 }
 

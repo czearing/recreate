@@ -2,7 +2,7 @@ use crate::{
     cdp::Cdp,
     digest,
     model::{Checkpoint, Domain, Viewport},
-    network, probe,
+    network, snapshot_transfer,
 };
 use base64::{Engine, engine::general_purpose::STANDARD};
 use serde_json::{Value, json};
@@ -26,7 +26,7 @@ pub async fn capture(
     viewport: Viewport,
 ) -> anyhow::Result<Checkpoint> {
     let started = std::time::Instant::now();
-    let snapshot = cdp.evaluate(probe::SNAPSHOT).await?;
+    let snapshot = snapshot_transfer::capture(cdp).await?;
     let snapshot_elapsed = started.elapsed();
     let accessibility = cdp
         .send("Accessibility.getFullAXTree", json!({"depth": -1}))

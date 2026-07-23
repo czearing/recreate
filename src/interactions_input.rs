@@ -64,7 +64,7 @@ pub async fn click_matching(
          const before=[scrollX,scrollY]; const ancestors=[]; \
          for(let node=element.parentElement;node&&node!==document.documentElement;node=node.parentElement) \
            ancestors.push([node,node.scrollLeft,node.scrollTop]); \
-         element.scrollIntoView({{block:'center',inline:'center'}}); \
+         element.scrollIntoView({{block:'center',inline:'center',behavior:'instant'}}); \
          element.dataset.recreatePreserveScroll=String( \
            scrollX!==before[0]||scrollY!==before[1]|| \
            ancestors.some(([node,left,top])=>node.scrollLeft!==left||node.scrollTop!==top)); \

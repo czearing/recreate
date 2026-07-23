@@ -210,6 +210,27 @@ fn append_node_rules(
     let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
     super::authored_css::normalize(&mut changed, node, css_rules);
+    let captured_line_clamp = node
+        .style
+        .get("-webkit-line-clamp")
+        .is_some_and(|value| value != "none" && value != "0");
+    let vertical_box = node
+        .style
+        .get("-webkit-box-orient")
+        .is_some_and(|value| value == "vertical")
+        || super::authored_css::has_property(node, css_rules, "-webkit-box-orient");
+    let authored_line_clamp = multiline_text_box(node)
+        .then(|| {
+            super::authored_css::positive_integer_property(node, css_rules, "-webkit-line-clamp")
+        })
+        .flatten();
+    if captured_line_clamp && vertical_box || authored_line_clamp.is_some() {
+        changed.insert("display".into(), "-webkit-box".into());
+        if let Some(lines) = authored_line_clamp {
+            changed.insert("-webkit-box-orient".into(), "vertical".into());
+            changed.insert("-webkit-line-clamp".into(), lines.to_string());
+        }
+    }
     if constrained_by_flex
         && node
             .style
@@ -220,6 +241,14 @@ fn append_node_rules(
     {
         changed.remove("width");
         changed.remove("inline-size");
+    }
+
+    fn multiline_text_box(node: &Node) -> bool {
+        node.style
+            .get("line-height")
+            .and_then(|value| value.strip_suffix("px"))
+            .and_then(|value| value.parse::<f64>().ok())
+            .is_some_and(|line_height| node.rect.height > line_height * 1.5)
     }
     if !super::authored_css::has_property(node, css_rules, "width") && fluid_flex_item(node, parent)
     {
@@ -268,6 +297,7 @@ fn shrunk_flex_item(base: &Node, node: &Node, parent: Option<&Node>) -> bool {
     parent.is_some_and(|parent| {
         parent.style.get("display").map(String::as_str) == Some("flex")
             && parent.style.get("flex-direction").map(String::as_str) == Some("row")
+            && node.rect.width <= parent.rect.width + 1.0
             && node
                 .style
                 .get("flex-shrink")

@@ -98,8 +98,11 @@ fn append_forced_properties(state: &PageState, css: &mut String) {
             "z-index",
             &["a", "button", "input", "select", "textarea"][..],
         ),
+        ("appearance", &["button", "input", "select", "textarea"][..]),
         ("resize", &["textarea"][..]),
         ("content-visibility", &["i"][..]),
+        ("will-change", &[][..]),
+        ("mix-blend-mode", &[][..]),
     ] {
         let Some(index) = root
             .computed_style_properties
@@ -111,12 +114,17 @@ fn append_forced_properties(state: &PageState, css: &mut String) {
         for node in state
             .nodes
             .iter()
-            .filter(|node| tags.contains(&node.tag.as_str()))
+            .filter(|node| tags.is_empty() || tags.contains(&node.tag.as_str()))
         {
             let Some(dom) = state.dom.get(&node.path) else {
                 continue;
             };
-            if let Some(value) = style_value(root, dom, index) {
+            if let Some(value) = style_value(root, dom, index)
+                && !matches!(
+                    (property, value),
+                    ("will-change", "auto") | ("mix-blend-mode", "normal")
+                )
+            {
                 css.push_str(&format!("{}{{{property}:{value};}}\n", node.path));
             }
         }

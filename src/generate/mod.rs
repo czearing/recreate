@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod animation_order_tests;
 mod animation_timing;
-mod animations;
+pub(crate) mod animations;
 mod assets;
 mod assets_remote;
 mod attribute_sequences;

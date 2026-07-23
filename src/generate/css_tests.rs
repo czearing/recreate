@@ -11,6 +11,16 @@ fn preserves_global_font_and_keyframe_rules() {
 }
 
 #[test]
+fn interaction_paint_overrides_authored_important_rules() {
+    assert_eq!(
+        important_interaction_paint(
+            "color:white;fill:currentColor;background-color:black;width:10px;"
+        ),
+        "color:white!important;fill:currentColor!important;background-color:black!important;width:10px;"
+    );
+}
+
+#[test]
 fn rewrites_longer_protocol_relative_asset_urls_first() {
     let assets = BTreeMap::from([
         (
