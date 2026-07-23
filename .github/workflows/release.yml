@@ -87,13 +87,11 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm run ci
       - id: npm-version
-        run: |
-          version="$(node -p "require('./package.json').version")"
-          if npm view "recreate-cli@$version" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "publish=true" >> "$GITHUB_OUTPUT"
-          fi
+        run: >
+          node -e "const fs=require('node:fs'); const version=require('./package.json').version;
+          fetch('https://registry.npmjs.org/recreate-cli').then(response=>response.json())
+          .then(metadata=>fs.appendFileSync(process.env.GITHUB_OUTPUT,
+          'publish='+String(!metadata.versions?.[version])+'\n'))"
       - if: ${{ steps.npm-version.outputs.publish == 'true' }}
         run: npm publish --tag latest --access public --provenance
         env:
