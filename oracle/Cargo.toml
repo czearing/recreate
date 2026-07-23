@@ -24,7 +24,6 @@ tempfile = "3"
 tokio = { version = "1", features = ["io-util", "macros", "net", "process", "rt-multi-thread", "time"] }
 tokio-tungstenite = "0.28"
 url = "2"
-zune-png = "0.5"
 
 [dev-dependencies]
 proptest = "1"

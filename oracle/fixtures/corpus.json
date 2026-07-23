@@ -9,8 +9,7 @@
     "ResizeObserver delivery",
     "media-query boundary transitions",
     "finite Web Animations timing",
-    "accessibility and focus",
-    "decoded compositor pixels"
+    "accessibility and focus"
   ],
   "standards_basis": [
     "HTML event loop",

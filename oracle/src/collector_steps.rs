@@ -2,22 +2,26 @@ use crate::{
     browser::Browser,
     checkpoint,
     collector_browser::{advance, reload, resize},
+    collector_state::state,
     model::{Checkpoint, Scenario, Step, Viewport},
     replay,
 };
 use std::collections::BTreeMap;
+use tokio::time::{Duration, sleep};
 
 pub(crate) struct Run<'a> {
     browser: &'a mut Browser,
     viewport: Viewport,
     checkpoints: Vec<Checkpoint>,
     responsive_cache: BTreeMap<(u32, u32), Checkpoint>,
+    baseline_state: String,
     clean: bool,
 }
 
 impl<'a> Run<'a> {
-    pub(crate) fn new(browser: &'a mut Browser) -> Self {
-        Self {
+    pub(crate) async fn new(browser: &'a mut Browser) -> anyhow::Result<Self> {
+        let baseline_state = state(browser).await?;
+        Ok(Self {
             browser,
             viewport: Viewport {
                 width: 1280,
@@ -25,12 +29,22 @@ impl<'a> Run<'a> {
             },
             checkpoints: Vec::new(),
             responsive_cache: BTreeMap::new(),
+            baseline_state,
             clean: true,
-        }
+        })
     }
 
     pub(crate) fn finish(self) -> Vec<Checkpoint> {
         self.checkpoints
+    }
+
+    pub(crate) fn fail(&mut self, scenario: &Scenario, step: usize, error: &anyhow::Error) {
+        self.checkpoints.push(checkpoint::failure(
+            &scenario.id,
+            step,
+            self.viewport.clone(),
+            &format!("{error:#}"),
+        ));
     }
 
     pub(crate) async fn execute(
@@ -98,14 +112,29 @@ impl<'a> Run<'a> {
     }
 
     async fn reset(&mut self, index: &mut usize) -> anyhow::Result<()> {
-        if self.clean {
+        if self.clean || state(self.browser).await? == self.baseline_state {
+            self.clean = true;
             *index += 1;
             return Ok(());
         }
+
         reload(self.browser).await?;
-        self.clean = true;
-        *index += 1;
-        Ok(())
+        let mut current = String::new();
+        for _ in 0..80 {
+            current = state(self.browser).await?;
+            if current == self.baseline_state {
+                self.clean = true;
+                *index += 1;
+                return Ok(());
+            }
+            sleep(Duration::from_millis(25)).await;
+        }
+        let baseline: serde_json::Value = serde_json::from_str(&self.baseline_state)?;
+        let current: serde_json::Value = serde_json::from_str(&current)?;
+        let (path, expected, actual) = crate::compare_difference::between(&baseline, &current);
+        anyhow::bail!(
+            "reset did not restore browser state at {path}: expected={expected} actual={actual}"
+        );
     }
 
     async fn push_responsive(&mut self, scenario: &Scenario, index: usize) -> anyhow::Result<()> {

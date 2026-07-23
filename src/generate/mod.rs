@@ -9,6 +9,7 @@ mod attribute_sequences;
 mod authenticated_interaction_runtime_tests;
 mod authored_css;
 mod authored_media;
+mod carousel_inference;
 mod css;
 mod css_layout;
 mod css_values;

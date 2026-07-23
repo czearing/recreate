@@ -24,6 +24,7 @@ pub(crate) async fn wait_rendered(browser: &mut Browser) -> anyhow::Result<()> {
             && state["fonts"] == "loaded"
             && state["meaningful"] == true
         {
+            sleep(Duration::from_millis(300)).await;
             settle(browser).await?;
             return Ok(());
         }
@@ -65,12 +66,28 @@ async fn loader_id(browser: &mut Browser) -> anyhow::Result<String> {
 }
 
 async fn settle(browser: &mut Browser) -> anyhow::Result<()> {
-    browser
+    let stable = browser
         .cdp
         .evaluate(
-            "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))",
+            r#"new Promise(resolve=>{
+              let clean=0;
+              const started=performance.now();
+              const frame=()=>{
+                const state=globalThis.__recreateOracle?.pending;
+                const pending=(state?.fetches||0)>0||(state?.xhrs||0)>0;
+                clean=pending?0:clean+1;
+                if(clean>=2)resolve(true)
+                else if(performance.now()-started>=2000)resolve(true)
+                else requestAnimationFrame(frame);
+              };
+              requestAnimationFrame(frame);
+            })"#,
         )
         .await?;
+    anyhow::ensure!(
+        stable == true,
+        "rendered page did not reach a DOM fixed point"
+    );
     Ok(())
 }
 
@@ -107,7 +124,7 @@ pub(crate) async fn resize(
         .await?;
     browser
         .cdp
-        .evaluate("new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")
+        .evaluate("new Promise(requestAnimationFrame)")
         .await?;
     Ok(Viewport { width, height })
 }

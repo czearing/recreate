@@ -21,6 +21,12 @@ fn shipping_sources_are_small_and_isolated() {
             "crate::generate",
             "../src/",
             "fidelity.rs",
+            "Page.captureScreenshot",
+            "document.styleSheets",
+            ".cssRules",
+            "Debugger.",
+            "getScriptSource",
+            "sourceMap",
         ] {
             assert!(
                 !source.contains(forbidden),

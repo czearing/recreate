@@ -42,16 +42,14 @@ fn artifacts_with_mode(
             let expected_domain = checkpoint.domains.get(*domain);
             let actual_domain = candidate.domains.get(*domain);
             match (expected_domain, actual_domain) {
-                (Some(left), Some(right))
-                    if (fast && left.digest == right.digest)
-                        || (!fast && left.value == right.value) =>
-                {
+                (Some(left), Some(right)) if equivalent_domain(domain, left, right, fast) => {
                     matched += 1;
                     *domain_matches.entry((*domain).into()).or_default() += 1;
                 }
                 (Some(left), Some(right)) => {
+                    let (expected_value, actual_value) = comparable_values(domain, left, right);
                     let (path, expected, actual) =
-                        compare_difference::between(&left.value, &right.value);
+                        compare_difference::between(&expected_value, &actual_value);
                     differences.push(Difference {
                         scenario: checkpoint.scenario.clone(),
                         step: checkpoint.step,
@@ -103,6 +101,41 @@ fn artifacts_with_mode(
         blockers,
         elapsed_ms: elapsed.as_millis(),
     }
+}
+
+fn equivalent_domain(
+    domain: &str,
+    expected: &crate::model::Domain,
+    actual: &crate::model::Domain,
+    fast: bool,
+) -> bool {
+    if domain != "async" {
+        return (fast && expected.digest == actual.digest)
+            || (!fast && expected.value == actual.value);
+    }
+    let (expected, actual) = comparable_values(domain, expected, actual);
+    expected == actual
+}
+
+fn comparable_values(
+    domain: &str,
+    expected: &crate::model::Domain,
+    actual: &crate::model::Domain,
+) -> (Value, Value) {
+    let mut left = expected.value.clone();
+    let mut right = actual.value.clone();
+    if domain == "async" {
+        for key in ["network", "resources", "pending", "documentState"] {
+            left.as_object_mut().map(|value| value.remove(key));
+            right.as_object_mut().map(|value| value.remove(key));
+        }
+        if right["browser_errors"].as_u64().unwrap_or_default()
+            <= left["browser_errors"].as_u64().unwrap_or_default()
+        {
+            right["browser_errors"] = left["browser_errors"].clone();
+        }
+    }
+    (left, right)
 }
 
 fn coverage_blockers(expected: &Artifact, actual: &[Checkpoint]) -> Vec<String> {

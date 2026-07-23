@@ -134,7 +134,17 @@ no-first-run;no-default-browser-check;noerrdialogs",
         self.target_owned = true;
         self.prepare().await
     }
-
+    pub async fn open_instrumented(&mut self, url: &str, script: &str) -> anyhow::Result<()> {
+        self.open("about:blank").await?;
+        self.cdp
+            .send(
+                "Page.addScriptToEvaluateOnNewDocument",
+                json!({"source": script}),
+            )
+            .await?;
+        self.cdp.send("Page.navigate", json!({"url": url})).await?;
+        Ok(())
+    }
     pub async fn open_or_reuse(&mut self, url: &str) -> anyhow::Result<()> {
         let current = self
             .cdp

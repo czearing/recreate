@@ -1,11 +1,10 @@
 pub const INSTALL: &str = r#"(() => {
   if (globalThis.__recreateOracle) return;
-  const pending = {timeouts: new Map(), intervals: new Map(), fetches: 0};
-  const registrations = [];
-  const record = (kind, detail = '') => registrations.push({kind, detail: String(detail)});
+  const pending = {timeouts: new Map(), intervals: new Map(), fetches: 0, xhrs: 0};
+  const registrations = [], record = (kind, detail = '') =>
+    registrations.push({kind, detail: String(detail)});
   let next = 0;
-  const nativeTimeout = globalThis.setTimeout;
-  const nativeInterval = globalThis.setInterval;
+  const nativeTimeout = globalThis.setTimeout, nativeInterval = globalThis.setInterval;
   globalThis.setTimeout = (fn, delay = 0, ...args) => {
     record('timeout', delay);
     const id = ++next;
@@ -30,35 +29,31 @@ pub const INSTALL: &str = r#"(() => {
     try { return await nativeFetch(...args); }
     finally { pending.fetches--; }
   };
+  const nativeSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function(...args) {
+    record('xhr', this.responseURL);
+    pending.xhrs++;
+    this.addEventListener('loadend', () => pending.xhrs--, {once:true});
+    return nativeSend.apply(this, args);
+  };
   const nativeAdd = EventTarget.prototype.addEventListener;
   EventTarget.prototype.addEventListener = function(type, listener, options) {
     record('listener', type);
     return nativeAdd.call(this, type, listener, options);
   };
   const nativeRaf = globalThis.requestAnimationFrame;
-  globalThis.requestAnimationFrame = fn => {
-    record('raf');
-    return nativeRaf.call(globalThis, fn);
-  };
+  globalThis.requestAnimationFrame = fn => { record('raf'); return nativeRaf.call(globalThis, fn); };
   const nativeMicrotask = globalThis.queueMicrotask;
   globalThis.queueMicrotask = fn => {
-    record('microtask');
-    return nativeMicrotask.call(globalThis, fn);
+    record('microtask'); return nativeMicrotask.call(globalThis, fn);
   };
-  const nativeMedia = globalThis.matchMedia;
-  globalThis.matchMedia = query => {
-    record('media', query);
-    return nativeMedia.call(globalThis, query);
-  };
+  const nativeMedia = globalThis.matchMedia; globalThis.matchMedia = query => { record('media', query); return nativeMedia.call(globalThis, query); };
   const nativeAnimate = Element.prototype.animate;
   if (nativeAnimate) Element.prototype.animate = function(frames, options) {
-    record('waapi', JSON.stringify(options));
-    return nativeAnimate.call(this, frames, options);
+    record('waapi', JSON.stringify(options)); return nativeAnimate.call(this, frames, options);
   };
-  const nativeShadow = Element.prototype.attachShadow;
-  Element.prototype.attachShadow = function(options) {
-    record('shadow', options?.mode);
-    return nativeShadow.call(this, options);
+  const nativeShadow = Element.prototype.attachShadow; Element.prototype.attachShadow = function(options) {
+    record('shadow', options?.mode); return nativeShadow.call(this, options);
   };
   globalThis.__recreateOracle = {pending, registrations};
 })()"#;
@@ -73,11 +68,13 @@ pub const SNAPSHOT: &str = r#"(() => {
   };
   const styles = new WeakMap(), rects = new WeakMap(), paths = new WeakMap(), clipCache = new WeakMap();
   const style = e => { if (!styles.has(e)) styles.set(e,getComputedStyle(e)); return styles.get(e); };
-  const frame=document.body.appendChild(document.createElement('iframe'));
-  frame.style.display='none';
-  const probe=frame.contentDocument.body.appendChild(frame.contentDocument.createElement('div'));
-  const styleNames=[...frame.contentWindow.getComputedStyle(probe)];
-  frame.remove();
+  const styleNames=globalThis.__recreateOracleStyleNames||(()=>{
+    const frame=document.body.appendChild(document.createElement('iframe'));
+    frame.style.display='none';
+    const probe=frame.contentDocument.body.appendChild(frame.contentDocument.createElement('div'));
+    const names=[...frame.contentWindow.getComputedStyle(probe)];frame.remove();return names;
+  })();
+  globalThis.__recreateOracleStyleNames=styleNames;
   const rect = e => { if (!rects.has(e)) rects.set(e,e.getBoundingClientRect()); return rects.get(e); };
   const visible = e => {
     const s = style(e), r = rect(e);
@@ -116,7 +113,22 @@ pub const SNAPSHOT: &str = r#"(() => {
         .some(k => parseFloat(s[k]) > 0) || s.boxShadow !== 'none';
     return control || named || leafText || painted;
   };
-  const nodes = [...document.querySelectorAll('*')].filter(e => visible(e) && semantic(e)).map(e => {
+  const actionState=globalThis.__recreateOracleAction;
+  const active=document.activeElement;
+  const scoped=actionState ? new Set() : null;
+  if(scoped){
+    const include=(e,tree=false)=>{
+      if(!e||e.nodeType!==Node.ELEMENT_NODE)return;
+      for(let n=e;n;n=n.parentElement)scoped.add(n);
+      if(tree)for(const child of e.querySelectorAll('*'))scoped.add(child);
+    };
+    for(const node of actionState.dirtyNodes||[])include(node);
+    for(const node of actionState.dirtyTrees||[])include(node,true);
+    for(const animation of document.getAnimations())include(animation.effect?.target);
+    include(active);
+  }
+  const candidates=scoped?[...scoped].filter(e=>e.isConnected):[...document.querySelectorAll('*')];
+  const nodes = candidates.filter(e => visible(e) && semantic(e)).map(e => {
     const r = rect(e), s = style(e);
     return {
       path: path(e), tag: e.localName, role: e.getAttribute('role') || '',
@@ -163,8 +175,9 @@ pub const SNAPSHOT: &str = r#"(() => {
     playbackRate: a.playbackRate, timing: a.effect?.getComputedTiming(),
     keyframes: a.effect?.getKeyframes()
   }));
-  const active = document.activeElement;
-  const pending = globalThis.__recreateOracle?.pending || {timeouts:{size:0},intervals:{size:0},fetches:0};
+  const action = globalThis.__recreateOracleActionResult || null;
+  const pending = globalThis.__recreateOracle?.pending ||
+    {timeouts:{size:0},intervals:{size:0},fetches:0,xhrs:0};
   const resources = performance.getEntriesByType('resource').map(entry => ({
     name: entry.name.startsWith('data:') ? entry.name : (() => {
       try { const u=new URL(entry.name); return u.pathname+u.search; } catch { return entry.name; }
@@ -174,11 +187,12 @@ pub const SNAPSHOT: &str = r#"(() => {
   return {
     url: location.href, title: document.title, nodes, animations,
     focus: active ? (nodes.find(node => node.path === path(active))?.anchor || '') : '',
-    ambiguous,
+    action, ambiguous,
     document: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
     visualViewport: visualViewport ? [visualViewport.width,visualViewport.height,visualViewport.scale,
       visualViewport.offsetLeft,visualViewport.offsetTop] : null,
-    pending: {timeouts: pending.timeouts.size, intervals: pending.intervals.size, fetches: pending.fetches},
+    pending: {timeouts: pending.timeouts.size, intervals: pending.intervals.size,
+      fetches: pending.fetches, xhrs: pending.xhrs},
     resources,
     documentState: Object.fromEntries(Object.entries(document.body?.dataset || {}).sort())
   };

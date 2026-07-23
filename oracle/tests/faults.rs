@@ -98,7 +98,7 @@ fn infrastructure_faults_fail_closed() {
     assert!(artifact::verify(&missing_checkpoint).is_err());
 
     let mut missing_domain = valid_artifact();
-    missing_domain.checkpoints[0].domains.remove("compositor");
+    missing_domain.checkpoints[0].domains.remove("structure");
     let missing_domain = artifact::seal(missing_domain).unwrap();
     assert!(artifact::verify(&missing_domain).is_err());
 

@@ -12,15 +12,15 @@ capture or generation interpretation into the oracle.
 ## Certification contract
 
 Certification is exact inside the artifact's pinned finite contract. Every
-checkpoint must match in all eight domains: structure, geometry, computed
+checkpoint must match in all seven domains: structure, geometry, computed
 style, accessibility, interaction state, asynchronous state, browser animation
-state, and final compositor pixels. Missing checkpoints, browser errors,
+state. Missing checkpoints, browser errors,
 unknown domains, corrupt artifacts, or environment drift fail closed.
 
-Compositor images are hashed in memory and are never written to disk. Reports
-provide an exact parts-per-million score and the shortest typed JSON path to
-each differing domain. A score of 100% is not certification unless coverage is
-complete and there are no blockers.
+No screenshots or image comparisons are used. Reports provide an exact
+parts-per-million score and the shortest typed JSON path to each differing
+domain. A score of 100% is not certification unless coverage is complete and
+there are no blockers.
 
 ## Commands
 
@@ -50,8 +50,8 @@ platform, architecture, flags, locale, timezone, color scheme, motion
 preference, and device scale factor used by the source recording.
 
 Discovery executes in a pre-document trace lane. Its clean structure,
-accessibility, motion, geometry, style, interaction, and decoded compositor
-pixel roots must equal the uninstrumented source lane. Unsupported or unbounded
+accessibility, motion, geometry, style, and interaction roots must equal the
+uninstrumented source lane. Unsupported or unbounded
 surfaces become explicit obligations and prevent artifact verification rather
 than being sampled or ignored.
 
@@ -60,8 +60,8 @@ than being sampled or ignored.
 The checked-in isolated page contains one-pixel responsive boundaries, delayed
 virtual-time behavior, a complete finite animation cycle, semantic controls,
 trusted inputs, accessibility, clipping, hit testing, complete computed style,
-and decoded final compositor pixels. Qualification requires source-self
-acceptance, acceptance of an independently formatted equivalent page, rejection
+Qualification requires source-self acceptance, acceptance of an independently
+formatted equivalent page, rejection
 and correct first-domain localization of every public and separately loaded
 holdout mutant, byte-equivalent
 optimized/reference reports, and warm p95/p99 no slower than 2,000/2,500 ms.

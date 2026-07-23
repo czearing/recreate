@@ -1,16 +1,16 @@
 pub use crate::collector::collect;
 use crate::{
     artifact, checkpoint,
-    cli::{Cli, Command, CompareArgs, RecordArgs},
-    compare, discovery,
+    cli::{Cli, Command, RecordArgs},
+    discovery, engine_support,
     model::{Artifact, Coverage, ObligationStatus},
     qualification, scenario, source_self,
 };
-use std::{fs, time::Instant};
+use anyhow::Context;
 pub async fn run(cli: Cli) -> anyhow::Result<()> {
     match cli.command {
         Command::Record(args) => record(args).await,
-        Command::Compare(args) => compare_command(args).await,
+        Command::Compare(args) => engine_support::compare(args).await,
         Command::Qualify(args) => qualification::run(args).await,
         Command::Benchmark(args) => crate::benchmark::run(args).await,
     }
@@ -27,14 +27,51 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
         (trace_width, args.browser.height),
         args.diagnostic,
     )
-    .await?;
+    .await
+    .context("recording source discovery graph")?;
     if args.diagnostic {
-        discovered
+        discovered.scenarios.retain(|scenario| {
+            [
+                "interaction-",
+                "state-sequence-",
+                "keyboard-navigation",
+                "successor-",
+            ]
+            .iter()
+            .any(|prefix| scenario.id.starts_with(prefix))
+        });
+        let retained = discovered
             .scenarios
-            .retain(|scenario| scenario.id.starts_with("interaction-"));
+            .iter()
+            .map(|scenario| scenario.id.as_str())
+            .collect::<std::collections::BTreeSet<_>>();
+        for obligation in &mut discovered.obligations {
+            obligation
+                .scenarios
+                .retain(|scenario| retained.contains(scenario.as_str()));
+            if obligation.scenarios.is_empty()
+                && matches!(obligation.status, ObligationStatus::Qualified)
+            {
+                obligation.status = ObligationStatus::Uncovered;
+            }
+        }
     }
     insert_before_async(&mut scenarios, discovered.scenarios);
-    let checkpoints = collect(&mut browser, &args.source, &scenarios).await?;
+    if args.diagnostic {
+        scenarios.retain(|scenario| {
+            [
+                "interaction-",
+                "state-sequence-",
+                "keyboard-navigation",
+                "successor-",
+            ]
+            .iter()
+            .any(|prefix| scenario.id.starts_with(prefix))
+        });
+    }
+    let checkpoints = collect(&mut browser, &args.source, &scenarios)
+        .await
+        .context("collecting authoritative source checkpoints")?;
     let mut incomplete = Vec::new();
     let clean = checkpoints
         .iter()
@@ -88,18 +125,21 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
             .map(|item| item.id.clone())
             .collect::<Vec<_>>(),
     );
-    if checkpoints.iter().any(has_ambiguous_nodes) {
+    if checkpoints.iter().any(engine_support::has_ambiguous_nodes) {
         incomplete.push("ambiguous-node-assignment".into());
     }
     if discovered
         .obligations
         .iter()
         .any(|obligation| obligation.kind == "fetch")
-        && !checkpoints.iter().any(has_network_evidence)
+        && !checkpoints.iter().any(engine_support::has_network_evidence)
     {
         incomplete.push("network-registration-without-response-fixture".into());
     }
-    if checkpoints.iter().any(has_unavailable_network_body) {
+    if checkpoints
+        .iter()
+        .any(engine_support::has_unavailable_network_body)
+    {
         incomplete.push("network-response-body-unavailable".into());
     }
     let artifact = artifact::seal(Artifact {
@@ -145,52 +185,4 @@ fn insert_before_async(
         .filter(|scenario| scenario.id == "async-settled");
     scenarios.extend(discovered);
     scenarios.extend(async_scenario);
-}
-pub async fn compare_command(args: CompareArgs) -> anyhow::Result<()> {
-    let expected = if args.diagnostic {
-        artifact::read_diagnostic(&args.artifact)?
-    } else {
-        artifact::read(&args.artifact)?
-    };
-    let mut browser = crate::browser_factory::start(&args.browser).await?;
-    browser.prepare().await?;
-    let actual_environment = browser.environment().await?;
-    anyhow::ensure!(
-        expected.environment == actual_environment,
-        "browser environment differs from source artifact"
-    );
-    let started = Instant::now();
-    let actual = collect(&mut browser, &args.candidate, &expected.scenarios).await?;
-    browser.close().await;
-    let report = compare::artifacts(&expected, &actual, started.elapsed());
-    let encoded = serde_json::to_vec_pretty(&report)?;
-    if let Some(path) = args.out {
-        fs::write(path, &encoded)?;
-    }
-    println!("{}", String::from_utf8(encoded)?);
-    anyhow::ensure!(report.certified, "candidate is not certified");
-    Ok(())
-}
-fn has_ambiguous_nodes(checkpoint: &crate::model::Checkpoint) -> bool {
-    checkpoint.domains["structure"].value["ambiguous"]
-        .as_array()
-        .is_some_and(|items| !items.is_empty())
-}
-fn has_network_evidence(checkpoint: &crate::model::Checkpoint) -> bool {
-    let asynchronous = &checkpoint.domains["async"].value;
-    asynchronous["network"]
-        .as_array()
-        .is_some_and(|entries| !entries.is_empty())
-        || asynchronous["resources"]
-            .as_array()
-            .is_some_and(|entries| !entries.is_empty())
-        || asynchronous["documentState"]["network"].is_string()
-}
-
-fn has_unavailable_network_body(checkpoint: &crate::model::Checkpoint) -> bool {
-    checkpoint.domains["async"].value["network"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .any(|entry| entry["body_unavailable"] == true)
 }

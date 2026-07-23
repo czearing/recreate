@@ -21,14 +21,27 @@ async fn qualifies_stateful_interaction_failures() {
     let checkpoints = engine::collect(&mut browser, &source, &discovered.scenarios)
         .await
         .unwrap();
+    let menu_scenario = discovered
+        .scenarios
+        .iter()
+        .find(|scenario| {
+            scenario.steps.iter().any(|step| {
+                matches!(
+                    step,
+                    recreate_oracle::model::Step::Activate { anchor }
+                        if anchor.contains("Open actions")
+                )
+            })
+        })
+        .unwrap();
     let menu = checkpoints
         .iter()
-        .filter(|checkpoint| checkpoint.scenario == "interaction-0")
+        .filter(|checkpoint| checkpoint.scenario == menu_scenario.id)
         .collect::<Vec<_>>();
-    assert_eq!(menu.len(), 2, "{:?}", discovered.scenarios);
+    assert_eq!(menu.len(), 3, "{:?}", discovered.scenarios);
     assert_ne!(
         menu[0].domains["geometry"].digest, menu[1].domains["geometry"].digest,
-        "menu activation produced no browser-visible geometry change"
+        "menu escape produced no browser-visible geometry change"
     );
     let expected = artifact::seal(Artifact {
         format: "recreate-oracle/v1".into(),
@@ -71,9 +84,14 @@ async fn qualifies_stateful_interaction_failures() {
 }
 
 async fn certify(browser: &mut Browser, expected: &Artifact, url: &str) {
+    let started = std::time::Instant::now();
     let actual = engine::collect(browser, url, &expected.scenarios)
         .await
         .unwrap();
+    assert!(
+        started.elapsed().as_secs_f64() < 5.0,
+        "candidate replay exceeded five seconds"
+    );
     let report = compare::artifacts(expected, &actual, Default::default());
     assert!(report.certified, "{:?}", report.differences);
 }
@@ -95,8 +113,8 @@ fn mutants(source: &str) -> Vec<(&'static str, String, &'static str)> {
         (
             "page grey",
             source.replace(
-                "document.querySelector('[aria-label=\"Open actions\"]').onclick=()=>menu.hidden=!menu.hidden;",
-                "document.querySelector('[aria-label=\"Open actions\"]').onclick=()=>{menu.hidden=!menu.hidden;document.body.style.background='rgb(220,220,220)'};",
+                "actions.onclick=()=>{menu.hidden=!menu.hidden;actions.setAttribute('aria-expanded',!menu.hidden)};",
+                "actions.onclick=()=>{menu.hidden=!menu.hidden;actions.setAttribute('aria-expanded',!menu.hidden);document.body.style.background='rgb(220,220,220)'};",
             ),
             "style",
         ),
@@ -123,6 +141,62 @@ fn mutants(source: &str) -> Vec<(&'static str, String, &'static str)> {
                 "list.onclick=()=>view(grid)",
             ),
             "accessibility",
+        ),
+        (
+            "sequential transition error",
+            source.replace(
+                "panel.textContent=tab.textContent+' content'}",
+                "panel.textContent=tab.textContent+' content';if(tab.textContent==='Activity')throw new Error('transition')}",
+            ),
+            "async",
+        ),
+        (
+            "focus paint missing",
+            source.replace(
+                "button:focus{outline:3px solid rgb(0,90,220);outline-offset:2px}",
+                "button:focus{outline:none}",
+            ),
+            "style",
+        ),
+        (
+            "unaffected node removed",
+            source.replace(
+                "profile.onclick=()=>profile.setAttribute('aria-expanded',profile.getAttribute('aria-expanded')!=='true');",
+                "profile.onclick=()=>{profile.setAttribute('aria-expanded',profile.getAttribute('aria-expanded')!=='true');profile.querySelector('img')?.remove()};",
+            ),
+            "structure",
+        ),
+        (
+            "scroll action inert",
+            source.replace(
+                "document.querySelector('[aria-label=\"Next item\"]').onclick=()=>rail.scrollLeft+=120;",
+                "document.querySelector('[aria-label=\"Next item\"]').onclick=()=>{};",
+            ),
+            "structure",
+        ),
+        (
+            "expansion inert",
+            source.replace(
+                "document.querySelector('[aria-label=\"Show more\"]').onclick=()=>{",
+                "document.querySelector('[aria-label=\"Show more\"]').onclick=()=>{return;",
+            ),
+            "structure",
+        ),
+        (
+            "browser error",
+            source.replace(
+                "actions.onclick=()=>{menu.hidden=!menu.hidden;actions.setAttribute('aria-expanded',!menu.hidden)};",
+                "actions.onclick=()=>{menu.hidden=!menu.hidden;actions.setAttribute('aria-expanded',!menu.hidden);throw new Error('command')};",
+            ),
+            "async",
+        ),
+        (
+            "slow action",
+            source.replace(
+                "profile.onclick=()=>profile.setAttribute('aria-expanded',profile.getAttribute('aria-expanded')!=='true');",
+                "profile.onclick=()=>setTimeout(()=>profile.setAttribute('aria-expanded',profile.getAttribute('aria-expanded')!=='true'),480);",
+            ),
+            "interaction",
         ),
     ]
 }

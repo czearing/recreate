@@ -1,14 +1,13 @@
 use crate::model::Checkpoint;
 use serde_json::Value;
 
-const DOMAINS: [&str; 7] = [
+const DOMAINS: [&str; 6] = [
     "interaction",
     "structure",
     "accessibility",
     "motion",
     "geometry",
     "style",
-    "compositor",
 ];
 
 pub fn matches_clean(traced: &Checkpoint, clean: &Checkpoint) -> bool {

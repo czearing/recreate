@@ -4,9 +4,13 @@ use serde_json::Value;
 
 pub async fn manifest(cdp: &mut Cdp) -> anyhow::Result<Value> {
     let mut entries = Vec::new();
+    let events = cdp.take_events_named("Network.responseReceived");
+    if events.is_empty() {
+        return Ok(Value::Array(entries));
+    }
     let frame_tree = cdp.send("Page.getFrameTree", serde_json::json!({})).await?;
     let loader_id = &frame_tree["frameTree"]["frame"]["loaderId"];
-    for event in cdp.take_events_named("Network.responseReceived") {
+    for event in events {
         let kind = event["params"]["type"].as_str().unwrap_or_default();
         if !matches!(kind, "Fetch" | "XHR") || event["params"]["loaderId"] != *loader_id {
             continue;

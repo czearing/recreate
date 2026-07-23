@@ -42,6 +42,42 @@ const CANDIDATES: &str = r#"
       element.parentElement;
     return owner ? visible(owner) : false;
   };
+  const followsRepeatedContent = element => {
+    let cursor = element;
+    for (let depth = 0; cursor?.parentElement && depth < 4; depth++) {
+      const siblings = Array.from(cursor.parentElement.children);
+      for (const sibling of siblings.slice(0, siblings.indexOf(cursor)).reverse()) {
+        const children = Array.from(sibling.children).filter(visible);
+        const groups = new Map();
+        for (const child of children) {
+          const key = `${child.tagName}:${child.getAttribute('role') || ''}`;
+          const group = groups.get(key) || [];
+          group.push(child.getBoundingClientRect());
+          groups.set(key, group);
+        }
+        for (const group of groups.values()) {
+          if (group.length < 3) continue;
+          const first = group[0];
+          const sameSize = group.every(rect =>
+            Math.abs(rect.width - first.width) <= 2 &&
+            Math.abs(rect.height - first.height) <= 2
+          );
+          const distributed = group.some(rect =>
+            Math.abs(rect.x - first.x) > 2 || Math.abs(rect.y - first.y) > 2
+          );
+          if (sameSize && distributed) return true;
+        }
+      }
+      cursor = cursor.parentElement;
+    }
+    return false;
+  };
+  const localStateControl = element =>
+    Array.from(element.parentElement?.children || []).some(sibling =>
+      sibling !== element && (
+        sibling.disabled || sibling.getAttribute('aria-disabled') === 'true'
+      )
+    ) || followsRepeatedContent(element);
   const controls = Array.from(document.querySelectorAll(
   'a[href],button,[role="button"],[role="tab"],[aria-haspopup],[aria-expanded],' +
   '[aria-pressed],[aria-selected],summary,' +
@@ -75,8 +111,35 @@ const CANDIDATES: &str = r#"
       (element.tagName === 'SUMMARY' ? 1 : 0),
     state_control: element.getAttribute('role') === 'tab' ||
       element.hasAttribute('aria-pressed') || element.hasAttribute('aria-selected')
-  }}).filter(candidate => candidate.priority >= 8)
+  }}).filter(candidate => candidate.priority >= 8 ||
+    ((candidate.tag === 'button' || candidate.tag === 'summary') &&
+      localStateControl(document.querySelector(candidate.path))))
   .sort((a, b) => b.priority - a.priority);
+})()
+"#;
+
+const PREFLIGHT: &str = r#"
+(() => {
+  let hash = 2166136261;
+  const add = value => {
+    const text = String(value);
+    for (let index = 0; index < text.length; index++) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+  };
+  add(`${document.documentElement.scrollWidth}:${document.documentElement.scrollHeight}`);
+  for (const element of document.querySelectorAll('*')) {
+    const rect = element.getBoundingClientRect();
+    add(element.tagName);
+    add(element.childElementCount);
+    add(`${Math.round(rect.x * 2)}:${Math.round(rect.y * 2)}:${Math.round(rect.width * 2)}:${Math.round(rect.height * 2)}`);
+    add(`${element.scrollLeft}:${element.scrollTop}`);
+    for (const name of ['aria-expanded', 'aria-pressed', 'aria-selected', 'disabled', 'hidden']) {
+      add(element.getAttribute(name) || '');
+    }
+  }
+  return `${document.querySelectorAll('*').length}:${hash >>> 0}`;
 })()
 "#;
 
@@ -110,6 +173,7 @@ struct Candidate {
     tag: String,
     label: String,
     occurrence: usize,
+    priority: u8,
     state_control: bool,
 }
 
@@ -149,11 +213,23 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
         };
         let mut opened = None;
         for attempt in 0..2 {
+            let before = if candidate.priority < 8 {
+                Some(cdp.evaluate(PREFLIGHT).await?)
+            } else {
+                None
+            };
             let clicked = activate(cdp, &candidate).await?;
             if !clicked {
                 break;
             }
             let settled = settle(cdp, candidate.uses_text_entry()).await?;
+            let unchanged = match before {
+                Some(before) => cdp.evaluate(PREFLIGHT).await? == before,
+                None => false,
+            };
+            if unchanged {
+                break;
+            }
             let focused = focused_path(cdp).await?;
             if cdp.evaluate("location.href").await?.as_str() != Some(first.url.as_str()) {
                 break;
@@ -391,6 +467,9 @@ mod tests {
         assert!(super::CANDIDATES.contains("candidate.priority >= 8"));
         assert!(super::CANDIDATES.contains("candidateVisible(element)"));
         assert!(super::CANDIDATES.contains("article,li,[role=\"button\"]"));
+        assert!(super::CANDIDATES.contains("followsRepeatedContent"));
+        assert!(super::CANDIDATES.contains("sameSize && distributed"));
+        assert!(super::PREFLIGHT.contains("getBoundingClientRect"));
     }
 
     #[test]

@@ -63,7 +63,7 @@ pub fn interaction_states(
                     .find(|baseline| baseline.viewport.width == state.viewport.width)
                     .unwrap_or(&specification.states[0]);
                 let full_replacement = false;
-                let surface_roots = if full_replacement {
+                let mut surface_roots = if full_replacement {
                     Default::default()
                 } else if shared_surface {
                     let roots = crate::interaction_surface::roots(state, baseline);
@@ -95,6 +95,12 @@ pub fn interaction_states(
                     }
                     roots
                 };
+                if state_control {
+                    surface_roots.retain(|root| {
+                        interaction.trigger_path != *root
+                            && !descendant_of(&interaction.trigger_path, root)
+                    });
+                }
                 if shared_surface
                     && surface_roots.is_empty()
                     && let Some((fallback_index, fallback_roots)) = &fallback_surface
@@ -333,14 +339,7 @@ fn changed_structure_roots(
                     .is_none_or(|parent| parent.tag != "body")
                 && baseline_nodes
                     .get(node.path.as_str())
-                    .is_some_and(|baseline_node| {
-                        compatible_children(state, baseline, &node.path)
-                            || node.rect != baseline_node.rect
-                            || node.rect.width * node.rect.height
-                                < f64::from(state.viewport.width)
-                                    * f64::from(state.viewport.height)
-                                    * 0.8
-                    })
+                    .is_some_and(|_| !compatible_children(state, baseline, &node.path))
         })
         .map(|node| node.path.clone())
         .collect::<std::collections::HashSet<_>>();

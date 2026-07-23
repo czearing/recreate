@@ -37,14 +37,22 @@ fn head(state: &PageState, classes: &BTreeMap<String, String>) -> String {
         .nodes
         .iter()
         .filter(|node| node.parent.as_deref() == Some(head.path.as_str()))
-        .filter(|node| {
-            matches!(
-                node.tag.as_str(),
-                "base" | "link" | "meta" | "style" | "title"
-            )
-        })
+        .filter(|node| safe_head_node(node))
         .map(|node| element(node, state, classes))
         .collect()
+}
+
+fn safe_head_node(node: &Node) -> bool {
+    if node.tag != "link" {
+        return matches!(node.tag.as_str(), "base" | "meta" | "style" | "title");
+    }
+    let relation = node.attributes.get("rel").map(String::as_str);
+    let kind = node.attributes.get("as").map(String::as_str);
+    safe_link(relation, kind)
+}
+
+fn safe_link(relation: Option<&str>, kind: Option<&str>) -> bool {
+    relation != Some("modulepreload") && !(relation == Some("preload") && kind == Some("script"))
 }
 
 fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -> String {
@@ -99,4 +107,17 @@ fn escape(value: &str) -> String {
         .replace('"', "&quot;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::safe_link;
+
+    #[test]
+    fn excludes_executable_source_preloads() {
+        assert!(!safe_link(Some("modulepreload"), None));
+        assert!(!safe_link(Some("preload"), Some("script")));
+        assert!(safe_link(Some("stylesheet"), None));
+        assert!(safe_link(Some("icon"), None));
+    }
 }

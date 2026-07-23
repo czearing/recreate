@@ -6,6 +6,7 @@ use crate::{
     model::{Checkpoint, Obligation, ObligationStatus, Scenario, Step, Viewport},
     probe, probe_discovery,
 };
+use anyhow::Context;
 
 pub struct Discovery {
     pub scenarios: Vec<Scenario>,
@@ -20,28 +21,43 @@ pub async fn run(
     diagnostic: bool,
 ) -> anyhow::Result<Discovery> {
     let (width, height) = viewport;
-    browser.open_or_reuse(url).await?;
-    wait_rendered(browser).await?;
+    browser
+        .open(url)
+        .await
+        .context("opening source discovery target")?;
+    wait_rendered(browser)
+        .await
+        .context("waiting for source discovery target")?;
     let script = browser
         .cdp
         .send(
             "Page.addScriptToEvaluateOnNewDocument",
             serde_json::json!({"source": probe::INSTALL}),
         )
-        .await?;
-    reload(browser).await?;
-    resize(browser, width, height).await?;
+        .await
+        .context("installing source discovery instrumentation")?;
+    reload(browser)
+        .await
+        .context("reloading instrumented source discovery target")?;
+    wait_rendered(browser)
+        .await
+        .context("waiting for hydrated source discovery target")?;
+    resize(browser, width, height)
+        .await
+        .context("sizing source discovery target")?;
     let value = browser
         .cdp
         .evaluate(&format!("({})({diagnostic})", probe_discovery::DISCOVER))
-        .await?;
+        .await
+        .context("discovering initial browser controls")?;
     let traced_checkpoint = checkpoint::capture(
         &mut browser.cdp,
         "trace-qualification",
         0,
         Viewport { width, height },
     )
-    .await?;
+    .await
+    .context("capturing discovery qualification checkpoint")?;
     browser
         .cdp
         .send(
@@ -50,32 +66,10 @@ pub async fn run(
         )
         .await?;
     let anchors = serde_json::from_value::<Vec<String>>(value["anchors"].clone())?;
-    let persistent = serde_json::from_value::<Vec<bool>>(value["persistent"].clone())?;
-    let interaction_scenarios = anchors
-        .iter()
-        .zip(persistent)
-        .enumerate()
-        .map(|(index, (anchor, persistent))| {
-            let mut steps = vec![
-                Step::Reset,
-                Step::Hover {
-                    anchor: anchor.clone(),
-                },
-                Step::Activate {
-                    anchor: anchor.clone(),
-                },
-            ];
-            if !persistent {
-                steps.push(Step::Key {
-                    key: "Escape".into(),
-                });
-            }
-            Scenario {
-                id: format!("interaction-{index}"),
-                steps,
-            }
-        })
-        .collect::<Vec<_>>();
+    let controls = serde_json::from_value::<Vec<crate::discovery_interactions::Control>>(
+        value["controls"].clone(),
+    )?;
+    let (interaction_scenarios, mut obligations) = crate::discovery_interactions::build(&controls);
     let mut scenarios = Vec::new();
     let boundaries = serde_json::from_value::<Vec<u32>>(value["boundaries"].clone())?;
     if !boundaries.is_empty() {
@@ -102,16 +96,11 @@ pub async fn run(
         });
     }
     scenarios.extend(interaction_scenarios);
-    let mut obligations = anchors
-        .iter()
-        .enumerate()
-        .map(|(index, _)| Obligation {
-            id: format!("control:{index}"),
-            kind: "trusted-input".into(),
-            status: ObligationStatus::Qualified,
-            scenarios: vec![format!("interaction-{index}")],
-        })
-        .collect::<Vec<_>>();
+    obligations.extend(
+        crate::discovery_graph::expand(browser, url, diagnostic, &controls, &mut scenarios)
+            .await
+            .context("expanding browser-observed successor graph")?,
+    );
     for token in value["opaque"].as_array().into_iter().flatten() {
         obligations.push(Obligation {
             id: format!("opaque:{}", token.as_str().unwrap_or("unknown")),

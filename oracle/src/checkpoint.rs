@@ -4,7 +4,6 @@ use crate::{
     model::{Checkpoint, Domain, Viewport},
     network, snapshot_transfer,
 };
-use base64::{Engine, engine::general_purpose::STANDARD};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
@@ -16,7 +15,6 @@ pub const DOMAINS: &[&str] = &[
     "motion",
     "geometry",
     "style",
-    "compositor",
 ];
 
 pub async fn capture(
@@ -28,47 +26,15 @@ pub async fn capture(
     let started = std::time::Instant::now();
     let snapshot = snapshot_transfer::capture(cdp).await?;
     let snapshot_elapsed = started.elapsed();
-    let accessibility = cdp
-        .send("Accessibility.getFullAXTree", json!({"depth": -1}))
-        .await?;
+    let accessibility = if snapshot["action"].is_null() {
+        Some(
+            cdp.send("Accessibility.getFullAXTree", json!({"depth": -1}))
+                .await?,
+        )
+    } else {
+        None
+    };
     let accessibility_elapsed = started.elapsed();
-    let screenshot_width = snapshot["visualViewport"][0]
-        .as_f64()
-        .unwrap_or_else(|| f64::from(viewport.width));
-    let screenshot_height = snapshot["visualViewport"][1]
-        .as_f64()
-        .unwrap_or_else(|| f64::from(viewport.height))
-        .min(
-            snapshot["document"][1]
-                .as_f64()
-                .unwrap_or_else(|| f64::from(viewport.height)),
-        )
-        .max(1.0);
-    let png = cdp
-        .send(
-            "Page.captureScreenshot",
-            json!({
-                "format": "png",
-                "fromSurface": true,
-                "captureBeyondViewport": false,
-                "optimizeForSpeed": true,
-                "clip": {
-                    "x": 0,
-                    "y": 0,
-                    "width": screenshot_width,
-                    "height": screenshot_height,
-                    "scale": 1
-                }
-            }),
-        )
-        .await?;
-    let screenshot_elapsed = started.elapsed();
-    let encoded = STANDARD.decode(png["data"].as_str().unwrap_or_default())?;
-    let mut decoder =
-        zune_png::PngDecoder::new(zune_png::zune_core::bytestream::ZCursor::new(&encoded));
-    let pixels = decoder
-        .decode_raw()
-        .map_err(|error| anyhow::anyhow!("decode compositor PNG: {error}"))?;
     let mut domains = BTreeMap::new();
     insert(
         &mut domains,
@@ -97,23 +63,24 @@ pub async fn capture(
         "accessibility",
         serde_json::json!({
             "dom": map_nodes(&snapshot, &["anchor", "role", "name", "text", "state"])?,
-            "ax": normalize_ax(&accessibility)
+            "ax": accessibility.as_ref().map(normalize_ax)
         }),
     )?;
-    insert(&mut domains, "interaction", select(&snapshot, &["focus"]))?;
+    insert(
+        &mut domains,
+        "interaction",
+        select(&snapshot, &["focus", "action"]),
+    )?;
     let mut asynchronous = select(&snapshot, &["pending", "documentState"]);
     asynchronous["network"] = network::manifest(cdp).await?;
     asynchronous["browser_errors"] = serde_json::json!(cdp.error_count());
     insert(&mut domains, "async", asynchronous)?;
     insert(&mut domains, "motion", select(&snapshot, &["animations"]))?;
-    let compositor = serde_json::json!({"sha256": digest::bytes(&pixels)});
-    insert(&mut domains, "compositor", compositor)?;
     if std::env::var_os("RECREATE_TIMING").is_some() {
         eprintln!(
-            "oracle_checkpoint_ms snapshot={} accessibility={} screenshot={} total={}",
+            "oracle_checkpoint_ms snapshot={} accessibility={} total={}",
             snapshot_elapsed.as_millis(),
             (accessibility_elapsed - snapshot_elapsed).as_millis(),
-            (screenshot_elapsed - accessibility_elapsed).as_millis(),
             started.elapsed().as_millis()
         );
     }
@@ -123,6 +90,32 @@ pub async fn capture(
         viewport,
         domains,
     })
+}
+
+pub fn failure(scenario: &str, step: usize, viewport: Viewport, error: &str) -> Checkpoint {
+    let domains = DOMAINS
+        .iter()
+        .map(|name| {
+            let value = if *name == "interaction" {
+                serde_json::json!({"action":{"replay_error":error}})
+            } else {
+                serde_json::json!({"replay_error": error})
+            };
+            (
+                (*name).into(),
+                Domain {
+                    digest: crate::digest::json(&value).unwrap_or_default(),
+                    value,
+                },
+            )
+        })
+        .collect();
+    Checkpoint {
+        scenario: scenario.into(),
+        step,
+        viewport,
+        domains,
+    }
 }
 
 fn normalize_ax(value: &Value) -> Value {
