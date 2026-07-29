@@ -16,6 +16,10 @@ pub fn verify(artifact: &Artifact) -> anyhow::Result<()> {
     verify_with(artifact, false)
 }
 
+pub fn verify_diagnostic(artifact: &Artifact) -> anyhow::Result<()> {
+    verify_with(artifact, true)
+}
+
 fn verify_with(artifact: &Artifact, allow_incomplete: bool) -> anyhow::Result<()> {
     let expected = artifact.payload_digest.clone();
     let actual = seal(artifact.clone())?.payload_digest;
@@ -58,7 +62,9 @@ fn verify_with(artifact: &Artifact, allow_incomplete: bool) -> anyhow::Result<()
             .iter()
             .map(|step| match step {
                 crate::model::Step::ResizePath { widths, .. } => widths.len(),
-                crate::model::Step::Reset | crate::model::Step::Hover { .. } => 0,
+                crate::model::Step::Reset
+                | crate::model::Step::PrepareActivate { .. }
+                | crate::model::Step::PrepareHover { .. } => 0,
                 _ => 1,
             })
             .sum::<usize>();

@@ -21,6 +21,7 @@ fn baseline_animation_rules_follow_interaction_base_styles() {
             focused_path: None,
             states: vec![state(false)],
         }],
+        transitions: Vec::new(),
     };
     let output = css::build(&specification, &Default::default());
     assert!(

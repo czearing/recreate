@@ -60,14 +60,14 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
         .map(|(index, (roots, _))| {
             let node = nodes.get(&roots[0]).copied();
             let base = node
-                .map(|node| names::for_node(node, index))
+                .map(|node| names::for_node(node, index, &nodes))
                 .unwrap_or_else(|| format!("Component{}", index + 1));
             let count = names.entry(base.clone()).or_insert(0_usize);
             *count += 1;
             let name = if *count == 1 {
                 base
             } else {
-                format!("{base}{count}")
+                format!("{base}Variant{count}")
             };
             Component { name, roots }
         })

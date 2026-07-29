@@ -189,13 +189,5 @@ fn content_type(path: &Path) -> &'static str {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn asset_paths_cannot_escape_build_root() {
-        let root = Path::new("dist");
-        assert_eq!(asset_path(root, "/../secret"), root.join("secret"));
-        assert_eq!(asset_path(root, "/"), root.join("index.html"));
-    }
-}
+#[path = "runtime_tests.rs"]
+mod tests;

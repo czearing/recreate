@@ -59,9 +59,9 @@ grid.onclick=()=>view(grid);
 list.onclick=()=>view(list);
 const rail=document.querySelector('.rail');
 document.querySelector('[aria-label="Next item"]').onclick=()=>rail.scrollLeft+=120;
-document.querySelector('[aria-label="Show more"]').onclick=()=>{
+const more=document.querySelector('[aria-label="Show more"]');more.onclick=()=>{
   const item=document.createElement('article');item.className='item';item.textContent='More';
-  document.querySelector('.more').append(item);
+  document.querySelector('.more').append(item);more.disabled=true;
 };
 </script>
 </html>

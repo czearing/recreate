@@ -1,4 +1,4 @@
-use super::{document, mount};
+use super::{document, project_mount::mount};
 
 #[test]
 fn mounts_at_body_without_adding_a_wrapper() {

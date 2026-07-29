@@ -151,6 +151,7 @@ fn normalize_ax(value: &Value) -> Value {
 fn simple_ax_property(value: &Value) -> Option<Value> {
     let inner = &value["value"]["value"];
     (value["name"] != "url"
+        && value["name"] != "focused"
         && matches!(inner, Value::Bool(_) | Value::Number(_) | Value::String(_)))
     .then(|| serde_json::json!({"name": value["name"], "value": inner}))
 }

@@ -146,6 +146,7 @@ pub fn specification(states: Vec<PageState>, interactions: Vec<Interaction>) -> 
         captured_url,
         states,
         interactions,
+        transitions: Vec::new(),
     }
 }
 

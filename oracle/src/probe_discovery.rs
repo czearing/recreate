@@ -1,11 +1,8 @@
 pub const DISCOVER: &str = r#"(diagnostic => {
   const selector='a[href],button,input:not([type="hidden"]),select,textarea,summary,'+
     '[role="button"],[role="tab"],[role="menuitem"],[role="option"],[role="checkbox"],'+
-    '[role="radio"],[role="switch"],[role="slider"],[contenteditable="true"],[tabindex]';
-  const path=e=>{const parts=[];for(let n=e;n&&n!==document.documentElement;n=n.parentElement){
-    const peers=n.parentElement?[...n.parentElement.children].filter(x=>x.localName===n.localName):[n];
-    parts.push(n.localName+':nth-of-type('+(peers.indexOf(n)+1)+')');
-  }return 'html>'+parts.reverse().join('>')};
+    '[role="radio"],[role="switch"],[role="slider"],[contenteditable="true"],'+
+    '[tabindex]:not([tabindex="-1"])';
   const controls = [...document.querySelectorAll(selector)]
     .filter(e => {
       const s = getComputedStyle(e), r = e.getBoundingClientRect();
@@ -18,27 +15,12 @@ pub const DISCOVER: &str = r#"(diagnostic => {
   const occurrences = new Map();
   const rows = controls.map(e => {
     const key = [e.getAttribute('role') || '', e.getAttribute('aria-label') || '',
-      e.children.length ? '' : (e.textContent || '').replace(/\s+/g,' ').trim(), e.localName].join('|');
+      '', e.localName].join('|');
     const occurrence = occurrences.get(key) || 0;
     occurrences.set(key, occurrence + 1);
-    const stateful=e.getAttribute('role')==='tab'||e.hasAttribute('aria-pressed')||
-      e.hasAttribute('aria-selected');
-    const popup=e.hasAttribute('aria-haspopup')||e.hasAttribute('aria-expanded');
-    const group=e.closest('[role="tablist"],[role="radiogroup"],[role="listbox"],[role="menu"]')||
-      e.parentElement;
-    const active=['aria-selected','aria-pressed','aria-checked']
-      .some(name=>e.getAttribute(name)==='true')||e.checked===true;
-    return {anchor:key+'@'+occurrence,key,persistent:stateful,stateful,active,popup,
-      group:group?path(group):''};
+    return {anchor:key+'@'+occurrence};
   });
-  const groups = new Map();
-  for (const row of rows) {
-    const group=groups.get(row.key)||[]; group.push(row); groups.set(row.key,group);
-  }
-  const selected=[...groups.values()].flatMap(group =>
-    group.length<=2?group:[group[0],group[group.length-1]]);
-  const anchors=selected.map(row=>row.anchor);
-  const persistent=selected.map(row=>row.persistent);
+  const anchors=rows.map(row=>row.anchor);
   const opaque = [...document.querySelectorAll('iframe,video,audio,canvas')]
     .map(element => element.localName);
   const runtime = globalThis.__recreateOracle?.registrations || [];
@@ -57,7 +39,7 @@ pub const DISCOVER: &str = r#"(diagnostic => {
     const frames=[]; for(let time=0;time<duration;time+=1000/60) frames.push(Math.round(time*1000)/1000);
     frames.push(duration); return frames;
   }))].sort((a,b)=>a-b);
-  return {anchors, persistent, controls:selected, opaque, registrations,
+  return {anchors, controls:rows, opaque, registrations,
     runtime,
     boundaries:[...new Set(boundaries)].sort((a,b)=>a-b), motionFrames,
     motionUnbounded: motionFrames.length > 600 || durations.some(value => value > 10000)};
@@ -66,7 +48,8 @@ pub const DISCOVER: &str = r#"(diagnostic => {
 pub const FIND_ANCHOR: &str = r#"anchor => {
   const selector='a[href],button,input:not([type="hidden"]),select,textarea,summary,'+
     '[role="button"],[role="tab"],[role="menuitem"],[role="option"],[role="checkbox"],'+
-    '[role="radio"],[role="switch"],[role="slider"],[contenteditable="true"],[tabindex]';
+    '[role="radio"],[role="switch"],[role="slider"],[contenteditable="true"],'+
+    '[tabindex]:not([tabindex="-1"])';
   const controls = [...document.querySelectorAll(selector)]
     .filter(e => {
       const s=getComputedStyle(e),r=e.getBoundingClientRect();
@@ -83,7 +66,7 @@ pub const FIND_ANCHOR: &str = r#"anchor => {
   let fallbackOccurrence=0,fallback=null;
   for (const e of controls) {
     const key=[e.getAttribute('role')||'',e.getAttribute('aria-label')||'',
-      e.children.length?'':(e.textContent||'').replace(/\s+/g,' ').trim(),e.localName].join('|');
+      '',e.localName].join('|');
     const occurrence=occurrences.get(key)||0;
     occurrences.set(key,occurrence+1);
     if (key+'@'+occurrence===anchor) {

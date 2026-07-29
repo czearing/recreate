@@ -29,47 +29,22 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
     )
     .await
     .context("recording source discovery graph")?;
-    if args.diagnostic {
-        discovered.scenarios.retain(|scenario| {
-            [
-                "interaction-",
-                "state-sequence-",
-                "keyboard-navigation",
-                "successor-",
-            ]
-            .iter()
-            .any(|prefix| scenario.id.starts_with(prefix))
-        });
-        let retained = discovered
+    insert_before_async(&mut scenarios, discovered.scenarios);
+    let scenario_ids = scenarios
+        .iter()
+        .map(|scenario| scenario.id.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    for obligation in &mut discovered.obligations {
+        obligation
             .scenarios
-            .iter()
-            .map(|scenario| scenario.id.as_str())
-            .collect::<std::collections::BTreeSet<_>>();
-        for obligation in &mut discovered.obligations {
-            obligation
-                .scenarios
-                .retain(|scenario| retained.contains(scenario.as_str()));
-            if obligation.scenarios.is_empty()
-                && matches!(obligation.status, ObligationStatus::Qualified)
-            {
-                obligation.status = ObligationStatus::Uncovered;
-            }
+            .retain(|scenario| scenario_ids.contains(scenario.as_str()));
+        if obligation.scenarios.is_empty()
+            && matches!(obligation.status, ObligationStatus::Qualified)
+        {
+            obligation.status = ObligationStatus::Uncovered;
         }
     }
-    insert_before_async(&mut scenarios, discovered.scenarios);
-    if args.diagnostic {
-        scenarios.retain(|scenario| {
-            [
-                "interaction-",
-                "state-sequence-",
-                "keyboard-navigation",
-                "successor-",
-            ]
-            .iter()
-            .any(|prefix| scenario.id.starts_with(prefix))
-        });
-    }
-    let checkpoints = collect(&mut browser, &args.source, &scenarios)
+    let checkpoints = crate::collector::collect_strict(&mut browser, &args.source, &scenarios)
         .await
         .context("collecting authoritative source checkpoints")?;
     let mut incomplete = Vec::new();
@@ -92,7 +67,20 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
         incomplete.push(format!("diagnostic-trace-instability:{domain}:{path}"));
     }
     if args.diagnostic {
-        incomplete.push("diagnostic-source-self-unverified".into());
+        if args.verify_source {
+            source_self::verify(
+                &mut browser,
+                &args.source,
+                &scenarios,
+                &environment,
+                &discovered.obligations,
+                &checkpoints,
+                &args.out,
+            )
+            .await?;
+        } else {
+            incomplete.push("diagnostic-source-self-unverified".into());
+        }
         incomplete.push("diagnostic-discovered-responsive-motion-skipped".into());
     } else {
         source_self::verify(
@@ -160,6 +148,7 @@ pub async fn record(args: RecordArgs) -> anyhow::Result<()> {
         },
         payload_digest: String::new(),
     })?;
+    artifact::verify_diagnostic(&artifact)?;
     artifact::write(&args.out, &artifact)?;
     println!("{}", serde_json::to_string_pretty(&artifact.coverage)?);
     Ok(())

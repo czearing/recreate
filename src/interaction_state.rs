@@ -6,6 +6,7 @@ pub fn differs(left: &PageState, right: &PageState) -> bool {
     left.nodes != right.nodes
 }
 
+#[cfg(test)]
 pub fn meaningfully_differs(left: &PageState, right: &PageState) -> bool {
     left.nodes.len() != right.nodes.len()
         || left.nodes.iter().zip(&right.nodes).any(|(left, right)| {

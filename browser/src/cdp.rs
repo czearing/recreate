@@ -12,6 +12,7 @@ type Socket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
 pub struct Cdp {
     socket: Socket,
+    url: String,
     next_id: u64,
     events: BTreeMap<String, Vec<Value>>,
     timeout: std::time::Duration,
@@ -31,6 +32,7 @@ impl Cdp {
             .with_context(|| format!("connect CDP websocket {url}"))?;
         Ok(Self {
             socket,
+            url: url.into(),
             next_id: 0,
             events: BTreeMap::new(),
             timeout,
@@ -78,18 +80,34 @@ impl Cdp {
     }
 
     pub async fn evaluate(&mut self, expression: &str) -> anyhow::Result<Value> {
-        let result = self
-            .send(
-                "Runtime.evaluate",
-                json!({"expression":expression,"returnByValue":true,"awaitPromise":true}),
-            )
-            .await?;
+        let params = json!({"expression":expression,"returnByValue":true,"awaitPromise":true});
+        let result = match self.send("Runtime.evaluate", params.clone()).await {
+            Ok(result) => result,
+            Err(error) if Self::reconnectable(&error) => {
+                self.reconnect().await?;
+                self.send("Runtime.evaluate", params).await?
+            }
+            Err(error) => return Err(error),
+        };
         anyhow::ensure!(
             result["exceptionDetails"].is_null(),
-            "browser evaluation failed: {}",
-            result["exceptionDetails"]
+            "browser evaluation failed for {}: {}",
+            expression.chars().take(240).collect::<String>(),
+            result["exceptionDetails"],
         );
         Ok(result["result"]["value"].clone())
+    }
+
+    async fn reconnect(&mut self) -> anyhow::Result<()> {
+        let config = WebSocketConfig::default()
+            .max_message_size(Some(64 * 1024 * 1024))
+            .max_frame_size(Some(64 * 1024 * 1024));
+        let (socket, _) = connect_async_with_config(&self.url, Some(config), false)
+            .await
+            .with_context(|| format!("reconnect CDP websocket {}", self.url))?;
+        self.socket = socket;
+        self.events.clear();
+        Ok(())
     }
 
     pub fn take_events(&mut self) -> Vec<Value> {
@@ -99,8 +117,20 @@ impl Cdp {
             .collect()
     }
 
+    fn reconnectable(error: &anyhow::Error) -> bool {
+        let message = format!("{error:#}");
+        message.contains("timed out")
+            || message.contains("disconnected")
+            || message.contains("connection was aborted")
+            || message.contains("Connection reset")
+    }
+
     pub fn take_events_named(&mut self, name: &str) -> Vec<Value> {
         self.events.remove(name).unwrap_or_default()
+    }
+
+    pub fn put_events_named(&mut self, name: &str, events: Vec<Value>) {
+        self.events.entry(name.into()).or_default().extend(events);
     }
 
     pub fn error_count(&mut self) -> usize {

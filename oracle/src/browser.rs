@@ -11,6 +11,8 @@ pub struct Browser {
     profile: Option<PathBuf>,
     target_id: String,
     target_owned: bool,
+    network_fixture: Option<crate::network::Fixture>,
+    storage_fixture: Option<serde_json::Value>,
     _job: Option<ProcessJob>,
 }
 
@@ -54,6 +56,8 @@ impl Browser {
             profile: Some(profile),
             target_id: target.id,
             target_owned: true,
+            network_fixture: None,
+            storage_fixture: None,
             _job: Some(job),
         })
     }
@@ -69,6 +73,8 @@ impl Browser {
             profile: None,
             target_id: target.id,
             target_owned: false,
+            network_fixture: None,
+            storage_fixture: None,
             _job: None,
         })
     }
@@ -111,6 +117,7 @@ no-first-run;no-default-browser-check;noerrdialogs",
                 .send(&format!("{domain}.enable"), json!({}))
                 .await?;
         }
+        crate::browser_prepare::focus(&mut self.cdp).await?;
         self.cdp
             .send(
                 "Emulation.setTimezoneOverride",
@@ -121,6 +128,82 @@ no-first-run;no-default-browser-check;noerrdialogs",
             .send("Emulation.setLocaleOverride", json!({"locale": "en-US"}))
             .await?;
         Ok(())
+    }
+
+    pub async fn capture_network_fixture(&mut self) -> anyhow::Result<()> {
+        if self.network_fixture.is_none() {
+            self.network_fixture = Some(crate::network::capture_fixture(&mut self.cdp).await?);
+        } else if let Some(fixture) = &mut self.network_fixture {
+            crate::network::update_fixture(&mut self.cdp, fixture).await?;
+        }
+        self.cdp.send("Fetch.disable", json!({})).await?;
+        crate::network::enable_fixture(&mut self.cdp).await?;
+        Ok(())
+    }
+
+    pub async fn begin_network_fixture(&mut self) -> anyhow::Result<()> {
+        self.network_fixture = Some(crate::network::Fixture::default());
+        crate::network::enable_learning(&mut self.cdp).await
+    }
+
+    pub async fn capture_storage_fixture(&mut self) -> anyhow::Result<()> {
+        let fixture = self
+            .cdp
+            .evaluate(
+                "(()=>{try{return {local:Object.entries(localStorage),\
+                 session:Object.entries(sessionStorage)}}catch{return null}})()",
+            )
+            .await?;
+        self.storage_fixture = (!fixture.is_null()).then_some(fixture);
+        Ok(())
+    }
+
+    pub async fn restore_storage_fixture(&mut self) -> anyhow::Result<()> {
+        let Some(fixture) = &self.storage_fixture else {
+            return Ok(());
+        };
+        let encoded = serde_json::to_string(fixture)?;
+        self.cdp
+            .evaluate(&format!(
+                "(()=>{{const fixture={encoded};localStorage.clear();sessionStorage.clear();\
+                 for(const [key,value] of fixture.local)localStorage.setItem(key,value);\
+                 for(const [key,value] of fixture.session)sessionStorage.setItem(key,value)}})()"
+            ))
+            .await?;
+        Ok(())
+    }
+
+    pub async fn fulfill_network_fixture(&mut self) -> anyhow::Result<()> {
+        if let Some(fixture) = &mut self.network_fixture {
+            crate::network::fulfill_pending(&mut self.cdp, fixture).await?;
+        }
+        Ok(())
+    }
+
+    pub async fn refresh_network_fixture(&mut self) -> anyhow::Result<()> {
+        if let Some(fixture) = &mut self.network_fixture {
+            crate::network::update_fixture(&mut self.cdp, fixture).await?;
+        }
+        Ok(())
+    }
+
+    pub async fn disable_network_fixture(&mut self) -> anyhow::Result<()> {
+        if self.network_fixture.is_some() {
+            self.cdp.send("Fetch.disable", json!({})).await?;
+        }
+        Ok(())
+    }
+
+    pub fn has_state_fixture(&self) -> bool {
+        self.storage_fixture.is_some()
+            || self
+                .network_fixture
+                .as_ref()
+                .is_some_and(|fixture| !fixture.is_empty())
+    }
+
+    pub fn has_network_fixture(&self) -> bool {
+        self.network_fixture.is_some()
     }
 
     pub async fn open(&mut self, url: &str) -> anyhow::Result<()> {
@@ -134,14 +217,24 @@ no-first-run;no-default-browser-check;noerrdialogs",
         self.target_owned = true;
         self.prepare().await
     }
+
+    pub async fn reconnect(&mut self) -> anyhow::Result<()> {
+        let target = recreate_browser::find_target(&self.endpoint, Some(&self.target_id)).await?;
+        self.cdp = Cdp::connect(&target.websocket_url).await?;
+        self.cdp.set_timeout(Duration::from_secs(120));
+        self.prepare().await
+    }
     pub async fn open_instrumented(&mut self, url: &str, script: &str) -> anyhow::Result<()> {
-        self.open("about:blank").await?;
         self.cdp
             .send(
                 "Page.addScriptToEvaluateOnNewDocument",
                 json!({"source": script}),
             )
             .await?;
+        if self.network_fixture.is_some() {
+            crate::network::enable_fixture(&mut self.cdp).await?;
+        }
+        self.restore_storage_fixture().await?;
         self.cdp.send("Page.navigate", json!({"url": url})).await?;
         Ok(())
     }

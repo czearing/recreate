@@ -50,6 +50,11 @@ pub async fn list(endpoint: &str) -> Result<Vec<Target>> {
     recreate_browser::list(endpoint).await
 }
 
+#[cfg(test)]
+pub async fn close(endpoint: &str, id: &str) -> Result<()> {
+    recreate_browser::close(endpoint, id).await
+}
+
 async fn create(endpoint: &str, url: &str) -> Result<Target> {
     recreate_browser::create(endpoint, url).await
 }

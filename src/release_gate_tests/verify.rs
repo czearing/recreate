@@ -28,7 +28,7 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
         out: PathBuf::new(),
         viewports: String::new(),
     };
-    let (_, mut cdp) = browser::target(&args).await?;
+    let (target, mut cdp) = browser::target(&args).await?;
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
     cdp.send(
@@ -66,6 +66,8 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
     let (keyboard_activation, focus_restoration, reduced_motion) =
         verify_interaction(spec, &mut cdp).await?;
     let (console_errors, network_errors) = collect_errors(&mut cdp);
+    drop(cdp);
+    browser::close(&args.cdp_url, &target.id).await?;
     drop(server);
     Ok(Verification {
         parity_mismatches,
@@ -86,10 +88,17 @@ async fn verify_interaction(
     let Some(interaction) = spec.interactions.first() else {
         return Ok((true, true, true));
     };
-    crate::browser::set_viewport(cdp, VIEWPORTS[0].0, VIEWPORTS[0].1).await?;
+    cdp.evaluate("sessionStorage.clear()").await?;
+    capture::prepare_interaction_state(
+        cdp,
+        &crate::release_gate_tests::support::viewport(VIEWPORTS[0].0, VIEWPORTS[0].1),
+        true,
+    )
+    .await?;
     settle(cdp).await?;
     cdp.evaluate("document.querySelector('[data-recreate-control]').focus()")
         .await?;
+    settle(cdp).await?;
     dispatch_key(cdp, "Enter", 13).await?;
     settle(cdp).await?;
     let keyboard = cdp
@@ -102,7 +111,11 @@ async fn verify_interaction(
         settle(cdp).await?;
         let actual = capture::read_state(cdp, expected.viewport.clone()).await?;
         let parity = super::support::parity(expected, &actual);
-        assert_eq!(parity.mismatches, 0, "interaction: {:?}", parity.details);
+        assert_eq!(
+            parity.mismatches, 0,
+            "interaction {}px: {:?}",
+            expected.viewport.width, parity.details
+        );
     }
     crate::browser::set_viewport(cdp, VIEWPORTS[0].0, VIEWPORTS[0].1).await?;
     dispatch_key(cdp, "Escape", 27).await?;

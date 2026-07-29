@@ -36,7 +36,7 @@ async fn writes_semantic_component_project() {
         .unwrap();
     let root = directory.path().join("react");
     assert!(root.join("src/states.jsx").exists());
-    let app = std::fs::read_to_string(root.join("src/App.jsx")).unwrap();
+    let app = read_source_tree(&root.join("src"));
     assert!(app.contains("Interaction1"));
     assert!(app.contains("aria-expanded={\"false\"}"));
     assert!(app.contains("onKeyDown"));
@@ -46,13 +46,22 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("function Baseline0({activate,showStartup,onStartupDone})"));
     assert!(app.contains("baselineViews[viewport]({activate,showStartup:!startupDone"));
     assert!(app.contains("onStartupDone:()=>setStartupDone(true)"));
-    let states = std::fs::read_to_string(root.join("src/states.jsx")).unwrap();
+    let states = app.clone();
     assert!(app.contains("setAttribute('aria-expanded'"));
-    assert!(states.contains("aria-modal={\"true\"}"));
-    assert!(states.contains("autoFocus"));
+    assert!(
+        states.contains("aria-modal={\"true\"}") || states.contains("[\"aria-modal\",\"true\"]")
+    );
+    assert!(states.contains("autoFocus") || app.contains("focusedTargets"));
     assert!(states.contains("createPortal"));
     assert!(!states.contains("<ReplacementSurface"));
-    assert!(app.contains("const overlay=state===1?"));
+    assert!(app.contains("const renderState=value=>value===1?"));
+    assert!(app.contains("const contentState=closableStates[state]?returnState.current:state"));
+    assert!(app.contains("const popup=closableStates[state]?renderState(state):null"));
+    assert!(app.contains("const controlStyles="));
+    assert!(app.contains("const baselineSelectedTokens="));
+    assert!(app.contains("const baselinePressedTokens="));
+    assert!(app.contains("const mergeStateScroll="));
+    assert!(app.contains("const selectedState=useRef(baselineSelectedState)"));
     assert!(app.contains("replacementStates=[false,false]"));
     assert!(app.contains("mergeHorizontalScroll(captureScroll(event.currentTarget),captured)"));
     assert!(app.contains("live.get(path)?.[2]??0"));
@@ -70,6 +79,15 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("restoreFocus.current=trigger"));
     assert!(app.contains("trigger.focus({preventScroll:true})"));
     assert!(app.contains("requestAnimationFrame(()=>requestAnimationFrame(()=>{trigger.focus"));
+    assert!(app.contains("const preservePosition="));
+    assert!(!app.contains("location.reload()"));
+    assert!(!states.contains("const stableRoots=roots.map"));
+    assert!(states.contains("existing.__recreateReplacement=token"));
+    assert!(states.contains("existing.__recreateBaseline??"));
+    assert!(states.contains("for(const[node]of baseline.children)"));
+    assert!(states.contains("const[host]=React.useState"));
+    assert!(!states.contains("setTarget(host)"));
+    assert!(states.contains("const target=floating?document.body"));
     assert!(root.join("src/runtime/sequence.mjs").exists());
     assert!(root.join("src/runtime/interaction.mjs").exists());
     assert!(app.contains("smooth:true"));
@@ -77,12 +95,13 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("scrollEase(progress)"));
     assert!(app.contains("target.focus({preventScroll:true})"));
     assert!(app.contains("const focusedTargets=[null,"));
-    let css = std::fs::read_to_string(root.join("src/styles.css")).unwrap();
+    let css = read_css_tree(&root.join("src"));
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));
     assert!(css.contains("@media(min-width:391px) and (max-width:768px)"));
     assert!(css.contains("@media(min-width:321px) and (max-width:390px)"));
     assert!(css.contains("@media(max-width:320px)"));
-    assert!(css.contains("content:\"mobile\";color:blue;"));
+    assert!(css.contains("content:\"mobile\";"));
+    assert!(css.contains("color:blue;"));
     assert!(css.contains("content:none;"));
     assert!(css.contains("@keyframes"));
     assert!(!css.contains("[data-recreate-control]:focus-visible"));
@@ -95,8 +114,8 @@ async fn text_entry_state_preserves_the_mounted_control() {
         .await
         .unwrap();
     let source = directory.path().join("react/src");
-    let app = std::fs::read_to_string(source.join("App.jsx")).unwrap();
-    let states = std::fs::read_to_string(source.join("states.jsx")).unwrap();
+    let app = read_source_tree(&source);
+    let states = app.clone();
 
     assert!(app.contains("inputActive===true&&state===next)return"));
     assert!(app.contains("closableStates=[false,false]"));
@@ -109,4 +128,35 @@ async fn text_entry_state_preserves_the_mounted_control() {
     assert!(states.contains("detach={true}"));
     assert!(!states.contains("SuppressPortals"));
     assert!(!states.contains("<ReplacementSurface path={\"html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(1)>textarea"));
+}
+
+pub(super) fn read_source_tree(root: &std::path::Path) -> String {
+    read_tree(root, &["js", "jsx", "mjs"])
+}
+
+pub(super) fn read_css_tree(root: &std::path::Path) -> String {
+    read_tree(root, &["css"])
+}
+
+fn read_tree(root: &std::path::Path, extensions: &[&str]) -> String {
+    let mut output = String::new();
+    let mut pending = vec![root.to_path_buf()];
+    while let Some(path) = pending.pop() {
+        if path.is_dir() {
+            pending.extend(
+                std::fs::read_dir(path)
+                    .unwrap()
+                    .filter_map(Result::ok)
+                    .map(|entry| entry.path()),
+            );
+        } else if path
+            .extension()
+            .and_then(|value| value.to_str())
+            .is_some_and(|extension| extensions.contains(&extension))
+        {
+            output.push_str(&std::fs::read_to_string(path).unwrap());
+            output.push('\n');
+        }
+    }
+    output
 }

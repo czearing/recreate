@@ -1,7 +1,7 @@
 use crate::model::{Node, Specification};
 use std::collections::BTreeMap;
 
-pub const EFFECT: &str = r#"useEffect(()=>{if(!inferredCarousel)return;const previous=document.querySelector(inferredCarousel.previous);const next=document.querySelector(inferredCarousel.next);const target=document.querySelector(inferredCarousel.target);if(!previous||!next||!target)return;const update=advanced=>{previous.disabled=!advanced;next.disabled=advanced;animateScroll(target,advanced?inferredCarousel.extent:0,0)};const forward=()=>update(true);const reverse=()=>update(false);next.addEventListener('click',forward);previous.addEventListener('click',reverse);return()=>{next.removeEventListener('click',forward);previous.removeEventListener('click',reverse)}},[]);"#;
+pub const EFFECT: &str = r#"useEffect(()=>{let previous=inferredCarousel&&document.querySelector(inferredCarousel.previous);let next=inferredCarousel&&document.querySelector(inferredCarousel.next);let target=inferredCarousel&&document.querySelector(inferredCarousel.target);let extent=inferredCarousel?.extent||0;if(!previous||!next||!target){for(const parent of document.querySelectorAll('body *')){const controls=[...parent.children].filter(child=>child.matches('button,input'));previous=controls.find(control=>control.disabled||control.getAttribute('aria-disabled')==='true');next=controls.find(control=>control!==previous&&!control.disabled&&control.getAttribute('aria-disabled')!=='true');if(!previous||!next)continue;for(let node=parent;node;node=node.parentElement){if(node.scrollWidth-node.clientWidth>20){target=node;extent=node.scrollWidth-node.clientWidth;break}}if(target)break}}if(!previous||!next||!target)return;const update=advanced=>{previous.disabled=!advanced;next.disabled=advanced;animateScroll(target,advanced?extent:0,0);if(!advanced){target.scrollTo(0,0);for(const child of target.querySelectorAll('*')){const matrix=new DOMMatrixReadOnly(getComputedStyle(child).transform);if(Math.abs(matrix.m41)>100)child.style.transform='translateX(0px)'}}};const forward=()=>update(true);const reverse=()=>update(false);next.addEventListener('click',forward);previous.addEventListener('click',reverse);return()=>{next.removeEventListener('click',forward);previous.removeEventListener('click',reverse)}},[]);"#;
 
 pub fn javascript(specification: &Specification, captured: bool) -> String {
     let value = (!captured)
@@ -116,6 +116,7 @@ mod tests {
             captured_url: String::new(),
             states: vec![state],
             interactions: Vec::new(),
+            transitions: Vec::new(),
         };
         let output = super::javascript(&specification, false);
         assert!(output.contains("\"extent\":220"));

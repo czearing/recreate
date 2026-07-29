@@ -1,26 +1,36 @@
 use crate::{
     browser::Browser,
     checkpoint,
-    collector_browser::{advance, reload, resize},
-    collector_state::state,
+    collector_browser::{advance, reload, resize, wait_interaction_ready},
+    collector_transition,
     model::{Checkpoint, Scenario, Step, Viewport},
-    replay,
+    replay, transition,
 };
 use std::collections::BTreeMap;
-use tokio::time::{Duration, sleep};
 
 pub(crate) struct Run<'a> {
-    browser: &'a mut Browser,
-    viewport: Viewport,
-    checkpoints: Vec<Checkpoint>,
+    pub(crate) browser: &'a mut Browser,
+    pub(crate) viewport: Viewport,
+    pub(crate) checkpoints: Vec<Checkpoint>,
     responsive_cache: BTreeMap<(u32, u32), Checkpoint>,
-    baseline_state: String,
-    clean: bool,
+    pub(crate) baseline_digest: String,
+    pub(crate) baseline_transition: serde_json::Value,
+    baseline_url: String,
+    baseline_graph_digest: String,
+    pub(crate) transition_state: Option<serde_json::Value>,
+    pub(crate) clean: bool,
 }
 
 impl<'a> Run<'a> {
     pub(crate) async fn new(browser: &'a mut Browser) -> anyhow::Result<Self> {
-        let baseline_state = state(browser).await?;
+        let baseline = transition::capture(&mut browser.cdp).await?;
+        let baseline_url = browser
+            .cdp
+            .evaluate("location.href")
+            .await?
+            .as_str()
+            .unwrap_or_default()
+            .to_owned();
         Ok(Self {
             browser,
             viewport: Viewport {
@@ -29,7 +39,11 @@ impl<'a> Run<'a> {
             },
             checkpoints: Vec::new(),
             responsive_cache: BTreeMap::new(),
-            baseline_state,
+            baseline_digest: transition::reset_digest(&baseline)?,
+            baseline_transition: baseline.clone(),
+            baseline_url,
+            baseline_graph_digest: transition::state_digest(&baseline)?,
+            transition_state: Some(baseline),
             clean: true,
         })
     }
@@ -57,41 +71,52 @@ impl<'a> Run<'a> {
             Step::Reset => self.reset(index).await?,
             Step::SetViewport { width, height } => {
                 self.viewport = resize(self.browser, *width, *height).await?;
+                self.transition_state = None;
                 self.push_responsive(scenario, *index).await?;
                 *index += 1;
             }
             Step::ResizePath { widths, height } => {
                 for width in widths {
                     self.viewport = resize(self.browser, *width, *height).await?;
+                    self.transition_state = None;
                     self.push_responsive(scenario, *index).await?;
                     *index += 1;
                 }
             }
             Step::AdvanceTime { milliseconds } => {
+                self.browser.disable_network_fixture().await?;
                 advance(self.browser, *milliseconds).await?;
+                self.transition_state = None;
                 self.push(scenario, *index).await?;
                 self.clean = false;
                 *index += 1;
             }
             Step::Activate { anchor } => {
-                replay::activate(self.browser, anchor).await?;
-                self.push(scenario, *index).await?;
-                self.clean = false;
+                let before = collector_transition::before(self).await?;
+                let after = replay::activate(self.browser, anchor).await?;
+                collector_transition::push(self, scenario, *index, &before, after).await?;
                 *index += 1;
             }
             Step::Hover { anchor } => {
-                replay::hover(self.browser, anchor).await?;
-                self.clean = false;
+                let before = collector_transition::before(self).await?;
+                let after = replay::hover(self.browser, anchor).await?;
+                collector_transition::push(self, scenario, *index, &before, after).await?;
+                *index += 1;
+            }
+            Step::PrepareActivate { anchor } => {
+                let after = replay::activate(self.browser, anchor).await?;
+                collector_transition::update(self, after)?;
+                *index += 1;
+            }
+            Step::PrepareHover { anchor } => {
+                let after = replay::hover(self.browser, anchor).await?;
+                collector_transition::update(self, after)?;
                 *index += 1;
             }
             Step::Key { key } => {
-                replay::key(self.browser, key).await?;
-                self.push(scenario, *index).await?;
-                self.clean = self.checkpoints.last().is_some_and(|checkpoint| {
-                    self.responsive_cache
-                        .get(&(self.viewport.width, self.viewport.height))
-                        .is_some_and(|baseline| equivalent_state(checkpoint, baseline))
-                });
+                let before = collector_transition::before(self).await?;
+                let after = replay::key(self.browser, key).await?;
+                collector_transition::push(self, scenario, *index, &before, after).await?;
                 *index += 1;
             }
             Step::SeekAnimations { milliseconds } => {
@@ -103,6 +128,7 @@ impl<'a> Run<'a> {
                     .cdp
                     .evaluate("new Promise(r => requestAnimationFrame(r))")
                     .await?;
+                self.transition_state = None;
                 self.push(scenario, *index).await?;
                 self.clean = false;
                 *index += 1;
@@ -110,31 +136,47 @@ impl<'a> Run<'a> {
         }
         Ok(())
     }
-
     async fn reset(&mut self, index: &mut usize) -> anyhow::Result<()> {
-        if self.clean || state(self.browser).await? == self.baseline_state {
-            self.clean = true;
+        let source_fixture = self.browser.has_state_fixture();
+        if self.clean && !source_fixture {
             *index += 1;
             return Ok(());
         }
-
-        reload(self.browser).await?;
-        let mut current = String::new();
-        for _ in 0..80 {
-            current = state(self.browser).await?;
-            if current == self.baseline_state {
-                self.clean = true;
-                *index += 1;
-                return Ok(());
+        if !source_fixture {
+            let graph_clean = self
+                .transition_state
+                .as_ref()
+                .map(transition::state_digest)
+                .transpose()?
+                .as_deref()
+                == Some(&self.baseline_graph_digest);
+            if graph_clean {
+                replay::neutralize(self.browser).await?;
+                collector_transition::refresh(self).await?;
+                if self.clean {
+                    *index += 1;
+                    return Ok(());
+                }
             }
-            sleep(Duration::from_millis(25)).await;
+        } else {
+            tokio::time::sleep(std::time::Duration::from_millis(600)).await;
         }
-        let baseline: serde_json::Value = serde_json::from_str(&self.baseline_state)?;
-        let current: serde_json::Value = serde_json::from_str(&current)?;
-        let (path, expected, actual) = crate::compare_difference::between(&baseline, &current);
-        anyhow::bail!(
-            "reset did not restore browser state at {path}: expected={expected} actual={actual}"
-        );
+        self.browser.restore_storage_fixture().await?;
+        if source_fixture {
+            self.browser
+                .cdp
+                .send(
+                    "Page.navigate",
+                    serde_json::json!({"url":self.baseline_url}),
+                )
+                .await?;
+            wait_interaction_ready(self.browser).await?;
+        } else {
+            reload(self.browser).await?;
+        }
+        collector_transition::wait_reset(self).await?;
+        *index += 1;
+        Ok(())
     }
 
     async fn push_responsive(&mut self, scenario: &Scenario, index: usize) -> anyhow::Result<()> {
@@ -159,7 +201,6 @@ impl<'a> Run<'a> {
         self.checkpoints.push(captured);
         Ok(())
     }
-
     async fn push(&mut self, scenario: &Scenario, index: usize) -> anyhow::Result<()> {
         self.checkpoints.push(
             checkpoint::capture(
@@ -172,8 +213,4 @@ impl<'a> Run<'a> {
         );
         Ok(())
     }
-}
-
-fn equivalent_state(current: &Checkpoint, baseline: &Checkpoint) -> bool {
-    current.domains["structure"].digest == baseline.domains["structure"].digest
 }

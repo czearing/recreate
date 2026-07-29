@@ -98,6 +98,7 @@ mod tests {
                 captured_url: String::new(),
                 states: Vec::new(),
                 interactions: Vec::new(),
+                transitions: Vec::new(),
             },
             directory.path(),
         )

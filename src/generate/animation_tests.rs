@@ -1,4 +1,5 @@
 use super::*;
+use crate::generate::animation_keyframes::declarations;
 use serde_json::json;
 
 fn animation(target: &str) -> Animation {

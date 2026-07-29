@@ -52,3 +52,17 @@ fn caches_dom_paths_and_sibling_indexes() {
     assert!(script.contains("const siblingIndexes = new WeakMap"));
     assert!(!script.contains("peers.indexOf"));
 }
+
+#[test]
+fn generated_capture_script_parses() {
+    let script = super::source_without_assets();
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("capture.js");
+    std::fs::write(&path, &script).unwrap();
+    let status = std::process::Command::new("node")
+        .args(["--check"])
+        .arg(path)
+        .status()
+        .unwrap();
+    assert!(status.success());
+}

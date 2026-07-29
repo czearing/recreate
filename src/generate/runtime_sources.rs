@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::{fs, path::Path};
 
-const MODULES: [(&str, &str); 5] = [
+const MODULES: [(&str, &str); 6] = [
     (
         "interaction.mjs",
         include_str!("../../runtime/interaction.mjs"),
@@ -10,6 +10,7 @@ const MODULES: [(&str, &str); 5] = [
     ("carousel.mjs", include_str!("../../runtime/carousel.mjs")),
     ("textarea.mjs", include_str!("../../runtime/textarea.mjs")),
     ("anchor.mjs", include_str!("../../runtime/anchor.mjs")),
+    ("style.mjs", include_str!("../../runtime/style.mjs")),
 ];
 
 pub fn write(source: &Path) -> Result<()> {

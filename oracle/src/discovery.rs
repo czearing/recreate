@@ -22,26 +22,48 @@ pub async fn run(
 ) -> anyhow::Result<Discovery> {
     let (width, height) = viewport;
     browser
-        .open(url)
+        .open_or_reuse(url)
         .await
         .context("opening source discovery target")?;
     wait_rendered(browser)
         .await
         .context("waiting for source discovery target")?;
+    let instrumentation = format!(
+        "{};\n{};\nglobalThis.__recreateOracleCapture=({});",
+        crate::determinism::INSTALL,
+        probe::INSTALL,
+        crate::transition_probe::FUNCTION
+    );
     let script = browser
         .cdp
         .send(
             "Page.addScriptToEvaluateOnNewDocument",
-            serde_json::json!({"source": probe::INSTALL}),
+            serde_json::json!({"source": instrumentation}),
         )
         .await
         .context("installing source discovery instrumentation")?;
+    browser
+        .begin_network_fixture()
+        .await
+        .context("starting deterministic source network learning")?;
     reload(browser)
         .await
         .context("reloading instrumented source discovery target")?;
     wait_rendered(browser)
         .await
         .context("waiting for hydrated source discovery target")?;
+    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+    wait_rendered(browser)
+        .await
+        .context("waiting for delayed source hydration")?;
+    browser
+        .capture_network_fixture()
+        .await
+        .context("capturing deterministic source network responses")?;
+    browser
+        .capture_storage_fixture()
+        .await
+        .context("capturing deterministic source storage")?;
     resize(browser, width, height)
         .await
         .context("sizing source discovery target")?;
@@ -58,18 +80,11 @@ pub async fn run(
     )
     .await
     .context("capturing discovery qualification checkpoint")?;
-    browser
-        .cdp
-        .send(
-            "Page.removeScriptToEvaluateOnNewDocument",
-            serde_json::json!({"identifier": script["identifier"]}),
-        )
-        .await?;
     let anchors = serde_json::from_value::<Vec<String>>(value["anchors"].clone())?;
     let controls = serde_json::from_value::<Vec<crate::discovery_interactions::Control>>(
         value["controls"].clone(),
     )?;
-    let (interaction_scenarios, mut obligations) = crate::discovery_interactions::build(&controls);
+    let mut obligations = Vec::new();
     let mut scenarios = Vec::new();
     let boundaries = serde_json::from_value::<Vec<u32>>(value["boundaries"].clone())?;
     if !boundaries.is_empty() {
@@ -95,7 +110,9 @@ pub async fn run(
                 .collect(),
         });
     }
-    scenarios.extend(interaction_scenarios);
+    if let Some(keyboard) = crate::discovery_interactions::keyboard(&controls) {
+        scenarios.push(keyboard);
+    }
     obligations.extend(
         crate::discovery_graph::expand(browser, url, diagnostic, &controls, &mut scenarios)
             .await
@@ -110,6 +127,13 @@ pub async fn run(
         });
     }
     discovery_obligations::append(&value, anchors.is_empty(), &mut obligations);
+    browser
+        .cdp
+        .send(
+            "Page.removeScriptToEvaluateOnNewDocument",
+            serde_json::json!({"identifier": script["identifier"]}),
+        )
+        .await?;
     Ok(Discovery {
         scenarios,
         obligations,

@@ -1,17 +1,22 @@
 use crate::model::PageState;
+use std::collections::BTreeMap;
 
-pub fn append_responsive(states: &[PageState], css: &mut String) {
+pub fn append_responsive(
+    states: &[PageState],
+    classes: &BTreeMap<String, String>,
+    css: &mut String,
+) {
     let Some(base) = states.first() else {
         return;
     };
     let mut base_rules = String::new();
-    append(base, &mut base_rules);
+    append(base, classes, &mut base_rules);
     css.push_str(&base_rules);
     let mut responsive: Vec<_> = states.iter().skip(1).collect();
     responsive.sort_by_key(|state| std::cmp::Reverse(state.viewport.width));
     for (index, state) in responsive.iter().enumerate() {
         let mut rules = String::new();
-        append(state, &mut rules);
+        append(state, classes, &mut rules);
         let rules = super::custom_property_diff::against(&base_rules, &rules);
         let wider = if index == 0 {
             base.viewport.width
@@ -25,7 +30,7 @@ pub fn append_responsive(states: &[PageState], css: &mut String) {
     }
 }
 
-pub fn append(state: &PageState, css: &mut String) {
+pub fn append(state: &PageState, classes: &BTreeMap<String, String>, css: &mut String) {
     let Some(root) = state.dom.get("html") else {
         return;
     };
@@ -39,28 +44,14 @@ pub fn append(state: &PageState, css: &mut String) {
         css.push_str(&declarations);
         css.push_str("}\n");
     }
-    append_scoped_custom_properties(state, css);
-    for property in [
-        "-webkit-box-orient",
-        "-webkit-font-smoothing",
-        "caret-color",
-        "color",
-        "isolation",
-        "justify-self",
-        "overflow-wrap",
-        "resize",
-        "text-overflow",
-        "user-select",
-        "visibility",
-        "-webkit-line-clamp",
-        "z-index",
-    ] {
-        append_inherited_fallback(state, property, css);
-    }
-    append_forced_properties(state, css);
+    append_scoped_custom_properties(state, classes, css);
 }
 
-fn append_scoped_custom_properties(state: &PageState, css: &mut String) {
+fn append_scoped_custom_properties(
+    state: &PageState,
+    classes: &BTreeMap<String, String>,
+    css: &mut String,
+) {
     let Some(root) = state.dom.get("html") else {
         return;
     };
@@ -84,49 +75,10 @@ fn append_scoped_custom_properties(state: &PageState, css: &mut String) {
             })
             .collect::<String>();
         if !declarations.is_empty() {
-            css.push_str(&format!("{path}{{{declarations}}}\n"));
-        }
-    }
-}
-
-fn append_forced_properties(state: &PageState, css: &mut String) {
-    let Some(root) = state.dom.get("html") else {
-        return;
-    };
-    for (property, tags) in [
-        (
-            "z-index",
-            &["a", "button", "input", "select", "textarea"][..],
-        ),
-        ("appearance", &["button", "input", "select", "textarea"][..]),
-        ("resize", &["textarea"][..]),
-        ("content-visibility", &["i"][..]),
-        ("will-change", &[][..]),
-        ("mix-blend-mode", &[][..]),
-    ] {
-        let Some(index) = root
-            .computed_style_properties
-            .iter()
-            .position(|candidate| candidate == property)
-        else {
-            continue;
-        };
-        for node in state
-            .nodes
-            .iter()
-            .filter(|node| tags.is_empty() || tags.contains(&node.tag.as_str()))
-        {
-            let Some(dom) = state.dom.get(&node.path) else {
+            let Some(selector) = class_selector(classes, path) else {
                 continue;
             };
-            if let Some(value) = style_value(root, dom, index)
-                && !matches!(
-                    (property, value),
-                    ("will-change", "auto") | ("mix-blend-mode", "normal")
-                )
-            {
-                css.push_str(&format!("{}{{{property}:{value};}}\n", node.path));
-            }
+            css.push_str(&format!("{selector}{{{declarations}}}\n"));
         }
     }
 }
@@ -143,33 +95,13 @@ fn render(properties: &[String], dictionary: &[String], values: &[u32]) -> Strin
         .collect()
 }
 
-fn append_inherited_fallback(state: &PageState, property: &str, css: &mut String) {
-    let Some(root) = state.dom.get("html") else {
-        return;
-    };
-    let Some(index) = root
-        .computed_style_properties
-        .iter()
-        .position(|candidate| candidate == property)
-    else {
-        return;
-    };
-    for (path, node) in &state.dom {
-        if node.node_type != 1 || path.contains("#text") {
-            continue;
-        }
-        let value = style_value(root, node, index);
-        let parent = node
-            .physical_parent
-            .as_deref()
-            .and_then(|path| state.dom.get(path))
-            .and_then(|parent| style_value(root, parent, index));
-        if let Some(value) = value
-            && Some(value) != parent
-        {
-            css.push_str(&format!("{path}{{{property}:{value};}}\n"));
-        }
-    }
+fn class_selector(classes: &BTreeMap<String, String>, path: &str) -> Option<String> {
+    classes.get(path).map(|class_names| {
+        class_names
+            .split_whitespace()
+            .map(|class_name| format!(".{class_name}"))
+            .collect()
+    })
 }
 
 fn style_value<'a>(

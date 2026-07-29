@@ -17,14 +17,35 @@ const RENDERED_STATE: &str = r#"(() => {
 })()"#;
 
 pub(crate) async fn wait_rendered(browser: &mut Browser) -> anyhow::Result<()> {
+    wait_ready(browser, true, true).await
+}
+
+pub(crate) async fn wait_replay_ready(browser: &mut Browser) -> anyhow::Result<()> {
+    wait_ready(browser, false, true).await
+}
+
+pub(crate) async fn wait_interaction_ready(browser: &mut Browser) -> anyhow::Result<()> {
+    wait_ready(browser, false, false).await
+}
+
+async fn wait_ready(
+    browser: &mut Browser,
+    hydration_delay: bool,
+    require_complete: bool,
+) -> anyhow::Result<()> {
     for _ in 0..2400 {
+        browser.fulfill_network_fixture().await?;
         let state = browser.cdp.evaluate(RENDERED_STATE).await?;
+        browser.fulfill_network_fixture().await?;
         if state["body"] == true
-            && state["ready"] == "complete"
+            && (state["ready"] == "complete"
+                || (!require_complete && state["ready"] == "interactive"))
             && state["fonts"] == "loaded"
             && state["meaningful"] == true
         {
-            sleep(Duration::from_millis(300)).await;
+            if hydration_delay {
+                sleep(Duration::from_millis(300)).await;
+            }
             settle(browser).await?;
             return Ok(());
         }
@@ -40,6 +61,7 @@ pub(crate) async fn reload(browser: &mut Browser) -> anyhow::Result<()> {
         .send("Page.reload", serde_json::json!({}))
         .await?;
     for _ in 0..2400 {
+        browser.fulfill_network_fixture().await?;
         if let Ok(state) = browser.cdp.evaluate(RENDERED_STATE).await
             && loader_id(browser).await.ok().as_deref() != Some(previous_loader.as_str())
             && state["body"] == true
@@ -66,6 +88,7 @@ async fn loader_id(browser: &mut Browser) -> anyhow::Result<String> {
 }
 
 async fn settle(browser: &mut Browser) -> anyhow::Result<()> {
+    browser.fulfill_network_fixture().await?;
     let stable = browser
         .cdp
         .evaluate(
@@ -76,7 +99,7 @@ async fn settle(browser: &mut Browser) -> anyhow::Result<()> {
                 const state=globalThis.__recreateOracle?.pending;
                 const pending=(state?.fetches||0)>0||(state?.xhrs||0)>0;
                 clean=pending?0:clean+1;
-                if(clean>=2)resolve(true)
+                if(clean>=1)resolve(true)
                 else if(performance.now()-started>=2000)resolve(true)
                 else requestAnimationFrame(frame);
               };
@@ -84,6 +107,7 @@ async fn settle(browser: &mut Browser) -> anyhow::Result<()> {
             })"#,
         )
         .await?;
+    browser.fulfill_network_fixture().await?;
     anyhow::ensure!(
         stable == true,
         "rendered page did not reach a DOM fixed point"
@@ -106,6 +130,13 @@ pub(crate) async fn advance(browser: &mut Browser, milliseconds: u32) -> anyhow:
     browser
         .cdp
         .wait_event("Emulation.virtualTimeBudgetExpired")
+        .await?;
+    browser
+        .cdp
+        .send(
+            "Emulation.setVirtualTimePolicy",
+            json!({"policy":"advance"}),
+        )
         .await?;
     Ok(())
 }

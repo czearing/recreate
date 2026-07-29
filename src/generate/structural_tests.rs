@@ -107,15 +107,16 @@ async fn writes_exact_viewport_and_interaction_structures() {
             focused_path: Some(focused),
             states: interaction_states,
         }],
+        transitions: Vec::new(),
     };
     let directory = tempfile::tempdir().unwrap();
     write_project(&specification, directory.path(), &[])
         .await
         .unwrap();
     let source = directory.path().join("react/src");
-    let app = std::fs::read_to_string(source.join("App.jsx")).unwrap();
-    let interactions = std::fs::read_to_string(source.join("states.jsx")).unwrap();
-    let css = std::fs::read_to_string(source.join("styles.css")).unwrap();
+    let app = super::tests::read_source_tree(&source);
+    let interactions = app.clone();
+    let css = super::tests::read_css_tree(&source);
     assert!(app.contains("function Baseline0"));
     assert!(app.contains("function Baseline1"));
     assert!(app.contains("const viewportWidths=[1200,390]"));

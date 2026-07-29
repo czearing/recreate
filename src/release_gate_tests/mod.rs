@@ -139,7 +139,7 @@ async fn validate_fixture(
         out: PathBuf::new(),
         viewports: String::new(),
     };
-    let (_, mut cdp) = browser::target(&args).await?;
+    let (source_target, mut cdp) = browser::target(&args).await?;
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
     cdp.send(
@@ -151,14 +151,20 @@ async fn validate_fixture(
     for (index, (width, height)) in selected_viewports(VIEWPORTS).into_iter().enumerate() {
         states.push(capture::capture_state(&mut cdp, viewport(width, height), index == 0).await?);
     }
-    let captured_interactions = if name == "interaction" {
-        interactions::capture(&mut cdp, &states).await?
+    let captured_graph = if name == "interaction" {
+        interactions::capture_graph(&mut cdp, &states).await?
     } else {
-        Vec::new()
+        interactions::CapturedGraph {
+            interactions: Vec::new(),
+            transitions: Vec::new(),
+        }
     };
     let capture_ms = capture_started.elapsed().as_millis();
     let source_errors = collect_errors(&mut cdp);
-    let specification = specification(states, captured_interactions);
+    drop(cdp);
+    browser::close(&args.cdp_url, &source_target.id).await?;
+    let mut specification = specification(states, captured_graph.interactions);
+    specification.transitions = captured_graph.transitions;
     let directory = workspace.join(name);
     crate::generate::write_project(&specification, &directory, &[]).await?;
     assert!(crate::validate::validate(&specification, &directory)?.passed);

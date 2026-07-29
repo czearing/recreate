@@ -1,4 +1,4 @@
-use super::{css::declarations, responsive};
+use super::responsive;
 use crate::model::{Node, PageState};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashSet};
@@ -43,11 +43,11 @@ fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>)
     );
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
-        signature.push_str(&declarations(&before.style, assets));
+        signature.push_str(&responsive::output_declarations(&before.style, assets));
     }
     if let Some(after) = &node.after {
         signature.push_str(&after.content);
-        signature.push_str(&declarations(&after.style, assets));
+        signature.push_str(&responsive::output_declarations(&after.style, assets));
     }
     format!("s{}", &hex::encode(Sha256::digest(signature))[..10])
 }
@@ -79,14 +79,14 @@ fn append_rule(
         css.push_str(&format!(
             ".{class}::before{{content:{};{}}}\n",
             before.content,
-            declarations(&before.style, assets)
+            responsive::output_declarations(&before.style, assets)
         ));
     }
     if let Some(after) = &node.after {
         css.push_str(&format!(
             ".{class}::after{{content:{};{}}}\n",
             after.content,
-            declarations(&after.style, assets)
+            responsive::output_declarations(&after.style, assets)
         ));
     }
 }

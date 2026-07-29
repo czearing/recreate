@@ -36,13 +36,29 @@ pub async fn verify(
         payload_digest: String::new(),
     };
     for repetition in 2..=3 {
-        let actual = engine::collect(browser, source, scenarios).await?;
+        browser.reconnect().await?;
+        let actual = crate::collector::collect_strict(browser, source, scenarios).await?;
         let report = compare::artifacts(&expected, &actual, Default::default());
         if report.certified {
             continue;
         }
         let report_path = output.with_extension(format!("instability-{repetition}.json"));
         std::fs::write(&report_path, serde_json::to_vec_pretty(&report)?)?;
+        if let Some(difference) = &report.first_difference {
+            let expected_value = checkpoints.iter().find(|checkpoint| {
+                checkpoint.scenario == difference.scenario && checkpoint.step == difference.step
+            });
+            let actual_value = actual.iter().find(|checkpoint| {
+                checkpoint.scenario == difference.scenario && checkpoint.step == difference.step
+            });
+            std::fs::write(
+                output.with_extension(format!("instability-{repetition}-values.json")),
+                serde_json::to_vec_pretty(&serde_json::json!({
+                    "expected": expected_value,
+                    "actual": actual_value
+                }))?,
+            )?;
+        }
         let first = report
             .first_difference
             .as_ref()

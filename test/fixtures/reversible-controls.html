@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reversible controls</title>
+    <style>
+      body { font: 16px system-ui; }
+      #track { display: flex; width: 240px; overflow: hidden; scroll-behavior: auto; }
+      #track > div { min-width: 240px; padding: 24px; box-sizing: border-box; }
+    </style>
+  </head>
+  <body>
+    <button id="back" disabled>Back</button>
+    <button id="forward">Forward</button>
+    <div id="track">
+      <div>First state</div>
+      <div>Second state</div>
+    </div>
+    <script>
+      const back = document.querySelector('#back');
+      const forward = document.querySelector('#forward');
+      const track = document.querySelector('#track');
+      const update = advanced => {
+        track.scrollLeft = advanced ? 240 : 0;
+        back.disabled = !advanced;
+        forward.disabled = advanced;
+      };
+      forward.addEventListener('click', () => update(true));
+      back.addEventListener('click', () => update(false));
+    </script>
+  </body>
+</html>

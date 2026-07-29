@@ -1,3 +1,12 @@
+#[path = "responsive_geometry_measure.rs"]
+mod measure;
+#[path = "responsive_geometry_position.rs"]
+mod position;
+#[path = "responsive_geometry_scroll.rs"]
+mod scroll;
+#[path = "responsive_geometry_width.rs"]
+mod width;
+
 use crate::model::{Node, Styles, Viewport};
 
 pub fn normalize(
@@ -7,8 +16,8 @@ pub fn normalize(
     viewport: &Viewport,
     base: Option<(&Node, &Viewport)>,
 ) {
-    preserve_scrollbar_space(styles, node, base.map(|(node, _)| node), viewport);
-    normalize_width(styles, node, parent, viewport, base);
+    scroll::preserve_space(styles, node, base.map(|(node, _)| node), viewport);
+    width::normalize(styles, node, parent, viewport, base);
     super::responsive_height::normalize(styles, node, viewport);
     let authored_centering = styles
         .get("margin-left")
@@ -23,339 +32,11 @@ pub fn normalize(
         styles.insert("margin-left".into(), "0px".into());
         styles.insert("margin-right".into(), "0px".into());
     }
-
-    normalize_centering(styles, node, parent, viewport);
-    normalize_fixed_edge(styles, node, viewport);
+    position::normalize_centering(styles, node, parent, viewport);
+    position::normalize_fixed_edge(styles, node, viewport);
 }
 
-fn normalize_fixed_edge(styles: &mut Styles, node: &Node, viewport: &Viewport) {
-    if node.style.get("position").map(String::as_str) != Some("fixed")
-        || node.rect.width >= f64::from(viewport.width) * 0.8
-    {
-        return;
-    }
-    let right = f64::from(viewport.width) - node.rect.x - node.rect.width;
-    if !(-1.0..=32.0).contains(&right) {
-        return;
-    }
-    styles.insert("left".into(), "auto".into());
-    styles.insert("right".into(), format!("{}px", right.max(0.0)));
-}
-
-fn preserve_scrollbar_space(
-    styles: &mut Styles,
-    node: &Node,
-    base: Option<&Node>,
-    viewport: &Viewport,
-) {
-    if node.style.get("scrollbar-width").map(String::as_str) != Some("thin")
-        || node.style.get("overflow-y").map(String::as_str) != Some("auto")
-    {
-        return;
-    }
-    if node.rect.width >= f64::from(viewport.width) * 0.8 {
-        if base.is_some_and(has_scrollbar_gutter) {
-            styles.insert("border-right-width".into(), "0px".into());
-            styles.insert("border-right-style".into(), "none".into());
-        }
-        return;
-    }
-    let Some(width) = px(&node.style, "width") else {
-        return;
-    };
-    let expected = width
-        + px(&node.style, "padding-left").unwrap_or_default()
-        + px(&node.style, "padding-right").unwrap_or_default();
-    let gutter = node.rect.width - expected;
-    if gutter >= 6.0 {
-        styles.insert("width".into(), format!("{}px", width + gutter));
-    } else if base.is_some_and(has_scrollbar_gutter) {
-        styles.insert("border-right-width".into(), "0px".into());
-        styles.insert("border-right-style".into(), "none".into());
-    }
-}
-
-fn has_scrollbar_gutter(node: &Node) -> bool {
-    let Some(width) = px(&node.style, "width") else {
-        return false;
-    };
-    node.rect.width
-        - width
-        - px(&node.style, "padding-left").unwrap_or_default()
-        - px(&node.style, "padding-right").unwrap_or_default()
-        >= 6.0
-}
-
-fn px(styles: &Styles, key: &str) -> Option<f64> {
-    styles.get(key)?.strip_suffix("px")?.parse::<f64>().ok()
-}
-
-fn normalize_width(
-    styles: &mut Styles,
-    node: &Node,
-    parent: Option<&Node>,
-    viewport: &Viewport,
-    base: Option<(&Node, &Viewport)>,
-) {
-    if compact_control(node) || compact_role_image(node) || intrinsic_media(node) {
-        return;
-    }
-    if stretches_between_horizontal_edges(node, parent) {
-        if base.is_some() {
-            styles.insert("width".into(), "auto".into());
-        } else {
-            styles.remove("width");
-        }
-        return;
-    }
-    if stretches_across_grid_track(node, parent) {
-        styles.remove("width");
-        return;
-    }
-    if !is_root(node) && parent.is_some_and(|parent| fills_parent_content_box(node, parent)) {
-        if matches!(
-            node.tag.as_str(),
-            "button" | "input" | "select" | "textarea"
-        ) {
-            styles.insert("width".into(), "100%".into());
-            return;
-        }
-        if parent.is_some_and(|parent| {
-            parent.style.get("display").map(String::as_str) == Some("flex")
-                && parent.style.get("align-items").map(String::as_str) == Some("center")
-        }) {
-            styles.insert("width".into(), "100%".into());
-            return;
-        }
-        if styles
-            .get("width")
-            .is_some_and(|width| width.ends_with("px"))
-        {
-            if base.is_some() {
-                styles.insert("width".into(), "auto".into());
-            } else {
-                styles.remove("width");
-            }
-        }
-        return;
-    }
-    if !fills_viewport(node, viewport) {
-        return;
-    }
-    if !is_root(node) {
-        let padding = horizontal_padding(&node.style);
-        let width = if node
-            .style
-            .get("box-sizing")
-            .is_some_and(|value| value == "content-box")
-            && padding > 0.0
-        {
-            format!("calc(100% - {padding}px)")
-        } else {
-            "100%".into()
-        };
-        styles.insert("width".into(), width);
-        return;
-    }
-
-    let fixed_base = base.is_some_and(|(node, viewport)| !fills_viewport(node, viewport));
-    if fixed_base {
-        styles.insert("width".into(), "auto".into());
-    } else {
-        styles.remove("width");
-    }
-}
-
-fn stretches_across_grid_track(node: &Node, parent: Option<&Node>) -> bool {
-    parent.is_some_and(|parent| {
-        parent.style.get("display").map(String::as_str) == Some("grid")
-            && !matches!(
-                node.style.get("position").map(String::as_str),
-                Some("absolute" | "fixed")
-            )
-            && node
-                .style
-                .get("justify-self")
-                .is_none_or(|value| matches!(value.as_str(), "auto" | "normal" | "stretch"))
-    })
-}
-
-fn stretches_between_horizontal_edges(node: &Node, parent: Option<&Node>) -> bool {
-    let Some(parent) = parent else {
-        return false;
-    };
-    if !matches!(
-        node.style.get("position").map(String::as_str),
-        Some("absolute" | "fixed")
-    ) {
-        return false;
-    }
-    let left = node.rect.x - parent.rect.x;
-    let right = parent.rect.x + parent.rect.width - node.rect.x - node.rect.width;
-    (0.0..=64.0).contains(&left)
-        && (0.0..=64.0).contains(&right)
-        && node.style.get("left").is_some_and(|value| value != "auto")
-        && node.style.get("right").is_some_and(|value| value != "auto")
-}
-
-fn fills_parent_content_box(node: &Node, parent: &Node) -> bool {
-    let left = border_px(&parent.style, "border-left-width", "border-left")
-        + px(&parent.style, "padding-left").unwrap_or_default();
-    let right = border_px(&parent.style, "border-right-width", "border-right")
-        + px(&parent.style, "padding-right").unwrap_or_default();
-    let content_width = if parent
-        .style
-        .get("box-sizing")
-        .is_some_and(|value| value == "border-box")
-    {
-        parent.rect.width - left - right
-    } else {
-        px(&parent.style, "width").unwrap_or(parent.rect.width - left - right)
-    };
-    (node.rect.x - parent.rect.x - left).abs() <= 1.0
-        && (node.rect.width - content_width).abs() <= 1.0
-}
-
-fn border_px(styles: &Styles, width: &str, side: &str) -> f64 {
-    styles
-        .get(width)
-        .or_else(|| styles.get(side))
-        .or_else(|| styles.get("border"))
-        .and_then(|value| value.split_whitespace().next())
-        .and_then(|value| value.strip_suffix("px"))
-        .and_then(|value| value.parse().ok())
-        .unwrap_or_default()
-}
-
-fn intrinsic_media(node: &Node) -> bool {
-    matches!(
-        node.tag.as_str(),
-        "canvas"
-            | "circle"
-            | "ellipse"
-            | "foreignObject"
-            | "image"
-            | "img"
-            | "line"
-            | "path"
-            | "polygon"
-            | "polyline"
-            | "rect"
-            | "svg"
-            | "text"
-            | "use"
-            | "video"
-    )
-}
-
-fn compact_control(node: &Node) -> bool {
-    node.rect.width <= 48.0
-        && node.rect.height <= 48.0
-        && (matches!(node.tag.as_str(), "button" | "input" | "select")
-            || node
-                .attributes
-                .get("role")
-                .is_some_and(|role| role == "button"))
-}
-
-fn compact_role_image(node: &Node) -> bool {
-    node.rect.width <= 80.0
-        && node.rect.height <= 80.0
-        && node
-            .attributes
-            .get("role")
-            .is_some_and(|role| role == "img")
-}
-
-fn horizontal_padding(styles: &Styles) -> f64 {
-    let values: Vec<_> = styles
-        .get("padding")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .filter_map(|value| value.strip_suffix("px")?.parse::<f64>().ok())
-        .collect();
-    match values.as_slice() {
-        [all] => all * 2.0,
-        [_, horizontal] | [_, horizontal, _] => horizontal * 2.0,
-        [_, right, _, left] => right + left,
-        _ => 0.0,
-    }
-}
-
-fn normalize_centering(
-    styles: &mut Styles,
-    node: &Node,
-    parent: Option<&Node>,
-    viewport: &Viewport,
-) {
-    if styles
-        .get("margin-left")
-        .is_some_and(|value| value == "auto")
-        && styles
-            .get("margin-right")
-            .is_some_and(|value| value == "auto")
-    {
-        return;
-    }
-    if fills_viewport(node, viewport) {
-        return;
-    }
-
-    let right = f64::from(viewport.width) - node.rect.x - node.rect.width;
-    if node.rect.width < f64::from(viewport.width) * 0.5
-        || node.rect.x <= 1.0
-        || (node.rect.x - right).abs() > 16.0
-    {
-        return;
-    }
-    if parent.is_some_and(|parent| {
-        (parent.rect.x - node.rect.x).abs() <= 4.0
-            && (parent.rect.width - node.rect.width).abs() <= 4.0
-    }) {
-        return;
-    }
-    if parent.is_some_and(|parent| {
-        let left = node.rect.x - parent.rect.x;
-        let right = parent.rect.x + parent.rect.width - node.rect.x - node.rect.width;
-        left >= 0.0 && right >= 0.0 && (left - right).abs() <= 4.0
-    }) {
-        return;
-    }
-    if !owns_centering(node) {
-        return;
-    }
-
-    let gutter = right - node.rect.x;
-    let centered_width = node.rect.width + gutter;
-    styles.insert(
-        "margin-left".into(),
-        format!("calc((100vw - {centered_width}px) / 2)"),
-    );
-    styles.insert("margin-right".into(), "auto".into());
-    styles.insert("translate".into(), "0px 0px".into());
-}
-
-fn owns_centering(node: &Node) -> bool {
-    node.style
-        .get("max-width")
-        .is_some_and(|value| value != "none")
-        || ["margin-left", "margin-right"].into_iter().any(|key| {
-            node.style
-                .get(key)
-                .and_then(|value| value.strip_suffix("px"))
-                .and_then(|value| value.parse::<f64>().ok())
-                .is_some_and(|value| value > 1.0)
-        })
-}
-
-fn centered(node: &Node, viewport: &Viewport) -> bool {
-    let right = f64::from(viewport.width) - node.rect.x - node.rect.width;
-    node.rect.width >= f64::from(viewport.width) * 0.5
-        && node.rect.x > 1.0
-        && (node.rect.x - right).abs() <= 16.0
-}
-
-fn fills_viewport(node: &Node, viewport: &Viewport) -> bool {
+pub(super) fn fills_viewport(node: &Node, viewport: &Viewport) -> bool {
     let viewport_width = f64::from(viewport.width);
     let right_inset = viewport_width - node.rect.x - node.rect.width;
     (node.rect.width - viewport_width).abs() <= 1.0 && node.rect.x.abs() <= 1.0
@@ -365,7 +46,14 @@ fn fills_viewport(node: &Node, viewport: &Viewport) -> bool {
             && right_inset.abs() <= 32.0
 }
 
-fn is_root(node: &Node) -> bool {
+pub(super) fn is_root(node: &Node) -> bool {
     matches!(node.tag.as_str(), "html" | "body")
         || node.attributes.get("id").is_some_and(|id| id == "root")
+}
+
+fn centered(node: &Node, viewport: &Viewport) -> bool {
+    let right = f64::from(viewport.width) - node.rect.x - node.rect.width;
+    node.rect.width >= f64::from(viewport.width) * 0.5
+        && node.rect.x > 1.0
+        && (node.rect.x - right).abs() <= 16.0
 }

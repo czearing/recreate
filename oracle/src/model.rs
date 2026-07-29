@@ -32,6 +32,8 @@ pub enum Step {
     AdvanceTime { milliseconds: u32 },
     Activate { anchor: String },
     Hover { anchor: String },
+    PrepareActivate { anchor: String },
+    PrepareHover { anchor: String },
     Key { key: String },
     SeekAnimations { milliseconds: u32 },
 }
