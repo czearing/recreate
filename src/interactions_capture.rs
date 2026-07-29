@@ -1,6 +1,6 @@
 use super::{
     interactions_discovery::discover_transitions,
-    interactions_evidence::{deduplicate, responsive_baselines, surface_backed},
+    interactions_evidence::{action_family, deduplicate, responsive_baselines, surface_backed},
     interactions_focus::{begin_scope, take_scope},
     interactions_graph::edge,
     interactions_runtime::{activate, close, restore, settle},
@@ -74,6 +74,20 @@ pub(super) async fn capture_states(
                 })
         {
             shared.trigger_occurrence = None;
+            continue;
+        }
+        if let Some(family) = action_family(&candidate.label)
+            && let Some(template) = interactions.iter().find(|interaction| {
+                interaction.trigger_tag == candidate.tag
+                    && action_family(&interaction.trigger_label) == Some(family)
+                    && surface_backed(interaction, baselines)
+            })
+        {
+            let mut shared = template.clone();
+            shared.trigger_path = candidate.path.clone();
+            shared.trigger_label = candidate.label.clone();
+            shared.trigger_occurrence = Some(candidate.occurrence);
+            interactions.push(shared);
             continue;
         }
         let candidate_started = std::time::Instant::now();

@@ -37,6 +37,7 @@ pub(super) const CANDIDATES: &str = r#"
   return controls.filter(element =>
     visible(element) &&
     (!modal || modal.contains(element)) &&
+    !element.matches('[aria-hidden="true"],[data-tabster-dummy],[role="none"],[role="presentation"]') &&
     !(element.type === 'submit' && element.closest('form')) &&
     !element.closest('[contenteditable="true"]')
   ).map(element => {

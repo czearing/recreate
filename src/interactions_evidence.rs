@@ -99,3 +99,8 @@ pub(super) fn surface_backed(interaction: &Interaction, baselines: &[PageState])
             .is_some_and(|baseline| !crate::interaction_surface::roots(state, baseline).is_empty())
     })
 }
+
+pub(super) fn action_family(label: &str) -> Option<&str> {
+    let (action, subject) = label.split_once(" for ")?;
+    (!action.trim().is_empty() && !subject.trim().is_empty()).then_some(action.trim())
+}

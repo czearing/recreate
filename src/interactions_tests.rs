@@ -11,6 +11,8 @@ fn repeated_controls_keep_independent_bindings() {
     assert!(!CANDIDATES.contains("values.findIndex"));
     assert!(CANDIDATES.contains("visible(element)"));
     assert!(CANDIDATES.contains("[tabindex]:not([tabindex=\"-1\"])"));
+    assert!(CANDIDATES.contains("[data-tabster-dummy]"));
+    assert!(CANDIDATES.contains("[role=\"none\"]"));
     assert!(!CANDIDATES.contains("closest('article"));
     assert!(!CANDIDATES.contains("priority"));
     assert!(!CANDIDATES.contains("}).filter(candidate =>"));
@@ -46,6 +48,18 @@ fn state_controls_remain_relevant_in_successor_states() {
         state_control: true,
     };
     assert!(candidate_relevant(&candidate, &state, &state, None));
+}
+
+#[test]
+fn repeated_collection_actions_share_a_semantic_family() {
+    assert_eq!(
+        super::interactions_evidence::action_family("Change icon for Project Alpha"),
+        Some("Change icon")
+    );
+    assert_eq!(
+        super::interactions_evidence::action_family("Create notebook"),
+        None
+    );
 }
 
 #[test]
