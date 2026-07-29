@@ -12,6 +12,8 @@ use crate::{
 };
 use anyhow::Result;
 
+const MAX_FOCUS_PROBES: usize = 20;
+
 pub(super) async fn capture_focus_transitions(
     cdp: &mut Cdp,
     baseline: &PageState,
@@ -28,7 +30,7 @@ pub(super) async fn capture_focus_transitions(
     let mut from_state = 0;
     let mut visited = std::collections::HashSet::new();
     let mut focused_states = Vec::new();
-    for _ in 0..candidates.len().saturating_add(4) {
+    for _ in 0..candidates.len().saturating_add(4).min(MAX_FOCUS_PROBES) {
         cdp.take_events();
         let before = cdp.evaluate(PREFLIGHT).await?;
         begin_scope(cdp, "").await?;

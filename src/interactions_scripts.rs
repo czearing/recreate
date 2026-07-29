@@ -38,6 +38,8 @@ pub(super) const CANDIDATES: &str = r#"
     visible(element) &&
     (!modal || modal.contains(element)) &&
     !element.matches('[aria-hidden="true"],[data-tabster-dummy],[role="none"],[role="presentation"]') &&
+    !(element.getAttribute('role') === 'button' &&
+      element.querySelector('button,a[href],[role="button"]')) &&
     !(element.type === 'submit' && element.closest('form')) &&
     !element.closest('[contenteditable="true"]')
   ).map(element => {

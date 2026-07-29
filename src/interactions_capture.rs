@@ -26,10 +26,10 @@ pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Inter
 }
 
 pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<CapturedGraph> {
-    let mut interactions = capture_states(cdp, baselines).await?;
+    let (mut interactions, aliases) = capture_states(cdp, baselines).await?;
     deduplicate(&mut interactions);
     let base_states = interactions.len();
-    let transitions = match discover_transitions(cdp, baselines, &mut interactions).await {
+    let mut transitions = match discover_transitions(cdp, baselines, &mut interactions).await {
         Ok(transitions) => transitions,
         Err(error) => {
             eprintln!("stopped optional transition expansion: {error:#}");
@@ -41,6 +41,20 @@ pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Cap
                 .collect()
         }
     };
+    for alias in aliases {
+        let Some(destination) = interactions.iter().position(|interaction| {
+            interaction.trigger_path == alias.template_path
+                && interaction.trigger_tag == alias.template_tag
+                && interaction.trigger_label == alias.template_label
+        }) else {
+            continue;
+        };
+        transitions.push(super::interactions_graph::edge_candidate(
+            0,
+            destination + 1,
+            &alias.candidate,
+        ));
+    }
     Ok(CapturedGraph {
         interactions,
         transitions,
@@ -50,13 +64,15 @@ pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Cap
 pub(super) async fn capture_states(
     cdp: &mut Cdp,
     baselines: &[PageState],
-) -> Result<Vec<Interaction>> {
+) -> Result<(Vec<Interaction>, Vec<InteractionAlias>)> {
     let Some(first) = baselines.first() else {
-        return Ok(Vec::new());
+        return Ok((Vec::new(), Vec::new()));
     };
     let mut initial = Some(restore(cdp, first, false).await?);
     let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
     let mut interactions = Vec::new();
+    let mut aliases = Vec::new();
+    let mut reload_next = false;
     for candidate in &candidates {
         cdp.take_events();
         if candidate.disabled || candidate.navigates {
@@ -80,21 +96,21 @@ pub(super) async fn capture_states(
             && let Some(template) = interactions.iter().find(|interaction| {
                 interaction.trigger_tag == candidate.tag
                     && action_family(&interaction.trigger_label) == Some(family)
-                    && surface_backed(interaction, baselines)
             })
         {
-            let mut shared = template.clone();
-            shared.trigger_path = candidate.path.clone();
-            shared.trigger_label = candidate.label.clone();
-            shared.trigger_occurrence = Some(candidate.occurrence);
-            interactions.push(shared);
+            aliases.push(InteractionAlias {
+                candidate: candidate.clone(),
+                template_path: template.trigger_path.clone(),
+                template_tag: template.trigger_tag.clone(),
+                template_label: template.trigger_label.clone(),
+            });
             continue;
         }
         let candidate_started = std::time::Instant::now();
-        let reuse_page = true;
+        let clean_reload = requires_clean_reload(candidate, first);
         let fresh = match initial.take() {
             Some(state) => state,
-            None => match restore(cdp, first, !reuse_page).await {
+            None => match restore(cdp, first, std::mem::take(&mut reload_next)).await {
                 Ok(state) => state,
                 Err(error) => {
                     eprintln!("stopped base interaction capture: {error:#}");
@@ -102,6 +118,7 @@ pub(super) async fn capture_states(
                 }
             },
         };
+        reload_next = clean_reload;
         let before = cdp.evaluate(PREFLIGHT).await?;
         begin_scope(cdp, &candidate.path).await?;
         if !activate(cdp, candidate).await? {
@@ -133,7 +150,7 @@ pub(super) async fn capture_states(
         );
         let mut states = vec![state];
         for baseline in responsive {
-            let fresh = restore(cdp, baseline, !reuse_page).await?;
+            let fresh = restore(cdp, baseline, clean_reload).await?;
             let before = cdp.evaluate(PREFLIGHT).await?;
             begin_scope(cdp, &candidate.path).await?;
             if !activate(cdp, candidate).await? {
@@ -167,5 +184,26 @@ pub(super) async fn capture_states(
         });
         cdp.take_events();
     }
-    Ok(interactions)
+    Ok((interactions, aliases))
+}
+
+pub(super) struct InteractionAlias {
+    candidate: Candidate,
+    template_path: String,
+    template_tag: String,
+    template_label: String,
+}
+
+pub(super) fn requires_clean_reload(candidate: &Candidate, baseline: &PageState) -> bool {
+    if candidate.state_control || candidate.uses_text_entry() {
+        return false;
+    }
+    baseline
+        .nodes
+        .iter()
+        .find(|node| node.path == candidate.path)
+        .is_none_or(|node| {
+            !node.attributes.contains_key("aria-haspopup")
+                && !node.attributes.contains_key("aria-expanded")
+        })
 }

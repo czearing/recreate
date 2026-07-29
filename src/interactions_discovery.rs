@@ -37,7 +37,7 @@ pub(super) async fn discover_transitions(
         .map(|interaction| vec![candidate(interaction, baseline)])
         .collect::<Vec<_>>();
     let mut state_index = 0;
-    while state_index < prefixes.len() && state_index < 32 && transitions.len() < 256 {
+    while state_index < prefixes.len() && state_index < 12 && transitions.len() < 128 {
         let prefix = prefixes[state_index].clone();
         let Some((_, reached)) = reach(cdp, baseline, &prefix).await? else {
             state_index += 1;
@@ -45,22 +45,30 @@ pub(super) async fn discover_transitions(
         };
         let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
         let trigger = prefix.last().map(|candidate| candidate.path.as_str());
+        let popup = prefix
+            .last()
+            .is_some_and(|candidate| !candidate.state_control)
+            && overlay_state(&reached, baseline);
         let mut candidates = candidates
             .into_iter()
             .filter(|candidate| {
                 !candidate.disabled
                     && !candidate.navigates
-                    && candidate_relevant(candidate, baseline, &reached, trigger)
+                    && candidate_relevant(candidate, baseline, &reached, trigger, popup)
             })
             .collect::<Vec<_>>();
         candidates.sort_by_key(|candidate| {
-            (
-                !candidate.state_control,
-                trigger != Some(candidate.path.as_str()),
-            )
+            if popup {
+                (trigger != Some(candidate.path.as_str()), false)
+            } else {
+                (
+                    !candidate.state_control,
+                    trigger != Some(candidate.path.as_str()),
+                )
+            }
         });
         let discovered = candidates.len();
-        candidates.truncate(16);
+        candidates.truncate(if popup { 2 } else { 8 });
         eprintln!(
             "exploring interaction state {} with {}/{} affected controls",
             state_index + 1,
@@ -137,12 +145,13 @@ pub(super) fn candidate_relevant(
     baseline: &PageState,
     reached: &PageState,
     trigger: Option<&str>,
+    popup: bool,
 ) -> bool {
-    if candidate.state_control {
-        return true;
-    }
     if trigger == Some(candidate.path.as_str()) {
         return true;
+    }
+    if candidate.state_control {
+        return !popup;
     }
     let current = reached
         .nodes
@@ -159,6 +168,42 @@ pub(super) fn candidate_relevant(
         }
         _ => false,
     }
+}
+
+pub(super) fn popup_state(state: &PageState, baseline: &PageState) -> bool {
+    let baseline_paths = baseline
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::HashSet<_>>();
+    state.nodes.iter().any(|node| {
+        !baseline_paths.contains(node.path.as_str())
+            && (node
+                .attributes
+                .get("aria-modal")
+                .is_some_and(|value| value == "true")
+                || node.attributes.get("role").is_some_and(|role| {
+                    matches!(
+                        role.as_str(),
+                        "dialog" | "menu" | "listbox" | "tooltip" | "alertdialog"
+                    )
+                }))
+    })
+}
+
+pub(super) fn overlay_state(state: &PageState, baseline: &PageState) -> bool {
+    if popup_state(state, baseline) {
+        return true;
+    }
+    let baseline_paths = baseline
+        .nodes
+        .iter()
+        .map(|node| node.path.as_str())
+        .collect::<std::collections::HashSet<_>>();
+    state.nodes.iter().any(|node| {
+        !baseline_paths.contains(node.path.as_str())
+            && super::interactions_evidence::actionable_node(node)
+    })
 }
 
 fn transition_attributes(node: &crate::model::Node) -> Vec<(&str, &str)> {

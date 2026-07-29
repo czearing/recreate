@@ -12,6 +12,7 @@ use crate::{
     model::{Interaction, InteractionAction, InteractionTransition, PageState},
 };
 use anyhow::Result;
+use std::collections::HashSet;
 
 pub(super) async fn capture_hover_transitions(
     cdp: &mut Cdp,
@@ -21,14 +22,14 @@ pub(super) async fn capture_hover_transitions(
 ) -> Result<()> {
     let fresh = restore(cdp, baseline, false).await?;
     let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
-    for (index, target) in candidates
+    for (index, target) in representative_candidates(candidates, baseline)
         .into_iter()
-        .filter(|candidate| !candidate.disabled)
         .enumerate()
     {
         if index > 0 && index % 10 == 0 {
             eprintln!("captured hover probes={index}");
         }
+
         cdp.take_events();
         let before = cdp.evaluate(PREFLIGHT).await?;
         begin_scope(cdp, &target.path).await?;
@@ -114,4 +115,36 @@ pub(super) async fn capture_hover_transitions(
         }
     }
     Ok(())
+}
+
+pub(super) fn representative_candidates(
+    candidates: Vec<Candidate>,
+    baseline: &PageState,
+) -> Vec<Candidate> {
+    let mut seen = HashSet::new();
+    candidates
+        .into_iter()
+        .filter(|candidate| !candidate.disabled)
+        .filter_map(|candidate| {
+            let mut declarations = baseline
+                .state_styles
+                .iter()
+                .filter(|style| {
+                    style.target == candidate.path
+                        && style
+                            .pseudo
+                            .as_deref()
+                            .into_iter()
+                            .chain(style.target_pseudo.as_deref())
+                            .any(|pseudo| pseudo.contains(":hover"))
+                })
+                .map(|style| style.declarations.as_str())
+                .collect::<Vec<_>>();
+            declarations.sort_unstable();
+            (!declarations.is_empty()
+                && seen.insert((candidate.tag.clone(), declarations.join("|"))))
+            .then_some(candidate)
+        })
+        .take(32)
+        .collect()
 }

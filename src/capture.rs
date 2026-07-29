@@ -103,7 +103,7 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
-    let interaction_graph = if args.baseline_only {
+    let interaction_graph = if args.baseline_only || args.spec_only {
         interactions::CapturedGraph {
             interactions: Vec::new(),
             transitions: Vec::new(),

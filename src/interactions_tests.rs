@@ -13,6 +13,7 @@ fn repeated_controls_keep_independent_bindings() {
     assert!(CANDIDATES.contains("[tabindex]:not([tabindex=\"-1\"])"));
     assert!(CANDIDATES.contains("[data-tabster-dummy]"));
     assert!(CANDIDATES.contains("[role=\"none\"]"));
+    assert!(CANDIDATES.contains("element.querySelector('button,a[href],[role=\"button\"]')"));
     assert!(!CANDIDATES.contains("closest('article"));
     assert!(!CANDIDATES.contains("priority"));
     assert!(!CANDIDATES.contains("}).filter(candidate =>"));
@@ -47,7 +48,38 @@ fn state_controls_remain_relevant_in_successor_states() {
         navigates: false,
         state_control: true,
     };
-    assert!(candidate_relevant(&candidate, &state, &state, None));
+    assert!(candidate_relevant(&candidate, &state, &state, None, false));
+}
+
+#[test]
+fn popup_states_do_not_cross_product_unrelated_state_controls() {
+    let mut baseline = empty_state();
+    let mut trigger = empty_node("html>body>button:nth-of-type(1)");
+    trigger.attributes.insert("role".into(), "tab".into());
+    baseline.nodes.push(trigger.clone());
+    let mut popup = empty_node("html>body>div:nth-of-type(2)");
+    popup.attributes.insert("role".into(), "menu".into());
+    let mut reached = baseline.clone();
+    reached.nodes.push(popup);
+    let candidate = Candidate {
+        path: trigger.path.clone(),
+        tag: "button".into(),
+        label: "Grid".into(),
+        occurrence: 0,
+        disabled: false,
+        navigates: false,
+        state_control: true,
+    };
+    assert!(super::interactions_discovery::popup_state(
+        &reached, &baseline
+    ));
+    assert!(!candidate_relevant(
+        &candidate,
+        &baseline,
+        &reached,
+        Some("html>body>button:nth-of-type(2)"),
+        true
+    ));
 }
 
 #[test]
@@ -60,6 +92,56 @@ fn repeated_collection_actions_share_a_semantic_family() {
         super::interactions_evidence::action_family("Create notebook"),
         None
     );
+}
+
+#[test]
+fn plain_invoke_controls_force_clean_reload() {
+    let mut baseline = empty_state();
+    let voice = empty_node("html>body>button:nth-of-type(1)");
+    baseline.nodes.push(voice.clone());
+    let candidate = Candidate {
+        path: voice.path,
+        tag: voice.tag,
+        label: "Use voice".into(),
+        occurrence: 0,
+        disabled: false,
+        navigates: false,
+        state_control: false,
+    };
+    assert!(super::interactions_capture::requires_clean_reload(
+        &candidate, &baseline
+    ));
+}
+
+#[test]
+fn hover_candidates_deduplicate_identical_visual_evidence() {
+    let mut baseline = empty_state();
+    let first = empty_node("html>body>button:nth-of-type(1)");
+    let second = empty_node("html>body>button:nth-of-type(2)");
+    for node in [&first, &second] {
+        baseline.state_styles.push(crate::model::StateStyle {
+            target: node.path.clone(),
+            scope: None,
+            pseudo: Some(":hover".into()),
+            target_pseudo: None,
+            media: None,
+            declarations: "color: red;".into(),
+        });
+    }
+    let candidate = |node: &crate::model::Node| Candidate {
+        path: node.path.clone(),
+        tag: node.tag.clone(),
+        label: node.path.clone(),
+        occurrence: 0,
+        disabled: false,
+        navigates: false,
+        state_control: false,
+    };
+    let representatives = super::interactions_hover::representative_candidates(
+        vec![candidate(&first), candidate(&second)],
+        &baseline,
+    );
+    assert_eq!(representatives.len(), 1);
 }
 
 #[test]
@@ -128,6 +210,31 @@ fn empty_state() -> crate::model::PageState {
         css_rules: Vec::new(),
         asset_urls: Vec::new(),
         asset_data: Default::default(),
+    }
+}
+
+fn empty_node(path: &str) -> crate::model::Node {
+    crate::model::Node {
+        path: path.into(),
+        parent: path.rsplit_once('>').map(|(parent, _)| parent.into()),
+        tag: path
+            .rsplit_once('>')
+            .map_or(path, |(_, node)| node)
+            .split(':')
+            .next()
+            .unwrap_or("div")
+            .into(),
+        text: String::new(),
+        attributes: Default::default(),
+        rect: crate::model::Rect {
+            x: 0.0,
+            y: 0.0,
+            width: 1.0,
+            height: 1.0,
+        },
+        style: Default::default(),
+        before: None,
+        after: None,
     }
 }
 
