@@ -31,7 +31,6 @@ mod interactions;
 mod interactions_input;
 mod lifecycle_script;
 mod model;
-mod oracle_command;
 mod page_script;
 mod probe;
 #[cfg(test)]
@@ -55,16 +54,9 @@ async fn main() -> Result<()> {
     match cli.command {
         Command::Capture(args) => capture::run(args).await,
         Command::Fidelity(args) => fidelity::run(args).await,
-        Command::Generate(args) => {
-            generate::from_file(&args.spec, &args.out).await?;
-            if let Some(artifact) = args.oracle {
-                oracle_command::embed(&artifact, &args.out)?;
-            }
-            Ok(())
-        }
+        Command::Generate(args) => generate::from_file(&args.spec, &args.out).await,
         Command::Install(args) => skill::install(args),
         Command::Open(args) => browser::open(args).await,
-        Command::Oracle(args) => oracle_command::run(args).await,
         Command::Skill => {
             print!("{}", skill::workflow());
             Ok(())
