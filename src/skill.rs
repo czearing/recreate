@@ -41,14 +41,9 @@ pub fn workflow() -> &'static str {
    motion is observed without navigating to another page:
    recreate capture --reuse --reload --target <id> --cdp-url <cdp_url>
 7. Build from react/src/App.jsx and validate acceptance.json.
-8. For every visible authored animation or hover interaction, run focused motion
-    fidelity against the source and candidate targets:
-    recreate fidelity --source-target <source-target> \
-      --candidate-target <candidate-target> --label <control-label> \
-      --cdp-url <cdp_url> --output fidelity-report.json
-9. PR-ready requires acceptance.json, passing focused fidelity reports, every
-   visible interaction tested, and a clean diff. No independent oracle is
-   currently shipped; do not claim oracle certification.
+8. PR-ready requires acceptance.json, every visible interaction tested directly
+   in the browser, and a clean diff. No independent visual or motion comparison
+   engine is currently shipped; do not claim fidelity or oracle certification.
 "#
 }
 
@@ -62,9 +57,9 @@ license: MIT
 
 Run `"{}" skill` first, then follow the printed workflow.
 
-Do not claim independent oracle certification. No independent oracle is currently
-shipped. Treat focused fidelity, visible-interaction testing, and clean-diff
-validation as separate limited gates.
+Do not claim independent oracle or automated fidelity certification. Neither
+comparison engine is currently shipped as a PR gate. Treat acceptance,
+visible-interaction testing, and clean-diff validation as separate limited gates.
 "#,
         binary.display()
     )
@@ -138,7 +133,6 @@ mod tests {
         assert!(workflow().contains("recreate open <url>"));
         assert!(workflow().contains("instrumented reload"));
         assert!(workflow().contains("Never use a headless test browser"));
-        assert!(workflow().contains("recreate fidelity"));
-        assert!(workflow().contains("No independent oracle"));
+        assert!(workflow().contains("No independent visual or motion comparison"));
     }
 }
