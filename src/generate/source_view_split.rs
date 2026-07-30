@@ -126,18 +126,13 @@ fn split_collection_sections(
         })
         .collect::<Vec<_>>();
     let groups = section_groups(&children, 500);
-    let kind = if source.contains("notebook-card") {
-        "NotebookCollection"
-    } else {
-        "Collection"
-    };
     let mut replacements = Vec::new();
     let mut section_imports = String::new();
     for (section, (start, end)) in groups.into_iter().enumerate() {
         let suffix = ["Primary", "Continuation", "Remainder"]
             .get(section)
             .map_or_else(|| format!("Section{}", section + 1), |name| (*name).into());
-        let name = format!("Interaction{interaction}View{view}{kind}{suffix}Surface{surface}");
+        let name = format!("Interaction{interaction}View{view}Collection{suffix}Surface{surface}");
         write_section(directory, &name, &source[start..end], imports)?;
         replacements.push((start, end, format!("<{name} />")));
         section_imports.push_str(&format!("import {name} from './{name}.jsx';\n"));

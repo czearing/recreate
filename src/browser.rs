@@ -3,47 +3,131 @@ use crate::{
     cli::{CaptureArgs, OpenArgs},
 };
 use anyhow::{Context, Result, bail};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{path::PathBuf, process::Command, time::Duration};
+use std::{fs, path::PathBuf, process::Command, time::Duration};
 
 pub use recreate_browser::Target;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub(crate) struct OpenSession {
+    pub cdp_url: String,
+    pub target: String,
+    pub url: String,
+    #[serde(default)]
+    pub rendered_url: String,
+}
 
 pub async fn open(args: OpenArgs) -> Result<()> {
     ensure_endpoint(&args.cdp_url).await?;
     let target = create(&args.cdp_url, &args.url).await?;
     activate(&args.cdp_url, &target.id).await?;
+    save_open_session(&OpenSession {
+        cdp_url: args.cdp_url,
+        target: target.id,
+        url: args.url,
+        rendered_url: target.url.clone(),
+    })?;
     println!(
         "{}",
         serde_json::to_string_pretty(&serde_json::json!({
-            "cdp_url": args.cdp_url,
-            "target": target.id,
-            "url": target.url
+            "status": "opened",
+            "url": target.url,
         }))?
     );
     Ok(())
 }
 
 pub async fn target(args: &CaptureArgs) -> Result<(Target, Cdp)> {
-    ensure_endpoint(&args.cdp_url).await?;
+    let remembered = (args.reuse && args.target.is_none())
+        .then(last_open_session)
+        .transpose()?;
+    let endpoint = remembered
+        .as_ref()
+        .map_or(args.cdp_url.as_str(), |session| session.cdp_url.as_str());
+    ensure_endpoint(endpoint).await?;
     let target = if args.reuse {
-        let id = args
-            .target
-            .as_deref()
-            .context("--reuse requires --target")?;
-        list(&args.cdp_url)
+        let id = remembered
+            .as_ref()
+            .map(|session| session.target.as_str())
+            .or(args.target.as_deref())
+            .context("run `recreate open <url>` before `recreate capture --reuse`")?;
+        list(endpoint)
             .await?
             .into_iter()
             .find(|target| target.id == id)
-            .with_context(|| format!("open target not found: {id}"))?
+            .with_context(|| format!("remembered browser tab is no longer open: {id}"))?
     } else {
         let url = args.url.as_deref().context("capture requires a URL")?;
-        create(&args.cdp_url, url).await?
+        create(endpoint, url).await?
     };
     if args.reuse {
-        activate(&args.cdp_url, &target.id).await?;
+        activate(endpoint, &target.id).await?;
     }
     let cdp = Cdp::connect(&target.websocket_url).await?;
     Ok((target, cdp))
+}
+
+pub(crate) fn last_open_session() -> Result<OpenSession> {
+    let path = open_session_path()?;
+    let bytes = fs::read(&path).with_context(|| {
+        format!(
+            "no remembered browser tab; run `recreate open <url>` first ({})",
+            path.display()
+        )
+    })?;
+    serde_json::from_slice(&bytes).context("remembered browser tab is invalid")
+}
+
+fn save_open_session(session: &OpenSession) -> Result<()> {
+    let path = open_session_path()?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_vec(session)?)?;
+    remember_open_tab(session)
+}
+
+/// Records every tab opened by `recreate open` so several prepared pages can be
+/// compared against each other without one overwriting another.
+fn remember_open_tab(session: &OpenSession) -> Result<()> {
+    let path = open_tabs_path()?;
+    let mut tabs: Vec<OpenSession> = fs::read(&path)
+        .ok()
+        .and_then(|bytes| serde_json::from_slice(&bytes).ok())
+        .unwrap_or_default();
+    tabs.retain(|tab| {
+        !same_url(&tab.url, &session.url)
+            && !(tab.cdp_url == session.cdp_url && tab.target == session.target)
+    });
+    tabs.push(session.clone());
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_vec(&tabs)?)?;
+    Ok(())
+}
+
+pub(crate) fn find_open_session(url: &str) -> Option<OpenSession> {
+    let tabs: Vec<OpenSession> = fs::read(open_tabs_path().ok()?)
+        .ok()
+        .and_then(|bytes| serde_json::from_slice(&bytes).ok())
+        .unwrap_or_default();
+    tabs.into_iter()
+        .rev()
+        .find(|tab| same_url(&tab.url, url) || same_url(&tab.rendered_url, url))
+}
+
+fn same_url(left: &str, right: &str) -> bool {
+    left.trim_end_matches('/') == right.trim_end_matches('/')
+}
+
+fn open_tabs_path() -> Result<PathBuf> {
+    Ok(dirs_home()?.join(".recreate").join("open-tabs.json"))
+}
+
+fn open_session_path() -> Result<PathBuf> {
+    Ok(dirs_home()?.join(".recreate").join("last-open.json"))
 }
 
 pub async fn list(endpoint: &str) -> Result<Vec<Target>> {

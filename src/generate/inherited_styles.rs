@@ -3,6 +3,20 @@ use crate::model::{Node, Styles};
 const PROPERTIES: &[&str] = &["-webkit-text-fill-color", "color", "fill", "stroke"];
 
 pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules: &[String]) {
+    normalize_indexed(
+        styles,
+        node,
+        parent,
+        &super::authored_css::Index::new(rules),
+    );
+}
+
+pub fn normalize_indexed(
+    styles: &mut Styles,
+    node: &Node,
+    parent: Option<&Node>,
+    rules: &super::authored_css::Index<'_>,
+) {
     let Some(parent) = parent else {
         return;
     };
@@ -10,7 +24,7 @@ pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules:
         if disabled_control(node) && matches!(*property, "color" | "-webkit-text-fill-color") {
             continue;
         }
-        if let Some(value) = authored_value(node, rules, property) {
+        if let Some(value) = rules.inherited_value(node, property) {
             styles.insert((*property).into(), value);
         } else if styles.get(*property) == parent.style.get(*property)
             && !(matches!(
@@ -32,56 +46,6 @@ pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules:
                 .get("aria-disabled")
                 .is_some_and(|value| value == "true"))
     }
-}
-
-fn authored_value(node: &Node, rules: &[String], property: &str) -> Option<String> {
-    let classes: Vec<_> = node
-        .attributes
-        .get("class")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .collect();
-    let values: Vec<_> = rules
-        .iter()
-        .filter_map(|rule| rule.split_once('{'))
-        .filter(|(selector, _)| {
-            !selector.starts_with('@')
-                && !selector.contains(':')
-                && classes
-                    .iter()
-                    .any(|class| directly_targets(selector, class))
-        })
-        .flat_map(|(_, declarations)| declarations.split(';'))
-        .filter_map(|declaration| declaration.split_once(':'))
-        .filter(|(name, value)| name.trim() == property && !value.contains("var("))
-        .map(|(_, value)| value.trim().to_string())
-        .collect();
-    let first = values.first()?;
-    values
-        .iter()
-        .all(|value| value == first)
-        .then(|| first.clone())
-}
-
-fn directly_targets(selectors: &str, class: &str) -> bool {
-    selectors.split(',').any(|selector| {
-        let compound = selector
-            .trim()
-            .rsplit(|character: char| {
-                character.is_whitespace() || matches!(character, '>' | '+' | '~')
-            })
-            .find(|part| !part.is_empty())
-            .unwrap_or_default();
-        let needle = format!(".{class}");
-        compound.match_indices(&needle).any(|(index, _)| {
-            compound[index + needle.len()..]
-                .chars()
-                .next()
-                .is_none_or(|character| {
-                    !character.is_ascii_alphanumeric() && !matches!(character, '-' | '_')
-                })
-        })
-    })
 }
 
 #[cfg(test)]

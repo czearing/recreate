@@ -43,17 +43,7 @@ pub fn item_name(signature: &str, values: &[String], entity: Option<&str>) -> St
         return format!("{entity}Card");
     }
     if signature.starts_with("<button") {
-        if value_text.contains("Change icon") {
-            return format!("{entity}IconButton");
-        }
         return format!("{entity}ActionButton");
-    }
-    if signature.starts_with('<')
-        && (signature.contains("MoreOptions")
-            || value_text.contains("More options")
-            || value_text.contains("Change icon"))
-    {
-        return format!("{entity}ListItem");
     }
     if signature.starts_with(&format!("<{entity}")) {
         return format!("{entity}ItemContent");
@@ -97,8 +87,6 @@ fn prop_name(signature: &str, values: &[String], index: usize) -> String {
     if let Some(attribute) = attribute_before(before) {
         return match attribute {
             "className" => format!("{}ClassName", element_role(before)),
-            "aria-label" if value.starts_with("Change icon") => "iconLabel".into(),
-            "aria-label" if value == "More options" => "menuLabel".into(),
             "aria-label" if element_role(before) == "container" => "ariaLabel".into(),
             "aria-label" => "label".into(),
             "src" => "imageSrc".into(),
@@ -112,15 +100,7 @@ fn prop_name(signature: &str, values: &[String], index: usize) -> String {
     let role = element_role(before);
     if role.contains("Title") {
         "title".into()
-    } else if role.contains("UpdatedTime") {
-        "updatedTime".into()
-    } else if role.contains("CollaboratorCount") && value.parse::<f64>().is_ok() {
-        "additionalCollaboratorCount".into()
-    } else if role.contains("CollaboratorCount") {
-        "additionalCollaboratorPrefix".into()
-    } else if role.contains("ItemCount") && value.parse::<f64>().is_ok() {
-        "itemCount".into()
-    } else if role.contains("Icon") || role.contains("Glyph") {
+    } else if role.contains("Icon") {
         "icon".into()
     } else if value.starts_with("/assets/") {
         "imageSrc".into()
@@ -130,8 +110,6 @@ fn prop_name(signature: &str, values: &[String], index: usize) -> String {
         "count".into()
     } else if value.contains(" ago") || month_date(&value) {
         "updatedTime".into()
-    } else if value.starts_with("Change icon") {
-        "iconLabel".into()
     } else if value.chars().count() <= 3 && !value.chars().any(char::is_alphanumeric) {
         "icon".into()
     } else {
@@ -152,14 +130,11 @@ fn semantic_field(signature: &str, values: &[String], index: usize) -> bool {
         return matches!(
             attribute,
             "aria-label" | "src" | "id" | "data-recreate-trigger"
-        ) && !matches!(value.as_str(), "" | "More options");
+        ) && !value.is_empty();
     }
     !value.is_empty()
         && !generated_class(&value)
-        && !matches!(
-            value.as_str(),
-            "button" | "true" | "false" | "items" | " ago" | "100%" | "20"
-        )
+        && !matches!(value.as_str(), "button" | "true" | "false")
 }
 
 fn attribute_before(source: &str) -> Option<&str> {

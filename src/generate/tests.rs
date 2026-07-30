@@ -95,6 +95,9 @@ async fn writes_semantic_component_project() {
     assert!(app.contains("scrollEase(progress)"));
     assert!(app.contains("target.focus({preventScroll:true})"));
     assert!(app.contains("const focusedTargets=[null,"));
+    assert!(app.contains("const responsiveAttributePaths="));
+    assert!(app.contains("const responsiveAttributeValues="));
+    assert!(app.contains("for(const[pathIndex,attributesIndex]"));
     let css = read_css_tree(&root.join("src"));
     assert!(css.contains("@media(min-width:769px) and (max-width:1440px)"));
     assert!(css.contains("@media(min-width:391px) and (max-width:768px)"));
@@ -105,6 +108,23 @@ async fn writes_semantic_component_project() {
     assert!(css.contains("content:none;"));
     assert!(css.contains("@keyframes"));
     assert!(!css.contains("[data-recreate-control]:focus-visible"));
+}
+
+#[tokio::test]
+async fn writes_byte_identical_projects_across_runs() {
+    let first = tempfile::tempdir().unwrap();
+    let second = tempfile::tempdir().unwrap();
+    let specification = support::specification();
+    write_project(&specification, first.path(), &[])
+        .await
+        .unwrap();
+    write_project(&specification, second.path(), &[])
+        .await
+        .unwrap();
+    assert_eq!(
+        file_inventory(&first.path().join("react")),
+        file_inventory(&second.path().join("react"))
+    );
 }
 
 #[tokio::test]
@@ -159,4 +179,29 @@ fn read_tree(root: &std::path::Path, extensions: &[&str]) -> String {
         }
     }
     output
+}
+
+fn file_inventory(root: &std::path::Path) -> Vec<(String, Vec<u8>)> {
+    let mut files = Vec::new();
+    let mut pending = vec![root.to_path_buf()];
+    while let Some(path) = pending.pop() {
+        if path.is_dir() {
+            pending.extend(
+                std::fs::read_dir(path)
+                    .unwrap()
+                    .filter_map(Result::ok)
+                    .map(|entry| entry.path()),
+            );
+        } else {
+            files.push((
+                path.strip_prefix(root)
+                    .unwrap()
+                    .to_string_lossy()
+                    .replace('\\', "/"),
+                std::fs::read(path).unwrap(),
+            ));
+        }
+    }
+    files.sort_by(|left, right| left.0.cmp(&right.0));
+    files
 }

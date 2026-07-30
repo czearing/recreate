@@ -5,6 +5,7 @@ use crate::{
 };
 use std::collections::BTreeMap;
 
+#[cfg(test)]
 #[allow(clippy::too_many_arguments)]
 pub(super) fn append_node_rules(
     base: &Node,
@@ -17,10 +18,35 @@ pub(super) fn append_node_rules(
     fluid_height: bool,
     constrained_by_flex: bool,
 ) -> String {
+    append_node_rules_indexed(
+        base,
+        node,
+        parent,
+        viewports,
+        class,
+        assets,
+        &super::super::authored_css::Index::new(css_rules),
+        fluid_height,
+        constrained_by_flex,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn append_node_rules_indexed(
+    base: &Node,
+    node: &Node,
+    parent: Option<&Node>,
+    viewports: (&Viewport, &Viewport),
+    class: &str,
+    assets: &BTreeMap<String, String>,
+    css_rules: &super::super::authored_css::Index<'_>,
+    fluid_height: bool,
+    constrained_by_flex: bool,
+) -> String {
     let mut rules = String::new();
     let (base_viewport, viewport) = viewports;
     let mut changed = changed_styles(&base.style, &node.style);
-    super::super::authored_css::normalize(&mut changed, node, css_rules);
+    super::super::authored_css::normalize_indexed(&mut changed, node, css_rules);
     normalize_line_clamp(&mut changed, node, css_rules);
     if constrained_by_flex
         && node
@@ -33,7 +59,7 @@ pub(super) fn append_node_rules(
         changed.remove("width");
         changed.remove("inline-size");
     }
-    if !super::super::authored_css::has_property(node, css_rules, "width")
+    if !super::super::authored_css::has_property_indexed(node, css_rules, "width")
         && fluid_flex_item(node, parent)
     {
         if shrunk_flex_item(base, node, parent) {
@@ -46,7 +72,7 @@ pub(super) fn append_node_rules(
     if fluid_height {
         changed.remove("height");
     }
-    super::super::inherited_styles::normalize(&mut changed, node, parent, css_rules);
+    super::super::inherited_styles::normalize_indexed(&mut changed, node, parent, css_rules);
     super::super::responsive_geometry::normalize(
         &mut changed,
         node,
@@ -76,7 +102,11 @@ pub(super) fn append_node_rules(
     rules
 }
 
-fn normalize_line_clamp(changed: &mut Styles, node: &Node, css_rules: &[String]) {
+fn normalize_line_clamp(
+    changed: &mut Styles,
+    node: &Node,
+    css_rules: &super::super::authored_css::Index<'_>,
+) {
     let captured = node
         .style
         .get("-webkit-line-clamp")
@@ -85,10 +115,10 @@ fn normalize_line_clamp(changed: &mut Styles, node: &Node, css_rules: &[String])
         .style
         .get("-webkit-box-orient")
         .is_some_and(|value| value == "vertical")
-        || super::super::authored_css::has_property(node, css_rules, "-webkit-box-orient");
+        || super::super::authored_css::has_property_indexed(node, css_rules, "-webkit-box-orient");
     let authored = multiline_text_box(node)
         .then(|| {
-            super::super::authored_css::positive_integer_property(
+            super::super::authored_css::positive_integer_property_indexed(
                 node,
                 css_rules,
                 "-webkit-line-clamp",

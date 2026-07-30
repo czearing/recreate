@@ -1,37 +1,5 @@
-use crate::model::{Node, Styles};
-use std::collections::BTreeMap;
-
-pub(super) fn declarations(node: &Node, rules: &[String]) -> Styles {
-    let mut values: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    for declarations in rules.iter().filter_map(|rule| {
-        let (selector, declarations) = rule.split_once('{')?;
-        (!selector.starts_with('@')
-            && !selector.contains(':')
-            && directly_targets_node(selector, node))
-        .then_some(declarations)
-    }) {
-        for (name, value) in declarations
-            .split(';')
-            .filter_map(|declaration| declaration.split_once(':'))
-            .map(|(name, value)| (name.trim(), value.trim()))
-            .filter(|(name, value)| retained(name) && !value.contains("var("))
-        {
-            values.entry(name.into()).or_default().push(value.into());
-        }
-    }
-    values
-        .into_iter()
-        .filter_map(|(name, values)| {
-            values
-                .iter()
-                .rev()
-                .find(|value| resolved_matches(node, &name, value))
-                .map(|value| (name, value.clone()))
-        })
-        .collect()
-}
-
-fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
+use crate::model::Node;
+pub(super) fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
     if matches!(name, "width" | "height") && value == "auto" {
         return node
             .style
@@ -171,7 +139,7 @@ fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
     attributes
 }
 
-fn retained(name: &str) -> bool {
+pub(super) fn retained(name: &str) -> bool {
     matches!(
         name,
         "align-content"

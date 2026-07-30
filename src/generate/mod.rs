@@ -9,6 +9,7 @@ mod attribute_sequences;
 #[cfg(test)]
 mod authenticated_interaction_runtime_tests;
 mod authored_css;
+mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
 mod carousel_inference;
@@ -72,7 +73,6 @@ mod responsive_runtime_support;
 mod responsive_runtime_tests;
 mod roots;
 mod runtime_sources;
-#[allow(dead_code)]
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;

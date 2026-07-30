@@ -19,22 +19,51 @@ The capture includes:
 
 ```text
 recreate capture <url>
-recreate capture --reuse --reload --target <target-id>
+recreate capture --reuse --reload
+recreate backtest <command> [args]
 recreate open <url>
 recreate generate --spec <spec.json> --out <directory>
 recreate verify --spec <spec.json> --url <generated-url>
 recreate verify --spec <spec.json> --url <generated-url> --interaction 1
 recreate install [--copilot | --claude | --all]
-recreate skill
 ```
 
 Capture options:
 
 ```text
---cdp-url http://127.0.0.1:9222
 --out recreate-output
 --viewports 1920x1080,1440x900,768x1024,390x844,320x568
 ```
+
+Advanced capture options:
+
+| Option | Purpose |
+| --- | --- |
+| `--reuse` | Capture the browser tab remembered by `recreate open`. |
+| `--reload` | Reload that tab after instrumentation to capture startup behavior. |
+| `--target <id>` | Override the remembered tab for automation or debugging. |
+| `--cdp-url <url>` | Override the remembered browser endpoint for automation or debugging. |
+
+Backtest options are available through `recreate backtest --help`. Use
+`compare --focus "<region>"` only to debug a named region; it does not replace
+the full comparison.
+
+## Generated recreation
+
+`recreate capture` writes the React project and acceptance evidence.
+
+Compare any source and recreation URLs:
+
+```text
+recreate backtest run --source <source-url> --recreation <recreation-url>
+```
+
+Use `--focus "<name>"` for an isolated debugging report. It is a
+case-insensitive name search, not a CSS selector. It matches visible text,
+accessible names, and semantic regions such as toolbar, navigation, banner,
+main, or dialog. All matches are included. The name must match both pages; if
+either page has no match, selection fails. Focus does not replace the final full
+comparison.
 
 ## Browser access
 

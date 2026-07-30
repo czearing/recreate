@@ -7,7 +7,7 @@ mod output;
 #[path = "responsive_rules.rs"]
 mod rules;
 
-pub use output::{base_declarations, output_declarations};
+pub use output::{base_declarations, base_declarations_indexed, output_declarations};
 pub use rules::append_filtered;
 pub(super) use rules::{band, media_rule};
 

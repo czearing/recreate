@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recreate backtest canonical fixture</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    main { display: grid; gap: 16px; width: min(960px, calc(100% - 32px)); margin: 24px auto; }
+    section { padding: 16px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; }
+    button { min-height: 36px; padding: 8px 12px; }
+    .geometry-panel { width: 480px; max-width: 100%; height: 64px; background: #e2e8f0; }
+    .paint-swatch { width: 64px; height: 64px; background: #2563eb; }
+    .typography-sample { font-weight: 700; font-size: 20px; line-height: 1.4; }
+    .hover-card { width: 180px; padding: 16px; background: #f1f5f9; }
+    .hover-card:hover { background: #dbeafe; }
+    .animation-box {
+      width: 48px;
+      height: 48px;
+      background: #7c3aed;
+      animation: fixture-slide 30000ms linear infinite;
+      animation-delay: -7500ms;
+      animation-play-state: paused;
+    }
+    @keyframes fixture-slide { from { transform: translateX(0); } to { transform: translateX(120px); } }
+    dialog { width: 360px; border: 1px solid #64748b; border-radius: 8px; }
+    @media (max-width: 600px) { .responsive-note { display: none; } }
+  </style>
+</head>
+<body>
+  <main data-backtest-id="fixture-root">
+    <header data-backtest-id="page-header">
+      <h1 data-backtest-id="page-title">Canonical fixture</h1>
+      <span data-backtest-id="status-badge">stable</span>
+    </header>
+    <section data-backtest-id="visual-section">
+      <div class="geometry-panel" data-backtest-id="geometry-panel">geometry</div>
+      <div class="paint-swatch" data-backtest-id="paint-swatch" aria-label="blue paint swatch"></div>
+      <p class="typography-sample" data-backtest-id="typography-sample">Weighted type</p>
+      <p class="responsive-note" data-backtest-id="responsive-note">Hidden at narrow widths</p>
+    </section>
+    <section data-backtest-id="interaction-section">
+      <button type="button" data-backtest-id="click-toggle">Run click action</button>
+      <output data-backtest-id="click-result">idle</output>
+      <div class="hover-card" data-backtest-id="hover-card" tabindex="0">Hover target</div>
+    </section>
+    <section data-backtest-id="focus-section">
+      <button type="button" data-backtest-id="dialog-open">Open dialog</button>
+      <button type="button" data-backtest-id="focus-fallback">Fallback focus</button>
+      <dialog data-backtest-id="dialog">
+        <p>Deterministic dialog</p>
+        <button type="button" data-backtest-id="dialog-close">Close dialog</button>
+      </dialog>
+    </section>
+    <section data-backtest-id="time-section">
+      <div class="animation-box" data-backtest-id="animation-box"></div>
+      <div role="status" aria-live="polite" data-backtest-id="live-region">waiting</div>
+      <output data-backtest-id="async-result">pending</output>
+    </section>
+  </main>
+  <script>
+    const byId = (id) => document.querySelector('[data-backtest-id="' + id + '"]');
+    const clickToggle = byId("click-toggle");
+    const clickResult = byId("click-result");
+    const dialog = byId("dialog");
+    const dialogOpen = byId("dialog-open");
+    const dialogClose = byId("dialog-close");
+    clickToggle.addEventListener("click", () => { clickResult.textContent = "clicked"; });
+    dialogOpen.addEventListener("click", () => { dialog.showModal(); dialogClose.focus(); });
+    dialogClose.addEventListener("click", () => {
+      dialog.close();
+      dialogOpen.focus();
+    });
+    dialog.addEventListener("cancel", (event) => { event.preventDefault(); dialogClose.click(); });
+    setTimeout(() => {
+      byId("async-result").textContent = "stale";
+      byId("live-region").textContent = "timer complete";
+    }, 60000);
+  </script>
+</body>
+</html>

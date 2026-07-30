@@ -1,11 +1,11 @@
 use crate::model::Node;
 
-pub fn append(
+pub fn append_indexed(
     node: &Node,
     flex: Option<&str>,
     float: Option<&str>,
     width: Option<f64>,
-    rules: &[String],
+    rules: &super::authored_css::Index<'_>,
     css: &mut String,
 ) {
     if let Some(direction) = flex {
@@ -22,14 +22,20 @@ pub fn append(
         .get("-webkit-line-clamp")
         .is_some_and(|value| value != "none" && value != "0");
     let authored_line_clamp = (!line_clamp && super::css_visual::multiline_text_box(node))
-        .then(|| super::authored_css::positive_integer_property(node, rules, "-webkit-line-clamp"))
+        .then(|| {
+            super::authored_css::positive_integer_property_indexed(
+                node,
+                rules,
+                "-webkit-line-clamp",
+            )
+        })
         .flatten();
     if line_clamp
         && (node
             .style
             .get("-webkit-box-orient")
             .is_some_and(|value| value == "vertical")
-            || super::authored_css::has_property(node, rules, "-webkit-box-orient"))
+            || super::authored_css::has_property_indexed(node, rules, "-webkit-box-orient"))
         || authored_line_clamp.is_some()
     {
         css.push_str("display:-webkit-box;");

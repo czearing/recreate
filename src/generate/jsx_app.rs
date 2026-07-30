@@ -14,30 +14,47 @@ pub fn app(
     if specification.states.is_empty() {
         return "export default function App(){return null}\n".into();
     }
-    let views = specification
+    let bodies = specification
         .states
         .iter()
         .zip(class_maps)
-        .enumerate()
-        .map(|(index, (state, classes))| {
+        .map(|(state, classes)| {
             let mut handlers = interactions::base_handlers(specification, state);
             attribute_sequences::append_handlers(state, &mut handlers);
             let current = structural_tree::for_state(components, state, classes);
             let page = jsx_variants::page(state, &current, assets, &handlers);
-            let startup = if state.startup_nodes.is_empty() {
-                String::new()
-            } else {
-                let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
-                let fragment = jsx_variants::fragment(
-                    &startup,
-                    assets,
-                    state.startup_delay_ms,
-                    state.startup_duration_ms,
-                );
-                format!("{{createPortal({fragment},document.body)}}")
-            };
+            if state.startup_nodes.is_empty() {
+                return page;
+            }
+            let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
+            let fragment = jsx_variants::fragment(
+                &startup,
+                assets,
+                state.startup_delay_ms,
+                state.startup_duration_ms,
+            );
+            format!("<>{page}{{createPortal({fragment},document.body)}}</>")
+        })
+        .collect::<Vec<_>>();
+    let mut unique_bodies: Vec<&String> = Vec::new();
+    let view_indexes = bodies
+        .iter()
+        .map(|body| {
+            unique_bodies
+                .iter()
+                .position(|existing| *existing == body)
+                .unwrap_or_else(|| {
+                    unique_bodies.push(body);
+                    unique_bodies.len() - 1
+                })
+        })
+        .collect::<Vec<_>>();
+    let views = unique_bodies
+        .iter()
+        .enumerate()
+        .map(|(index, body)| {
             format!(
-                "function Baseline{index}({{activate,showStartup,onStartupDone}}){{return <>{page}{startup}</>}}\n"
+                "function Baseline{index}({{activate,showStartup,onStartupDone}}){{return {body}}}\n"
             )
         })
         .collect::<String>();
@@ -48,7 +65,8 @@ pub fn app(
         .max_by_key(|(_, state)| (state.nodes.len(), state.viewport.width))
         .map(|(index, _)| index)
         .unwrap_or_default();
-    let view_names = (0..specification.states.len())
+    let view_names = view_indexes
+        .iter()
         .map(|index| format!("Baseline{index}"))
         .collect::<Vec<_>>()
         .join(",");
@@ -57,6 +75,22 @@ pub fn app(
         .map(|index| format!("Interaction{index}"))
         .collect::<Vec<_>>()
         .join(", ");
+    let component_names = components
+        .items
+        .iter()
+        .map(|item| item.name.as_str())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let component_import = if component_names.is_empty() {
+        String::new()
+    } else {
+        format!("import {{ {component_names} }} from './components/index.js';\n")
+    };
+    let state_import = if state_imports.is_empty() {
+        String::new()
+    } else {
+        format!("import {{ {state_imports} }} from './states.jsx';\n")
+    };
     let state_overlay = (1..=specification.interactions.len())
         .map(|index| {
             format!("state==={index}?<Interaction{index} width={{width}} onReset={{reset}}/>:")
@@ -138,6 +172,9 @@ pub fn app(
     let attribute_sequences = attribute_sequences::javascript(specification);
     let responsive_attributes =
         super::responsive_attributes::javascript(&specification.states, canonical);
+    let responsive_attribute_paths = responsive_attributes.paths;
+    let responsive_attribute_values = responsive_attributes.values;
+    let responsive_attributes = responsive_attributes.viewports;
     let initial_scrolls = super::initial_scroll::targets(specification);
     let inferred_carousel =
         super::carousel_inference::javascript(specification, carousel_state != 0);
@@ -293,14 +330,7 @@ pub fn app(
     )
     .unwrap();
     let output = format!(
-        "import React,{{useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{moveCarousel}} from './runtime/carousel.mjs';\nimport {{reduceInteraction}} from './runtime/interaction.mjs';\nimport {{startSequences}} from './runtime/sequence.mjs';\nimport {{ {} }} from './components/index.js';\nimport {{ {} }} from './states.jsx';\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nconst pathOf=element=>{{const parts=[];for(let node=element;node&&node!==document.documentElement;node=node.parentElement){{const peers=node.parentElement?[...node.parentElement.children].filter(child=>child.tagName===node.tagName):[node];parts.push(`${{node.tagName.toLowerCase()}}:nth-of-type(${{peers.indexOf(node)+1}})`)}}return `html>${{parts.reverse().join('>')}}`}};\nconst captureScroll=element=>{{const elements=[];for(let node=element?.parentElement;node&&node!==document.documentElement;node=node.parentElement){{if(node.scrollLeft||node.scrollTop)elements.push([pathOf(node),node.scrollLeft,node.scrollTop])}}return{{window:[scrollX,scrollY],elements}}}};\n        const scrollAnimations=new WeakMap();const scrollEase=value=>{{let current=value;for(let index=0;index<5;index++){{const inverse=1-current;const x=3*inverse*inverse*current*.4+3*inverse*current*current*.2+current*current*current;const slope=3*inverse*inverse*.4+6*inverse*current*(.2-.4)+3*current*current*(1-.2);if(Math.abs(slope)<1e-4)break;current=Math.max(0,Math.min(1,current-(x-value)/slope))}}const inverse=1-current;return 3*inverse*current*current+current*current*current}};const setScroll=(element,left,top)=>element===window?scrollTo(left,top):element.scrollTo(left,top);const animateScroll=(element,left,top)=>{{if(element!==window&&top===0){{const content=[...element.children].find(child=>child.scrollWidth>element.clientWidth&&getComputedStyle(child).transition.includes('transform'));        if(content){{element.scrollTo(0,0);requestAnimationFrame(()=>requestAnimationFrame(()=>{{content.style.transform=`translateX(${{-left}}px)`}}));return}}}}const startLeft=element===window?scrollX:element.scrollLeft;const startTop=element===window?scrollY:element.scrollTop;if(Math.abs(startLeft-left)<1&&Math.abs(startTop-top)<1)return;const token={{}};scrollAnimations.set(element,token);const started=performance.now();const frame=now=>{{if(scrollAnimations.get(element)!==token)return;const progress=Math.min(1,(now-started)/320);const eased=scrollEase(progress);setScroll(element,startLeft+(left-startLeft)*eased,startTop+(top-startTop)*eased);if(progress<1)requestAnimationFrame(frame)}};requestAnimationFrame(frame)}};const restoreScroll=snapshot=>{{if(snapshot.smooth){{animateScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)animateScroll(element,left,top)}});return}}setScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)setScroll(element,left,top)}})}};\n{}\nconst viewportWidths=[{widths}];\nconst closableStates=[{closable}];\nconst statefulStates=[{stateful}];\nconst replacementStates=[{replacement_states}];\nconst capturedScrolls={scroll_targets};\nconst carouselState={carousel_state};\nconst attributeSequences={attribute_sequences};\nconst responsiveAttributes={responsive_attributes};\nconst capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;\n        const subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\n                                                export default function App(){{const[state,setState]=useState(0);const[scrollRevision,setScrollRevision]=useState(0);const[carouselAdvanced,setCarouselAdvanced]=useState(false);const lastTrigger=useRef('');const scroll=useRef(null);const width=useSyncExternalStore(subscribe,()=>document.documentElement.clientWidth,()=>0);const viewport=selectViewport(width,viewportWidths);const reset=()=>{{const selector='[data-recreate-trigger=\"'+lastTrigger.current+'\"]';scroll.current=captureScroll(document.querySelector(selector));setState(0);requestAnimationFrame(()=>document.querySelector(selector)?.focus({{preventScroll:true}}))}};const activate=(event,next,inputActive)=>{{if(inputActive===false){{if(state===next)reset();return}}if(inputActive===true&&state===next)return;lastTrigger.current=event.currentTarget.dataset.recreateTrigger;const captured=capturedScroll(next,viewport);if(!statefulStates[next]){{scroll.current=captured?{{...mergeHorizontalScroll(captureScroll(event.currentTarget),captured),smooth:true}}:null;if(next===carouselState)setCarouselAdvanced(true);if(scroll.current)setScrollRevision(value=>value+1);return}}if(state===next){{reset();return}}scroll.current=event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{{window:[0,0],elements:[]}}):captureScroll(event.currentTarget);setState(next)}};useLayoutEffect(()=>{{if(state!==0)return;for(const[path,attributes]of responsiveAttributes[viewport]||[]){{const element=document.querySelector(path);if(!element)continue;for(const[name,value]of attributes)value===null?element.removeAttribute(name):element.setAttribute(name,value)}}}},[viewport,state]);useLayoutEffect(()=>{{document.querySelectorAll('[data-recreate-trigger][aria-expanded]').forEach(element=>element.setAttribute('aria-expanded',String(Number(element.dataset.recreateTrigger)===state)));if(state&&closableStates[state])requestAnimationFrame(()=>{{const surfaces=[...document.querySelectorAll('[data-recreate-surface]')];const surface=surfaces.at(-1);const target=(focusedTargets[state]&&document.querySelector(focusedTargets[state]))||[...surfaces].reverse().find(element=>element.matches('input,button,[tabindex]'))||surface?.querySelector('input,button,[tabindex]')||surface;if(target){{if(target===surface&&!target.matches('input,button,[tabindex]'))target.tabIndex=-1;target.focus({{preventScroll:true}})}}}});if(!scroll.current)return;const snapshot=scroll.current;restoreScroll(snapshot);if(!snapshot.smooth)requestAnimationFrame(()=>restoreScroll(snapshot))}},[state,scrollRevision]);useEffect(()=>{{if(!carouselState||!carouselPrevious||!carouselNext)return;const previous=document.querySelector(carouselPrevious);const more=document.querySelector(carouselNext);if(!previous||!more)return;previous.disabled=!carouselAdvanced;more.disabled=carouselAdvanced;const reverse=()=>{{if(!carouselAdvanced)return;const captured=capturedScroll(carouselState,viewport);if(!captured)return;const origin={{window:[0,0],elements:captured.elements.map(([path,left,top])=>[path,0,top])}};scroll.current={{...mergeHorizontalScroll(captureScroll(more),origin),smooth:true}};setCarouselAdvanced(false);setScrollRevision(value=>value+1)}};previous.addEventListener('click',reverse);return()=>previous.removeEventListener('click',reverse)}},[carouselAdvanced,viewport]);useEffect(()=>{{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{{const element=document.querySelector(`[data-recreate-sequence=\"${{index}}\"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])}},sequence.interval_ms)}});return()=>timers.forEach(timer=>timer&&clearInterval(timer))}},[viewport]);useEffect(()=>{{if(!state||!closableStates[state])return;const key=event=>{{if(event.key==='Escape')reset()}};const pointer=event=>{{if(!event.target.closest('[data-recreate-surface],[data-recreate-control]'))reset()}}        ;addEventListener('keydown',key);addEventListener('pointerdown',pointer);return()=>{{removeEventListener('keydown',key);removeEventListener('pointerdown',pointer)}}}},[state]);const renderState=value=>{render_state};const contentState=closableStates[state]?returnState.current:state;const content=renderState(contentState);const popup=closableStates[state]?renderState(state):null;const baseline=baselineViews[viewport]({{activate,showStartup:!startupDone,onStartupDone:()=>setStartupDone(true)}});return replacementStates[contentState]?<>{{content}}{{popup}}</>:<>{{baseline}}{{content}}{{popup}}</>}}\n",
-        components
-            .items
-            .iter()
-            .map(|item| item.name.as_str())
-            .collect::<Vec<_>>()
-            .join(", "),
-        state_imports,
+        "import React,{{useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{moveCarousel}} from './runtime/carousel.mjs';\nimport {{reduceInteraction}} from './runtime/interaction.mjs';\nimport {{startSequences}} from './runtime/sequence.mjs';\n{component_import}{state_import}const keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nconst pathOf=element=>{{const parts=[];for(let node=element;node&&node!==document.documentElement;node=node.parentElement){{const peers=node.parentElement?[...node.parentElement.children].filter(child=>child.tagName===node.tagName):[node];parts.push(`${{node.tagName.toLowerCase()}}:nth-of-type(${{peers.indexOf(node)+1}})`)}}return `html>${{parts.reverse().join('>')}}`}};\nconst captureScroll=element=>{{const elements=[];for(let node=element?.parentElement;node&&node!==document.documentElement;node=node.parentElement){{if(node.scrollLeft||node.scrollTop)elements.push([pathOf(node),node.scrollLeft,node.scrollTop])}}return{{window:[scrollX,scrollY],elements}}}};\n        const scrollAnimations=new WeakMap();const scrollEase=value=>{{let current=value;for(let index=0;index<5;index++){{const inverse=1-current;const x=3*inverse*inverse*current*.4+3*inverse*current*current*.2+current*current*current;const slope=3*inverse*inverse*.4+6*inverse*current*(.2-.4)+3*current*current*(1-.2);if(Math.abs(slope)<1e-4)break;current=Math.max(0,Math.min(1,current-(x-value)/slope))}}const inverse=1-current;return 3*inverse*current*current+current*current*current}};const setScroll=(element,left,top)=>element===window?scrollTo(left,top):element.scrollTo(left,top);const animateScroll=(element,left,top)=>{{if(element!==window&&top===0){{const content=[...element.children].find(child=>child.scrollWidth>element.clientWidth&&getComputedStyle(child).transition.includes('transform'));        if(content){{element.scrollTo(0,0);requestAnimationFrame(()=>requestAnimationFrame(()=>{{content.style.transform=`translateX(${{-left}}px)`}}));return}}}}const startLeft=element===window?scrollX:element.scrollLeft;const startTop=element===window?scrollY:element.scrollTop;if(Math.abs(startLeft-left)<1&&Math.abs(startTop-top)<1)return;const token={{}};scrollAnimations.set(element,token);const started=performance.now();const frame=now=>{{if(scrollAnimations.get(element)!==token)return;const progress=Math.min(1,(now-started)/320);const eased=scrollEase(progress);setScroll(element,startLeft+(left-startLeft)*eased,startTop+(top-startTop)*eased);if(progress<1)requestAnimationFrame(frame)}};requestAnimationFrame(frame)}};const restoreScroll=snapshot=>{{if(snapshot.smooth){{animateScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)animateScroll(element,left,top)}});return}}setScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)setScroll(element,left,top)}})}};\n{}\nconst viewportWidths=[{widths}];\nconst closableStates=[{closable}];\nconst statefulStates=[{stateful}];\nconst replacementStates=[{replacement_states}];\nconst capturedScrolls={scroll_targets};\nconst carouselState={carousel_state};\n        const attributeSequences={attribute_sequences};\nconst responsiveAttributePaths={responsive_attribute_paths};\nconst responsiveAttributeValues={responsive_attribute_values};\nconst responsiveAttributes={responsive_attributes};\nconst capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;\n        const subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\n                                                export default function App(){{const[state,setState]=useState(0);const[scrollRevision,setScrollRevision]=useState(0);const[carouselAdvanced,setCarouselAdvanced]=useState(false);const lastTrigger=useRef('');const scroll=useRef(null);const width=useSyncExternalStore(subscribe,()=>document.documentElement.clientWidth,()=>0);const viewport=selectViewport(width,viewportWidths);const reset=()=>{{const selector='[data-recreate-trigger=\"'+lastTrigger.current+'\"]';scroll.current=captureScroll(document.querySelector(selector));setState(0);requestAnimationFrame(()=>document.querySelector(selector)?.focus({{preventScroll:true}}))}};const activate=(event,next,inputActive)=>{{if(inputActive===false){{if(state===next)reset();return}}if(inputActive===true&&state===next)return;lastTrigger.current=event.currentTarget.dataset.recreateTrigger;const captured=capturedScroll(next,viewport);if(!statefulStates[next]){{scroll.current=captured?{{...mergeHorizontalScroll(captureScroll(event.currentTarget),captured),smooth:true}}:null;if(next===carouselState)setCarouselAdvanced(true);if(scroll.current)setScrollRevision(value=>value+1);return}}if(state===next){{reset();return}}scroll.current=event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{{window:[0,0],elements:[]}}):captureScroll(event.currentTarget);setState(next)}};useLayoutEffect(()=>{{if(state!==0)return;for(const[pathIndex,attributesIndex]of responsiveAttributes[viewport]||[]){{const element=document.querySelector(responsiveAttributePaths[pathIndex]);if(!element)continue;for(const[name,value]of responsiveAttributeValues[attributesIndex])value===null?element.removeAttribute(name):element.setAttribute(name,value)}}}},[viewport,state]);useLayoutEffect(()=>{{document.querySelectorAll('[data-recreate-trigger][aria-expanded]').forEach(element=>element.setAttribute('aria-expanded',String(Number(element.dataset.recreateTrigger)===state)));if(state&&closableStates[state])requestAnimationFrame(()=>{{const surfaces=[...document.querySelectorAll('[data-recreate-surface]')];const surface=surfaces.at(-1);const target=(focusedTargets[state]&&document.querySelector(focusedTargets[state]))||[...surfaces].reverse().find(element=>element.matches('input,button,[tabindex]'))||surface?.querySelector('input,button,[tabindex]')||surface;if(target){{if(target===surface&&!target.matches('input,button,[tabindex]'))target.tabIndex=-1;target.focus({{preventScroll:true}})}}}});if(!scroll.current)return;const snapshot=scroll.current;restoreScroll(snapshot);if(!snapshot.smooth)requestAnimationFrame(()=>restoreScroll(snapshot))}},[state,scrollRevision]);useEffect(()=>{{if(!carouselState||!carouselPrevious||!carouselNext)return;const previous=document.querySelector(carouselPrevious);const more=document.querySelector(carouselNext);if(!previous||!more)return;previous.disabled=!carouselAdvanced;more.disabled=carouselAdvanced;const reverse=()=>{{if(!carouselAdvanced)return;const captured=capturedScroll(carouselState,viewport);if(!captured)return;const origin={{window:[0,0],elements:captured.elements.map(([path,left,top])=>[path,0,top])}};scroll.current={{...mergeHorizontalScroll(captureScroll(more),origin),smooth:true}};setCarouselAdvanced(false);setScrollRevision(value=>value+1)}};previous.addEventListener('click',reverse);return()=>previous.removeEventListener('click',reverse)}},[carouselAdvanced,viewport]);useEffect(()=>{{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{{const element=document.querySelector(`[data-recreate-sequence=\"${{index}}\"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])}},sequence.interval_ms)}});return()=>timers.forEach(timer=>timer&&clearInterval(timer))}},[viewport]);useEffect(()=>{{if(!state||!closableStates[state])return;const key=event=>{{if(event.key==='Escape')reset()}};const pointer=event=>{{if(!event.target.closest('[data-recreate-surface],[data-recreate-control]'))reset()}}        ;addEventListener('keydown',key);addEventListener('pointerdown',pointer);return()=>{{removeEventListener('keydown',key);removeEventListener('pointerdown',pointer)}}}},[state]);const renderState=value=>{render_state};const contentState=closableStates[state]?returnState.current:state;const content=renderState(contentState);const popup=closableStates[state]?renderState(state):null;const baseline=baselineViews[viewport]({{activate,showStartup:!startupDone,onStartupDone:()=>setStartupDone(true)}});return replacementStates[contentState]?<>{{content}}{{popup}}</>:<>{{baseline}}{{content}}{{popup}}</>}}\n",
         jsx_variants::selector(),
     );
     let output = output.replace(

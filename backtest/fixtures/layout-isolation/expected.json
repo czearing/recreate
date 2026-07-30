@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "case": "layout-isolation",
+  "source": "source/index.html",
+  "control": {
+    "path": "control/index.html",
+    "findings": 0,
+    "duplicates": 0,
+    "maximumDurationMs": 4999
+  },
+  "mutations": [
+    {
+      "id": "single-control-shift",
+      "path": "mutations/single-control-shift/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base content / button \"Gamma\" x 1100->1000 -100px",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    }
+  ]
+}

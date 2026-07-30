@@ -51,7 +51,11 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             (2..=120).contains(&size).then_some((roots, size))
         })
         .collect();
-    candidates.sort_by_key(|(_, size)| std::cmp::Reverse(*size));
+    candidates.sort_by(|(left_roots, left_size), (right_roots, right_size)| {
+        right_size
+            .cmp(left_size)
+            .then_with(|| left_roots.cmp(right_roots))
+    });
     candidates.truncate(80);
     let mut names = HashMap::new();
     let items: Vec<Component> = candidates

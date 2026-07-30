@@ -1,6 +1,6 @@
 use super::{
     flex::{constrained_by_flex_chain, shrunk_flex_item},
-    node_rules::append_node_rules,
+    node_rules::append_node_rules_indexed,
 };
 use crate::model::{Node, Specification};
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -30,6 +30,7 @@ pub fn append_filtered(
             .iter()
             .map(|node| (node.path.as_str(), node))
             .collect();
+        let authored_rules = super::super::authored_css::Index::new(&state.css_rules);
         let shrunk_roots = shrunk_roots(&state.nodes, &base_nodes, &state_nodes);
         let mut rules = String::new();
         for node in &state.nodes {
@@ -41,7 +42,7 @@ pub fn append_filtered(
             else {
                 continue;
             };
-            rules.push_str(&append_node_rules(
+            rules.push_str(&append_node_rules_indexed(
                 base_node,
                 node,
                 node.parent
@@ -50,7 +51,7 @@ pub fn append_filtered(
                 (&base.viewport, &state.viewport),
                 class,
                 assets,
-                &state.css_rules,
+                &authored_rules,
                 fluid_heights.contains(&node.path),
                 constrained_by_flex_chain(node, &shrunk_roots, &state_nodes),
             ));

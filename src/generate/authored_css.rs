@@ -1,8 +1,13 @@
-use super::authored_css_rules::declarations;
 use crate::model::{Node, Styles};
 
+pub use super::authored_css_index::Index;
+
 pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
-    let mut authored = declarations(node, rules);
+    normalize_indexed(styles, node, &Index::new(rules));
+}
+
+pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
+    let mut authored = rules.declarations(node);
     if node.tag == "textarea"
         && authored
             .get("height")
@@ -64,44 +69,24 @@ pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
 }
 
 pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool {
-    rules
-        .iter()
-        .filter_map(|rule| rule.split_once('{'))
-        .any(|(selector, declarations)| {
-            !selector.starts_with('@')
-                && !selector.contains(':')
-                && directly_targets_node(selector, node)
-                && declarations
-                    .split(';')
-                    .filter_map(|declaration| declaration.split_once(':'))
-                    .any(|(name, _)| name.trim() == property)
-        })
+    has_property_indexed(node, &Index::new(rules), property)
 }
 
+pub fn has_property_indexed(node: &Node, rules: &Index<'_>, property: &str) -> bool {
+    rules.has_property(node, property)
+}
+
+#[cfg(test)]
 pub fn positive_integer_property(node: &Node, rules: &[String], property: &str) -> Option<u32> {
-    rules
-        .iter()
-        .filter_map(|rule| rule.split_once('{'))
-        .filter(|(selector, _)| {
-            !selector.starts_with('@')
-                && !selector.contains(':')
-                && directly_targets_node(selector, node)
-        })
-        .flat_map(|(_, declarations)| declarations.split(';'))
-        .filter_map(|declaration| declaration.split_once(':'))
-        .filter(|(name, _)| name.trim() == property)
-        .map(|(_, value)| {
-            value
-                .trim()
-                .trim_end_matches('}')
-                .trim()
-                .trim_end_matches("!important")
-                .trim()
-        })
-        .next_back()?
-        .parse()
-        .ok()
-        .filter(|value| *value > 0)
+    positive_integer_property_indexed(node, &Index::new(rules), property)
+}
+
+pub fn positive_integer_property_indexed(
+    node: &Node,
+    rules: &Index<'_>,
+    property: &str,
+) -> Option<u32> {
+    rules.positive_integer_property(node, property)
 }
 
 fn flexible(styles: &Styles) -> bool {

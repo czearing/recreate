@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raster attribution control</title>
+  <style>
+    body { margin: 0; background: #fff; font-family: Arial, sans-serif; }
+    main { display: flex; gap: 24px; align-items: center; padding: 40px; }
+    .hero { width: 180px; height: 120px; background-image: linear-gradient(135deg, #2563eb, #7c3aed); }
+    .status { position: relative; width: 120px; height: 120px; }
+    .status::before { content: ""; position: absolute; inset: 20px; border-radius: 50%; background: #16a34a; }
+    canvas { display: block; width: 180px; height: 120px; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" data-backtest-id="hero" aria-label="Hero artwork"></section>
+    <section class="status" data-backtest-id="status-mark" aria-label="Status mark"></section>
+    <canvas data-backtest-id="chart" aria-label="Usage chart" width="180" height="120"></canvas>
+  </main>
+  <script>
+    const context = document.querySelector("canvas").getContext("2d");
+    context.fillStyle = "#0f172a";
+    context.fillRect(0, 0, 180, 120);
+    context.fillStyle = "#38bdf8";
+    context.fillRect(24, 28, 132, 64);
+  </script>
+</body>
+</html>

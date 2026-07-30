@@ -2,7 +2,7 @@ use crate::{
     browser,
     cli::CaptureArgs,
     generate, interactions, lifecycle_script,
-    model::{PageState, Specification, Viewport},
+    model::{PageState, Specification},
     probe, validate,
 };
 use anyhow::Result;
@@ -17,14 +17,6 @@ use state::{
     browser_cookies, capture_state_with_startup, capture_state_without_assets, set_motion,
 };
 
-#[allow(dead_code)]
-pub async fn prepare_state(
-    cdp: &mut crate::cdp::Cdp,
-    viewport: &Viewport,
-    reload: bool,
-) -> Result<()> {
-    state::prepare_state(cdp, viewport, reload).await
-}
 pub use state::{
     capture_state, prepare_interaction_state, read_interaction_state, read_state,
     read_visual_interaction_state,

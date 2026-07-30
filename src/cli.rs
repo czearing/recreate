@@ -1,5 +1,5 @@
 use clap::{Args, Parser, Subcommand};
-use std::path::PathBuf;
+use std::{ffi::OsString, path::PathBuf};
 
 #[derive(Parser)]
 #[command(name = "recreate", version, about)]
@@ -10,38 +10,23 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
+    #[command(disable_help_flag = true)]
+    Backtest {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<OsString>,
+    },
     Capture(CaptureArgs),
-    Fidelity(FidelityArgs),
     Generate(GenerateArgs),
     Install(InstallArgs),
     Open(OpenArgs),
-    Skill,
     Verify(VerifyArgs),
 }
 
 #[derive(Args, Clone)]
-pub struct FidelityArgs {
-    #[arg(long)]
-    pub source_target: String,
-    #[arg(long)]
-    pub candidate_target: String,
-    #[arg(long)]
-    pub label: String,
-    #[arg(long, default_value_t = 1440)]
-    pub width: u32,
-    #[arg(long, default_value_t = 900)]
-    pub height: u32,
-    #[arg(long, default_value = "320,390,480,600,768,960,1200,1440,1920")]
-    pub widths: String,
-    #[arg(long, default_value = "http://127.0.0.1:9223")]
-    pub cdp_url: String,
-    #[arg(long)]
-    pub output: Option<PathBuf>,
-}
-
-#[derive(Args, Clone)]
 pub struct OpenArgs {
+    /// Source page to open in Recreate's visible browser.
     pub url: String,
+    /// Advanced override for the browser debugging endpoint.
     #[arg(long, default_value = "http://127.0.0.1:9223")]
     pub cdp_url: String,
 }
@@ -68,21 +53,30 @@ pub struct VerifyArgs {
 
 #[derive(Args, Clone)]
 pub struct CaptureArgs {
+    /// Source URL for a new capture. Omit when using --reuse.
     pub url: Option<String>,
+    /// Capture the page most recently opened by `recreate open`.
     #[arg(long)]
     pub reuse: bool,
+    /// Reload after instrumentation to record startup behavior.
     #[arg(long)]
     pub reload: bool,
+    /// Capture only the baseline page without replaying interactions.
     #[arg(long)]
     pub baseline_only: bool,
+    /// Write capture evidence without generating the React project.
     #[arg(long)]
     pub spec_only: bool,
+    /// Advanced override for a specific browser tab.
     #[arg(long)]
     pub target: Option<String>,
+    /// Advanced override for the browser debugging endpoint.
     #[arg(long, default_value = "http://127.0.0.1:9222")]
     pub cdp_url: String,
+    /// Directory for the generated recreation and capture evidence.
     #[arg(long, default_value = "recreate-output")]
     pub out: PathBuf,
+    /// Comma-separated viewport sizes to capture.
     #[arg(long, default_value = "1920x1080,1440x900,768x1024,390x844,320x568")]
     pub viewports: String,
 }
@@ -116,6 +110,27 @@ mod tests {
         };
         assert_eq!(args.url.as_deref(), Some("https://example.com"));
         assert_eq!(args.viewports, "1200x800,390x844");
+    }
+
+    #[test]
+    fn forwards_backtest_arguments_unchanged() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "backtest",
+            "compare",
+            "--source",
+            "source.json",
+            "--focus",
+            "toolbar",
+        ])
+        .unwrap();
+        let Command::Backtest { args } = cli.command else {
+            panic!("expected backtest");
+        };
+        assert_eq!(
+            args,
+            ["compare", "--source", "source.json", "--focus", "toolbar"].map(OsString::from)
+        );
     }
 
     #[test]

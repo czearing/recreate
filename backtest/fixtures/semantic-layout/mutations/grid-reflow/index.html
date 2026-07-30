@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semantic layout reflow</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; }
+    main { display: grid; grid-template-columns: repeat(2, 200px); gap: 24px 20px; width: 700px; margin: 80px auto; }
+    article { width: 200px; height: 100px; padding: 16px; border: 1px solid #94a3b8; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main aria-label="Notebook grid">
+    <article aria-label="Alpha notebook">Alpha notebook</article>
+    <article aria-label="Bravo notebook">Bravo notebook</article>
+    <article aria-label="Charlie notebook">Charlie notebook</article>
+    <article aria-label="Delta notebook">Delta notebook</article>
+    <article aria-label="Echo notebook">Echo notebook</article>
+    <article aria-label="Foxtrot notebook">Foxtrot notebook</article>
+  </main>
+</body>
+</html>

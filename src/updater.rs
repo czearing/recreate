@@ -3,7 +3,7 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::{
     fs,
-    path::PathBuf,
+    path::{Path, PathBuf},
     process::Command,
     time::{Duration, SystemTime},
 };
@@ -42,6 +42,7 @@ pub async fn refresh() -> Result<bool> {
         return Ok(false);
     }
     let release: Release = response.json().await?;
+    refresh_backtest(&client, &release).await?;
     let name = asset_name();
     let asset = release
         .assets
@@ -80,6 +81,96 @@ pub async fn refresh() -> Result<bool> {
         .env("RECREATE_NO_UPDATE", "1")
         .status()?;
     std::process::exit(status.code().unwrap_or(1));
+}
+
+pub async fn ensure_backtest() -> Result<PathBuf> {
+    let path = backtest_path()?;
+    if path.is_file() {
+        return Ok(path);
+    }
+    let client = reqwest::Client::new();
+    let release: Release = client
+        .get(RELEASE_API)
+        .header("Accept", "application/vnd.github+json")
+        .header("User-Agent", "recreate")
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    install_asset(&client, &release, backtest_asset_name(), &path).await?;
+    Ok(path)
+}
+
+async fn refresh_backtest(client: &reqwest::Client, release: &Release) -> Result<()> {
+    let path = backtest_path()?;
+    let name = backtest_asset_name();
+    let Some(asset) = release.assets.iter().find(|asset| asset.name == name) else {
+        return if path.is_file() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!("release asset missing: {name}"))
+        };
+    };
+    if path.is_file() {
+        let digest = sha256(&fs::read(&path)?);
+        if asset
+            .digest
+            .as_deref()
+            .is_some_and(|expected| expected == digest)
+        {
+            return Ok(());
+        }
+    }
+    install_asset(client, release, name, &path).await
+}
+
+async fn install_asset(
+    client: &reqwest::Client,
+    release: &Release,
+    name: &str,
+    path: &Path,
+) -> Result<()> {
+    let asset = release
+        .assets
+        .iter()
+        .find(|asset| asset.name == name)
+        .with_context(|| format!("release asset missing: {name}"))?;
+    let bytes = client
+        .get(&asset.browser_download_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .bytes()
+        .await?;
+    let digest = sha256(&bytes);
+    if let Some(expected) = &asset.digest {
+        anyhow::ensure!(*expected == digest, "release digest mismatch: {name}");
+    }
+    let temporary = path.with_extension("download");
+    fs::write(&temporary, &bytes)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&temporary, fs::Permissions::from_mode(0o755))?;
+    }
+    if path.exists() {
+        fs::remove_file(path)?;
+    }
+    fs::rename(temporary, path)?;
+    Ok(())
+}
+
+fn backtest_path() -> Result<PathBuf> {
+    let name = if cfg!(windows) {
+        "recreate-backtest.exe"
+    } else {
+        "recreate-backtest"
+    };
+    Ok(std::env::current_exe()?
+        .parent()
+        .context("installed binary directory unavailable")?
+        .join(name))
 }
 
 fn installed_binary() -> Result<bool> {
@@ -135,6 +226,15 @@ fn asset_name() -> &'static str {
     }
 }
 
+fn backtest_asset_name() -> &'static str {
+    match (std::env::consts::OS, std::env::consts::ARCH) {
+        ("windows", "x86_64") => "recreate-backtest-windows-x86_64.exe",
+        ("linux", "x86_64") => "recreate-backtest-linux-x86_64",
+        ("macos", "aarch64") => "recreate-backtest-macos-aarch64",
+        _ => "recreate-backtest-unsupported",
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -142,6 +242,7 @@ mod tests {
     #[test]
     fn current_platform_has_an_asset_name() {
         assert_ne!(asset_name(), "recreate-unsupported");
+        assert_ne!(backtest_asset_name(), "recreate-backtest-unsupported");
     }
 
     #[test]

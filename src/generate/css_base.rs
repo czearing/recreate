@@ -54,6 +54,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         })
         .map(|baseline| super::css_paths::contextual_widths(base, baseline))
         .unwrap_or_default();
+    let authored_rules = super::authored_css::Index::new(&base.css_rules);
     let fluid_heights = super::css_state_helpers::fluid_height_paths(specification);
     if std::env::var_os("RECREATE_TIMING").is_some()
         && let Some(paths) = &changed_paths
@@ -125,21 +126,21 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             .or_insert_with(|| format!("{prefix}{}", &hash(&signature)[..10]))
             .clone();
         if cache.emitted.insert(class.clone()) {
-            let mut declarations = super::responsive::base_declarations(
+            let mut declarations = super::responsive::base_declarations_indexed(
                 node,
                 parent,
                 &base.viewport,
                 assets,
-                &base.css_rules,
+                &authored_rules,
                 fluid_heights.contains(&node.path),
                 text_parents.contains(&node.path),
             );
-            super::css_base_style::append(
+            super::css_base_style::append_indexed(
                 node,
                 flex,
                 float,
                 width,
-                &base.css_rules,
+                &authored_rules,
                 &mut declarations,
             );
             if !include_interactions {

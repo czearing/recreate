@@ -50,8 +50,10 @@ chmod +x "$HOME/.recreate/bin/recreate"
 ```
 
 The installer adds a personal `/recreate` skill for GitHub Copilot CLI and
-Claude Code. The native binary checks GitHub Releases for validated updates on
-every invocation.
+Claude Code and installs the independent backtester beside the native CLI.
+Users access it only through `recreate backtest`; its companion process and
+installation path are internal details. The native binary checks GitHub
+Releases for validated updates on every invocation.
 
 ## Capture
 
@@ -65,8 +67,20 @@ After access is complete, instrument and reload that same authenticated target
 to capture startup motion:
 
 ```bash
-recreate capture --reuse --reload --target <target-id> --cdp-url <cdp-url>
+recreate capture --reuse --reload
 ```
+
+Recreate remembers the tab opened by `recreate open`; target IDs and browser
+debugging addresses are internal details. Advanced overrides are documented in
+[`docs/reference.md`](docs/reference.md).
+
+Compare any source and recreation URLs, including localhost:
+
+```bash
+recreate backtest run --source https://example.com --recreation http://localhost:8080
+```
+
+Add `--focus "toolbar"` to isolate one semantic region while debugging.
 
 Recreate writes:
 

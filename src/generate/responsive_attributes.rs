@@ -3,9 +3,19 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 const EXCLUDED: &[&str] = &["class", "style"];
 
-pub fn javascript(states: &[PageState], canonical: usize) -> String {
+pub struct Javascript {
+    pub paths: String,
+    pub values: String,
+    pub viewports: String,
+}
+
+pub fn javascript(states: &[PageState], canonical: usize) -> Javascript {
     let Some(base) = states.get(canonical) else {
-        return "[]".into();
+        return Javascript {
+            paths: "[]".into(),
+            values: "[]".into(),
+            viewports: "[]".into(),
+        };
     };
     let base_nodes = base
         .nodes
@@ -38,7 +48,15 @@ pub fn javascript(states: &[PageState], canonical: usize) -> String {
             }
         }
     }
-    let output = states
+    let paths = varying.keys().cloned().collect::<Vec<_>>();
+    let path_indexes = paths
+        .iter()
+        .enumerate()
+        .map(|(index, path)| (path.as_str(), index))
+        .collect::<HashMap<_, _>>();
+    let mut values = Vec::new();
+    let mut value_indexes = HashMap::<String, usize>::new();
+    let viewports = states
         .iter()
         .map(|state| {
             let nodes = state
@@ -54,12 +72,25 @@ pub fn javascript(states: &[PageState], canonical: usize) -> String {
                         .iter()
                         .map(|name| serde_json::json!([name, node.attributes.get(name)]))
                         .collect::<Vec<_>>();
-                    Some(serde_json::json!([path, attributes]))
+                    let serialized = serde_json::to_string(&attributes).unwrap();
+                    let next = values.len();
+                    let value_index = *value_indexes.entry(serialized).or_insert_with(|| {
+                        values.push(attributes);
+                        next
+                    });
+                    Some(serde_json::json!([
+                        path_indexes[path.as_str()],
+                        value_index
+                    ]))
                 })
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    serde_json::to_string(&output).unwrap()
+    Javascript {
+        paths: serde_json::to_string(&paths).unwrap(),
+        values: serde_json::to_string(&values).unwrap(),
+        viewports: serde_json::to_string(&viewports).unwrap(),
+    }
 }
 
 #[cfg(test)]
@@ -80,8 +111,9 @@ mod tests {
 
         let output = javascript(&states, 1);
 
-        assert!(output.contains(&path));
-        assert!(output.contains("0 0 230 180"));
-        assert!(output.contains("0 0 310 180"));
+        assert!(output.paths.contains(&path));
+        assert!(output.values.contains("0 0 230 180"));
+        assert!(output.values.contains("0 0 310 180"));
+        assert!(output.viewports.contains("[0,"));
     }
 }

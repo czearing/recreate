@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motion isolation source</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    .tile {
+      width: 120px;
+      height: 80px;
+      margin: 260px 0 0 120px;
+      background: #dbeafe;
+      animation: drift-source 500ms ease-in-out 1 both paused;
+      animation-delay: -250ms;
+    }
+    @keyframes drift-source {
+      from { opacity: .2; transform: translateX(0); }
+      to { opacity: 1; transform: translateX(40px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="tile" role="img" aria-label="Motion tile"></div>
+</body>
+</html>

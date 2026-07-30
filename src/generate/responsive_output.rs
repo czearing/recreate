@@ -14,9 +14,29 @@ pub fn base_declarations(
     fluid_height: bool,
     text_parent: bool,
 ) -> String {
+    base_declarations_indexed(
+        node,
+        parent,
+        viewport,
+        assets,
+        &super::super::authored_css::Index::new(css_rules),
+        fluid_height,
+        text_parent,
+    )
+}
+
+pub fn base_declarations_indexed(
+    node: &Node,
+    parent: Option<&Node>,
+    viewport: &Viewport,
+    assets: &BTreeMap<String, String>,
+    css_rules: &super::super::authored_css::Index<'_>,
+    fluid_height: bool,
+    text_parent: bool,
+) -> String {
     let mut styles = node.style.clone();
-    let authored_width = super::super::authored_css::has_property(node, css_rules, "width");
-    super::super::authored_css::normalize(&mut styles, node, css_rules);
+    let authored_width = super::super::authored_css::has_property_indexed(node, css_rules, "width");
+    super::super::authored_css::normalize_indexed(&mut styles, node, css_rules);
     if !authored_width
         && (intrinsic_flex_text(node, parent, text_parent) || fluid_flex_item(node, parent))
     {
@@ -25,7 +45,7 @@ pub fn base_declarations(
     if fluid_height {
         styles.remove("height");
     }
-    super::super::inherited_styles::normalize(&mut styles, node, parent, css_rules);
+    super::super::inherited_styles::normalize_indexed(&mut styles, node, parent, css_rules);
     super::super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     normalize(&mut styles);
     declarations(&styles, assets)

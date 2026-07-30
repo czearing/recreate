@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "case": "raster-attribution",
+  "source": "source/index.html",
+  "control": {
+    "path": "control/index.html",
+    "findings": 0,
+    "duplicates": 0,
+    "maximumDurationMs": 4999
+  },
+  "mutations": [
+    {
+      "id": "background-content",
+      "path": "mutations/background-content/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base main / region \"Hero artwork\" background-content expected->different",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    },
+    {
+      "id": "pseudo-content",
+      "path": "mutations/pseudo-content/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base main / region \"Status mark\" pseudo-content expected->different",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    },
+    {
+      "id": "canvas-content",
+      "path": "mutations/canvas-content/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base main / Canvas \"Usage chart\" canvas-content expected->different",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    }
+  ]
+}

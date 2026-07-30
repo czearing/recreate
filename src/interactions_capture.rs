@@ -20,7 +20,7 @@ pub struct CapturedGraph {
     pub transitions: Vec<InteractionTransition>,
 }
 
-#[cfg_attr(not(test), allow(dead_code))]
+#[cfg(test)]
 pub async fn capture(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Vec<Interaction>> {
     Ok(capture_graph(cdp, baselines).await?.interactions)
 }

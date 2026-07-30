@@ -1,5 +1,6 @@
 mod asset_script;
 mod attribute_sequence_script;
+mod backtest;
 mod behavior;
 mod browser;
 mod capture;
@@ -16,12 +17,6 @@ mod compare_dom;
 mod compare_node;
 #[cfg(test)]
 mod compare_tests;
-mod fidelity;
-mod fidelity_responsive;
-mod fidelity_responsive_script;
-#[cfg(test)]
-mod fidelity_responsive_tests;
-mod fidelity_script;
 mod generate;
 mod interaction_rebase;
 mod interaction_script;
@@ -52,15 +47,11 @@ async fn main() -> Result<()> {
     }
     let cli = Cli::parse();
     match cli.command {
+        Command::Backtest { args } => backtest::run(args).await,
         Command::Capture(args) => capture::run(args).await,
-        Command::Fidelity(args) => fidelity::run(args).await,
         Command::Generate(args) => generate::from_file(&args.spec, &args.out).await,
-        Command::Install(args) => skill::install(args),
+        Command::Install(args) => skill::install(args).await,
         Command::Open(args) => browser::open(args).await,
-        Command::Skill => {
-            print!("{}", skill::workflow());
-            Ok(())
-        }
         Command::Verify(args) => compare::run(args).await,
     }
 }

@@ -34,6 +34,8 @@ fn split_app_data(source: &Path, app: &mut String) -> Result<()> {
         "carouselNext",
         "carouselState",
         "attributeSequences",
+        "responsiveAttributePaths",
+        "responsiveAttributeValues",
         "responsiveAttributes",
     ];
     let mut data = Vec::new();

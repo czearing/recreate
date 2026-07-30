@@ -15,8 +15,9 @@ mod interactions_runtime;
 #[path = "interactions_scripts.rs"]
 mod interactions_scripts;
 
-#[allow(unused_imports)]
-pub use interactions_capture::{CapturedGraph, capture, capture_graph};
+#[cfg(test)]
+pub use interactions_capture::capture;
+pub use interactions_capture::{CapturedGraph, capture_graph};
 pub use interactions_evidence::deduplicate;
 
 #[cfg(test)]

@@ -21,14 +21,20 @@ jobs:
           - os: ubuntu-latest
             source: target/release/recreate
             asset: recreate-linux-x86_64
+            backtest_source: backtest/target/release/recreate-backtest
+            backtest_asset: recreate-backtest-linux-x86_64
             browser: /usr/bin/google-chrome
           - os: windows-latest
             source: target/release/recreate.exe
             asset: recreate-windows-x86_64.exe
+            backtest_source: backtest/target/release/recreate-backtest.exe
+            backtest_asset: recreate-backtest-windows-x86_64.exe
             browser: C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
           - os: macos-15
             source: target/release/recreate
             asset: recreate-macos-aarch64
+            backtest_source: backtest/target/release/recreate-backtest
+            backtest_asset: recreate-backtest-macos-aarch64
             browser: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
     runs-on: ${{ matrix.os }}
     steps:
@@ -49,17 +55,22 @@ jobs:
         env:
           RECREATE_BROWSER: ${{ matrix.browser }}
       - run: cargo build --release --locked
+      - run: cargo build --manifest-path backtest/Cargo.toml --release --locked
       - uses: actions/upload-artifact@v4
         with:
           name: release-gate-evidence-${{ matrix.asset }}
           path: target/release-gate/evidence.json
           if-no-files-found: error
       - shell: bash
-        run: cp "${{ matrix.source }}" "${{ matrix.asset }}"
+        run: |
+          cp "${{ matrix.source }}" "${{ matrix.asset }}"
+          cp "${{ matrix.backtest_source }}" "${{ matrix.backtest_asset }}"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
-          path: ${{ matrix.asset }}
+          path: |
+            ${{ matrix.asset }}
+            ${{ matrix.backtest_asset }}
           if-no-files-found: error
 
   publish:

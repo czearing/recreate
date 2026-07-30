@@ -1,68 +1,98 @@
-use crate::cli::InstallArgs;
+use crate::{
+    cli::{Cli, InstallArgs},
+    updater,
+};
 use anyhow::{Context, Result, bail};
+use clap::CommandFactory;
 use std::{
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
 };
 
-pub fn install(args: InstallArgs) -> Result<()> {
+pub async fn install(args: InstallArgs) -> Result<()> {
     let home = home()?;
     let targets = targets(&args, &home)?;
-    let binary = install_binary(&home)?;
+    undocumented_commands(installed_skill(), &shipped_commands())
+        .map_err(|missing| anyhow::anyhow!("skill documents unavailable commands: {missing}"))?;
+    install_binary(&home)?;
+    updater::ensure_backtest().await?;
     for target in targets {
         let directory = home.join(target).join("skills").join("recreate");
         if directory.is_symlink() {
             bail!("refusing to replace linked skill: {}", directory.display());
         }
         fs::create_dir_all(&directory)?;
-        fs::write(directory.join("SKILL.md"), installed_skill(&binary))?;
+        fs::write(directory.join("SKILL.md"), installed_skill())?;
         println!("installed {}", directory.display());
     }
     Ok(())
 }
 
-pub fn workflow() -> &'static str {
-    r#"Current Recreate workflow:
-
-1. Get the source URL and destination repository.
-2. Open the source in a dedicated visible browser:
-   recreate open <url>
-   Keep the returned cdp_url and target id. Never use a headless test browser
-   for a user access or sign-in step.
-3. Inspect that exact rendered target through CDP. Never substitute raw HTML.
-4. Decide from the full rendered page whether it is the requested interface or
-   an access step. If ambiguous, ask one short question: recreate the visible
-   page or wait for the page behind it. Judge from rendered controls and content,
-   never URL/title keywords or site-specific login patterns.
-5. If access is required, foreground the exact target and ask the user to
-   complete access there. Confirm the requested interface is visibly rendered
-   in the same target before capture. Keep credentials and session data in-browser.
-6. Capture the exact inspected target with an instrumented reload so startup
-   motion is observed without navigating to another page:
-   recreate capture --reuse --reload --target <id> --cdp-url <cdp_url>
-7. Build from react/src/App.jsx and validate acceptance.json.
-8. PR-ready requires acceptance.json, every visible interaction tested directly
-   in the browser, and a clean diff. No independent visual or motion comparison
-   engine is currently shipped; do not claim fidelity or oracle certification.
-"#
-}
-
-fn installed_skill(binary: &Path) -> String {
-    format!(
-        r#"---
+fn installed_skill() -> &'static str {
+    r#"---
 name: recreate
-description: Capture and recreate a live interface with its structure, styling, responsive behavior, assets, and interactions.
+description: Recreate a web page in React and compare it to the source.
 license: MIT
 ---
 
-Run `"{}" skill` first, then follow the printed workflow.
+Recreate is a tool for capturing a given source web page, generating a recreation that is written in React, and providing a text based diff of the two.
 
-Do not claim independent oracle or automated fidelity certification. Neither
-comparison engine is currently shipped as a PR gate. Treat acceptance,
-visible-interaction testing, and clean-diff validation as separate limited gates.
-"#,
-        binary.display()
-    )
+1. Run `recreate open <source-url>` and request browser access only if needed.
+2. Run `recreate capture --reuse --reload` to capture that source and generate its React recreation.
+3. Make the recreation available at a URL, such as `http://localhost:8080`.
+4. Run `recreate backtest run --source <source-url> --recreation <recreation-url>`.
+5. Use the plain-English findings to fix content, layout, typography, interactions, and motion; repeat until clean.
+6. To inspect one part, add `--focus "<name>"`, for example `--focus "toolbar"` or `--focus "App launcher"`; still run the full comparison before finishing.
+7. Verify every visible interaction and authored motion.
+8. Finish only when the full comparison is conclusive, under five seconds, and has no unresolved or duplicate findings.
+9. Present the result as debugging evidence, not fidelity certification.
+
+Parameters used:
+
+- `<source-url>`: the original page to compare.
+- `<recreation-url>`: the running recreation to compare, including localhost.
+- `--reuse`: use the source page opened in step 1.
+- `--reload`: include the page's startup behavior.
+- `--source`: set the source URL for the comparison.
+- `--recreation`: set the recreation URL for the comparison.
+- `--focus`: case-insensitive name search, not a CSS selector. It matches visible text, accessible names, and semantic regions such as toolbar, navigation, banner, main, or dialog on both pages. Multiple matches are included; if either page has no match, the command reports that selection failure.
+
+Use `recreate <command> --help` for optional advanced parameters.
+"#
+}
+
+fn shipped_commands() -> BTreeSet<String> {
+    Cli::command()
+        .get_subcommands()
+        .map(|command| command.get_name().to_owned())
+        .collect()
+}
+
+/// The skill is the agent's only contract, so a build must never install
+/// instructions naming a command it does not expose.
+fn undocumented_commands(
+    skill: &str,
+    shipped: &BTreeSet<String>,
+) -> std::result::Result<(), String> {
+    let mut missing = BTreeSet::new();
+    for (index, _) in skill.match_indices("recreate ") {
+        let rest = &skill[index + "recreate ".len()..];
+        let name: String = rest
+            .chars()
+            .take_while(|character| character.is_ascii_lowercase())
+            .collect();
+        if name.is_empty() {
+            continue;
+        }
+        if !shipped.contains(&name) {
+            missing.insert(name);
+        }
+    }
+    if missing.is_empty() {
+        return Ok(());
+    }
+    Err(missing.into_iter().collect::<Vec<_>>().join(", "))
 }
 
 fn install_binary(home: &Path) -> Result<PathBuf> {
@@ -118,21 +148,63 @@ mod tests {
     use super::*;
 
     #[test]
-    fn skill_points_to_native_binary() {
-        let content = installed_skill(Path::new("/tmp/recreate"));
-        assert!(content.contains("recreate"));
-        assert!(content.contains("skill"));
-        assert!(!content.contains("node "));
-        assert!(!content.contains("npm "));
+    fn installed_skill_only_documents_shipped_commands() {
+        undocumented_commands(installed_skill(), &shipped_commands())
+            .expect("installed skill must not document commands the binary lacks");
     }
 
     #[test]
-    fn workflow_uses_rendered_access_state_not_login_patterns() {
-        assert!(workflow().contains("never URL/title keywords"));
-        assert!(workflow().contains("rendered controls and content"));
-        assert!(workflow().contains("recreate open <url>"));
-        assert!(workflow().contains("instrumented reload"));
-        assert!(workflow().contains("Never use a headless test browser"));
-        assert!(workflow().contains("No independent visual or motion comparison"));
+    fn a_documented_command_the_binary_lacks_is_rejected() {
+        let shipped = ["capture".to_owned()].into_iter().collect();
+        let error = undocumented_commands("Run `recreate backtest run --source x`.", &shipped)
+            .expect_err("a missing command must fail the install");
+        assert_eq!(error, "backtest");
+    }
+
+    #[test]
+    fn placeholders_and_prose_are_not_treated_as_commands() {
+        let shipped = ["capture".to_owned()].into_iter().collect();
+        undocumented_commands(
+            "Recreate is a tool. Use `recreate <command> --help` and `recreate capture`.",
+            &shipped,
+        )
+        .expect("placeholders and prose must not be mistaken for commands");
+    }
+
+    #[test]
+    fn installed_skill_exposes_the_complete_workflow() {
+        let content = installed_skill();
+        assert_eq!(content.matches("\n1. ").count(), 1);
+        assert!(content.contains("\n9. "));
+        assert!(!content.contains("\n10. "));
+    }
+
+    #[test]
+    fn installed_skill_contains_backtest_gates() {
+        let content = installed_skill();
+        assert!(content.contains("--source <source-url>"));
+        assert!(content.contains("--recreation <recreation-url>"));
+        assert!(content.contains("--focus \"<name>\""));
+        assert!(content.contains("including localhost"));
+        assert!(content.contains("not a CSS selector"));
+        assert!(content.contains("Multiple matches are included"));
+        assert!(content.contains("selection failure"));
+        assert!(content.contains("plain-English findings"));
+        assert!(content.contains("recreate capture --reuse --reload"));
+        assert!(content.contains("Parameters used:"));
+        assert!(content.contains("use the source page opened in step 1"));
+        assert!(content.contains("include the page's startup behavior"));
+        assert!(content.contains("under five seconds"));
+        assert!(content.contains("debugging evidence"));
+        assert!(!content.contains("ask the user to run"));
+        assert!(!content.contains("dependencies"));
+        assert!(!content.contains("No arguments"));
+        assert!(!content.contains("recreate-backtest"));
+        assert!(!content.contains(".recreate"));
+        assert!(!content.contains("--target"));
+        assert!(!content.contains("--cdp-url"));
+        assert!(!content.contains("Locate"));
+        assert!(!content.contains("cargo build"));
+        assert!(content.contains("not fidelity certification"));
     }
 }

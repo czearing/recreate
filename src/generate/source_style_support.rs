@@ -70,6 +70,7 @@ pub fn jsx_files(source: &Path) -> Result<Vec<PathBuf>> {
             collect_jsx(&directory, &mut files)?;
         }
     }
+    files.sort();
     Ok(files)
 }
 
@@ -172,5 +173,18 @@ mod tests {
             super::format_css(".a{color:red;background:white;}"),
             ".a {\n  color:red;\n  background:white;\n}\n"
         );
+    }
+
+    #[test]
+    fn returns_jsx_files_in_stable_path_order() {
+        let directory = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(directory.path().join("components/z")).unwrap();
+        std::fs::create_dir_all(directory.path().join("components/a")).unwrap();
+        std::fs::write(directory.path().join("App.jsx"), "").unwrap();
+        std::fs::write(directory.path().join("states.jsx"), "").unwrap();
+        std::fs::write(directory.path().join("components/z/Z.jsx"), "").unwrap();
+        std::fs::write(directory.path().join("components/a/A.jsx"), "").unwrap();
+        let files = super::jsx_files(directory.path()).unwrap();
+        assert!(files.windows(2).all(|pair| pair[0] <= pair[1]));
     }
 }

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visual asset SVG mutation</title>
+  <style>
+    body { margin: 0; background: #fff; font-family: Arial, sans-serif; }
+    main { display: flex; gap: 24px; align-items: center; padding: 40px; }
+    img { display: block; width: 160px; height: 100px; }
+    svg { display: block; width: 160px; height: 100px; }
+  </style>
+</head>
+<body>
+  <main data-backtest-id="asset-gallery">
+    <img
+      data-backtest-id="product-image"
+      alt="Product preview"
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100'%3E%3Crect width='160' height='100' fill='%232563eb'/%3E%3Ccircle cx='80' cy='50' r='24' fill='white'/%3E%3C/svg%3E">
+    <svg data-backtest-id="brand-mark" role="img" aria-label="Brand mark" viewBox="0 0 160 100">
+      <path d="M80 12L148 88H12Z" fill="#16a34a"></path>
+    </svg>
+  </main>
+</body>
+</html>

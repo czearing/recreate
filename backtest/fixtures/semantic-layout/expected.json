@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "case": "semantic-layout",
+  "source": "source/index.html",
+  "control": {
+    "path": "control/index.html",
+    "findings": 0,
+    "duplicates": 0,
+    "maximumDurationMs": 4999
+  },
+  "mutations": [
+    {
+      "id": "grid-reflow",
+      "path": "mutations/grid-reflow/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base main \"Notebook grid\" article layout flow 3 columns / 2 rows->2 columns / 3 rows",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    },
+    {
+      "id": "grid-gap",
+      "path": "mutations/grid-gap/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base main \"Notebook grid\" article layout column-gap 20px->32px +12px",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    }
+  ]
+}

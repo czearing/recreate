@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "case": "visual-assets",
+  "source": "source/index.html",
+  "control": {
+    "path": "control/index.html",
+    "findings": 0,
+    "duplicates": 0,
+    "maximumDurationMs": 4999
+  },
+  "mutations": [
+    {
+      "id": "image-content",
+      "path": "mutations/image-content/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base product-image image-content expected->different",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    },
+    {
+      "id": "svg-content",
+      "path": "mutations/svg-content/index.html",
+      "viewport": 1440,
+      "finding": "V1440 base brand-mark svg-content expected->different",
+      "primaryFindings": 1,
+      "unexpectedPrimaryFindings": 0,
+      "duplicates": 0,
+      "maximumDurationMs": 4999
+    }
+  ]
+}
