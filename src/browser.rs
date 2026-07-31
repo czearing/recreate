@@ -96,16 +96,20 @@ fn remember_open_tab(session: &OpenSession) -> Result<()> {
         .ok()
         .and_then(|bytes| serde_json::from_slice(&bytes).ok())
         .unwrap_or_default();
-    tabs.retain(|tab| {
-        !same_url(&tab.url, &session.url)
-            && !(tab.cdp_url == session.cdp_url && tab.target == session.target)
-    });
+    tabs.retain(|tab| !replaces(session, tab));
     tabs.push(session.clone());
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
     fs::write(path, serde_json::to_vec(&tabs)?)?;
     Ok(())
+}
+
+/// A newly opened tab supersedes an earlier one that shows the same page or
+/// occupies the same browser target.
+fn replaces(session: &OpenSession, tab: &OpenSession) -> bool {
+    same_url(&tab.url, &session.url)
+        || (tab.cdp_url == session.cdp_url && tab.target == session.target)
 }
 
 pub(crate) fn find_open_session(url: &str) -> Option<OpenSession> {
