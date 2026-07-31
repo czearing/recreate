@@ -3,7 +3,7 @@ use std::io::ErrorKind;
 /// True when a failed CDP command is a dropped or stalled transport rather than
 /// a real protocol error, so the command is worth retrying on a fresh socket.
 pub fn reconnectable(error: &anyhow::Error) -> bool {
-    if transport_lost(error) {
+    if kinds(error).any(dropped_connection) {
         return true;
     }
     let message = format!("{error:#}");
@@ -12,12 +12,17 @@ pub fn reconnectable(error: &anyhow::Error) -> bool {
 
 /// True when the browser connection itself is gone. Unlike a stalled command,
 /// this means no further evidence can be collected, so callers must not treat
-/// the remaining work as merely skipped.
+/// the remaining work as merely skipped. A refused reconnect counts too: the
+/// browser is no longer listening at all.
 pub fn transport_lost(error: &anyhow::Error) -> bool {
+    kinds(error).any(|kind| dropped_connection(kind) || kind == ErrorKind::ConnectionRefused)
+}
+
+fn kinds(error: &anyhow::Error) -> impl Iterator<Item = ErrorKind> + '_ {
     error
         .chain()
         .filter_map(|cause| cause.downcast_ref::<std::io::Error>())
-        .any(|cause| dropped_connection(cause.kind()))
+        .map(|cause| cause.kind())
 }
 
 fn dropped_connection(kind: ErrorKind) -> bool {
@@ -70,6 +75,17 @@ mod tests {
             "CDP command timed out: Runtime.evaluate"
         )));
         assert!(reconnectable(&anyhow::anyhow!("CDP disconnected")));
+    }
+
+    #[test]
+    fn a_browser_that_is_gone_is_reported_but_never_retried() {
+        use super::{reconnectable, transport_lost};
+        let refused = wrapped(
+            ErrorKind::ConnectionRefused,
+            "No connection could be made because the target machine actively refused it.",
+        );
+        assert!(transport_lost(&refused));
+        assert!(!reconnectable(&refused));
     }
 
     #[test]

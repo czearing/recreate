@@ -13,6 +13,9 @@ use std::fs;
 #[path = "capture/state.rs"]
 mod state;
 
+#[path = "capture/dynamic.rs"]
+mod dynamic;
+
 use state::{
     browser_cookies, capture_state_with_startup, capture_state_without_assets, set_motion,
 };

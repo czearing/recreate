@@ -83,7 +83,7 @@ pub(super) async fn capture_state_with_startup(
     wait_ready(cdp, startup.is_some()).await?;
     let startup_elapsed = started.elapsed().as_millis() as u64;
     if observe_dynamic {
-        tokio::time::sleep(std::time::Duration::from_millis(12_000)).await;
+        super::dynamic::observe(cdp).await?;
     }
     let mut state = read_state(cdp, viewport).await?;
     ensure_settled(&state)?;
