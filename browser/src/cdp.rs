@@ -118,11 +118,7 @@ impl Cdp {
     }
 
     fn reconnectable(error: &anyhow::Error) -> bool {
-        let message = format!("{error:#}");
-        message.contains("timed out")
-            || message.contains("disconnected")
-            || message.contains("connection was aborted")
-            || message.contains("Connection reset")
+        crate::retry::reconnectable(error)
     }
 
     pub fn take_events_named(&mut self, name: &str) -> Vec<Value> {

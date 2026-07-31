@@ -32,6 +32,9 @@ pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Cap
     let mut transitions = match discover_transitions(cdp, baselines, &mut interactions).await {
         Ok(transitions) => transitions,
         Err(error) => {
+            if recreate_browser::transport_lost(&error) {
+                return Err(error.context("lost the browser during transition expansion"));
+            }
             eprintln!("stopped optional transition expansion: {error:#}");
             interactions.truncate(base_states);
             interactions
@@ -113,6 +116,9 @@ pub(super) async fn capture_states(
             None => match restore(cdp, first, std::mem::take(&mut reload_next)).await {
                 Ok(state) => state,
                 Err(error) => {
+                    if recreate_browser::transport_lost(&error) {
+                        return Err(error.context("lost the browser during interaction capture"));
+                    }
                     eprintln!("stopped base interaction capture: {error:#}");
                     break;
                 }
