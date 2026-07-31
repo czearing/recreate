@@ -17,6 +17,7 @@ use state::{
     browser_cookies, capture_state_with_startup, capture_state_without_assets, set_motion,
 };
 
+pub(crate) use state::set_focus;
 pub use state::{
     capture_state, prepare_interaction_state, read_interaction_state, read_state,
     read_visual_interaction_state,
@@ -37,6 +38,7 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
     if args.reuse {
         cdp.evaluate(lifecycle_script::SOURCE).await?;
     }
+    set_focus(&mut cdp).await?;
     set_motion(&mut cdp).await?;
     let requested_url = args.url.clone().unwrap_or_else(|| target.url.clone());
     let mut states: Vec<PageState> = Vec::new();

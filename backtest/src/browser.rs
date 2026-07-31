@@ -56,21 +56,60 @@ pub fn find(explicit: Option<&Path>) -> anyhow::Result<PathBuf> {
         );
         return Ok(path.to_path_buf());
     }
-    let mut candidates = Vec::new();
-    if let Some(value) = std::env::var_os("PROGRAMFILES") {
-        candidates
-            .push(PathBuf::from(value.clone()).join("Google\\Chrome\\Application\\chrome.exe"));
-        candidates.push(PathBuf::from(value).join("Microsoft\\Edge\\Application\\msedge.exe"));
+    if let Some(value) = std::env::var_os(BROWSER_VARIABLE) {
+        let path = PathBuf::from(value);
+        anyhow::ensure!(
+            path.is_file(),
+            "{BROWSER_VARIABLE} does not point at an executable: {}",
+            path.display()
+        );
+        return Ok(path);
     }
-    if let Some(value) = std::env::var_os("PROGRAMFILES(X86)") {
-        candidates
-            .push(PathBuf::from(value.clone()).join("Microsoft\\Edge\\Application\\msedge.exe"));
-        candidates.push(PathBuf::from(value).join("Google\\Chrome\\Application\\chrome.exe"));
-    }
-    candidates
+    candidates()
         .into_iter()
         .find(|path| path.is_file())
         .context("Chrome or Edge executable was not found")
+}
+
+const BROWSER_VARIABLE: &str = "RECREATE_BACKTEST_BROWSER";
+
+#[cfg(windows)]
+fn candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+    for variable in ["PROGRAMFILES", "PROGRAMFILES(X86)"] {
+        let Some(value) = std::env::var_os(variable) else {
+            continue;
+        };
+        let root = PathBuf::from(value);
+        candidates.push(root.join("Google\\Chrome\\Application\\chrome.exe"));
+        candidates.push(root.join("Microsoft\\Edge\\Application\\msedge.exe"));
+    }
+    candidates
+}
+
+#[cfg(target_os = "macos")]
+fn candidates() -> Vec<PathBuf> {
+    [
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    ]
+    .into_iter()
+    .map(PathBuf::from)
+    .collect()
+}
+
+#[cfg(all(unix, not(target_os = "macos")))]
+fn candidates() -> Vec<PathBuf> {
+    [
+        "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
+        "/usr/bin/microsoft-edge",
+    ]
+    .into_iter()
+    .map(PathBuf::from)
+    .collect()
 }
 
 pub async fn launch(
@@ -176,4 +215,22 @@ pub async fn target(endpoint: &str, id: &str) -> anyhow::Result<Target> {
 fn free_port() -> anyhow::Result<u16> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     Ok(listener.local_addr()?.port())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rejects_explicit_browser_path_that_is_not_a_file() {
+        let error = find(Some(Path::new("does-not-exist"))).unwrap_err();
+        assert!(error.to_string().contains("browser executable not found"));
+    }
+
+    #[test]
+    fn offers_platform_specific_candidates() {
+        let candidates = candidates();
+        assert!(!candidates.is_empty());
+        assert!(candidates.iter().all(|path| path.is_absolute()));
+    }
 }

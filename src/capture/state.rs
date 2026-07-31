@@ -143,6 +143,18 @@ pub(super) async fn set_motion(cdp: &mut crate::cdp::Cdp) -> Result<()> {
     Ok(())
 }
 
+/// A page in a window that is not in front is treated as hidden, so pointer
+/// dispatch blocks for five seconds and animation frames are throttled.
+/// Emulating focus keeps an unattended capture both fast and faithful.
+pub(crate) async fn set_focus(cdp: &mut crate::cdp::Cdp) -> Result<()> {
+    cdp.send(
+        "Emulation.setFocusEmulationEnabled",
+        json!({ "enabled": true }),
+    )
+    .await?;
+    Ok(())
+}
+
 async fn clear_input_state(cdp: &mut crate::cdp::Cdp) -> Result<()> {
     let mut moved = false;
     for _ in 0..2 {

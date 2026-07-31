@@ -52,6 +52,9 @@ struct Run {
     /// comparison, such as a sign-in fixture. Repeatable.
     #[arg(long = "allow")]
     allow: Vec<String>,
+    /// Capture the source again instead of reusing a recent capture.
+    #[arg(long)]
+    recapture: bool,
     #[arg(long, hide = true)]
     source_cdp_url: Option<String>,
     #[arg(long, hide = true)]
@@ -194,18 +197,26 @@ async fn run(args: Run) -> anyhow::Result<()> {
     let source_session = args.output.join("source.session.json");
     let source_artifact = args.output.join("source.artifact.json");
     let candidate_session = args.output.join("recreation.session.json");
-    prepare(Prepare {
-        side: PrepareSide::Source,
-        url: args.source,
-        output: source_session.clone(),
-        browser: None,
-        cdp_url: args.source_cdp_url,
-        target: args.source_target,
-        width: 1440,
-        height: 900,
-        headless: false,
-    })
-    .await?;
+    let reuse = !args.recapture && reusable_source(&source_artifact, &args.source);
+    if reuse {
+        println!(
+            "reusing the source captured in the last {} minutes; pass --recapture to capture it again",
+            SOURCE_REUSE_SECONDS / 60
+        );
+    } else {
+        prepare(Prepare {
+            side: PrepareSide::Source,
+            url: args.source,
+            output: source_session.clone(),
+            browser: None,
+            cdp_url: args.source_cdp_url,
+            target: args.source_target,
+            width: 1440,
+            height: 900,
+            headless: false,
+        })
+        .await?;
+    }
     prepare(Prepare {
         side: PrepareSide::Candidate,
         url: args.recreation,
@@ -218,9 +229,11 @@ async fn run(args: Run) -> anyhow::Result<()> {
         headless: true,
     })
     .await?;
-    let source: Session = read_json(&source_session)?;
-    let artifact = capture::record_source_snapshot(&source).await?;
-    write_json(&source_artifact, &artifact)?;
+    if !reuse {
+        let source: Session = read_json(&source_session)?;
+        let artifact = capture::record_source_snapshot(&source).await?;
+        write_json(&source_artifact, &artifact)?;
+    }
     compare_snapshot(
         &source_artifact,
         &candidate_session,
@@ -229,6 +242,27 @@ async fn run(args: Run) -> anyhow::Result<()> {
         &args.allow,
     )
     .await
+}
+
+/// A source page does not change while its recreation is being fixed, so
+/// re-capturing it on every run is the largest avoidable cost in that loop.
+/// The capture is only reused briefly, so a source that does change is noticed.
+const SOURCE_REUSE_SECONDS: u64 = 900;
+
+fn reusable_source(artifact: &Path, source_url: &str) -> bool {
+    let Ok(metadata) = fs::metadata(artifact) else {
+        return false;
+    };
+    let fresh = metadata
+        .modified()
+        .ok()
+        .and_then(|modified| std::time::SystemTime::now().duration_since(modified).ok())
+        .is_some_and(|age| age.as_secs() < SOURCE_REUSE_SECONDS);
+    if !fresh {
+        return false;
+    }
+    read_json::<Artifact>(artifact)
+        .is_ok_and(|value| value.verify().is_ok() && value.source.requested_url == source_url)
 }
 
 async fn compare_snapshot(
@@ -630,6 +664,36 @@ mod tests {
         assert_eq!(args.source, "https://example.com");
         assert_eq!(args.recreation, "http://localhost:8080");
         assert_eq!(args.output, PathBuf::from("recreate-backtest-output"));
+    }
+
+    #[test]
+    fn a_missing_or_unreadable_source_capture_is_never_reused() {
+        let directory = tempfile::tempdir().unwrap();
+        let artifact = directory.path().join("source.artifact.json");
+        assert!(!reusable_source(&artifact, "https://example.com"));
+        fs::write(&artifact, "not an artifact").unwrap();
+        assert!(!reusable_source(&artifact, "https://example.com"));
+    }
+
+    #[test]
+    fn recapture_is_available_on_the_run_command() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "run",
+            "--source",
+            "https://example.com",
+            "--recreation",
+            "http://localhost:8080",
+            "--recapture",
+            "--allow",
+            "signed in as",
+        ])
+        .unwrap();
+        let Command::Run(args) = cli.command else {
+            panic!("expected run");
+        };
+        assert!(args.recapture);
+        assert_eq!(args.allow, vec!["signed in as".to_string()]);
     }
 
     #[test]

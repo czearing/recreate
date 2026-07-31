@@ -42,6 +42,7 @@ pub async fn state(
 ) -> Result<PageState> {
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
+    crate::capture::set_focus(cdp).await?;
     cdp.send(
         "Emulation.setEmulatedMedia",
         serde_json::json!({

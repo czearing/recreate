@@ -249,12 +249,26 @@ pub async fn install(cdp: &mut Cdp, deadline: Deadline) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// A page in a window that is not in front is treated as hidden: input dispatch
+/// blocks for five seconds and animation frames are throttled. Emulating focus
+/// makes an unattended comparison both fast and faithful.
+pub async fn focus_page(cdp: &mut Cdp, deadline: Deadline) -> anyhow::Result<()> {
+    cdp.call(
+        "Emulation.setFocusEmulationEnabled",
+        json!({ "enabled": true }),
+        deadline,
+    )
+    .await?;
+    Ok(())
+}
+
 pub async fn navigate(
     cdp: &mut Cdp,
     url: &str,
     viewport: &Viewport,
     deadline: Deadline,
 ) -> anyhow::Result<()> {
+    focus_page(cdp, deadline).await?;
     cdp.call(
         "Emulation.setDeviceMetricsOverride",
         json!({
@@ -463,6 +477,7 @@ async fn snapshot_states(
 ) -> anyhow::Result<Vec<State>> {
     cdp.call("Page.enable", json!({}), deadline).await?;
     cdp.call("Runtime.enable", json!({}), deadline).await?;
+    focus_page(cdp, deadline).await?;
     verify_document(cdp, requested, deadline).await?;
     cdp.call(
         "Emulation.setDeviceMetricsOverride",
@@ -527,6 +542,17 @@ pub async fn compare_candidate_snapshot(
             Cdp::connect(&target.web_socket_debugger_url, deadline.remaining()?).await
         })
         .await?;
+    // The recreation is reloaded so a rebuild is measured. Without this a fix
+    // is invisible, because the tab keeps rendering the build it first loaded.
+    cdp.call("Page.enable", json!({}), deadline).await?;
+    cdp.call("Runtime.enable", json!({}), deadline).await?;
+    navigate(
+        &mut cdp,
+        &session.requested_url,
+        &session.viewport,
+        deadline,
+    )
+    .await?;
     let states = snapshot_states(
         &mut cdp,
         &session.requested_url,
