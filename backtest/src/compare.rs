@@ -77,6 +77,8 @@ pub fn artifacts(source: &Artifact, candidate: &Artifact, elapsed_ms: u128) -> R
         candidate_digest: candidate.digest.clone(),
         diagnostic: None,
         scope: None,
+        allowed: Vec::new(),
+        unused_allowances: Vec::new(),
     }
 }
 
@@ -154,6 +156,8 @@ pub fn inconclusive(source_digest: String, elapsed_ms: u128, diagnostic: String)
         candidate_digest: String::new(),
         diagnostic: Some(diagnostic),
         scope: None,
+        allowed: Vec::new(),
+        unused_allowances: Vec::new(),
     }
 }
 
@@ -181,6 +185,8 @@ fn preparation_required(
         candidate_digest: candidate.digest.clone(),
         diagnostic: Some(diagnostic),
         scope: None,
+        allowed: Vec::new(),
+        unused_allowances: Vec::new(),
     }
 }
 
@@ -199,6 +205,8 @@ pub fn preparation_required_session(
         candidate_digest: String::new(),
         diagnostic: Some(diagnostic),
         scope: None,
+        allowed: Vec::new(),
+        unused_allowances: Vec::new(),
     }
 }
 

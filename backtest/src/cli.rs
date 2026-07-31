@@ -48,6 +48,10 @@ struct Run {
     /// Case-insensitive visible name or semantic region, such as "toolbar" or "App launcher"; not a CSS selector.
     #[arg(long)]
     focus: Option<String>,
+    /// Case-insensitive text of a finding that is expected and must not fail the
+    /// comparison, such as a sign-in fixture. Repeatable.
+    #[arg(long = "allow")]
+    allow: Vec<String>,
     #[arg(long, hide = true)]
     source_cdp_url: Option<String>,
     #[arg(long, hide = true)]
@@ -110,6 +114,10 @@ struct Compare {
     /// Case-insensitive visible name or semantic region, such as "toolbar" or "App launcher"; not a CSS selector.
     #[arg(long)]
     focus: Option<String>,
+    /// Case-insensitive text of a finding that is expected and must not fail the
+    /// comparison, such as a sign-in fixture. Repeatable.
+    #[arg(long = "allow")]
+    allow: Vec<String>,
 }
 
 #[derive(Debug, Args)]
@@ -218,6 +226,7 @@ async fn run(args: Run) -> anyhow::Result<()> {
         &candidate_session,
         &args.output,
         args.focus,
+        &args.allow,
     )
     .await
 }
@@ -227,6 +236,7 @@ async fn compare_snapshot(
     candidate: &Path,
     output: &Path,
     focus: Option<String>,
+    allowances: &[String],
 ) -> anyhow::Result<()> {
     let (cancel_watchdog, watchdog) = mpsc::channel();
     std::thread::spawn(move || {
@@ -249,7 +259,7 @@ async fn compare_snapshot(
     let session: Session = read_json(candidate)?;
     let value = fixture::compare_snapshot(&artifact, &session, focus.as_deref()).await;
     let _ = cancel_watchdog.send(());
-    finish_compare(&comparison, &value)
+    finish_compare(&comparison, &value, allowances)
 }
 
 async fn prepare(args: Prepare) -> anyhow::Result<()> {
@@ -359,7 +369,7 @@ async fn compare(args: Compare) -> anyhow::Result<()> {
                     started.elapsed().as_millis(),
                     format!("source artifact unavailable: {error}"),
                 );
-                return finish_compare(&args.output, &value);
+                return finish_compare(&args.output, &value, &args.allow);
             }
         };
         let session: Session = match read_json(&args.candidate) {
@@ -370,21 +380,28 @@ async fn compare(args: Compare) -> anyhow::Result<()> {
                     started.elapsed().as_millis(),
                     format!("candidate session unavailable: {error}"),
                 );
-                return finish_compare(&args.output, &value);
+                return finish_compare(&args.output, &value, &args.allow);
             }
         };
         let value = match args.focus.as_deref() {
             Some(focus) => fixture::compare_once_focused(&artifact, &session, focus).await,
             None => fixture::compare_once(&artifact, &session).await,
         };
-        finish_compare(&args.output, &value)
+        finish_compare(&args.output, &value, &args.allow)
     }
     .await;
     let _ = cancel_watchdog.send(());
     result
 }
 
-fn finish_compare(output: &Path, value: &crate::model::Report) -> anyhow::Result<()> {
+fn finish_compare(
+    output: &Path,
+    value: &crate::model::Report,
+    allowances: &[String],
+) -> anyhow::Result<()> {
+    let mut value = value.clone();
+    report::apply_allowances(&mut value, allowances);
+    let value = &value;
     report::write(output, value)?;
     print!("{}", report::text(value));
     match value.status {
@@ -623,7 +640,7 @@ mod tests {
             crate::deadline::COMPARISON_DEADLINE_MS as u128,
             "comparison deadline expired".into(),
         );
-        assert!(finish_compare(directory.path(), &report).is_err());
+        assert!(finish_compare(directory.path(), &report, &[]).is_err());
         let text = fs::read_to_string(directory.path().join("comparison.txt")).unwrap();
         assert!(text.starts_with("INCONCLUSIVE"));
         assert!(text.contains("comparison deadline expired"));

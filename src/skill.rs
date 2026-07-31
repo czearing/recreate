@@ -62,9 +62,9 @@ Recreate is a tool for capturing a given source web page, generating a recreatio
 2. Run `recreate capture --reuse --reload` to capture that source and generate its React recreation.
 3. Make the recreation available at a URL, such as `http://localhost:8080`.
 4. Run `recreate backtest run --source <source-url> --recreation <recreation-url>`.
-5. Use the plain-English findings to fix content, layout, typography, interactions, and motion; repeat until clean.
+5. Use the plain-English findings to fix content, layout, typography, interactions, and motion; repeat until clean. If a finding is genuinely expected and cannot be fixed, such as a different signed-in identity, add `--allow "<text>"` for it and keep every other finding.
 6. To inspect one part, add `--focus "<name>"`, for example `--focus "toolbar"` or `--focus "App launcher"`; still run the full comparison before finishing.
-7. Verify every visible interaction and authored motion.
+7. The comparison already exercises interactions and authored motion, so never write your own browser, screenshot, or animation-sampling scripts.
 8. Finish only when the full comparison is conclusive, under five seconds, and has no unresolved or duplicate findings.
 9. Present the result as debugging evidence, not fidelity certification.
 
@@ -77,6 +77,7 @@ Parameters used:
 - `--source`: set the source URL for the comparison.
 - `--recreation`: set the recreation URL for the comparison.
 - `--focus`: case-insensitive name search, not a CSS selector. It matches visible text, accessible names, and semantic regions such as toolbar, navigation, banner, main, or dialog on both pages. Multiple matches are included; if either page has no match, the command reports that selection failure.
+- `--allow`: case-insensitive text of one expected finding, repeatable. Allowed findings are counted separately as `ALLOWED`, and an allowance that matches nothing is reported as a stale allowance.
 
 Use `recreate <command> --help` for optional advanced parameters.
 "#

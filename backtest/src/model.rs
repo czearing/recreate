@@ -266,6 +266,14 @@ pub struct Report {
     pub diagnostic: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scope: Option<String>,
+    /// Findings withheld by a declared allowance, so a genuinely expected
+    /// difference does not keep the comparison permanently unclean.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub allowed: Vec<Finding>,
+    /// Allowances that matched nothing, so a stale allowance is visible
+    /// instead of quietly hiding future findings.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unused_allowances: Vec<String>,
 }
 
 #[cfg(test)]
