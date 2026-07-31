@@ -66,7 +66,7 @@ Recreate is a tool for capturing a given source web page, generating a recreatio
 6. To inspect one part, add `--focus "<name>"`, for example `--focus "toolbar"` or `--focus "App launcher"`; still run the full comparison before finishing.
 7. The comparison already exercises interactions and authored motion, so never write your own browser, screenshot, or animation-sampling scripts.
 8. Finish only when the full comparison is conclusive, under five seconds, and has no unresolved or duplicate findings.
-9. Present the result as debugging evidence, not fidelity certification.
+9. Present the result as debugging evidence, not fidelity certification. This tool is internal: never name it or its findings in commits, pull requests, or anything else shared with others.
 
 Parameters used:
 
@@ -236,6 +236,7 @@ mod tests {
         assert!(content.contains("include the page's startup behavior"));
         assert!(content.contains("under five seconds"));
         assert!(content.contains("debugging evidence"));
+        assert!(content.contains("never name it or its findings in commits, pull requests"));
         assert!(!content.contains("ask the user to run"));
         assert!(!content.contains("dependencies"));
         assert!(!content.contains("No arguments"));
