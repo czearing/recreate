@@ -24,7 +24,27 @@ pub async fn install(args: InstallArgs) -> Result<()> {
         }
         fs::create_dir_all(&directory)?;
         fs::write(directory.join("SKILL.md"), installed_skill())?;
+        remove_stale_entries(&directory)?;
         println!("installed {}", directory.display());
+    }
+    Ok(())
+}
+
+/// An earlier release left a `run.mjs` launcher beside the skill. Agents call
+/// whatever the skill directory contains, so anything this install does not
+/// author would silently shadow the real command.
+fn remove_stale_entries(directory: &Path) -> Result<()> {
+    for entry in fs::read_dir(directory)? {
+        let entry = entry?;
+        if entry.file_name() == "SKILL.md" {
+            continue;
+        }
+        let path = entry.path();
+        if entry.file_type()?.is_dir() {
+            fs::remove_dir_all(&path)?;
+        } else {
+            fs::remove_file(&path)?;
+        }
     }
     Ok(())
 }
@@ -169,6 +189,25 @@ mod tests {
             &shipped,
         )
         .expect("placeholders and prose must not be mistaken for commands");
+    }
+
+    #[test]
+    fn install_removes_a_launcher_that_would_shadow_the_command() {
+        let directory = std::env::temp_dir().join(format!(
+            "recreate-skill-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(directory.join("nested")).unwrap();
+        fs::write(directory.join("SKILL.md"), installed_skill()).unwrap();
+        fs::write(directory.join("run.mjs"), "shadowing launcher").unwrap();
+        remove_stale_entries(&directory).unwrap();
+        assert!(directory.join("SKILL.md").is_file());
+        assert!(!directory.join("run.mjs").exists());
+        assert!(!directory.join("nested").exists());
+        fs::remove_dir_all(&directory).unwrap();
     }
 
     #[test]
