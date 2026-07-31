@@ -391,15 +391,79 @@ pub async fn record_source(session: &Session, baseline_only: bool) -> anyhow::Re
     Ok(artifact)
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentIdentity {
+    url: String,
+    title: String,
+    error_page: bool,
+    element_count: u64,
+}
+
+const DOCUMENT_IDENTITY: &str = r#"(() => {
+    const document_ = document;
+    const errorPage =
+        location.protocol === 'chrome-error:' ||
+        location.protocol === 'edge-error:' ||
+        location.href.startsWith('about:neterror') ||
+        !!document_.getElementById('main-frame-error') ||
+        !!document_.getElementById('security-error') ||
+        typeof window.certificateErrorPageController !== 'undefined';
+    return {
+        url: location.href,
+        title: document_.title || '',
+        errorPage,
+        elementCount: document_.querySelectorAll('*').length
+    };
+})()"#;
+
+/// Rejects browser error pages and empty documents before anything is measured,
+/// so a comparison never silently reports an interstitial as if it were the page.
+async fn verify_document(
+    cdp: &mut Cdp,
+    requested: &str,
+    deadline: Deadline,
+) -> anyhow::Result<DocumentIdentity> {
+    let identity: DocumentIdentity =
+        serde_json::from_value(cdp.evaluate(DOCUMENT_IDENTITY, deadline).await?)?;
+    if let Some(reason) = document_failure(&identity) {
+        anyhow::bail!(
+            "{reason}.\n  requested: {requested}\n  rendered:  {}\n  title:     {}",
+            identity.url,
+            identity.title
+        );
+    }
+    Ok(identity)
+}
+
+fn document_failure(identity: &DocumentIdentity) -> Option<&'static str> {
+    if identity.error_page {
+        return Some(
+            "the browser showed its own error page instead of this address. \
+             Check that the server is running, and for https that this browser profile \
+             trusts its certificate",
+        );
+    }
+    if identity.element_count <= 3 {
+        return Some(
+            "this address rendered an empty document. \
+             Check that the server is serving the expected build",
+        );
+    }
+    None
+}
+
 /// Captures the current rendered state of an already-prepared tab.
 /// Never navigates or reloads, so authenticated and interaction-derived state survives.
 async fn snapshot_states(
     cdp: &mut Cdp,
+    requested: &str,
     viewport: &Viewport,
     deadline: Deadline,
 ) -> anyhow::Result<Vec<State>> {
     cdp.call("Page.enable", json!({}), deadline).await?;
     cdp.call("Runtime.enable", json!({}), deadline).await?;
+    verify_document(cdp, requested, deadline).await?;
     cdp.call(
         "Emulation.setDeviceMetricsOverride",
         json!({
@@ -429,7 +493,13 @@ pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifac
     let target = browser::target(&session.cdp_url, &session.target_id).await?;
     let mut cdp = Cdp::connect(&target.web_socket_debugger_url, Duration::from_secs(5)).await?;
     let deadline = Deadline::new(30_000);
-    let states = snapshot_states(&mut cdp, &session.viewport, deadline).await?;
+    let states = snapshot_states(
+        &mut cdp,
+        &session.requested_url,
+        &session.viewport,
+        deadline,
+    )
+    .await?;
     let fingerprint = digest::json(&states[0].nodes)?;
     let mut artifact = Artifact {
         schema_version: SCHEMA_VERSION,
@@ -457,7 +527,13 @@ pub async fn compare_candidate_snapshot(
             Cdp::connect(&target.web_socket_debugger_url, deadline.remaining()?).await
         })
         .await?;
-    let states = snapshot_states(&mut cdp, &session.viewport, deadline).await?;
+    let states = snapshot_states(
+        &mut cdp,
+        &session.requested_url,
+        &session.viewport,
+        deadline,
+    )
+    .await?;
     let mut candidate = Artifact {
         schema_version: SCHEMA_VERSION,
         source: SourceIdentity {
@@ -1013,4 +1089,38 @@ fn snapshot_backend_targets(snapshot: &Value) -> anyhow::Result<HashMap<u64, Str
 
 fn js_escape(value: &str) -> String {
     value.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn identity(url: &str, error_page: bool, element_count: u64) -> DocumentIdentity {
+        DocumentIdentity {
+            url: url.into(),
+            title: "page".into(),
+            error_page,
+            element_count,
+        }
+    }
+
+    #[test]
+    fn rejects_a_browser_error_page_instead_of_measuring_it() {
+        let reason = document_failure(&identity("chrome-error://chromewebdata/", true, 56))
+            .expect("an error page must never be measured");
+        assert!(reason.contains("error page"));
+        assert!(reason.contains("certificate"));
+    }
+
+    #[test]
+    fn rejects_an_empty_document() {
+        let reason = document_failure(&identity("http://127.0.0.1:8080/", false, 3))
+            .expect("an empty document must never be measured");
+        assert!(reason.contains("empty document"));
+    }
+
+    #[test]
+    fn accepts_a_rendered_page() {
+        assert!(document_failure(&identity("http://127.0.0.1:8080/", false, 900)).is_none());
+    }
 }

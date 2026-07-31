@@ -103,6 +103,9 @@ pub async fn ensure_backtest() -> Result<PathBuf> {
 }
 
 async fn refresh_backtest(client: &reqwest::Client, release: &Release) -> Result<()> {
+    if std::env::var_os(BACKTEST_VARIABLE).is_some() {
+        return Ok(());
+    }
     let path = backtest_path()?;
     let name = backtest_asset_name();
     let Some(asset) = release.assets.iter().find(|asset| asset.name == name) else {
@@ -162,6 +165,15 @@ async fn install_asset(
 }
 
 fn backtest_path() -> Result<PathBuf> {
+    if let Some(value) = std::env::var_os(BACKTEST_VARIABLE) {
+        let path = PathBuf::from(value);
+        anyhow::ensure!(
+            path.is_file(),
+            "{BACKTEST_VARIABLE} does not point at an executable: {}",
+            path.display()
+        );
+        return Ok(path);
+    }
     let name = if cfg!(windows) {
         "recreate-backtest.exe"
     } else {
@@ -172,6 +184,9 @@ fn backtest_path() -> Result<PathBuf> {
         .context("installed binary directory unavailable")?
         .join(name))
 }
+
+/// Lets a locally built comparison companion be tested through the normal command.
+const BACKTEST_VARIABLE: &str = "RECREATE_BACKTEST_BIN";
 
 fn installed_binary() -> Result<bool> {
     let path = std::env::current_exe()?;
