@@ -1303,7 +1303,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 kind,
                 direction,
                 values.len(),
-                labels.join(", ")
+                label_list(&labels)
             );
             output.push(summary_finding(
                 state,
@@ -1326,7 +1326,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 property,
                 delta,
                 values.len(),
-                labels.join(", ")
+                label_list(&labels)
             );
             output.push(summary_finding(
                 state,
@@ -1356,7 +1356,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 candidate,
                 suffix,
                 values.len(),
-                labels.join(", ")
+                label_list(&labels)
             );
             output.push(summary_finding(
                 state,
@@ -1382,6 +1382,21 @@ fn grouped_labels(region: &str, values: &[Finding]) -> Vec<String> {
                 .to_string()
         })
         .collect()
+}
+
+/// A finding is only useful if it can be read. A large group names a few
+/// representative elements and counts the rest instead of printing every one.
+const NAMED_LABELS: usize = 6;
+
+fn label_list(labels: &[String]) -> String {
+    if labels.len() <= NAMED_LABELS + 1 {
+        return labels.join(", ");
+    }
+    format!(
+        "{}, and {} more",
+        labels[..NAMED_LABELS].join(", "),
+        labels.len() - NAMED_LABELS
+    )
 }
 
 fn summary_finding(state: &State, target: &str, property: &str, line: &str) -> Finding {
@@ -2510,5 +2525,31 @@ mod tests {
             assert_eq!(artifacts(&source, &candidate, 0).status, Status::Pass);
         }
         assert!(started.elapsed().as_secs_f64() < 1.0);
+    }
+}
+
+#[cfg(test)]
+mod label_tests {
+    use super::*;
+
+    fn labels(count: usize) -> Vec<String> {
+        (0..count)
+            .map(|index| format!("button \"{index}\""))
+            .collect()
+    }
+
+    #[test]
+    fn a_small_group_names_every_element() {
+        assert_eq!(
+            label_list(&labels(3)),
+            "button \"0\", button \"1\", button \"2\""
+        );
+    }
+
+    #[test]
+    fn a_large_group_stays_readable() {
+        let line = label_list(&labels(44));
+        assert!(line.ends_with("and 38 more"), "{line}");
+        assert_eq!(line.matches("button").count(), NAMED_LABELS);
     }
 }
