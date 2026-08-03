@@ -1,4 +1,4 @@
-use crate::model::{Report, Status};
+use crate::model::{Finding, Report, Status};
 use std::{fs, path::Path};
 
 /// Withholds findings the caller has declared expected, so a comparison whose
@@ -52,7 +52,17 @@ pub fn text(report: &Report) -> String {
         "{status} {}{allowed}{scope}",
         report.findings.len()
     )];
-    lines.extend(report.findings.iter().map(|finding| finding.line.clone()));
+    let mut section = String::new();
+    for finding in &report.findings {
+        let heading = format!("viewport {} / {}", finding.viewport, finding.scenario);
+        if heading != section {
+            lines.push(String::new());
+            lines.push(heading.clone());
+            section = heading;
+        }
+        lines.push(body(finding));
+        lines.extend(finding.items.iter().map(|item| format!("    {item}")));
+    }
     for allowance in &report.unused_allowances {
         lines.push(format!(
             "STALE ALLOWANCE {} matched nothing",
@@ -63,6 +73,23 @@ pub fn text(report: &Report) -> String {
         lines.push(format!("DIAG {}", diagnostic.replace('\n', " ")));
     }
     format!("{}\n", lines.join("\n"))
+}
+
+/// The viewport and state are printed once per section, and every element of a
+/// grouped root cause is listed separately, so no finding is a wall of text.
+fn body(finding: &Finding) -> String {
+    let prefix = format!("V{} {} ", finding.viewport, finding.scenario);
+    let line = finding.line.strip_prefix(&prefix).unwrap_or(&finding.line);
+    if finding.items.is_empty() {
+        return line.to_string();
+    }
+    let joined = finding.items.join(", ");
+    line.strip_suffix(&format!("{joined})"))
+        .map(|head| format!("{head})"))
+        .or_else(|| line.strip_suffix(&joined).map(str::to_string))
+        .unwrap_or_else(|| line.to_string())
+        .trim_end()
+        .to_string()
 }
 
 pub fn write(output: &Path, report: &Report) -> anyhow::Result<()> {
@@ -92,6 +119,7 @@ mod tests {
             candidate: String::new(),
             severity: "high".into(),
             confidence: "high".into(),
+            items: Vec::new(),
         }
     }
 
@@ -136,5 +164,41 @@ mod tests {
         apply_allowances(&mut report, &["sign in".into()]);
         assert_eq!(report.unused_allowances, vec!["sign in".to_string()]);
         assert!(text(&report).contains("STALE ALLOWANCE sign in matched nothing"));
+    }
+
+    #[test]
+    fn viewport_and_state_are_stated_once_per_section() {
+        let report = failing(&[
+            "V1440 base toolbar x 12->36 +24px",
+            "V1440 base content color #000->#111",
+        ]);
+        let rendered = text(&report);
+        assert_eq!(rendered.matches("viewport 1440 / base").count(), 1);
+        assert!(
+            rendered.contains("\ntoolbar x 12->36 +24px\n"),
+            "{rendered}"
+        );
+        assert!(!rendered.contains("V1440"), "{rendered}");
+    }
+
+    #[test]
+    fn grouped_items_are_listed_one_per_line() {
+        let items = vec![
+            "paragraph \"Case files, filings, and deadlines\"".to_string(),
+            "button \"Create\"".to_string(),
+        ];
+        let mut report = failing(&[&format!(
+            "V1440 base content paragraph missing 2: {}",
+            items.join(", ")
+        )]);
+        report.findings[0].items = items.clone();
+        let rendered = text(&report);
+        assert!(
+            rendered.contains("content paragraph missing 2:\n"),
+            "{rendered}"
+        );
+        for item in items {
+            assert!(rendered.contains(&format!("\n    {item}\n")), "{rendered}");
+        }
     }
 }

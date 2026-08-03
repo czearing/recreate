@@ -1310,6 +1310,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 &format!("{region} {kind}"),
                 "content",
                 &line,
+                labels,
             ));
         } else {
             output.append(&mut values);
@@ -1333,6 +1334,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 &format!("{region} layout"),
                 &property,
                 &line,
+                labels,
             ));
         } else {
             output.append(&mut values);
@@ -1363,6 +1365,7 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
                 &format!("{region} {property}"),
                 &property,
                 &line,
+                labels,
             ));
         } else {
             output.append(&mut values);
@@ -1384,22 +1387,19 @@ fn grouped_labels(region: &str, values: &[Finding]) -> Vec<String> {
         .collect()
 }
 
-/// A finding is only useful if it can be read. A large group names a few
-/// representative elements and counts the rest instead of printing every one.
-const NAMED_LABELS: usize = 6;
-
+/// Every affected element is named. A finding that hides items behind a count
+/// cannot be acted on, so grouping never drops labels.
 fn label_list(labels: &[String]) -> String {
-    if labels.len() <= NAMED_LABELS + 1 {
-        return labels.join(", ");
-    }
-    format!(
-        "{}, and {} more",
-        labels[..NAMED_LABELS].join(", "),
-        labels.len() - NAMED_LABELS
-    )
+    labels.join(", ")
 }
 
-fn summary_finding(state: &State, target: &str, property: &str, line: &str) -> Finding {
+fn summary_finding(
+    state: &State,
+    target: &str,
+    property: &str,
+    line: &str,
+    items: Vec<String>,
+) -> Finding {
     Finding {
         key: format!("{}:{}:{}", state.viewport.width, target, property),
         line: line.into(),
@@ -1411,6 +1411,7 @@ fn summary_finding(state: &State, target: &str, property: &str, line: &str) -> F
         candidate: String::new(),
         severity: "error".into(),
         confidence: "exact".into(),
+        items,
     }
 }
 
@@ -1931,10 +1932,28 @@ fn finding(
     delta: Option<String>,
 ) -> Finding {
     let suffix = delta.map_or_else(String::new, |value| format!(" {value}"));
-    let line = format!(
-        "V{} {} {} {} {}->{}{}",
-        state.viewport.width, state.scenario, target, property, source, candidate, suffix
-    );
+    let line = match (property, source, candidate) {
+        // "content present->missing" reads as a riddle. An element that exists
+        // on only one side is stated in the same words the grouped findings use.
+        ("content" | "node", "present", "missing") => format!(
+            "V{} {} {} missing",
+            state.viewport.width, state.scenario, target
+        ),
+        ("content" | "node", "missing", "present") => format!(
+            "V{} {} {} unexpected",
+            state.viewport.width, state.scenario, target
+        ),
+        _ => format!(
+            "V{} {} {} {} {}->{}{}",
+            state.viewport.width,
+            state.scenario,
+            target,
+            property,
+            round_pixels(source),
+            round_pixels(candidate),
+            suffix
+        ),
+    };
     Finding {
         key: format!("{}:{}:{}", state.viewport.width, target, property),
         line,
@@ -1946,7 +1965,18 @@ fn finding(
         candidate: candidate.into(),
         severity: "error".into(),
         confidence: "exact".into(),
+        items: Vec::new(),
     }
+}
+
+/// Comparison stays exact, but a reader gains nothing from `13.3333px`, so a
+/// pixel value is displayed at two decimals with trailing zeros removed.
+fn round_pixels(value: &str) -> String {
+    let Some(number) = value.strip_suffix("px").and_then(|v| v.parse::<f64>().ok()) else {
+        return value.to_string();
+    };
+    let rounded = format!("{:.2}", number);
+    format!("{}px", rounded.trim_end_matches('0').trim_end_matches('.'))
 }
 
 fn visibility(value: bool) -> &'static str {
@@ -2547,9 +2577,18 @@ mod label_tests {
     }
 
     #[test]
-    fn a_large_group_stays_readable() {
+    fn a_large_group_names_every_element() {
         let line = label_list(&labels(44));
-        assert!(line.ends_with("and 38 more"), "{line}");
-        assert_eq!(line.matches("button").count(), NAMED_LABELS);
+        assert!(!line.contains("more"), "{line}");
+        assert_eq!(line.matches("button").count(), 44);
+    }
+
+    #[test]
+    fn a_pixel_value_is_displayed_without_false_precision() {
+        assert_eq!(round_pixels("13.3333px"), "13.33px");
+        assert_eq!(round_pixels("14px"), "14px");
+        assert_eq!(round_pixels("12.50px"), "12.5px");
+        assert_eq!(round_pixels("Segoe UI"), "Segoe UI");
+        assert_eq!(round_pixels("#f0f0f0"), "#f0f0f0");
     }
 }

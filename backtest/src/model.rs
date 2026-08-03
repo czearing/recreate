@@ -251,6 +251,10 @@ pub struct Finding {
     pub candidate: String,
     pub severity: String,
     pub confidence: String,
+    /// Every element behind a grouped root cause, so the text report can list
+    /// them one per line instead of one unreadable comma run.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub items: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -21,7 +21,7 @@
       "property": "node",
       "source": "present",
       "candidate": "missing",
-      "finding": "V1440 base status-badge node present->missing",
+      "finding": "V1440 base status-badge missing",
       "path": "mutations/structure-missing-node/index.html",
       "status": "FAIL",
       "primaryFindings": 1,
