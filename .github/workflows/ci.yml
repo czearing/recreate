@@ -35,3 +35,31 @@ jobs:
           name: release-gate-evidence
           path: target/release-gate/evidence.json
           if-no-files-found: error
+
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backtest
+      - run: cargo fmt --manifest-path backtest/Cargo.toml --all -- --check
+      - run: cargo clippy --manifest-path backtest/Cargo.toml --all-targets --locked -- -D warnings
+      - run: cargo test --manifest-path backtest/Cargo.toml --all-targets --locked
+      - run: cargo build --manifest-path backtest/Cargo.toml --release --locked
+      - name: Qualify diff sensitivity and stability
+        run: |
+          backtest/target/release/recreate-backtest qualify \
+            --fixtures backtest/fixtures \
+            --output backtest/target/qualification.json \
+            --repeat 3
+        env:
+          RECREATE_BACKTEST_BROWSER: /usr/bin/google-chrome
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backtest-qualification
+          path: backtest/target/qualification.json
+          if-no-files-found: error

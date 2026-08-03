@@ -6,9 +6,8 @@ use crate::{
     report,
     server::Server,
 };
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fs, path::Path, time::Instant};
+use std::{fs, path::Path, time::Instant};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -124,32 +123,31 @@ pub async fn qualify(
             case.schema_version == SCHEMA_VERSION,
             "unsupported expected fixture schema"
         );
-        let mut artifacts = BTreeMap::<u32, Artifact>::new();
-        let mut needed = case
-            .mutations
-            .iter()
-            .map(|value| value.viewport)
-            .collect::<Vec<_>>();
-        needed.push(1440);
-        needed.sort_unstable();
-        needed.dedup();
-        for width in needed {
-            let source_url = format!(
-                "{}/{}/{}",
-                server.base_url,
-                case.case,
-                case.source.trim_start_matches('/')
-            );
-            let source_session = session(
-                Side::Source,
-                &source_process,
-                &source_target.id,
-                &source_url,
-                &source_browser,
-                width,
-            )?;
-            artifacts.insert(width, capture::record_source(&source_session, false).await?);
-        }
+        let source_url = format!(
+            "{}/{}/{}",
+            server.base_url,
+            case.case,
+            case.source.trim_start_matches('/')
+        );
+        let source_process_ref = &source_process;
+        let source_target_id = source_target.id.as_str();
+        let source_browser_ref = source_browser.as_str();
+        // Recorded per iteration so the gate can detect nondeterminism in source
+        // recording, not only in comparison.
+        let record_source = |width: u32| {
+            let source_url = source_url.clone();
+            async move {
+                let source_session = session(
+                    Side::Source,
+                    source_process_ref,
+                    source_target_id,
+                    &source_url,
+                    source_browser_ref,
+                    width,
+                )?;
+                capture::record_source(&source_session, false).await
+            }
+        };
 
         let control_url = format!(
             "{}/{}/{}",
@@ -160,6 +158,7 @@ pub async fn qualify(
         let mut control_durations = Vec::new();
         let mut stable_control = None;
         for _ in 0..repeat {
+            let artifact = record_source(1440).await?;
             let candidate_session = session(
                 Side::Candidate,
                 &candidate_process,
@@ -168,14 +167,7 @@ pub async fn qualify(
                 &candidate_browser,
                 1440,
             )?;
-            let result = run_one(
-                artifacts
-                    .get(&1440)
-                    .context("missing 1440 source artifact")?,
-                &candidate_session,
-                None,
-            )
-            .await;
+            let result = run_one(&artifact, &candidate_session, None).await;
             let report = result.report;
             all_durations.push(report.elapsed_ms);
             control_durations.push(report.elapsed_ms);
@@ -200,9 +192,6 @@ pub async fn qualify(
 
         let mut mutation_results = Vec::new();
         for mutation in &case.mutations {
-            let artifact = artifacts
-                .get(&mutation.viewport)
-                .with_context(|| format!("missing source viewport {}", mutation.viewport))?;
             let candidate_url = format!(
                 "{}/{}/{}",
                 server.base_url,
@@ -214,6 +203,7 @@ pub async fn qualify(
             let mut stable_json = None;
             let mut mutation_valid = true;
             for _ in 0..repeat {
+                let artifact = record_source(mutation.viewport).await?;
                 let candidate_session = session(
                     Side::Candidate,
                     &candidate_process,
@@ -222,12 +212,16 @@ pub async fn qualify(
                     &candidate_browser,
                     mutation.viewport,
                 )?;
-                let result = run_one(artifact, &candidate_session, None).await;
+                let result = run_one(&artifact, &candidate_session, None).await;
                 let report = result.report;
                 let duplicates = compare::duplicate_keys(&report.findings);
                 duplicate_findings += duplicates;
                 let lines = report::text(&report);
-                let finding = lines.lines().nth(1).unwrap_or_default();
+                let finding = report
+                    .findings
+                    .first()
+                    .map(|finding| finding.line.as_str())
+                    .unwrap_or_default();
                 let normalized = normalized_json(&report)?;
                 let expected = report.status == Status::Fail
                     && report.findings.len() == mutation.primary_findings

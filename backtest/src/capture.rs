@@ -43,6 +43,27 @@ const EVIDENCE_SCRIPT: &str = r##"
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();
+  const animations = document.getAnimations();
+  if (animations.length > 128) {
+    throw new Error(`capture animation limit exceeded: ${animations.length}`);
+  }
+  const settledTransitions = [];
+  for (const animation of animations) {
+    if (animation.constructor?.name !== "CSSTransition") continue;
+    const timing = animation.effect?.getTiming?.();
+    const activeDuration = Number(animation.effect?.getComputedTiming?.().activeDuration);
+    if (!timing || !Number.isFinite(activeDuration)) continue;
+    settledTransitions.push({
+      animation,
+      currentTime: animation.currentTime,
+      playState: animation.playState
+    });
+    try {
+      animation.pause();
+      animation.currentTime = (Number(timing.delay) || 0) + activeDuration;
+    } catch {}
+  }
+  document.documentElement.getBoundingClientRect();
   const nodes = {};
   const allElements = Array.from(document.querySelectorAll("*"));
   if (allElements.length > 5000) {
@@ -118,20 +139,19 @@ const EVIDENCE_SCRIPT: &str = r##"
       motions: []
     };
   }
-  const animations = document.getAnimations();
-  if (animations.length > 128) {
-    throw new Error(`capture animation limit exceeded: ${animations.length}`);
-  }
   const visualProperties = new Set([
     "backgroundColor", "borderRadius", "bottom", "boxShadow", "clipPath",
     "color", "filter", "height", "left", "opacity", "right", "top",
     "transform", "width"
   ]);
-  const animationStates = animations.map((animation) => ({
-    animation,
-    currentTime: animation.currentTime,
-    playState: animation.playState
-  }));
+  const animationStates = animations.map((animation) => {
+    const settled = settledTransitions.find((entry) => entry.animation === animation);
+    return settled || {
+      animation,
+      currentTime: animation.currentTime,
+      playState: animation.playState
+    };
+  });
   for (const { animation } of animationStates) {
     try { animation.pause(); } catch {}
   }
