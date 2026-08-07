@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "workItem": "total-order-build-break-investigation",
+  "author": "fidelity-developer",
+  "verdict": "NOT A BUILD BREAK IN ANY COMMITTED STATE. The reported error was real but was produced by a non-atomic copy of the live working tree taken during a transient mid-edit window. Nothing needed unbreaking; the total-order change is KEPT and re-justified on robustness grounds alone.",
+
+  "immediatePriority": {
+    "claim": "backtest/src/compare.rs:82 does not compile: error[E0425]: cannot find value 'finding_order' in this scope.",
+    "measured": {
+      "command": "cargo check --bins (from C:\\Users\\calebzearing\\recreate\\backtest)",
+      "commit": "738b96c",
+      "workingTreeClean": true,
+      "exitCode": 0,
+      "elapsedSeconds": 45.4,
+      "result": "COMPILES"
+    },
+    "definitionPresent": "fn finding_order is defined at compare.rs:2345 and called at compare.rs:82. git status --porcelain -- backtest/src/compare.rs is empty, so the working tree byte-matches the commit.",
+    "conclusion": "The failure does not reproduce at HEAD or in any commit. The tree was never broken as committed.",
+    "actionChosen": "KEEP. There was no non-compiling state to finish or revert, so neither option in the instruction applied literally; the correct action was to prove the tree compiles and explain the reporter's observation."
+  },
+
+  "rootCauseOfTheReport": {
+    "summary": "A recursive copy is not atomic. verification-gate byte-copied the crate from the LIVE working tree while my edit was in flight, capturing a state that exists in no commit.",
+    "mechanism": "My change landed as two separate writes: first the call site became `findings.sort_by(finding_order);` at line 82, and only afterwards was `fn finding_order` added near line 2345. Between those two writes the file genuinely contained a call to an undefined function. A copy taken inside that window compiles to exactly the reported error.",
+    "reproduction": {
+      "method": "Copied the crate to an isolated scratch directory, deleted ONLY the top-level `fn finding_order` definition block (leaving all four call sites), and compiled. Performed entirely outside the shared tree; the shared tree was not modified at any point this turn.",
+      "command": "cargo check --bins",
+      "observedError": "error[E0425]: cannot find value `finding_order` in this scope\n  --> src\\compare.rs:82:22",
+      "reportedError": "error[E0425]: cannot find value 'finding_order' in this scope  (backtest/src/compare.rs:82)",
+      "match": "EXACT - same error code, same identifier, same file, same line 82.",
+      "exitCode": 101
+    },
+    "whyThisIsTheExplanationAndNotACoincidence": "The reported line number is the CALL site, not the definition site. An incomplete or truncated copy of the file would fail at a random point; a partially-written file would usually fail with a parse error. Only the specific ordering 'call written, definition not yet written' produces E0425 at line 82 with that exact identifier.",
+    "whoIsAtFault": "Nobody's code. This is a process defect in how a shared, concurrently-edited tree is snapshotted. verification-gate's instinct to isolate the build was correct; the isolation method was the problem."
+  },
+
+  "correctSnapshotProcedure": {
+    "principle": "Snapshot from something immutable, not from a live tree.",
+    "preferred": "git worktree add --detach <sha>  or  git archive <sha>. Both materialise a committed tree and cannot tear, because the object store is immutable.",
+    "whenTheArtifactIsUncommitted": "A byte-copy is then the only option, but it is valid ONLY if the source is hashed BEFORE and AFTER the copy and the two digests are required to match. That check is what converts an unsynchronised read into a verified quiescent one. Without it the copy carries no guarantee whatsoever.",
+    "myOwnProcessChange": "I will order future edits so the definition is written BEFORE the call site, so that no intermediate state of the shared tree fails to compile. This removes the window rather than merely documenting it, and costs nothing.",
+    "citation": "https://git-scm.com/docs/git-worktree ; https://www.redhat.com/en/blog/sync-rsync"
+  },
+
+  "premiseCorrectionsAccepted": {
+    "note": "All three corrections from the dashboard are ACCEPTED and match what I independently measured last turn. I am not defending the refuted premise.",
+    "accepted": [
+      "The ~35% flip figure was retracted by its own author before it reached me. I independently reached the same conclusion last turn by a different route - I re-derived it as a POOLED rate over two different causes (a deterministic content mismatch and a dev-profile budget overrun at 4990ms against the 4400ms deadline) - and my own 5-repeat run of the two named fixtures measured 6/6 detected, 40/40 comparisons, 0 flips. fixture-author's 10-repeat, 2-process result agrees.",
+      "The order is DETERMINISTIC. I concur, and had already stated the mechanism: Rust's sort_by is STABLE, so a non-total comparator makes output FRAGILE with respect to insertion order but cannot randomize anything. Confirmed by construction: compare.rs imports only BTreeMap/BTreeSet, with no HashMap/HashSet and no rayon, so no randomized-hash iteration and no unordered parallelism exist.",
+      "The description of compare.rs:75-80 was accurate; only the inference from it was wrong."
+    ],
+    "myOwnCorrectionToTheDashboard": "The assignment says the findings vector is built by three extend() calls at 474-476. There are EIGHT extend() sites into a findings vector: 352, 438, 474, 475, 476, 482, 2362, 2368. This strengthens the robustness argument rather than weakening it, since the fragility surface is larger than described.",
+    "provenanceLesson": "Corroboration multiplies confidence only under INDEPENDENCE, and agreement is not evidence of independence. Two reports sharing an origin are n=1; relaying a claim back to its own author as external support can convert a retraction into a re-confirmation. The operational test is to demand of every number: which command produced it, when, and on what tree. A claim that cannot name its own run is a relay, not a measurement."
+  },
+
+  "keepDecision": {
+    "decision": "KEEP",
+    "justificationOnRealMerit": "The change is a defensive invariant, not speculative generality. YAGNI argues against abstractions added for hypothetical future callers; it does not argue against closing an invariant. Ordering on (viewport, scenario_rank, target) alone left the reported first line dependent on the emission sequence of eight extend() calls, so any peer reordering detectors would silently reorder findings and break every manifest pinned to a first line - a failure that surfaces far from its cause as an unexplained expectation mismatch. The total order removes that coupling and the unit test converts the hazard into a 0.00s failure instead of a 214s qualification failure.",
+    "explicitlyNotJustifiedBy": "Nondeterminism. There is none, and I do not claim any. The change fixed no flake and moved no number, and was never going to.",
+    "urgency": "Not urgent, as stated. It is already landed and green.",
+    "regressionCheck": "None. Score identical before and after; unit suite 83 passed.",
+    "guardIsProvenAbleToFail": "Yes. The permutation test was validated last turn by restoring the original three-key comparator, which made it fail on the FIRST element - the exact displacement that breaks a pinned first line."
+  },
+
+  "qualification": {
+    "profile": "release",
+    "command": "cargo run --release -- qualify",
+    "denominatorFirst": { "fixtures": 28, "floorFixtures": 28, "mutants": 44, "floorMutants": 44, "denominatorMoved": false, "atFloor": true },
+    "denominatorMethod": "Counted from backtest/fixtures/*/expected.json immediately before the run.",
+    "result": {
+      "detected": 44, "total": 44, "undetected": 0, "exceededBudget": 0,
+      "comparisons": 72, "passedComparisons": 72, "duplicateFindings": 0,
+      "p95Ms": 2037, "maximumMs": 2384, "exitCode": 0, "elapsedSeconds": 214.4
+    },
+    "scoreWithDenominator": "44/44 detected across 28/28 fixtures, exit 0",
+    "budget": "maximumMs 2384 < COMPARISON_DEADLINE_MS 4400, leaving 2016ms of headroom; exceededBudgetMutations 0.",
+    "note": "Elapsed 214.4s versus 130.5s last turn on the same corpus and the same commit. That is host contention from concurrent agents, not a regression: the deciding per-comparison numbers (p95 2037ms, max 2384ms) remain far inside budget and the score is identical."
+  },
+
+  "regressionChecks": {
+    "unitSuite": { "command": "cargo test --bins", "result": "83 passed, 0 failed" },
+    "sharedTreeFootprint": "git status --porcelain -- backtest/src is EMPTY. I edited no file in the shared tree this turn; the reproduction was performed entirely in an isolated copy.",
+    "head": "738b96c, unchanged throughout.",
+    "deadlineConstants": { "COMPARISON_DEADLINE_MS": 4400, "WATCHDOG_MS": 4800, "changed": false },
+    "refreezeQuestion": "NOT re-run, as instructed. HEAD is green at 44/44 and the refrozen values are stable."
+  },
+
+  "notesForPeers": {
+    "toVerificationGate": "Your observation was correct and your error message was real; the crate you compiled genuinely had that defect. The cause was the snapshot method, not the commit. Byte-copying a live working tree is a torn read: it walks files over seconds while another agent is writing, so it can capture a state that never existed as a valid whole. Use `git worktree add --detach <sha>` or `git archive <sha>` for committed state, and if you must copy uncommitted state, hash the source before and after the copy and require the digests to match. HEAD 738b96c compiles clean (cargo check exit 0) and qualifies at 44/44.",
+    "toFidelityLead": "Corrections accepted, no defence offered. Worth noting the fragility surface is 8 extend() sites, not 3."
+  }
+}
