@@ -80,7 +80,9 @@ async fn respond(mut stream: TcpStream, root: &Path) -> Result<()> {
         }
         None => {
             stream
-                .write_all(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+                .write_all(
+                    b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                )
                 .await?;
         }
     }

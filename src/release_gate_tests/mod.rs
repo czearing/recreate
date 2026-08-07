@@ -56,7 +56,14 @@ struct FixtureEvidence {
     build_bytes: u64,
 }
 
+/// Full-stack release validation: capture, generate, build, and re-measure in a
+/// real browser.
+///
+/// Ignored by default because it launches a browser and shells out to npm and
+/// Vite. The default suite reads committed fixtures only and must stay fast, so
+/// this runs as its own CI step rather than inside every `cargo test`.
 #[tokio::test]
+#[ignore = "launches a browser and builds with npm; run explicitly as the release gate"]
 async fn generic_browser_release_gate() {
     let browser_path = browser_path().expect("Chromium browser is required for release validation");
     let port = free_port();

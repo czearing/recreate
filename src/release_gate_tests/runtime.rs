@@ -1,72 +1,33 @@
 use anyhow::{Context, Result, bail};
 use std::{
     fs,
-    io::{Read, Write},
-    net::{TcpListener, TcpStream},
     path::{Path, PathBuf},
     process::Command,
-    thread::{self, JoinHandle},
 };
 
-pub struct Server {
-    address: String,
-    thread: Option<JoinHandle<()>>,
-}
+const DEPENDENCIES: &[&str] = &["vite@8.1.2", "react@19.2.0", "react-dom@19.2.0"];
 
-impl Server {
-    pub fn start(root: &Path) -> Result<Self> {
-        let listener = TcpListener::bind("127.0.0.1:0")?;
-        let address = listener.local_addr()?.to_string();
-        let root = root.to_path_buf();
-        let thread = thread::spawn(move || serve(listener, &root));
-        Ok(Self {
-            address,
-            thread: Some(thread),
-        })
-    }
+/// A private manifest is what makes a directory a Node package root.
+///
+/// npm resolves its install prefix by walking up to the nearest `package.json`.
+/// Without one of its own the runtime is not a root, so an install there is
+/// redirected into the enclosing repository and reports success while leaving
+/// the runtime empty.
+const MANIFEST: &str = r#"{"name":"recreate-build-runtime","private":true,"version":"0.0.0"}
+"#;
 
-    pub fn url(&self) -> String {
-        format!("http://{}", self.address)
-    }
-}
-
-impl Drop for Server {
-    fn drop(&mut self) {
-        let _ = TcpStream::connect(&self.address)
-            .and_then(|mut stream| stream.write_all(b"GET /__shutdown HTTP/1.1\r\n\r\n"));
-        if let Some(thread) = self.thread.take() {
-            let _ = thread.join();
-        }
-    }
-}
-
+/// Builds a generated project with the shared build runtime.
 pub fn build(root: &Path) -> Result<()> {
     let runtime = runtime_root();
-    let vite = vite_executable(&runtime);
-    if !vite.exists() {
-        fs::create_dir_all(&runtime)?;
-        run_npm(
-            &runtime,
-            &[
-                "install",
-                "--save-exact",
-                "--ignore-scripts",
-                "--no-audit",
-                "--no-fund",
-                "vite@8.1.2",
-                "react@19.2.0",
-                "react-dom@19.2.0",
-            ],
-        )?;
-    }
+    let vite = provision(&runtime)?;
     link_dependencies(root, &runtime)?;
-    let status = Command::new(vite)
+    let status = Command::new(&vite)
         .arg("build")
         .arg(".")
         .current_dir(root)
         .env("CI", "1")
         .status()
-        .context("run shared Vite build")?;
+        .with_context(|| format!("run {}", vite.display()))?;
     if !status.success() {
         bail!("shared Vite build failed with {status}");
     }
@@ -76,18 +37,51 @@ pub fn build(root: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Installs the shared dependencies once and returns the Vite executable.
+fn provision(runtime: &Path) -> Result<PathBuf> {
+    if let Ok(vite) = installed_executable(runtime) {
+        return Ok(vite);
+    }
+    prepare(runtime)?;
+    let mut arguments = vec![
+        "install",
+        "--save-exact",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund",
+    ];
+    arguments.extend_from_slice(DEPENDENCIES);
+    run_npm(runtime, &arguments)?;
+    installed_executable(runtime)
+}
+
+/// Makes `runtime` a package root before anything installs into it.
+fn prepare(runtime: &Path) -> Result<()> {
+    fs::create_dir_all(runtime)
+        .with_context(|| format!("create build runtime {}", runtime.display()))?;
+    fs::write(runtime.join("package.json"), MANIFEST)
+        .with_context(|| format!("mark {} as a package root", runtime.display()))?;
+    Ok(())
+}
+
+/// Resolves the installed Vite executable, reporting its absence rather than
+/// letting the caller execute a path that does not exist.
+fn installed_executable(runtime: &Path) -> Result<PathBuf> {
+    let vite = runtime
+        .join("node_modules")
+        .join(".bin")
+        .join(if cfg!(windows) { "vite.cmd" } else { "vite" });
+    if !vite.exists() {
+        bail!("no vite executable at {}", vite.display());
+    }
+    Ok(vite)
+}
+
 fn runtime_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("target")
         .join("release-gate")
         .join("runtime")
-}
-
-fn vite_executable(runtime: &Path) -> PathBuf {
-    runtime
-        .join("node_modules")
-        .join(".bin")
-        .join(if cfg!(windows) { "vite.cmd" } else { "vite" })
 }
 
 fn run_npm(root: &Path, args: &[&str]) -> Result<()> {
@@ -122,70 +116,6 @@ fn link_dependencies(root: &Path, runtime: &Path) -> Result<()> {
         bail!("link shared Node dependencies failed with {status}");
     }
     Ok(())
-}
-
-fn serve(listener: TcpListener, root: &Path) {
-    for stream in listener.incoming() {
-        let Ok(mut stream) = stream else { break };
-        let _ = stream.set_read_timeout(Some(std::time::Duration::from_secs(1)));
-        let Some(path) = request_path(&mut stream) else {
-            continue;
-        };
-        if path == "/__shutdown" {
-            break;
-        }
-        if path == "/favicon.ico" {
-            let _ = stream.write_all(
-                b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            );
-            continue;
-        }
-        let path = asset_path(root, &path);
-        let (status, body) = match fs::read(&path) {
-            Ok(body) => ("200 OK", body),
-            Err(_) => ("404 Not Found", b"not found".to_vec()),
-        };
-        let content_type = content_type(&path);
-        let header = format!(
-            "HTTP/1.1 {status}\r\nContent-Length: {}\r\nContent-Type: {content_type}\r\nConnection: close\r\n\r\n",
-            body.len()
-        );
-        let _ = stream.write_all(header.as_bytes());
-        let _ = stream.write_all(&body);
-    }
-}
-
-fn request_path(stream: &mut TcpStream) -> Option<String> {
-    let mut request = [0; 4096];
-    let size = stream.read(&mut request).ok()?;
-    let text = std::str::from_utf8(&request[..size]).ok()?;
-    text.lines()
-        .next()?
-        .split_whitespace()
-        .nth(1)
-        .map(str::to_string)
-}
-
-fn asset_path(root: &Path, request: &str) -> PathBuf {
-    let relative = request.split('?').next().unwrap_or("/");
-    if relative == "/" {
-        return root.join("index.html");
-    }
-    let safe = relative
-        .trim_start_matches('/')
-        .split('/')
-        .filter(|part| !part.is_empty() && *part != "..");
-    root.join(safe.collect::<PathBuf>())
-}
-
-fn content_type(path: &Path) -> &'static str {
-    match path.extension().and_then(|value| value.to_str()) {
-        Some("css") => "text/css",
-        Some("js") => "text/javascript",
-        Some("svg") => "image/svg+xml",
-        Some("png") => "image/png",
-        _ => "text/html; charset=utf-8",
-    }
 }
 
 #[cfg(test)]

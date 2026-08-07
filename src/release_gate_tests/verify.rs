@@ -1,5 +1,5 @@
-use super::{VIEWPORTS, runtime::Server, support::collect_errors};
-use crate::{browser, capture, cli::CaptureArgs, lifecycle_script, model::Specification};
+use super::{VIEWPORTS, support::collect_errors};
+use crate::{browser, capture, cli::CaptureArgs, lifecycle_script, model::Specification, serve};
 use anyhow::Result;
 use serde_json::json;
 use std::path::{Path, PathBuf};
@@ -16,9 +16,9 @@ pub struct Verification {
 }
 
 pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<Verification> {
-    let server = Server::start(dist)?;
+    let server = serve::Directory::serve(dist).await?;
     let args = CaptureArgs {
-        url: Some(server.url()),
+        url: Some(server.url.clone()),
         reuse: false,
         reload: false,
         spec_only: false,
