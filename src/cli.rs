@@ -53,7 +53,7 @@ pub struct VerifyArgs {
 
 #[derive(Args, Clone)]
 pub struct CaptureArgs {
-    /// Source URL for a new capture. Omit when using --reuse.
+    /// Source URL, or a local directory to serve and capture. Omit when using --reuse.
     pub url: Option<String>,
     /// Capture the page most recently opened by `recreate open`.
     #[arg(long)]

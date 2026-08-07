@@ -27,6 +27,7 @@ mod page_script;
 mod probe;
 #[cfg(test)]
 mod release_gate_tests;
+mod serve;
 mod skill;
 mod state_style_script;
 mod style_contract;

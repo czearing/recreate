@@ -3,7 +3,7 @@ use crate::{
     cli::CaptureArgs,
     generate, lifecycle_script,
     model::{PageState, Specification},
-    probe, validate,
+    probe, serve, validate,
 };
 use anyhow::Result;
 use base64::Engine;
@@ -26,8 +26,16 @@ use state::{
 pub(crate) use state::set_focus;
 pub use state::{capture_state, prepare_interaction_state, read_interaction_state, read_state};
 
-pub async fn run(args: CaptureArgs) -> Result<()> {
+pub async fn run(mut args: CaptureArgs) -> Result<()> {
     let capture_started = std::time::Instant::now();
+    let served = match args.url.as_deref().and_then(serve::as_directory) {
+        Some(root) => {
+            let served = serve::Directory::serve(&root).await?;
+            args.url = Some(served.url.clone());
+            Some(served)
+        }
+        None => None,
+    };
     let viewports = probe::parse_viewports(&args.viewports)?;
     fs::create_dir_all(&args.out)?;
     let (target, mut cdp) = browser::target(&args).await?;
@@ -139,5 +147,6 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         capture_started.elapsed().as_secs_f64()
     );
     println!("{}", serde_json::to_string_pretty(&acceptance)?);
+    drop(served);
     Ok(())
 }
