@@ -921,13 +921,14 @@ fn text_collisions(state: &State) -> BTreeMap<(String, String), f64> {
             if smallest <= 0.0 || area / smallest < 0.08 {
                 continue;
             }
-            // Nesting and full containment are how layered interfaces are built;
-            // only text intruding on unrelated text is a defect.
-            if contains(first, second)
-                || contains(second, first)
-                || related(state, left_key, second)
-                || related(state, right_key, first)
-            {
+            // Nesting is how layered interfaces are built, so a box painted
+            // inside one of its own ancestors is never a defect. That is a
+            // question of lineage, not geometry: `related` answers it exactly,
+            // and two elements on DIFFERENT branches that enclose one another
+            // are colliding - total enclosure is the most severe collision
+            // there is. This matches the overlap census predicate, which
+            // excludes ancestor/descendant pairs and nothing else.
+            if related(state, left_key, second) || related(state, right_key, first) {
                 continue;
             }
             let mut pair = [
@@ -940,13 +941,6 @@ fn text_collisions(state: &State) -> BTreeMap<(String, String), f64> {
         }
     }
     collisions
-}
-
-fn contains(outer: &NodeEvidence, inner: &NodeEvidence) -> bool {
-    outer.x <= inner.x + 1.0
-        && outer.y <= inner.y + 1.0
-        && outer.x + outer.width + 1.0 >= inner.x + inner.width
-        && outer.y + outer.height + 1.0 >= inner.y + inner.height
 }
 
 /// True when `key` names the node itself or any of its ancestors, so a child
@@ -2494,6 +2488,67 @@ mod tests {
         assert!(
             findings.iter().any(|finding| finding.property == "overlap"),
             "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    /// `inner_parent` decides lineage, so the same geometry can be posed twice:
+    /// once between siblings and once between an ancestor and its own
+    /// descendant. Only the parent link differs.
+    fn enclosure_state(inner_parent: &str, inner_x: f64) -> State {
+        let node = |parent: &str, text: &str, x: f64, width: f64| NodeEvidence {
+            tag: "span".into(),
+            parent: parent.into(),
+            text: text.into(),
+            visible: true,
+            x,
+            y: 0.0,
+            width,
+            height: 24.0,
+            ..NodeEvidence::default()
+        };
+        let mut state = card_state(22.0);
+        state.nodes = BTreeMap::from([
+            (
+                "outer".to_string(),
+                node("row", "Serializer options", 648.0, 200.0),
+            ),
+            (
+                "inner".to_string(),
+                node(inner_parent, "Related links panel", inner_x, 135.2),
+            ),
+        ]);
+        state
+    }
+
+    #[test]
+    fn total_enclosure_between_unrelated_branches_is_reported() {
+        // Both boxes hang off "row", which is not itself a node, so neither is
+        // the other's ancestor. The candidate encloses "inner" completely.
+        let findings = compare_semantic_state(
+            &enclosure_state("row", 300.0),
+            &enclosure_state("row", 664.8),
+        );
+        assert!(
+            findings.iter().any(|finding| finding.property == "overlap"),
+            "total enclosure is the most severe overlap and must not be discarded: {:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn text_enclosed_by_its_own_ancestor_is_never_reported() {
+        // Identical geometry to the test above; the only change is that
+        // "inner" is now a descendant of "outer", which is how layouts are
+        // built. Delete either `related` term in `text_collisions` and this
+        // test fails, so the exclusion is load-bearing rather than vacuous.
+        let findings = compare_semantic_state(
+            &enclosure_state("outer", 300.0),
+            &enclosure_state("outer", 664.8),
+        );
+        assert!(
+            !findings.iter().any(|finding| finding.property == "overlap"),
+            "a child painted inside its own parent is not a collision: {:?}",
             findings.iter().map(|f| &f.line).collect::<Vec<_>>()
         );
     }

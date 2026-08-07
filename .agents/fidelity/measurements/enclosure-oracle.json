@@ -1,0 +1,182 @@
+{
+  "record": "enclosure-oracle",
+  "workItem": "dashboard: the collision oracle discards the most severe overlaps",
+  "owner": "fidelity-developer",
+  "writeSet": ["backtest/src/compare.rs"],
+  "sourceArtifact": ".agents/fidelity/measurements/nav-overlap-fixture.json",
+
+  "originalIntentOfTheExclusion": {
+    "site": "backtest/src/compare.rs text_collisions()",
+    "removedPredicate": "contains(first, second) || contains(second, first)",
+    "removedComment": "Nesting and full containment are how layered interfaces are built; only text intruding on unrelated text is a defect.",
+    "intent": "Stop a wrapper being reported as colliding with its own contents. A parent box always encloses its children, so a naive all-pairs sweep makes every correct layout look catastrophically broken.",
+    "whyItWasTheWrongInstrument": "The intent is about LINEAGE, and geometry was only ever a proxy for it. Lineage implies enclosure, but enclosure does not imply lineage. The proxy is therefore sound only for the ancestor/descendant case that the adjacent related() terms already decide exactly, and unsound for every cross-branch pair, which it silently discards.",
+    "twoGuardsNotOne": "text_collisions already carried a second, correct guard: related(state, key, other) walks the parent chain. duplicates_semantic_ancestor separately handles the text-inheritance problem (a wrapper appearing to hold its child's string). Neither needed the geometric term."
+  },
+
+  "ancestorVersusUnrelated": {
+    "mustStayExcluded": "ancestor/descendant enclosure - layout working correctly",
+    "mustBeReported": "enclosure between elements on different branches - a genuine collision, and the most severe one",
+    "decidedBy": "related() - DOM lineage, exact, no tolerance",
+    "noLongerDecidedBy": "contains() - box geometry, carried a +/-1.0px fudge",
+    "corroboratingArtifact": {
+      "file": ".agents/fidelity/measurements/overlap-multi-site.mjs",
+      "line": 68,
+      "predicate": "const isAnc = (a, b) => a.contains(b) || b.contains(a);",
+      "significance": "The census that produced every overlap number in this workstream - including the 2298.5px2 that opened this item - excludes ancestor/descendant pairs by DOM lineage ALONE and carries no geometric containment rule, while using thresholds identical to the comparator (MIN_AREA 16, MIN_FRAC 0.08). The two geometric terms were the comparator's only predicate-level divergence from its own oracle, so this change is a reconciliation, not a new rule."
+    },
+    "changeShape": "deletion, not a special case: the two contains() terms and the now-dead fn contains were removed; related() is untouched"
+  },
+
+  "frozenMarkerLeftDetection": {
+    "fixture": "backtest/fixtures/frozen-offset",
+    "mutation": "frozen-marker-left",
+    "viewport": 800,
+    "geometry": "marker box 648..848 fully encloses rail text box 664.80..800 on the inline axis; the two are siblings under .row, with no lineage relation",
+    "before": {
+      "findings": 1,
+      "lines": ["V800 base complementary \"Marker panel\" x 360->648 +288px"],
+      "overlapReported": false
+    },
+    "after": {
+      "findings": 2,
+      "lines": [
+        "V800 base Marker panel over Related links panel overlap clear->2298.40px2",
+        "V800 base complementary \"Marker panel\" x 360->648 +288px"
+      ],
+      "overlapReported": true,
+      "measuredArea": 2298.40,
+      "independentInstrumentArea": 2298.5,
+      "agreement": "the widened comparator and the census instrument agree to 0.1px2, confirming the comparator now sees exactly the collision the census saw"
+    }
+  },
+
+  "noAncestorDescendantFalsePositives": {
+    "layer1_population": {
+      "check": "every fixture control asserts findings == 0; a control is the recreation agreeing with its source, so any overlap newly reported there would be a false positive by construction",
+      "controls": 28,
+      "result": "all 28 controls passed; both failures are mutations, never a control",
+      "evidence": "passedComparisons 70 of 72, and neither failure line names a control"
+    },
+    "layer2_positiveUnitTest": {
+      "tests": [
+        "compare::tests::total_enclosure_between_unrelated_branches_is_reported",
+        "compare::tests::text_enclosed_by_its_own_ancestor_is_never_reported"
+      ],
+      "design": "one helper poses IDENTICAL geometry twice and varies only the parent link, so the two tests differ solely in lineage",
+      "result": "both pass; full bin suite 81 passed, 0 failed",
+      "validationOfTheCheckItself": {
+        "method": "disabled the related() terms with `if false && (...)` and re-ran",
+        "outcome": "text_enclosed_by_its_own_ancestor_is_never_reported FAILED, reporting 'V1440 base Related links panel over Serializer options overlap clear->3244.80px2'",
+        "conclusion": "the ancestor exclusion is load-bearing and not vacuously satisfied by duplicates_semantic_ancestor or any earlier filter; the probe was reverted"
+      }
+    },
+    "layer3_residualRisk": {
+      "risk": "related() walks a hard `for _ in 0..24` ancestor cap. The geometric term was an unintended backstop for pairs nested deeper than 24 levels, so deleting it exposes them.",
+      "status": "not triggered by the current corpus - all 28 controls are clean and every fixture DOM is under 10 levels deep",
+      "correctRepairIfItEverBinds": "make related() walk to the root, NOT restore the geometric test"
+    },
+    "newFindingsAudit": {
+      "total": 2,
+      "bothAre": "cross-branch total enclosure - exactly the class this item exists to catch",
+      "falsePositives": 0,
+      "detail": [
+        {
+          "fixture": "frozen-offset",
+          "pair": "Marker panel over Related links panel",
+          "area": 2298.40,
+          "lineage": "siblings under .row",
+          "genuine": true
+        },
+        {
+          "fixture": "wrap-collision",
+          "pair": "Conversion table over Related links",
+          "area": 2881.92,
+          "lineage": "nav .trail li versus absolutely positioned .aside, siblings under .stage",
+          "geometry": "trail item 611..731 lies wholly inside the aside box 528..800; overlap width 120.08px equals the item's full text width, i.e. total enclosure",
+          "genuine": true,
+          "confirmedBy": "this fixture's OWN declared invariant I2 in nav-overlap-fixture.json - 'no trail item overlaps the aside panel'. Conversion table is a trail item, so the old oracle was under-reporting a violation of the invariant the fixture exists to police."
+        }
+      ]
+    }
+  },
+
+  "qualification": {
+    "command": "cargo run --release -- qualify",
+    "build": "release",
+    "denominatorFirst": {
+      "fixtures": 28,
+      "totalMutations": 44,
+      "floorFixtures": 28,
+      "floorMutations": 44,
+      "floorHeld": true,
+      "note": "the floor is on the DENOMINATOR, and it is unchanged at 44 mutants across 28 fixtures. Nothing was removed, suppressed or lowered."
+    },
+    "before": {
+      "detected": 44,
+      "total": 44,
+      "undetected": 0,
+      "exit": 0,
+      "comparisons": "72/72",
+      "duplicateFindings": 0,
+      "p95Ms": 1302,
+      "p99Ms": 3621,
+      "maximumMs": 3621,
+      "exceededBudgetMutations": 0,
+      "elapsedSeconds": 207.4
+    },
+    "after": {
+      "detected": 42,
+      "total": 44,
+      "undetected": 2,
+      "exit": 1,
+      "comparisons": "70/72",
+      "duplicateFindings": 0,
+      "p95Ms": 966,
+      "p99Ms": 1333,
+      "maximumMs": 1333,
+      "exceededBudgetMutations": 0,
+      "elapsedSeconds": 109.6
+    }
+  },
+
+  "blockedOnFixtureAuthor": {
+    "statement": "The oracle fix is correct and complete, but the qualification score fell 44/44 -> 42/44 because two frozen manifests encode the BLIND oracle's output. Both regressions are 'content mismatch' on finding COUNT and FIRST LINE, never a missed detection: both mutants still report status=Fail.",
+    "whyIDidNotFixIt": "backtest/fixtures/**/expected.json is fixture-author's write set and is explicitly forbidden to me. I did not edit, suppress or work around it.",
+    "gateMechanism": "backtest/src/fixture.rs:385 requires report.findings.len() == mutation.primary_findings exactly, and mutation.finding to equal the FIRST finding line. An additional overlap finding therefore breaks both conditions, and overlap lines sort ahead of the previously-first line in both cases.",
+    "contradictedClaim": {
+      "artifact": ".agents/fidelity/measurements/nav-overlap-fixture.json",
+      "claim": "frozen-marker-left is still DETECTED, via the x-shift finding rather than the overlap finding, so the fixture qualifies today and will tighten automatically if the oracle is widened.",
+      "finding": "The 'will tighten automatically' half is FALSE. backtest/fixtures/frozen-offset/expected.json freezes primaryFindings at 1 and pins finding to the x-shift line, so a widened oracle necessarily produces 2 findings and the fixture BREAKS rather than tightening. The dashboard assignment inherited this claim; it is the only part of the assignment that did not hold."
+    },
+    "exactRefreezeRequired": [
+      {
+        "file": "backtest/fixtures/frozen-offset/expected.json",
+        "mutation": "frozen-marker-left",
+        "primaryFindings": { "from": 1, "to": 2 },
+        "finding": {
+          "from": "V800 base complementary \"Marker panel\" x 360->648 +288px",
+          "to": "V800 base Marker panel over Related links panel overlap clear->2298.40px2"
+        }
+      },
+      {
+        "file": "backtest/fixtures/wrap-collision/expected.json",
+        "mutation": "frozen-run-width",
+        "primaryFindings": { "from": 4, "to": 5 },
+        "finding": {
+          "from": "V800 base Encoder and decoder over Related links overlap clear->1904.16px2",
+          "to": "V800 base Conversion table over Related links overlap clear->2881.92px2"
+        }
+      }
+    ],
+    "expectedScoreAfterRefreeze": "44/44 across 28 fixtures, exit 0"
+  },
+
+  "forbiddenFilesUntouched": [
+    "src/generate/authored_css.rs",
+    "src/generate/css_state_helpers.rs",
+    "backtest/src/deadline.rs",
+    "backtest/src/fixture.rs",
+    "backtest/fixtures/**"
+  ]
+}
