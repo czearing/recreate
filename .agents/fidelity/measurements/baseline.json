@@ -1,95 +1,154 @@
 {
-  "recordedBy": "verification-gate",
-  "recordedAtUtc": "2026-08-07T11:03:29.7839209Z",
-  "workItem": "002 responsive range mutants + multi-width sweep",
-  "verdict": "APPROVE",
-  "reason": "Measured under the release profile, work item 002 passes on three runs with 37/37 detected, 0 undetected, 0 exceeded budget, 0 failures. Prior rejections timed a DEBUG build: per-case debug/release ratio spanned 1.38-3.39 (median 2.50) with only 2 of 37 cases exempt, the flat-multiplier signature of an unoptimized profile. The proposed warm-up explanation is refuted by the accusers own repeat=3 artifact: iteration medians 501/501/495ms, iter1/iter3 ratio 1.01, iteration2 faster than iteration1 in 18 of 36 cases.",
-  "profile": "release",
-  "gitCommitShaAtMeasurement": "540c4a3",
-  "denominatorMutants": 37,
-  "denominatorFixtures": 25,
-  "comparisons": 62,
-  "medianOfRuns": 3,
-  "medianP95Ms": 946,
-  "medianP99Ms": 1407,
-  "medianMaximumMs": 1407,
-  "p95SpreadMs": 263.0,
-  "marginToBudgetMs": 3054,
-  "marginOverSpreadRatio": 11.6,
-  "runs": {
-    "release3Restore": {
-      "p99Ms": 1372,
-      "browsers": 78,
-      "undetected": 0,
-      "maximumMs": 1372,
-      "failures": 0,
-      "exceededBudget": 0,
-      "total": 37,
-      "detected": 37,
-      "p95Ms": 946
-    },
-    "release2": {
-      "p99Ms": 1407,
-      "browsers": 80,
-      "undetected": 0,
-      "maximumMs": 1407,
-      "failures": 0,
-      "exceededBudget": 0,
-      "total": 37,
-      "detected": 37,
-      "p95Ms": 893
-    },
-    "release1": {
-      "p99Ms": 1431,
-      "browsers": 76,
-      "undetected": 0,
-      "maximumMs": 1431,
-      "failures": 0,
-      "exceededBudget": 0,
-      "total": 37,
-      "detected": 37,
-      "p95Ms": 1156
-    }
-  },
-  "debugControlInterleaved": {
-    "debug2": {
-      "browsers": 93,
-      "p99Ms": 4245,
-      "p95Ms": 3095
-    },
-    "debug1": {
-      "browsers": 84,
-      "p99Ms": 3925,
-      "p95Ms": 2849
-    }
-  },
-  "warmUpHypothesisRefuted": {
-    "p95IfColdDiscarded": 1080,
-    "decayPresentIn": "18/36",
-    "ratio": 1.01,
-    "iter1MedianMs": 501,
-    "iter3MedianMs": 495,
-    "p95AsReported": 985,
-    "iter2MedianMs": 501,
-    "source": "backtest/target/after-r3.json repeat=3"
-  },
-  "negativeCase": {
+  "medianP95Ms": 998,
+  "consoleErrors": 0,
+  "protectedFilesModifiedByMe": [],
+  "discardedRun": {
+    "notATimeout": "elapsed=1080ms against budget=3799ms; expected MEASURE, actual status=Fail findings=2",
+    "undetectedMutant": "overlap-preserved/overlap-repaired",
+    "p95Ms": 2396,
+    "p99Ms": 3048,
     "exceededBudget": 0,
-    "predictedBeforeRunning": "29/37 detected, 8 undetected",
-    "profile": "release",
-    "predictionHeld": true,
-    "namesOriginalDefect": "7 responsive-range mutants status=Pass findings=0, plus responsive-isolation findings=1 expected 2",
-    "detected": 29,
-    "undetected": 8
+    "detected": 37,
+    "total": 38,
+    "which": "release3",
+    "exit": 1,
+    "undetected": 1,
+    "whyDiscarded": "The fixture corpus was being edited by another agent during the run: comprehensive was mid-deletion and overlap-preserved had been created minutes earlier. Run 4 re-measured the settled tree with a fixture-tree hash pinned identical before and after and returned 38/38."
   },
-  "restoreConfirmed": true,
+  "marginToBudgetMs": 3402,
+  "reason": "The assigned change does not exist. git status --porcelain -- src is empty and src/generate/source_item_dedupe.rs is untouched at HEAD 28140cb, so work item 003 has not been implemented and there is nothing to compare. A missing output is a reject, not a gap to fill; writing the refactor myself would destroy the independence that makes this gate worth anything. The gate itself was built and validated and is ready for the change when it lands.",
+  "verdict": "REJECT / RETURN - no subject to gate",
+  "recordedBy": "verification-gate",
+  "medianP99Ms": 1406,
+  "medianOfRuns": 3,
+  "profile": "release",
+  "denominatorFixtures": 26,
+  "duplicateFindings": 0,
+  "denominatorFloorsRequired": {
+    "fixtures": 25,
+    "mutants": 37
+  },
+  "recordedAtUtc": "2026-08-07T12:18:08.9450207Z",
+  "marginOverSpreadRatio": 10.6,
+  "p95SpreadMs": 321,
+  "denominatorMutants": 38,
+  "comparisons": 64,
+  "medianMaximumMs": 1406,
+  "gitCommitShaAtMeasurement": "28140cb",
   "gateConstants": {
-    "budgetReDerived": false,
     "unchanged": true,
+    "budgetReDerived": false,
     "WATCHDOG_MS": 4800,
     "COMPARISON_DEADLINE_MS": 4400
   },
-  "duplicateFindings": 0,
-  "consoleErrorMutantDetected": true,
-  "hostDuringAllRuns": "CPU 100 percent, 76-93 concurrent browsers - release passes anyway"
+  "workItem": "DOM-identity regression gate for the component-emitter refactor (work item 003)",
+  "denominatorMovement": "mutants 37 -> 38, fixtures 25 -> 26; grew, did not shrink",
+  "runs": {
+    "release2": {
+      "elapsedS": 105,
+      "maximumMs": 1479,
+      "p99Ms": 1479,
+      "exceededBudget": 0,
+      "detected": 37,
+      "total": 37,
+      "p95Ms": 998,
+      "treePinned": false,
+      "comparisons": 62,
+      "undetected": 0,
+      "exit": 0
+    },
+    "release1": {
+      "elapsedS": 99,
+      "maximumMs": 1365,
+      "p99Ms": 1365,
+      "exceededBudget": 0,
+      "detected": 37,
+      "total": 37,
+      "p95Ms": 981,
+      "treePinned": false,
+      "comparisons": 62,
+      "undetected": 0,
+      "exit": 0
+    },
+    "release4": {
+      "elapsedS": 126,
+      "maximumMs": 1406,
+      "p99Ms": 1406,
+      "exceededBudget": 0,
+      "detected": 38,
+      "total": 38,
+      "p95Ms": 1302,
+      "treePinned": true,
+      "comparisons": 64,
+      "undetected": 0,
+      "exit": 0
+    }
+  },
+  "treeStabilityPin": {
+    "hashAfter": "DC8DB78BFBA816BC4480339D64458185EAA4B47CF7D338ED1EDF32A27945741F",
+    "method": "SHA256 over per-file SHA256 of every file under backtest/fixtures, sorted by path",
+    "hashBefore": "DC8DB78BFBA816BC4480339D64458185EAA4B47CF7D338ED1EDF32A27945741F",
+    "fileCount": 116,
+    "stable": true
+  },
+  "elapsedSecondsPerRun": [
+    99,
+    105,
+    126
+  ],
+  "domIdentityGate": {
+    "script": ".agents/fidelity/dom-identity-gate.ps1",
+    "widths": [
+      320,
+      480,
+      768,
+      1024,
+      1440
+    ],
+    "height": 900,
+    "oracle": "Records both arms with 'record' and compares the base state's selector->node map exactly. 'compare' cannot be used here: it must capture the candidate live inside COMPARISON_DEADLINE_MS=4400, but one capture of this app measures 10157ms, so it returns INCONCLUSIVE 'comparison deadline expired'. The deadline was NOT raised.",
+    "volatilePropertyExcluded": "renderedContentSha256",
+    "exclusionEvidence": "A pixel hash of rasterised SVG icons, not a DOM property. Two control runs on byte-identical input disagreed with each other: differences at widths 768/1024/1440 in run 1 and 768/1024 in run 2, counts moving 4->5, with the same pair of hashes swapping sides between widths. 100 percent of false positives were this one property.",
+    "negativeControl": {
+      "arms": "genA (HEAD) vs genSelf (HEAD, regenerated) - byte-identical inputs",
+      "result": "5/5 IDENTICAL, 0 differences, exit 0",
+      "volatileDifferencesExcludedAndCounted": 4,
+      "elementsPerWidth": {
+        "w480": 347,
+        "w1024": 347,
+        "w768": 347,
+        "w320": 349,
+        "w1440": 347
+      },
+      "meaning": "The gate does not fire on unchanged input."
+    },
+    "canary": {
+      "perturbation": "title replaced and a canary-node div injected before #root in the after arm's built dist",
+      "result": "5/5 DIFFERING, exit 1",
+      "differencesPerWidth": [
+        718,
+        713,
+        713,
+        713,
+        713
+      ],
+      "elementCountShift": "349->350 at 320, 347->348 at 480/768/1024/1440",
+      "meaning": "The gate can fail, so its IDENTICAL verdicts are falsifiable rather than vacuous."
+    },
+    "realPair": {
+      "before": "5acc074",
+      "after": "28140cb",
+      "result": "UNMEASURABLE",
+      "evidence": "The before arm does not build. Generated react/src/components/CollectionItems/NotebookCard.jsx at 5acc074 both imports NotebookCard from ../index.js and declares 'export function NotebookCard', so rolldown fails with PARSE_ERROR 'Identifier NotebookCard has already been declared'. Self-import collisions: 1 file at 5acc074, 0 at 28140cb. Emitted component files: 51 at 5acc074, 47 at 28140cb.",
+      "conclusion": "There is no DOM at 5acc074 to preserve, so DOM identity across that pair is undefined. That commit was a defect fix, not a behaviour-preserving refactor."
+    },
+    "assignedSubject": {
+      "workItem": "003 duplicate component emission",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "git status --porcelain -- src returns empty at HEAD 28140cb; src/generate/source_item_dedupe.rs is unmodified.",
+      "action": "Returned to fidelity-developer unmeasured. Per the rule that a missing output is a reject and not a gap to fill, the refactor was not written by this agent."
+    },
+    "runtimeSeconds": 151,
+    "consoleErrors": 0
+  }
 }
