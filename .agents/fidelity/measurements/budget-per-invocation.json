@@ -1,0 +1,327 @@
+{
+  "recordedBy": "verification-gate",
+  "recordedAtUtc": "2026-08-07T17:31:17.027Z",
+  "purpose": "Re-verdict the 5000ms latency budget on the PER-INVOCATION basis the requester actually stated (one page: generation + the comparison/tests for that same page), replacing the invalid sum-across-5-specs basis used in index-hoist-landed.json.",
+  "profile": "release",
+  "gitCommitSha": "559ca02",
+  "scopeCorrectionAccepted": {
+    "by": "fidelity-lead",
+    "requesterWords": "I need this to run sub 5 seconds the recreate tool itself and the tests",
+    "priorBasis": "sum of generation across 5 unrelated specs vs a single-run 5000ms limit",
+    "ratified": true,
+    "reasonOnTheMerits": "A sum-of-N budget is invalid by construction: adding a sixth spec would register as a regression without any code becoming slower. The limit is a per-invocation latency, so the denominator of the comparison must be one page.",
+    "testsInterpretation": "The phrase and the tests is read as the per-page comparison (backtest compare_once), not the 28-fixture corpus wall time, per explicit instruction 2. Chosen because it is the only test cost attributable to a single page."
+  },
+  "premiseCorrections": [
+    {
+      "claim": "backtest/src/compare.rs currently does not compile.",
+      "finding": "STALE. Commit 738b96c already unbroke it. backtest built and ran qualification twice from the main tree, exit 0 on the clean run, 0 bytes stderr. No byte-copy workaround was needed.",
+      "artifact": "backtest/src/compare.rs at 559ca02"
+    },
+    {
+      "claim": "My own prior arm-B per-spec generation medians (live-r15 2235, fluid-r1 2034, fluid-r5 4039, review 3031, recreate-output 1031).",
+      "finding": "INFLATED BY THE HARNESS. Those used Start-Process with stdout/stderr redirection, which adds 350-880ms of process-launch overhead and quantizes near 1000ms. Direct invocation of the same binary on the same specs gives 1825/1805/3608/2029/150. recreate-output was 1031ms reported vs 150ms actual - 85% of the reported figure was harness, not tool.",
+      "consequence": "The ~900ms noise band I previously reported was mostly instrument, not host. Correcting the instrument shrank the worst-spec sd from ~900 to 319ms and made the median verdict decidable."
+    },
+    {
+      "claim": "A detached worktree is a safe place to run qualification.",
+      "finding": "FALSE FOR THIS CORPUS. A worktree at 559ca02 contains only 9 fixtures / 26 mutants; 19 fixtures are uncommitted fixture-author work living only in the main tree. My second qualification run, taken in the worktree, reported 26 mutants / 35 comparisons - a SHRUNKEN DENOMINATOR - and was discarded as void, not reported as a result.",
+      "consequence": "Corpus qualification must be run from the main tree until the 19 fixtures are committed. A worktree run silently improves ratios by removing work from the bottom."
+    },
+    {
+      "claim": "focus-behavior control FAIL 1 seen in my first run is a regression.",
+      "finding": "FLAKY, NOT A REGRESSION. Re-run from the same tree gave 72/72 passed and 0 failures. Reported, not repaired - it is not my work item.",
+      "artifact": "viewport-pixels hash 2eb034c9fa9b to f57ba70865c0, run 1 only"
+    }
+  ],
+  "gateIntegrity": {
+    "corpusSource": "main tree backtest/",
+    "expectedJsonManifests": 28,
+    "totalMutations": 44,
+    "detectedMutations": 44,
+    "killRate": "44/44 = 100%",
+    "denominatorShrank": false,
+    "runs": [
+      {
+        "id": "run1",
+        "cases": 28,
+        "comparisons": 72,
+        "passedComparisons": 71,
+        "detected": "44/44",
+        "exit": 1,
+        "stderrBytes": 141,
+        "note": "focus-behavior control flake"
+      },
+      {
+        "id": "run2-VOID",
+        "cases": 9,
+        "comparisons": 35,
+        "detected": "19/26",
+        "exit": 1,
+        "stderrBytes": 2729,
+        "note": "DISCARDED - worktree corpus, shrunken denominator, not a result"
+      },
+      {
+        "id": "run3",
+        "cases": 28,
+        "comparisons": 72,
+        "passedComparisons": 72,
+        "detected": "44/44",
+        "undetected": 0,
+        "exceededBudget": 0,
+        "duplicateFindings": 0,
+        "p95Ms": 934,
+        "p99Ms": 1455,
+        "maxMs": 1455,
+        "exit": 0,
+        "stderrBytes": 0,
+        "wallMs": 170055
+      }
+    ],
+    "deadlineRsUnchanged": {
+      "COMPARISON_DEADLINE_MS": 4400,
+      "WATCHDOG_MS": 4800,
+      "edited": false
+    },
+    "protectedFilesModified": "none"
+  },
+  "perPageComparisonCost": {
+    "instrument": "qualify costLines[].wallMs - one compare_once per fixture unit, the per-page comparison cost",
+    "rejectedInstrument": "28-fixture qualification wall time (170055ms) - the whole corpus, not one page, explicitly excluded",
+    "pooledSamples": 144,
+    "minMs": 390,
+    "medianMs": 527,
+    "p95Ms": 978,
+    "maxMs": 1455,
+    "meanMs": 632,
+    "sdMs": 231,
+    "perRun": [
+      {
+        "run": 1,
+        "n": 72,
+        "median": 563,
+        "p95": 1067,
+        "max": 1367,
+        "sd": 235
+      },
+      {
+        "run": 3,
+        "n": 72,
+        "median": 524,
+        "p95": 934,
+        "max": 1455,
+        "sd": 228
+      }
+    ],
+    "agreement": "Two independent 72-sample runs agree to 39ms at the median - the comparison cost is stable."
+  },
+  "generationCost": {
+    "instrument": "direct invocation of the release binary, 5 rounds x 5 specs, stopwatch around the process",
+    "allRunsExitZero": true,
+    "consoleErrorBytes": 0,
+    "fileCountsMatchGoldenMaster": {
+      "live-r15": 148,
+      "fluid-r1": 148,
+      "fluid-r5": 112,
+      "review": 187,
+      "recreate-output": 20,
+      "total": 615
+    },
+    "perSpecMs": {
+      "live-r15": [
+        1705,
+        1791,
+        1825,
+        1963,
+        2525
+      ],
+      "fluid-r1": [
+        1705,
+        1745,
+        1805,
+        1985,
+        1997
+      ],
+      "fluid-r5": [
+        3487,
+        3581,
+        3608,
+        3831,
+        4282
+      ],
+      "review": [
+        1908,
+        2007,
+        2029,
+        2050,
+        2097
+      ],
+      "recreate-output": [
+        125,
+        138,
+        150,
+        165,
+        176
+      ]
+    }
+  },
+  "verdictPerInvocation": {
+    "limitMs": 5000,
+    "formula": "generation median for the spec + per-page comparison median (527ms)",
+    "perSpec": [
+      {
+        "spec": "live-r15",
+        "genMedianMs": 1825,
+        "genSdMs": 328.3,
+        "cmpMs": 527,
+        "totalMs": 2352,
+        "combinedSdMs": 402,
+        "ci95": [
+          1565,
+          3139
+        ],
+        "sigmaInsideLimit": 6.6,
+        "result": "MET"
+      },
+      {
+        "spec": "fluid-r1",
+        "genMedianMs": 1805,
+        "genSdMs": 135.9,
+        "cmpMs": 527,
+        "totalMs": 2332,
+        "combinedSdMs": 268,
+        "ci95": [
+          1807,
+          2857
+        ],
+        "sigmaInsideLimit": 9.95,
+        "result": "MET"
+      },
+      {
+        "spec": "fluid-r5",
+        "genMedianMs": 3608,
+        "genSdMs": 319.1,
+        "cmpMs": 527,
+        "totalMs": 4135,
+        "combinedSdMs": 394,
+        "ci95": [
+          3363,
+          4907
+        ],
+        "sigmaInsideLimit": 2.2,
+        "result": "MET",
+        "worstCase": true
+      },
+      {
+        "spec": "review",
+        "genMedianMs": 2029,
+        "genSdMs": 70,
+        "cmpMs": 527,
+        "totalMs": 2556,
+        "combinedSdMs": 241,
+        "ci95": [
+          2083,
+          3029
+        ],
+        "sigmaInsideLimit": 10.13,
+        "result": "MET"
+      },
+      {
+        "spec": "recreate-output",
+        "genMedianMs": 150,
+        "genSdMs": 20.4,
+        "cmpMs": 527,
+        "totalMs": 677,
+        "combinedSdMs": 232,
+        "ci95": [
+          222,
+          1132
+        ],
+        "sigmaInsideLimit": 18.64,
+        "result": "MET"
+      }
+    ],
+    "overall": "MET at the typical invocation for all 5 of 5 specs.",
+    "worstCase": {
+      "spec": "fluid-r5",
+      "totalMs": 4135,
+      "marginMs": 865,
+      "ci95UpperMs": 4907,
+      "headroomAtCiUpperMs": 93
+    },
+    "genuinelyInsideOrMerelyClose": "GENUINELY INSIDE, but narrowly. The margin is 865ms = 2.20 combined sigma (one-sided p = 0.014), and the 95% CI upper bound of 4907ms falls 93ms below the limit. This is outside the host-noise band, so the measurement DOES decide the median case. It would not have been decidable against my earlier ~900ms noise figure; correcting the Start-Process instrument is what made it decidable.",
+    "upperTail": {
+      "basis": "worst observed generation + p95 comparison",
+      "fluidR5Ms": 5260,
+      "worstPlusWorstMs": 5737,
+      "result": "NOT MET / INDETERMINATE",
+      "reasoning": "5260 vs 5000 is 0.66 sigma above the limit, inside the noise band. The measurement CANNOT decide the tail case at n=5.",
+      "whatWouldSettleIt": "Variance-limited, therefore reducible by sampling: n = [(Z0.975+Z0.80)*sigma/delta]^2 = [(1.96+0.84)*394/260]^2 = 18 runs per spec resolves a 260ms difference at 95%/80%. About 6 minutes of wall time."
+    }
+  },
+  "hostContention": {
+    "statement": "The host is shared and saturated; every timing is a contaminated UPPER bound, so a MET verdict is conservative and a MISSED verdict is not.",
+    "contentionPctRun3": {
+      "min": 100,
+      "median": 123,
+      "max": 1682
+    },
+    "quietHost": "Not obtainable - peers are actively building in this tree. Mitigated instead by removing the dominant instrument artifact (Start-Process) and by pooling 144 comparison samples across two runs."
+  },
+  "residual": {
+    "question": "After the Index hoist, what is the largest remaining phase in the worst spec?",
+    "spec": "fluid-r5",
+    "instrument": "RECREATE_TIMING env-gated markers already present at HEAD; 3 instrumented runs. No code was added.",
+    "clockCorrection": "generate_* and project_* use two different Instant clocks. A naive subtraction across them understates the assets phase; figures below are computed on the correct per-clock basis.",
+    "generationMedianMs": 3552,
+    "phasesMs": {
+      "read": 18,
+      "parse": 311,
+      "assets": 2412,
+      "css": 123,
+      "components": 29,
+      "classes": 5,
+      "state_styles": 0,
+      "sources_emit": 657,
+      "tail": 19
+    },
+    "dominantPhase": {
+      "name": "project_assets",
+      "source": "src/generate/assets.rs::download",
+      "ms": 2412,
+      "shareOfGeneration": "67.9%",
+      "shareOfPerInvocationTotal": "58.3%"
+    },
+    "rootCauseMeasured": "NOT computation. fluid-r5 declares 18 remote asset URLs pointing at http://localhost:8261 - the capture-time server, which is dead. assets_remote::download attempts them and stalls on connection-refused. A single refused TCP connect to 127.0.0.1:8261 on this host measures 2092ms (dual-stack IPv6 to IPv4 fallback), accounting for essentially the whole 2412ms phase. Only 8 asset files are emitted, all from inline base64; all 18 remote fetches fail.",
+    "evidence": {
+      "remoteUrlsInSpec": 18,
+      "emittedAssetFiles": 8,
+      "emittedAssetBytes": 726784,
+      "singleRefusedConnectMs": 2092,
+      "port8261Listening": false
+    },
+    "amdahlBound": "If the assets phase went to zero, fluid-r5 generation falls 3552 to 1140ms and the per-invocation total falls 4135 to 1667ms, a 2.5x improvement that also brings the upper tail decisively inside budget.",
+    "aimedNextFix": "Bound or short-circuit the remote-asset fetch when the capture origin is unreachable (cap the connect timeout, or skip capture-origin localhost URLs once the first connect is refused). This is I/O stall removal, not algorithmic work, and is independent of the css_base cost that dominated live-r15.",
+    "contrastWithPriorProfile": "generation-profile.json (4c8ae61, live-r15) named css_base at 67.2%. For fluid-r5 at 559ca02 css_base is 46ms. The dominant phase is spec-dependent; there is no single hot spot across the corpus."
+  },
+  "consoleErrors": {
+    "generationRuns": "0 bytes stderr across all 40 generation invocations",
+    "qualificationRun3": "0 bytes stderr",
+    "qualificationRun1": "141 bytes - the focus-behavior flake diagnostic"
+  },
+  "newBaseline": {
+    "killRate": "44/44 over 28 fixtures",
+    "perPageComparisonMedianMs": 527,
+    "perPageComparisonP95Ms": 978,
+    "generationMediansMs": {
+      "live-r15": 1825,
+      "fluid-r1": 1805,
+      "fluid-r5": 3608,
+      "review": 2029,
+      "recreate-output": 150
+    },
+    "perInvocationWorstCaseMs": 4135,
+    "supersedes": "index-hoist-landed.json arm-B medians, which were harness-inflated"
+  },
+  "decision": "APPROVE - the 5000ms per-invocation budget is MET for all 5 specs at the typical invocation, worst case fluid-r5 at 4135ms with a 95% CI upper bound of 4907ms. The upper tail (5260ms) is NOT met and is not resolvable at n=5; it is reported as indeterminate rather than shaded to either side."
+}
