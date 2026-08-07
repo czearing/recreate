@@ -1,0 +1,6547 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T06:50:06.615Z",
+  "instrument": {
+    "engine": "headless Chromium via Chrome DevTools Protocol",
+    "viewport": "1440x900",
+    "method": "one pre-document instrumentation shim + one post-load census script per site; scroll pass to provoke deferred work; media queries read from raw stylesheet text via CSS.getStyleSheetText",
+    "principle": "measured the computed/rendered result, not stylesheet source"
+  },
+  "sitesSurveyed": 18,
+  "sitesAttempted": 18,
+  "frameworksCovered": [
+    "Next.js (React)",
+    "React",
+    "React + Primer (Rails hybrid)",
+    "Vue 3 / VitePress",
+    "Nuxt 3 (Vue)",
+    "Angular",
+    "SvelteKit",
+    "SolidJS",
+    "Astro",
+    "React Router / Remix",
+    "Ember",
+    "Yari (React SSR + vanilla)",
+    "MediaWiki (vanilla JS)",
+    "None (static HTML)",
+    "React (SSR)",
+    "Remix (React)"
+  ],
+  "featuresFound": 47,
+  "featuresTracked": 51,
+  "sitesDetail": [
+    {
+      "id": "nextjs",
+      "url": "https://nextjs.org/",
+      "framework": "Next.js (React)",
+      "why": "Reference implementation of the dominant React meta-framework; App Router RSC output.",
+      "ok": true,
+      "elementCount": 2274,
+      "maxDepth": 19,
+      "styleSheetsRead": 10,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        370,
+        384,
+        400,
+        401,
+        420,
+        421,
+        448,
+        480,
+        500,
+        512,
+        540,
+        576,
+        600,
+        601,
+        640,
+        740,
+        768,
+        780,
+        820,
+        890,
+        891,
+        960,
+        961,
+        992,
+        1004,
+        1020,
+        1024,
+        1090,
+        1100,
+        1150,
+        1200,
+        1280,
+        1400,
+        1496
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": true,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "drag-listener-registrations",
+        "form",
+        "custom-element",
+        "shadow-dom",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 220
+        },
+        "grid": {
+          "matchedElements": 5
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 68
+        },
+        "fixed": {
+          "matchedElements": 2
+        },
+        "sticky": {
+          "matchedElements": 1
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 30
+        },
+        "aspect-ratio": {
+          "matchedElements": 57
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 43
+        },
+        "backdrop-filter": {
+          "matchedElements": 17
+        },
+        "clip-path": {
+          "matchedElements": 3
+        },
+        "css-gradient": {
+          "matchedElements": 31
+        },
+        "box-shadow": {
+          "matchedElements": 102
+        },
+        "border-radius": {
+          "matchedElements": 512
+        },
+        "css-transition": {
+          "matchedElements": 1150
+        },
+        "css-animation": {
+          "matchedElements": 9
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 8
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 36
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 0
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 1
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 2
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 63
+        },
+        "responsive-image": {
+          "matchedElements": 27
+        },
+        "media-query": {
+          "breakpoints": 34
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 20,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 1,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 1
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 18,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 1,
+          "clientRouterLinks": 1,
+          "mutationObservers": 5
+        },
+        "deferred-load": {
+          "lazyImgs": 33,
+          "asyncDecode": 57,
+          "preload": 9,
+          "intersectionObservers": 15,
+          "ioObservedTargets": 69,
+          "idleCallbacks": 1,
+          "resizeObservers": 1,
+          "deferScripts": 25,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "tailwindcss",
+      "url": "https://tailwindcss.com/",
+      "framework": "Next.js (React)",
+      "why": "Utility-CSS site: densest source of declared breakpoints and container queries.",
+      "ok": true,
+      "elementCount": 2600,
+      "maxDepth": 22,
+      "styleSheetsRead": 2,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        320,
+        384,
+        448,
+        475,
+        500,
+        512,
+        544,
+        576,
+        600,
+        618,
+        640,
+        712,
+        768,
+        877,
+        1024,
+        1280,
+        1536
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": true,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "container-query",
+        "transform",
+        "aspect-ratio",
+        "scroll-snap",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "menu",
+        "tooltip",
+        "tab-set",
+        "carousel",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "custom-element",
+        "shadow-dom",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 157
+        },
+        "grid": {
+          "matchedElements": 75
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 89
+        },
+        "fixed": {
+          "matchedElements": 4
+        },
+        "sticky": {
+          "matchedElements": 3
+        },
+        "container-query": {
+          "matchedElements": 24
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 50
+        },
+        "aspect-ratio": {
+          "matchedElements": 24
+        },
+        "scroll-snap": {
+          "matchedElements": 1
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 30
+        },
+        "backdrop-filter": {
+          "matchedElements": 10
+        },
+        "clip-path": {
+          "matchedElements": 9
+        },
+        "css-gradient": {
+          "matchedElements": 23
+        },
+        "box-shadow": {
+          "matchedElements": 242
+        },
+        "border-radius": {
+          "matchedElements": 149
+        },
+        "css-transition": {
+          "matchedElements": 261
+        },
+        "css-animation": {
+          "matchedElements": 1
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 14
+        },
+        "menu": {
+          "matchedElements": 1
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 1
+        },
+        "tab-set": {
+          "matchedElements": 7
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 1
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 24
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 1
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 2
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 84
+        },
+        "responsive-image": {
+          "matchedElements": 15
+        },
+        "media-query": {
+          "breakpoints": 17
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 15,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 7,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 36,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 1
+        },
+        "deferred-load": {
+          "lazyImgs": 15,
+          "asyncDecode": 15,
+          "preload": 38,
+          "intersectionObservers": 4,
+          "ioObservedTargets": 27,
+          "idleCallbacks": 0,
+          "resizeObservers": 8,
+          "deferScripts": 15,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "vercel",
+      "url": "https://vercel.com/",
+      "framework": "Next.js (React)",
+      "why": "Commercial app shell by the framework authors; heavy motion and deferred load.",
+      "ok": true,
+      "elementCount": 1112,
+      "maxDepth": 25,
+      "styleSheetsRead": 10,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        242,
+        252,
+        340,
+        360,
+        370,
+        375,
+        383,
+        384,
+        395,
+        400,
+        401,
+        430,
+        440,
+        450,
+        470,
+        480,
+        500,
+        540,
+        560,
+        600,
+        601,
+        640,
+        670,
+        750,
+        768,
+        769,
+        800,
+        840,
+        860,
+        880,
+        893,
+        896,
+        960,
+        961,
+        992,
+        1024,
+        1033,
+        1036,
+        1080,
+        1100,
+        1108,
+        1200,
+        1201,
+        1300,
+        1400,
+        1496,
+        1600,
+        2300
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": true,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "container-query",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "webfont",
+        "menu",
+        "dialog",
+        "accordion",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "live-region",
+        "custom-element",
+        "shadow-dom",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-trapping",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 330
+        },
+        "grid": {
+          "matchedElements": 11
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 53
+        },
+        "fixed": {
+          "matchedElements": 7
+        },
+        "sticky": {
+          "matchedElements": 2
+        },
+        "container-query": {
+          "matchedElements": 2
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 5
+        },
+        "aspect-ratio": {
+          "matchedElements": 27
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1112
+        },
+        "z-index-stacking": {
+          "matchedElements": 38
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 8
+        },
+        "css-gradient": {
+          "matchedElements": 8
+        },
+        "box-shadow": {
+          "matchedElements": 19
+        },
+        "border-radius": {
+          "matchedElements": 88
+        },
+        "css-transition": {
+          "matchedElements": 163
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 13
+        },
+        "menu": {
+          "matchedElements": 6
+        },
+        "dialog": {
+          "matchedElements": 1
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 4
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 48
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 5
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 2
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 45
+        },
+        "responsive-image": {
+          "matchedElements": 14
+        },
+        "media-query": {
+          "breakpoints": 48
+        },
+        "focus-trapping": {
+          "modalSurfaces": 1,
+          "inert": 3,
+          "showModalCalls": 0,
+          "keyListeners": 22,
+          "focusableInModal": 37
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 2,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 12,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 19,
+          "mutationObservers": 5
+        },
+        "deferred-load": {
+          "lazyImgs": 12,
+          "asyncDecode": 18,
+          "preload": 14,
+          "intersectionObservers": 6,
+          "ioObservedTargets": 73,
+          "idleCallbacks": 2,
+          "resizeObservers": 3,
+          "deferScripts": 45,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "stripe",
+      "url": "https://stripe.com/",
+      "framework": "React",
+      "why": "Industry benchmark for high-fidelity marketing layout and custom interaction surfaces.",
+      "ok": true,
+      "elementCount": 2847,
+      "maxDepth": 32,
+      "styleSheetsRead": 5,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        248,
+        264,
+        360,
+        400,
+        410,
+        480,
+        504,
+        520,
+        568,
+        599,
+        600,
+        639,
+        640,
+        680,
+        706,
+        840,
+        882,
+        939,
+        940,
+        970,
+        1051,
+        1115,
+        1263,
+        1264,
+        1295,
+        1299,
+        1300,
+        1609
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": true,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "container-query",
+        "transform",
+        "aspect-ratio",
+        "scroll-snap",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "tooltip",
+        "accordion",
+        "carousel",
+        "combobox",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "live-region",
+        "custom-element",
+        "iframe",
+        "canvas",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 371
+        },
+        "grid": {
+          "matchedElements": 52
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 168
+        },
+        "fixed": {
+          "matchedElements": 2
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 23
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 239
+        },
+        "aspect-ratio": {
+          "matchedElements": 96
+        },
+        "scroll-snap": {
+          "matchedElements": 3
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 87
+        },
+        "backdrop-filter": {
+          "matchedElements": 1
+        },
+        "clip-path": {
+          "matchedElements": 90
+        },
+        "css-gradient": {
+          "matchedElements": 25
+        },
+        "box-shadow": {
+          "matchedElements": 6
+        },
+        "border-radius": {
+          "matchedElements": 170
+        },
+        "css-transition": {
+          "matchedElements": 174
+        },
+        "css-animation": {
+          "matchedElements": 1
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 2
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 4
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 4
+        },
+        "carousel": {
+          "matchedElements": 2
+        },
+        "combobox": {
+          "matchedElements": 1
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 24
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 16
+        },
+        "live-region": {
+          "matchedElements": 2
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 2
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 1
+        },
+        "svg": {
+          "matchedElements": 183
+        },
+        "responsive-image": {
+          "matchedElements": 136
+        },
+        "media-query": {
+          "breakpoints": 28
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 9,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 32,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 1
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 18,
+          "abortableFetch": 1,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 0
+        },
+        "deferred-load": {
+          "lazyImgs": 44,
+          "asyncDecode": 0,
+          "preload": 11,
+          "intersectionObservers": 49,
+          "ioObservedTargets": 49,
+          "idleCallbacks": 2,
+          "resizeObservers": 7,
+          "deferScripts": 75,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "github",
+      "url": "https://github.com/",
+      "framework": "React + Primer (Rails hybrid)",
+      "why": "Large production app: menus, dialogs, tooltips, virtualization, partial hydration.",
+      "ok": true,
+      "elementCount": 1772,
+      "maxDepth": 25,
+      "styleSheetsRead": 34,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        320,
+        360,
+        380,
+        400,
+        408,
+        420,
+        460,
+        479,
+        480,
+        500,
+        542,
+        543,
+        544,
+        600,
+        618,
+        640,
+        750,
+        767,
+        768,
+        800,
+        803,
+        804,
+        840,
+        875,
+        876,
+        980,
+        1011,
+        1012,
+        1024,
+        1028,
+        1029,
+        1150,
+        1200,
+        1279,
+        1280,
+        1281,
+        1299,
+        1300,
+        1320,
+        1400,
+        1600,
+        1604,
+        1728
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "float",
+        "absolute",
+        "fixed",
+        "sticky",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "webfont",
+        "menu",
+        "tooltip",
+        "tab-set",
+        "accordion",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "live-region",
+        "form",
+        "custom-element",
+        "shadow-dom",
+        "skip-link",
+        "video",
+        "canvas",
+        "svg",
+        "media-query",
+        "focus-trapping",
+        "focus-restoration",
+        "scroll-locking",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 320
+        },
+        "grid": {
+          "matchedElements": 35
+        },
+        "float": {
+          "matchedElements": 2
+        },
+        "absolute": {
+          "matchedElements": 85
+        },
+        "fixed": {
+          "matchedElements": 6
+        },
+        "sticky": {
+          "matchedElements": 1
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 91
+        },
+        "aspect-ratio": {
+          "matchedElements": 7
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 32
+        },
+        "backdrop-filter": {
+          "matchedElements": 8
+        },
+        "clip-path": {
+          "matchedElements": 35
+        },
+        "css-gradient": {
+          "matchedElements": 17
+        },
+        "box-shadow": {
+          "matchedElements": 6
+        },
+        "border-radius": {
+          "matchedElements": 74
+        },
+        "css-transition": {
+          "matchedElements": 0
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 7
+        },
+        "menu": {
+          "matchedElements": 4
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 3
+        },
+        "tab-set": {
+          "matchedElements": 10
+        },
+        "accordion": {
+          "matchedElements": 13
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 63
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 18
+        },
+        "live-region": {
+          "matchedElements": 3
+        },
+        "form": {
+          "matchedElements": 2
+        },
+        "custom-element": {
+          "matchedElements": 10
+        },
+        "shadow-dom": {
+          "matchedElements": 2
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 2
+        },
+        "canvas": {
+          "matchedElements": 6
+        },
+        "svg": {
+          "matchedElements": 115
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 43
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 1,
+          "showModalCalls": 0,
+          "keyListeners": 35,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 6,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 24,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 4,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 2,
+          "clientRouterLinks": 1,
+          "mutationObservers": 10
+        },
+        "deferred-load": {
+          "lazyImgs": 24,
+          "asyncDecode": 3,
+          "preload": 77,
+          "intersectionObservers": 32,
+          "ioObservedTargets": 27,
+          "idleCallbacks": 13,
+          "resizeObservers": 13,
+          "deferScripts": 7,
+          "moduleScripts": 9
+        }
+      }
+    },
+    {
+      "id": "vuejs",
+      "url": "https://vuejs.org/",
+      "framework": "Vue 3 / VitePress",
+      "why": "Vue ecosystem reference; SSG plus client hydration.",
+      "ok": true,
+      "elementCount": 798,
+      "maxDepth": 19,
+      "styleSheetsRead": 3,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        370,
+        463,
+        480,
+        512,
+        576,
+        639,
+        640,
+        720,
+        721,
+        768,
+        794,
+        959,
+        960,
+        1024,
+        1280,
+        1377,
+        1439,
+        1440,
+        1441
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": true,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "multi-column",
+        "transform",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "webfont",
+        "menu",
+        "disclosure-button",
+        "live-region",
+        "skip-link",
+        "iframe",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 117
+        },
+        "grid": {
+          "matchedElements": 2
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 25
+        },
+        "fixed": {
+          "matchedElements": 1
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 1
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 5
+        },
+        "aspect-ratio": {
+          "matchedElements": 0
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 798
+        },
+        "z-index-stacking": {
+          "matchedElements": 3
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 9
+        },
+        "css-gradient": {
+          "matchedElements": 2
+        },
+        "box-shadow": {
+          "matchedElements": 9
+        },
+        "border-radius": {
+          "matchedElements": 71
+        },
+        "css-transition": {
+          "matchedElements": 252
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 42
+        },
+        "menu": {
+          "matchedElements": 6
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 7
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 1
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 85
+        },
+        "responsive-image": {
+          "matchedElements": 80
+        },
+        "media-query": {
+          "breakpoints": 19
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 2,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 1,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 2,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 0
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 39,
+          "intersectionObservers": 3,
+          "ioObservedTargets": 43,
+          "idleCallbacks": 1,
+          "resizeObservers": 0,
+          "deferScripts": 2,
+          "moduleScripts": 1
+        }
+      }
+    },
+    {
+      "id": "nuxt",
+      "url": "https://nuxt.com/",
+      "framework": "Nuxt 3 (Vue)",
+      "why": "Vue meta-framework with island hydration and route-level deferred load.",
+      "ok": true,
+      "elementCount": 1973,
+      "maxDepth": 25,
+      "styleSheetsRead": 21,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        320,
+        640,
+        768,
+        1024,
+        1280,
+        1536,
+        2400
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": true,
+        "nuxt": true,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "table-layout",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "menu",
+        "tooltip",
+        "tab-set",
+        "carousel",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "form",
+        "canvas",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 432
+        },
+        "grid": {
+          "matchedElements": 51
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 90
+        },
+        "fixed": {
+          "matchedElements": 3
+        },
+        "sticky": {
+          "matchedElements": 1
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 30
+        },
+        "transform": {
+          "matchedElements": 36
+        },
+        "aspect-ratio": {
+          "matchedElements": 55
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 19
+        },
+        "backdrop-filter": {
+          "matchedElements": 2
+        },
+        "clip-path": {
+          "matchedElements": 16
+        },
+        "css-gradient": {
+          "matchedElements": 10
+        },
+        "box-shadow": {
+          "matchedElements": 87
+        },
+        "border-radius": {
+          "matchedElements": 243
+        },
+        "css-transition": {
+          "matchedElements": 228
+        },
+        "css-animation": {
+          "matchedElements": 24
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 29
+        },
+        "menu": {
+          "matchedElements": 1
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 1
+        },
+        "tab-set": {
+          "matchedElements": 53
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 2
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 34
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 17
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 2
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 1
+        },
+        "svg": {
+          "matchedElements": 5
+        },
+        "responsive-image": {
+          "matchedElements": 55
+        },
+        "media-query": {
+          "breakpoints": 7
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 62,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 1,
+          "focusCallsAfterLoad": 1,
+          "tabindexNegative": 33,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 12,
+          "abortableFetch": 2,
+          "xhrCalls": 0,
+          "forms": 2,
+          "clientRouterLinks": 0,
+          "mutationObservers": 35
+        },
+        "deferred-load": {
+          "lazyImgs": 44,
+          "asyncDecode": 0,
+          "preload": 198,
+          "intersectionObservers": 28,
+          "ioObservedTargets": 67,
+          "idleCallbacks": 20,
+          "resizeObservers": 69,
+          "deferScripts": 2,
+          "moduleScripts": 1
+        }
+      }
+    },
+    {
+      "id": "angular",
+      "url": "https://angular.dev/",
+      "framework": "Angular",
+      "why": "Angular reference site; CDK-driven overlay and a11y interaction surfaces.",
+      "ok": true,
+      "elementCount": 477,
+      "maxDepth": 22,
+      "styleSheetsRead": 19,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        430,
+        450,
+        550,
+        600,
+        601,
+        700,
+        701,
+        775,
+        900,
+        901,
+        1431,
+        1801
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": true,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "container-query",
+        "transform",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "scroll-container",
+        "webfont",
+        "menu",
+        "tab-set",
+        "disclosure-button",
+        "live-region",
+        "custom-element",
+        "svg",
+        "media-query",
+        "focus-trapping",
+        "focus-restoration",
+        "scroll-locking",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 68
+        },
+        "grid": {
+          "matchedElements": 9
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 12
+        },
+        "fixed": {
+          "matchedElements": 2
+        },
+        "sticky": {
+          "matchedElements": 1
+        },
+        "container-query": {
+          "matchedElements": 1
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 5
+        },
+        "aspect-ratio": {
+          "matchedElements": 0
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 477
+        },
+        "z-index-stacking": {
+          "matchedElements": 26
+        },
+        "backdrop-filter": {
+          "matchedElements": 2
+        },
+        "clip-path": {
+          "matchedElements": 2
+        },
+        "css-gradient": {
+          "matchedElements": 26
+        },
+        "box-shadow": {
+          "matchedElements": 4
+        },
+        "border-radius": {
+          "matchedElements": 61
+        },
+        "css-transition": {
+          "matchedElements": 80
+        },
+        "css-animation": {
+          "matchedElements": 9
+        },
+        "scroll-container": {
+          "matchedElements": 2
+        },
+        "webfont": {
+          "matchedElements": 40
+        },
+        "menu": {
+          "matchedElements": 3
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 9
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 3
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 25
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 8
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 12
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 3,
+          "showModalCalls": 0,
+          "keyListeners": 8,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 8,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 4,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 2,
+          "abortableFetch": 1,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 2
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 0,
+          "intersectionObservers": 0,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 1,
+          "resizeObservers": 1,
+          "deferScripts": 1,
+          "moduleScripts": 1
+        }
+      }
+    },
+    {
+      "id": "svelte",
+      "url": "https://svelte.dev/",
+      "framework": "SvelteKit",
+      "why": "Compiler-based framework with no virtual DOM; different runtime signature.",
+      "ok": true,
+      "elementCount": 396,
+      "maxDepth": 12,
+      "styleSheetsRead": 7,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        192,
+        480,
+        600,
+        720,
+        767,
+        768,
+        800,
+        831,
+        832,
+        900,
+        960,
+        1000,
+        1140,
+        1400,
+        1600
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": true,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "disclosure-button",
+        "live-region",
+        "form",
+        "custom-element",
+        "skip-link",
+        "video",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 24
+        },
+        "grid": {
+          "matchedElements": 4
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 22
+        },
+        "fixed": {
+          "matchedElements": 1
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 3
+        },
+        "aspect-ratio": {
+          "matchedElements": 115
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 395
+        },
+        "z-index-stacking": {
+          "matchedElements": 4
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 1
+        },
+        "css-gradient": {
+          "matchedElements": 0
+        },
+        "box-shadow": {
+          "matchedElements": 0
+        },
+        "border-radius": {
+          "matchedElements": 117
+        },
+        "css-transition": {
+          "matchedElements": 8
+        },
+        "css-animation": {
+          "matchedElements": 1
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 41
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 1
+        },
+        "live-region": {
+          "matchedElements": 2
+        },
+        "form": {
+          "matchedElements": 1
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 1
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 5
+        },
+        "responsive-image": {
+          "matchedElements": 16
+        },
+        "media-query": {
+          "breakpoints": 15
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 5,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 0,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 1,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 1,
+          "clientRouterLinks": 0,
+          "mutationObservers": 0
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 28,
+          "intersectionObservers": 1,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 0,
+          "resizeObservers": 0,
+          "deferScripts": 2,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "solidjs",
+      "url": "https://docs.solidjs.com/",
+      "framework": "SolidJS",
+      "why": "Fine-grained reactivity framework; small-team CSS conventions.",
+      "ok": true,
+      "elementCount": 388,
+      "maxDepth": 21,
+      "styleSheetsRead": 2,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        640,
+        768,
+        1024,
+        1280,
+        1536
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": true,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "sticky",
+        "transform",
+        "css-custom-property",
+        "z-index-stacking",
+        "backdrop-filter",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "scroll-container",
+        "tab-set",
+        "accordion",
+        "disclosure-button",
+        "live-region",
+        "iframe",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 31
+        },
+        "grid": {
+          "matchedElements": 3
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 13
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 4
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 1
+        },
+        "aspect-ratio": {
+          "matchedElements": 0
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 388
+        },
+        "z-index-stacking": {
+          "matchedElements": 2
+        },
+        "backdrop-filter": {
+          "matchedElements": 1
+        },
+        "clip-path": {
+          "matchedElements": 0
+        },
+        "css-gradient": {
+          "matchedElements": 9
+        },
+        "box-shadow": {
+          "matchedElements": 7
+        },
+        "border-radius": {
+          "matchedElements": 21
+        },
+        "css-transition": {
+          "matchedElements": 15
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 1
+        },
+        "webfont": {
+          "matchedElements": 0
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 4
+        },
+        "accordion": {
+          "matchedElements": 9
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 13
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 1
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 24
+        },
+        "responsive-image": {
+          "matchedElements": 1
+        },
+        "media-query": {
+          "breakpoints": 5
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 4,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 1,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 0,
+          "abortableFetch": 0,
+          "xhrCalls": 1,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 1
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 5,
+          "intersectionObservers": 2,
+          "ioObservedTargets": 2,
+          "idleCallbacks": 1,
+          "resizeObservers": 1,
+          "deferScripts": 2,
+          "moduleScripts": 3
+        }
+      }
+    },
+    {
+      "id": "astro",
+      "url": "https://astro.build/",
+      "framework": "Astro",
+      "why": "Islands architecture: mostly static HTML with selectively hydrated widgets.",
+      "ok": true,
+      "elementCount": 1831,
+      "maxDepth": 19,
+      "styleSheetsRead": 9,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        384,
+        448,
+        576,
+        640,
+        768,
+        1024,
+        1280,
+        1536
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "tooltip",
+        "tab-set",
+        "accordion",
+        "disclosure-button",
+        "live-region",
+        "form",
+        "custom-element",
+        "skip-link",
+        "svg",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 294
+        },
+        "grid": {
+          "matchedElements": 34
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 149
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 45
+        },
+        "aspect-ratio": {
+          "matchedElements": 36
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 46
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 4
+        },
+        "css-gradient": {
+          "matchedElements": 89
+        },
+        "box-shadow": {
+          "matchedElements": 6
+        },
+        "border-radius": {
+          "matchedElements": 255
+        },
+        "css-transition": {
+          "matchedElements": 182
+        },
+        "css-animation": {
+          "matchedElements": 2
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 6
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 16
+        },
+        "tab-set": {
+          "matchedElements": 20
+        },
+        "accordion": {
+          "matchedElements": 7
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 1
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 1
+        },
+        "custom-element": {
+          "matchedElements": 3
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 195
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 8
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 12,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 5,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 0,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 1,
+          "clientRouterLinks": 12,
+          "mutationObservers": 5
+        },
+        "deferred-load": {
+          "lazyImgs": 40,
+          "asyncDecode": 35,
+          "preload": 2,
+          "intersectionObservers": 2,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 1,
+          "resizeObservers": 1,
+          "deferScripts": 1,
+          "moduleScripts": 10
+        }
+      }
+    },
+    {
+      "id": "reactrouter",
+      "url": "https://reactrouter.com/",
+      "framework": "React Router / Remix",
+      "why": "Data-router framework whose defining feature is optimistic UI and deferred data.",
+      "ok": true,
+      "elementCount": 123,
+      "maxDepth": 9,
+      "styleSheetsRead": 2,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        320,
+        480,
+        640,
+        768,
+        1024,
+        1280,
+        1536
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": true,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "aspect-ratio",
+        "css-custom-property",
+        "css-gradient",
+        "border-radius",
+        "webfont",
+        "drag-listener-registrations",
+        "svg",
+        "media-query",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 32
+        },
+        "grid": {
+          "matchedElements": 6
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 3
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 0
+        },
+        "aspect-ratio": {
+          "matchedElements": 2
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 123
+        },
+        "z-index-stacking": {
+          "matchedElements": 0
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 0
+        },
+        "css-gradient": {
+          "matchedElements": 1
+        },
+        "box-shadow": {
+          "matchedElements": 0
+        },
+        "border-radius": {
+          "matchedElements": 9
+        },
+        "css-transition": {
+          "matchedElements": 0
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 4
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 12
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 0
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 11
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 7
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 5,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 0,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 1,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 1
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 6,
+          "intersectionObservers": 0,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 0,
+          "resizeObservers": 0,
+          "deferScripts": 0,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "emberjs",
+      "url": "https://emberjs.com/",
+      "framework": "Ember",
+      "why": "Older-generation MVC framework; legacy CSS idioms (float, absolute) survive here.",
+      "ok": true,
+      "elementCount": 554,
+      "maxDepth": 12,
+      "styleSheetsRead": 2,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        450,
+        844,
+        991,
+        1000,
+        1007,
+        1008,
+        1080,
+        1280,
+        1500
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": true,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "webfont",
+        "tab-set",
+        "disclosure-button",
+        "svg",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 28
+        },
+        "grid": {
+          "matchedElements": 20
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 13
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 33
+        },
+        "aspect-ratio": {
+          "matchedElements": 8
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 554
+        },
+        "z-index-stacking": {
+          "matchedElements": 0
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 0
+        },
+        "css-gradient": {
+          "matchedElements": 21
+        },
+        "box-shadow": {
+          "matchedElements": 7
+        },
+        "border-radius": {
+          "matchedElements": 36
+        },
+        "css-transition": {
+          "matchedElements": 6
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 6
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 9
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 5
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 25
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 9
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 4,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 3,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 1,
+          "abortableFetch": 0,
+          "xhrCalls": 1,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 1
+        },
+        "deferred-load": {
+          "lazyImgs": 14,
+          "asyncDecode": 0,
+          "preload": 1,
+          "intersectionObservers": 0,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 0,
+          "resizeObservers": 0,
+          "deferScripts": 3,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "mdn",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/display",
+      "framework": "Yari (React SSR + vanilla)",
+      "why": "Long-form document page: multi-column, sticky sidebar, deep DOM.",
+      "ok": true,
+      "elementCount": 3656,
+      "maxDepth": 23,
+      "styleSheetsRead": 129,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        426,
+        480,
+        496,
+        640,
+        769,
+        840,
+        992,
+        1000,
+        1044,
+        1104,
+        1200,
+        1441
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "sticky",
+        "table-layout",
+        "transform",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "scroll-container",
+        "webfont",
+        "accordion",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "custom-element",
+        "shadow-dom",
+        "skip-link",
+        "svg",
+        "media-query",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 106
+        },
+        "grid": {
+          "matchedElements": 55
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 14
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 4
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 26
+        },
+        "transform": {
+          "matchedElements": 4
+        },
+        "aspect-ratio": {
+          "matchedElements": 0
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 11
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 2
+        },
+        "css-gradient": {
+          "matchedElements": 1
+        },
+        "box-shadow": {
+          "matchedElements": 11
+        },
+        "border-radius": {
+          "matchedElements": 182
+        },
+        "css-transition": {
+          "matchedElements": 0
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 2
+        },
+        "webfont": {
+          "matchedElements": 13
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 79
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 15
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 9
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 39
+        },
+        "shadow-dom": {
+          "matchedElements": 111
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 4
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 12
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 17,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 0,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 3,
+          "abortableFetch": 1,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 5
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 2,
+          "intersectionObservers": 15,
+          "ioObservedTargets": 37,
+          "idleCallbacks": 0,
+          "resizeObservers": 5,
+          "deferScripts": 0,
+          "moduleScripts": 4
+        }
+      }
+    },
+    {
+      "id": "wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Web_browser",
+      "framework": "MediaWiki (vanilla JS)",
+      "why": "No modern framework: float-based infoboxes, table layout, legacy CSS.",
+      "ok": true,
+      "elementCount": 4138,
+      "maxDepth": 31,
+      "styleSheetsRead": 18,
+      "styleSheetsUnreadable": 1,
+      "breakpoints": [
+        500,
+        639,
+        640,
+        720,
+        1120,
+        1399,
+        1680
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": true
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "float",
+        "absolute",
+        "fixed",
+        "sticky",
+        "multi-column",
+        "table-layout",
+        "transform",
+        "aspect-ratio",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "box-shadow",
+        "border-radius",
+        "scroll-container",
+        "menu",
+        "accordion",
+        "disclosure-button",
+        "live-region",
+        "form",
+        "video",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "scroll-locking",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 257
+        },
+        "grid": {
+          "matchedElements": 2
+        },
+        "float": {
+          "matchedElements": 39
+        },
+        "absolute": {
+          "matchedElements": 107
+        },
+        "fixed": {
+          "matchedElements": 2
+        },
+        "sticky": {
+          "matchedElements": 2
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 1
+        },
+        "table-layout": {
+          "matchedElements": 323
+        },
+        "transform": {
+          "matchedElements": 4
+        },
+        "aspect-ratio": {
+          "matchedElements": 13
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 1500
+        },
+        "z-index-stacking": {
+          "matchedElements": 40
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 1
+        },
+        "css-gradient": {
+          "matchedElements": 0
+        },
+        "box-shadow": {
+          "matchedElements": 11
+        },
+        "border-radius": {
+          "matchedElements": 1248
+        },
+        "css-transition": {
+          "matchedElements": 0
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 2
+        },
+        "webfont": {
+          "matchedElements": 0
+        },
+        "menu": {
+          "matchedElements": 8
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 2
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 16
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 5
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 1
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 0
+        },
+        "responsive-image": {
+          "matchedElements": 10
+        },
+        "media-query": {
+          "breakpoints": 7
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 32,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 11,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 3,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 0,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 5,
+          "clientRouterLinks": 0,
+          "mutationObservers": 0
+        },
+        "deferred-load": {
+          "lazyImgs": 2,
+          "asyncDecode": 7,
+          "preload": 0,
+          "intersectionObservers": 3,
+          "ioObservedTargets": 34,
+          "idleCallbacks": 23,
+          "resizeObservers": 0,
+          "deferScripts": 1,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "hackernews",
+      "url": "https://news.ycombinator.com/",
+      "framework": "None (static HTML)",
+      "why": "Table-layout control case; proves the instrument reports absence, not noise.",
+      "ok": true,
+      "elementCount": 821,
+      "maxDepth": 15,
+      "styleSheetsRead": 1,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        300,
+        389,
+        390,
+        509,
+        510,
+        599,
+        600,
+        689,
+        690,
+        750,
+        809,
+        810,
+        899,
+        900,
+        1079,
+        1080,
+        1169,
+        1170,
+        1259,
+        1260,
+        1349
+      ],
+      "frameworkSignals": {
+        "react": false,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "table-layout",
+        "aspect-ratio",
+        "css-gradient",
+        "form",
+        "media-query"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 0
+        },
+        "grid": {
+          "matchedElements": 0
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 0
+        },
+        "fixed": {
+          "matchedElements": 0
+        },
+        "sticky": {
+          "matchedElements": 0
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 265
+        },
+        "transform": {
+          "matchedElements": 0
+        },
+        "aspect-ratio": {
+          "matchedElements": 2
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 0
+        },
+        "z-index-stacking": {
+          "matchedElements": 0
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 0
+        },
+        "css-gradient": {
+          "matchedElements": 30
+        },
+        "box-shadow": {
+          "matchedElements": 0
+        },
+        "border-radius": {
+          "matchedElements": 0
+        },
+        "css-transition": {
+          "matchedElements": 0
+        },
+        "css-animation": {
+          "matchedElements": 0
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 0
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 0
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 0
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 1
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 0
+        },
+        "iframe": {
+          "matchedElements": 0
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 0
+        },
+        "responsive-image": {
+          "matchedElements": 0
+        },
+        "media-query": {
+          "breakpoints": 21
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 0,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 0,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 0,
+          "abortableFetch": 0,
+          "xhrCalls": 0,
+          "forms": 1,
+          "clientRouterLinks": 0,
+          "mutationObservers": 0
+        },
+        "deferred-load": {
+          "lazyImgs": 0,
+          "asyncDecode": 0,
+          "preload": 0,
+          "intersectionObservers": 0,
+          "ioObservedTargets": 0,
+          "idleCallbacks": 0,
+          "resizeObservers": 0,
+          "deferScripts": 0,
+          "moduleScripts": 0
+        }
+      }
+    },
+    {
+      "id": "bbc",
+      "url": "https://www.bbc.com/news",
+      "framework": "React (SSR)",
+      "why": "High-traffic news grid: carousels, lazy media, many breakpoints.",
+      "ok": true,
+      "elementCount": 1448,
+      "maxDepth": 22,
+      "styleSheetsRead": 8,
+      "styleSheetsUnreadable": 2,
+      "breakpoints": [
+        399,
+        400,
+        599,
+        600,
+        650,
+        721,
+        767,
+        900,
+        985,
+        1007,
+        1008,
+        1279,
+        1280,
+        8192
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": true,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": false,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "float",
+        "absolute",
+        "fixed",
+        "sticky",
+        "transform",
+        "aspect-ratio",
+        "z-index-stacking",
+        "css-transition",
+        "css-animation",
+        "scroll-container",
+        "webfont",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "live-region",
+        "custom-element",
+        "skip-link",
+        "iframe",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 104
+        },
+        "grid": {
+          "matchedElements": 156
+        },
+        "float": {
+          "matchedElements": 8
+        },
+        "absolute": {
+          "matchedElements": 12
+        },
+        "fixed": {
+          "matchedElements": 4
+        },
+        "sticky": {
+          "matchedElements": 3
+        },
+        "container-query": {
+          "matchedElements": 0
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 0
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 13
+        },
+        "aspect-ratio": {
+          "matchedElements": 28
+        },
+        "scroll-snap": {
+          "matchedElements": 0
+        },
+        "css-custom-property": {
+          "matchedElements": 0
+        },
+        "z-index-stacking": {
+          "matchedElements": 254
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 0
+        },
+        "css-gradient": {
+          "matchedElements": 0
+        },
+        "box-shadow": {
+          "matchedElements": 0
+        },
+        "border-radius": {
+          "matchedElements": 0
+        },
+        "css-transition": {
+          "matchedElements": 16
+        },
+        "css-animation": {
+          "matchedElements": 1
+        },
+        "scroll-container": {
+          "matchedElements": 1
+        },
+        "webfont": {
+          "matchedElements": 35
+        },
+        "menu": {
+          "matchedElements": 0
+        },
+        "dialog": {
+          "matchedElements": 0
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 0
+        },
+        "accordion": {
+          "matchedElements": 0
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 24
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 1
+        },
+        "live-region": {
+          "matchedElements": 1
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 1
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 1
+        },
+        "iframe": {
+          "matchedElements": 16
+        },
+        "video": {
+          "matchedElements": 0
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 37
+        },
+        "responsive-image": {
+          "matchedElements": 21
+        },
+        "media-query": {
+          "breakpoints": 14
+        },
+        "focus-trapping": {
+          "modalSurfaces": 0,
+          "inert": 0,
+          "showModalCalls": 0,
+          "keyListeners": 21,
+          "focusableInModal": 0
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 9,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 26,
+          "abortableFetch": 3,
+          "xhrCalls": 34,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 7
+        },
+        "deferred-load": {
+          "lazyImgs": 15,
+          "asyncDecode": 0,
+          "preload": 0,
+          "intersectionObservers": 455,
+          "ioObservedTargets": 457,
+          "idleCallbacks": 9,
+          "resizeObservers": 67,
+          "deferScripts": 77,
+          "moduleScripts": 4
+        }
+      }
+    },
+    {
+      "id": "shopify",
+      "url": "https://www.shopify.com/",
+      "framework": "Remix (React)",
+      "why": "Large commerce marketing site; independent of the framework-docs monoculture.",
+      "ok": true,
+      "elementCount": 2264,
+      "maxDepth": 17,
+      "styleSheetsRead": 3,
+      "styleSheetsUnreadable": 0,
+      "breakpoints": [
+        320,
+        430,
+        480,
+        499,
+        500,
+        639,
+        640,
+        759,
+        760,
+        768,
+        899,
+        900,
+        1039,
+        1040,
+        1080,
+        1090,
+        1199,
+        1200,
+        1280,
+        1300,
+        1330,
+        1350,
+        1370,
+        1380,
+        1420,
+        1439,
+        1440,
+        1460,
+        1500,
+        1599,
+        1600
+      ],
+      "frameworkSignals": {
+        "react": true,
+        "next": false,
+        "vue": false,
+        "nuxt": false,
+        "angular": false,
+        "svelte": false,
+        "solid": false,
+        "astro": false,
+        "remix": true,
+        "ember": false,
+        "htmx": false,
+        "jquery": false
+      },
+      "featuresUsed": [
+        "flex",
+        "grid",
+        "absolute",
+        "fixed",
+        "sticky",
+        "container-query",
+        "multi-column",
+        "transform",
+        "aspect-ratio",
+        "scroll-snap",
+        "css-custom-property",
+        "z-index-stacking",
+        "clip-path",
+        "css-gradient",
+        "box-shadow",
+        "border-radius",
+        "css-transition",
+        "css-animation",
+        "webfont",
+        "menu",
+        "dialog",
+        "tab-set",
+        "accordion",
+        "drag-listener-registrations",
+        "disclosure-button",
+        "skip-link",
+        "iframe",
+        "video",
+        "svg",
+        "responsive-image",
+        "media-query",
+        "focus-trapping",
+        "focus-restoration",
+        "deferred-load"
+      ],
+      "evidence": {
+        "flex": {
+          "matchedElements": 751
+        },
+        "grid": {
+          "matchedElements": 32
+        },
+        "float": {
+          "matchedElements": 0
+        },
+        "absolute": {
+          "matchedElements": 127
+        },
+        "fixed": {
+          "matchedElements": 3
+        },
+        "sticky": {
+          "matchedElements": 2
+        },
+        "container-query": {
+          "matchedElements": 14
+        },
+        "subgrid": {
+          "matchedElements": 0
+        },
+        "multi-column": {
+          "matchedElements": 2
+        },
+        "table-layout": {
+          "matchedElements": 0
+        },
+        "transform": {
+          "matchedElements": 41
+        },
+        "aspect-ratio": {
+          "matchedElements": 77
+        },
+        "scroll-snap": {
+          "matchedElements": 1
+        },
+        "css-custom-property": {
+          "matchedElements": 1494
+        },
+        "z-index-stacking": {
+          "matchedElements": 111
+        },
+        "backdrop-filter": {
+          "matchedElements": 0
+        },
+        "clip-path": {
+          "matchedElements": 16
+        },
+        "css-gradient": {
+          "matchedElements": 33
+        },
+        "box-shadow": {
+          "matchedElements": 34
+        },
+        "border-radius": {
+          "matchedElements": 132
+        },
+        "css-transition": {
+          "matchedElements": 245
+        },
+        "css-animation": {
+          "matchedElements": 1
+        },
+        "scroll-container": {
+          "matchedElements": 0
+        },
+        "webfont": {
+          "matchedElements": 5
+        },
+        "menu": {
+          "matchedElements": 1
+        },
+        "dialog": {
+          "matchedElements": 1
+        },
+        "tooltip": {
+          "matchedElements": 0
+        },
+        "tab-set": {
+          "matchedElements": 9
+        },
+        "accordion": {
+          "matchedElements": 1
+        },
+        "carousel": {
+          "matchedElements": 0
+        },
+        "combobox": {
+          "matchedElements": 0
+        },
+        "drag-target": {
+          "matchedElements": 0
+        },
+        "drag-listener-registrations": {
+          "matchedElements": 14
+        },
+        "virtualized-list": {
+          "matchedElements": 0
+        },
+        "disclosure-button": {
+          "matchedElements": 1
+        },
+        "live-region": {
+          "matchedElements": 0
+        },
+        "form": {
+          "matchedElements": 0
+        },
+        "custom-element": {
+          "matchedElements": 0
+        },
+        "shadow-dom": {
+          "matchedElements": 0
+        },
+        "skip-link": {
+          "matchedElements": 2
+        },
+        "iframe": {
+          "matchedElements": 1
+        },
+        "video": {
+          "matchedElements": 4
+        },
+        "canvas": {
+          "matchedElements": 0
+        },
+        "svg": {
+          "matchedElements": 88
+        },
+        "responsive-image": {
+          "matchedElements": 74
+        },
+        "media-query": {
+          "breakpoints": 31
+        },
+        "focus-trapping": {
+          "modalSurfaces": 1,
+          "inert": 3,
+          "showModalCalls": 0,
+          "keyListeners": 9,
+          "focusableInModal": 100
+        },
+        "focus-restoration": {
+          "focusCalls": 0,
+          "focusCallsAfterLoad": 0,
+          "tabindexNegative": 13,
+          "autofocus": 0
+        },
+        "scroll-locking": {
+          "cssLockRules": 0,
+          "runtimeOverflowWrites": 0,
+          "bodyLockedAtRest": false,
+          "overscrollContained": 0
+        },
+        "optimistic-update": {
+          "pushState": 0,
+          "fetchCalls": 20,
+          "abortableFetch": 1,
+          "xhrCalls": 0,
+          "forms": 0,
+          "clientRouterLinks": 0,
+          "mutationObservers": 7
+        },
+        "deferred-load": {
+          "lazyImgs": 51,
+          "asyncDecode": 27,
+          "preload": 17,
+          "intersectionObservers": 42,
+          "ioObservedTargets": 92,
+          "idleCallbacks": 3,
+          "resizeObservers": 3,
+          "deferScripts": 14,
+          "moduleScripts": 0
+        }
+      }
+    }
+  ],
+  "features": [
+    {
+      "feature": "media-query",
+      "group": "responsive",
+      "detection": "stylesheet-text",
+      "siteCount": 18,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "hackernews",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "responsive-isolation",
+        "responsive-range"
+      ]
+    },
+    {
+      "feature": "absolute",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 17,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "layout-isolation",
+        "raster-attribution"
+      ]
+    },
+    {
+      "feature": "deferred-load",
+      "group": "behavior",
+      "detection": "rendered + runtime (IntersectionObserver wrap)",
+      "siteCount": 17,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "flex",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 17,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "raster-attribution",
+        "responsive-range",
+        "semantic-layout",
+        "visual-assets"
+      ]
+    },
+    {
+      "feature": "grid",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 17,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "responsive-range",
+        "semantic-layout"
+      ]
+    },
+    {
+      "feature": "border-radius",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 16,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "focus-behavior",
+        "raster-attribution",
+        "semantic-layout"
+      ]
+    },
+    {
+      "feature": "css-custom-property",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 16,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "svg",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 16,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "visual-assets"
+      ]
+    },
+    {
+      "feature": "transform",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 16,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "animation-timing",
+        "motion-behavior",
+        "motion-isolation",
+        "responsive-range"
+      ]
+    },
+    {
+      "feature": "css-gradient",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 15,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "hackernews",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "raster-attribution"
+      ]
+    },
+    {
+      "feature": "disclosure-button",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 15,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "webfont",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 15,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "z-index-stacking",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 15,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "aspect-ratio",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 14,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "nuxt",
+        "svelte",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "wikipedia",
+        "hackernews",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "box-shadow",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 14,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "focus-restoration",
+      "group": "behavior",
+      "detection": "runtime (wrapped HTMLElement.focus) + proxy",
+      "siteCount": 14,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "focus-behavior"
+      ]
+    },
+    {
+      "feature": "clip-path",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 13,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "css-transition",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 13,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "motion-behavior"
+      ]
+    },
+    {
+      "feature": "fixed",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 12,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "layout-isolation"
+      ]
+    },
+    {
+      "feature": "responsive-image",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 11,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "vuejs",
+        "nuxt",
+        "svelte",
+        "solidjs",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "sticky",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 11,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "custom-element",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 10,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "angular",
+        "svelte",
+        "astro",
+        "mdn",
+        "bbc"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "drag-listener-registrations",
+      "group": "interaction",
+      "detection": "runtime (inflated by framework event delegation - see gaps)",
+      "siteCount": 10,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "nuxt",
+        "reactrouter",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "live-region",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 10,
+      "sites": [
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "wikipedia",
+        "bbc"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "accessibility-isolation",
+        "async-timer"
+      ]
+    },
+    {
+      "feature": "css-animation",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 9,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "stripe",
+        "nuxt",
+        "angular",
+        "svelte",
+        "astro",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "animation-timing",
+        "motion-isolation"
+      ]
+    },
+    {
+      "feature": "accordion",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 8,
+      "sites": [
+        "vercel",
+        "stripe",
+        "github",
+        "solidjs",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "menu",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 8,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "tab-set",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 8,
+      "sites": [
+        "tailwindcss",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "backdrop-filter",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 7,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "stripe",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "form",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 7,
+      "sites": [
+        "nextjs",
+        "github",
+        "nuxt",
+        "svelte",
+        "astro",
+        "wikipedia",
+        "hackernews"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "skip-link",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 7,
+      "sites": [
+        "github",
+        "vuejs",
+        "svelte",
+        "astro",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "container-query",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 5,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "angular",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "iframe",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 5,
+      "sites": [
+        "stripe",
+        "vuejs",
+        "solidjs",
+        "bbc",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "scroll-container",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 5,
+      "sites": [
+        "angular",
+        "solidjs",
+        "mdn",
+        "wikipedia",
+        "bbc"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "shadow-dom",
+      "group": "interaction",
+      "detection": "dom+runtime",
+      "siteCount": 5,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "github",
+        "mdn"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "tooltip",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 5,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "github",
+        "nuxt",
+        "astro"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "focus-trapping",
+      "group": "behavior",
+      "detection": "proxy (modal surface present; trap only observable while open)",
+      "siteCount": 4,
+      "sites": [
+        "vercel",
+        "github",
+        "angular",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "focus-behavior"
+      ]
+    },
+    {
+      "feature": "table-layout",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 4,
+      "sites": [
+        "nuxt",
+        "mdn",
+        "wikipedia",
+        "hackernews"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "video",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 4,
+      "sites": [
+        "github",
+        "svelte",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "canvas",
+      "group": "interaction",
+      "detection": "dom",
+      "siteCount": 3,
+      "sites": [
+        "stripe",
+        "github",
+        "nuxt"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "raster-attribution"
+      ]
+    },
+    {
+      "feature": "carousel",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 3,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "nuxt"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "float",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 3,
+      "sites": [
+        "github",
+        "wikipedia",
+        "bbc"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "multi-column",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 3,
+      "sites": [
+        "vuejs",
+        "wikipedia",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "scroll-locking",
+      "group": "behavior",
+      "detection": "proxy (css lock rule / runtime overflow write)",
+      "siteCount": 3,
+      "sites": [
+        "github",
+        "angular",
+        "wikipedia"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "scroll-snap",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 3,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "dialog",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 2,
+      "sites": [
+        "vercel",
+        "shopify"
+      ],
+      "undetectedOnSites": 0,
+      "covered": true,
+      "coveringFixtures": [
+        "focus-behavior"
+      ]
+    },
+    {
+      "feature": "combobox",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 1,
+      "sites": [
+        "stripe"
+      ],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "drag-target",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 0,
+      "sites": [],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "optimistic-update",
+      "group": "behavior",
+      "detection": "UNDETECTED - no DOM signature",
+      "siteCount": 0,
+      "sites": [],
+      "undetectedOnSites": 18,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "subgrid",
+      "group": "layout",
+      "detection": "computed",
+      "siteCount": 0,
+      "sites": [],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    },
+    {
+      "feature": "virtualized-list",
+      "group": "interaction",
+      "detection": "aria/dom",
+      "siteCount": 0,
+      "sites": [],
+      "undetectedOnSites": 0,
+      "covered": false,
+      "coveringFixtures": []
+    }
+  ],
+  "breakpoints": [
+    {
+      "width": 640,
+      "siteCount": 13
+    },
+    {
+      "width": 768,
+      "siteCount": 11
+    },
+    {
+      "width": 1280,
+      "siteCount": 11
+    },
+    {
+      "width": 480,
+      "siteCount": 9
+    },
+    {
+      "width": 600,
+      "siteCount": 9
+    },
+    {
+      "width": 1024,
+      "siteCount": 9
+    },
+    {
+      "width": 500,
+      "siteCount": 6
+    },
+    {
+      "width": 320,
+      "siteCount": 5
+    },
+    {
+      "width": 400,
+      "siteCount": 5
+    },
+    {
+      "width": 900,
+      "siteCount": 5
+    },
+    {
+      "width": 1200,
+      "siteCount": 5
+    },
+    {
+      "width": 1536,
+      "siteCount": 5
+    },
+    {
+      "width": 384,
+      "siteCount": 4
+    },
+    {
+      "width": 576,
+      "siteCount": 4
+    },
+    {
+      "width": 639,
+      "siteCount": 4
+    },
+    {
+      "width": 840,
+      "siteCount": 4
+    },
+    {
+      "width": 960,
+      "siteCount": 4
+    },
+    {
+      "width": 1080,
+      "siteCount": 4
+    },
+    {
+      "width": 1300,
+      "siteCount": 4
+    },
+    {
+      "width": 1400,
+      "siteCount": 4
+    },
+    {
+      "width": 1600,
+      "siteCount": 4
+    },
+    {
+      "width": 360,
+      "siteCount": 3
+    },
+    {
+      "width": 370,
+      "siteCount": 3
+    },
+    {
+      "width": 430,
+      "siteCount": 3
+    },
+    {
+      "width": 448,
+      "siteCount": 3
+    },
+    {
+      "width": 450,
+      "siteCount": 3
+    },
+    {
+      "width": 512,
+      "siteCount": 3
+    },
+    {
+      "width": 599,
+      "siteCount": 3
+    },
+    {
+      "width": 601,
+      "siteCount": 3
+    },
+    {
+      "width": 720,
+      "siteCount": 3
+    },
+    {
+      "width": 750,
+      "siteCount": 3
+    },
+    {
+      "width": 767,
+      "siteCount": 3
+    },
+    {
+      "width": 800,
+      "siteCount": 3
+    },
+    {
+      "width": 992,
+      "siteCount": 3
+    },
+    {
+      "width": 1000,
+      "siteCount": 3
+    },
+    {
+      "width": 401,
+      "siteCount": 2
+    },
+    {
+      "width": 420,
+      "siteCount": 2
+    },
+    {
+      "width": 540,
+      "siteCount": 2
+    },
+    {
+      "width": 544,
+      "siteCount": 2
+    },
+    {
+      "width": 618,
+      "siteCount": 2
+    },
+    {
+      "width": 721,
+      "siteCount": 2
+    },
+    {
+      "width": 769,
+      "siteCount": 2
+    },
+    {
+      "width": 899,
+      "siteCount": 2
+    },
+    {
+      "width": 961,
+      "siteCount": 2
+    },
+    {
+      "width": 1007,
+      "siteCount": 2
+    },
+    {
+      "width": 1008,
+      "siteCount": 2
+    },
+    {
+      "width": 1090,
+      "siteCount": 2
+    },
+    {
+      "width": 1100,
+      "siteCount": 2
+    },
+    {
+      "width": 1150,
+      "siteCount": 2
+    },
+    {
+      "width": 1279,
+      "siteCount": 2
+    },
+    {
+      "width": 1299,
+      "siteCount": 2
+    },
+    {
+      "width": 1439,
+      "siteCount": 2
+    },
+    {
+      "width": 1440,
+      "siteCount": 2
+    },
+    {
+      "width": 1441,
+      "siteCount": 2
+    },
+    {
+      "width": 1496,
+      "siteCount": 2
+    },
+    {
+      "width": 1500,
+      "siteCount": 2
+    },
+    {
+      "width": 192,
+      "siteCount": 1
+    },
+    {
+      "width": 242,
+      "siteCount": 1
+    },
+    {
+      "width": 248,
+      "siteCount": 1
+    },
+    {
+      "width": 252,
+      "siteCount": 1
+    },
+    {
+      "width": 264,
+      "siteCount": 1
+    },
+    {
+      "width": 300,
+      "siteCount": 1
+    },
+    {
+      "width": 340,
+      "siteCount": 1
+    },
+    {
+      "width": 375,
+      "siteCount": 1
+    },
+    {
+      "width": 380,
+      "siteCount": 1
+    },
+    {
+      "width": 383,
+      "siteCount": 1
+    },
+    {
+      "width": 389,
+      "siteCount": 1
+    },
+    {
+      "width": 390,
+      "siteCount": 1
+    },
+    {
+      "width": 395,
+      "siteCount": 1
+    },
+    {
+      "width": 399,
+      "siteCount": 1
+    },
+    {
+      "width": 408,
+      "siteCount": 1
+    },
+    {
+      "width": 410,
+      "siteCount": 1
+    },
+    {
+      "width": 421,
+      "siteCount": 1
+    },
+    {
+      "width": 426,
+      "siteCount": 1
+    },
+    {
+      "width": 440,
+      "siteCount": 1
+    },
+    {
+      "width": 460,
+      "siteCount": 1
+    },
+    {
+      "width": 463,
+      "siteCount": 1
+    },
+    {
+      "width": 470,
+      "siteCount": 1
+    },
+    {
+      "width": 475,
+      "siteCount": 1
+    },
+    {
+      "width": 479,
+      "siteCount": 1
+    },
+    {
+      "width": 496,
+      "siteCount": 1
+    },
+    {
+      "width": 499,
+      "siteCount": 1
+    },
+    {
+      "width": 504,
+      "siteCount": 1
+    },
+    {
+      "width": 509,
+      "siteCount": 1
+    },
+    {
+      "width": 510,
+      "siteCount": 1
+    },
+    {
+      "width": 520,
+      "siteCount": 1
+    },
+    {
+      "width": 542,
+      "siteCount": 1
+    },
+    {
+      "width": 543,
+      "siteCount": 1
+    },
+    {
+      "width": 550,
+      "siteCount": 1
+    },
+    {
+      "width": 560,
+      "siteCount": 1
+    },
+    {
+      "width": 568,
+      "siteCount": 1
+    },
+    {
+      "width": 650,
+      "siteCount": 1
+    },
+    {
+      "width": 670,
+      "siteCount": 1
+    },
+    {
+      "width": 680,
+      "siteCount": 1
+    },
+    {
+      "width": 689,
+      "siteCount": 1
+    },
+    {
+      "width": 690,
+      "siteCount": 1
+    },
+    {
+      "width": 700,
+      "siteCount": 1
+    },
+    {
+      "width": 701,
+      "siteCount": 1
+    },
+    {
+      "width": 706,
+      "siteCount": 1
+    },
+    {
+      "width": 712,
+      "siteCount": 1
+    },
+    {
+      "width": 740,
+      "siteCount": 1
+    },
+    {
+      "width": 759,
+      "siteCount": 1
+    },
+    {
+      "width": 760,
+      "siteCount": 1
+    },
+    {
+      "width": 775,
+      "siteCount": 1
+    },
+    {
+      "width": 780,
+      "siteCount": 1
+    },
+    {
+      "width": 794,
+      "siteCount": 1
+    },
+    {
+      "width": 803,
+      "siteCount": 1
+    },
+    {
+      "width": 804,
+      "siteCount": 1
+    },
+    {
+      "width": 809,
+      "siteCount": 1
+    },
+    {
+      "width": 810,
+      "siteCount": 1
+    },
+    {
+      "width": 820,
+      "siteCount": 1
+    },
+    {
+      "width": 831,
+      "siteCount": 1
+    },
+    {
+      "width": 832,
+      "siteCount": 1
+    },
+    {
+      "width": 844,
+      "siteCount": 1
+    },
+    {
+      "width": 860,
+      "siteCount": 1
+    },
+    {
+      "width": 875,
+      "siteCount": 1
+    },
+    {
+      "width": 876,
+      "siteCount": 1
+    },
+    {
+      "width": 877,
+      "siteCount": 1
+    },
+    {
+      "width": 880,
+      "siteCount": 1
+    },
+    {
+      "width": 882,
+      "siteCount": 1
+    },
+    {
+      "width": 890,
+      "siteCount": 1
+    },
+    {
+      "width": 891,
+      "siteCount": 1
+    },
+    {
+      "width": 893,
+      "siteCount": 1
+    },
+    {
+      "width": 896,
+      "siteCount": 1
+    },
+    {
+      "width": 901,
+      "siteCount": 1
+    },
+    {
+      "width": 939,
+      "siteCount": 1
+    },
+    {
+      "width": 940,
+      "siteCount": 1
+    },
+    {
+      "width": 959,
+      "siteCount": 1
+    },
+    {
+      "width": 970,
+      "siteCount": 1
+    },
+    {
+      "width": 980,
+      "siteCount": 1
+    },
+    {
+      "width": 985,
+      "siteCount": 1
+    },
+    {
+      "width": 991,
+      "siteCount": 1
+    },
+    {
+      "width": 1004,
+      "siteCount": 1
+    },
+    {
+      "width": 1011,
+      "siteCount": 1
+    },
+    {
+      "width": 1012,
+      "siteCount": 1
+    },
+    {
+      "width": 1020,
+      "siteCount": 1
+    },
+    {
+      "width": 1028,
+      "siteCount": 1
+    },
+    {
+      "width": 1029,
+      "siteCount": 1
+    },
+    {
+      "width": 1033,
+      "siteCount": 1
+    },
+    {
+      "width": 1036,
+      "siteCount": 1
+    },
+    {
+      "width": 1039,
+      "siteCount": 1
+    },
+    {
+      "width": 1040,
+      "siteCount": 1
+    },
+    {
+      "width": 1044,
+      "siteCount": 1
+    },
+    {
+      "width": 1051,
+      "siteCount": 1
+    },
+    {
+      "width": 1079,
+      "siteCount": 1
+    },
+    {
+      "width": 1104,
+      "siteCount": 1
+    },
+    {
+      "width": 1108,
+      "siteCount": 1
+    },
+    {
+      "width": 1115,
+      "siteCount": 1
+    },
+    {
+      "width": 1120,
+      "siteCount": 1
+    },
+    {
+      "width": 1140,
+      "siteCount": 1
+    },
+    {
+      "width": 1169,
+      "siteCount": 1
+    },
+    {
+      "width": 1170,
+      "siteCount": 1
+    },
+    {
+      "width": 1199,
+      "siteCount": 1
+    },
+    {
+      "width": 1201,
+      "siteCount": 1
+    },
+    {
+      "width": 1259,
+      "siteCount": 1
+    },
+    {
+      "width": 1260,
+      "siteCount": 1
+    },
+    {
+      "width": 1263,
+      "siteCount": 1
+    },
+    {
+      "width": 1264,
+      "siteCount": 1
+    },
+    {
+      "width": 1281,
+      "siteCount": 1
+    },
+    {
+      "width": 1295,
+      "siteCount": 1
+    },
+    {
+      "width": 1320,
+      "siteCount": 1
+    },
+    {
+      "width": 1330,
+      "siteCount": 1
+    },
+    {
+      "width": 1349,
+      "siteCount": 1
+    },
+    {
+      "width": 1350,
+      "siteCount": 1
+    },
+    {
+      "width": 1370,
+      "siteCount": 1
+    },
+    {
+      "width": 1377,
+      "siteCount": 1
+    },
+    {
+      "width": 1380,
+      "siteCount": 1
+    },
+    {
+      "width": 1399,
+      "siteCount": 1
+    },
+    {
+      "width": 1420,
+      "siteCount": 1
+    },
+    {
+      "width": 1431,
+      "siteCount": 1
+    },
+    {
+      "width": 1460,
+      "siteCount": 1
+    },
+    {
+      "width": 1599,
+      "siteCount": 1
+    },
+    {
+      "width": 1604,
+      "siteCount": 1
+    },
+    {
+      "width": 1609,
+      "siteCount": 1
+    },
+    {
+      "width": 1680,
+      "siteCount": 1
+    },
+    {
+      "width": 1728,
+      "siteCount": 1
+    },
+    {
+      "width": 1801,
+      "siteCount": 1
+    },
+    {
+      "width": 2300,
+      "siteCount": 1
+    },
+    {
+      "width": 2400,
+      "siteCount": 1
+    },
+    {
+      "width": 8192,
+      "siteCount": 1
+    }
+  ],
+  "universalPairs": [
+    {
+      "pair": [
+        "absolute",
+        "deferred-load"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": false,
+      "coveringFixture": null
+    },
+    {
+      "pair": [
+        "absolute",
+        "flex"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": true,
+      "coveringFixture": "raster-attribution"
+    },
+    {
+      "pair": [
+        "absolute",
+        "grid"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": false,
+      "coveringFixture": null
+    },
+    {
+      "pair": [
+        "deferred-load",
+        "flex"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": false,
+      "coveringFixture": null
+    },
+    {
+      "pair": [
+        "deferred-load",
+        "grid"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": false,
+      "coveringFixture": null
+    },
+    {
+      "pair": [
+        "flex",
+        "grid"
+      ],
+      "siteCount": 17,
+      "coupling": "identical-site-set",
+      "covered": true,
+      "coveringFixture": "responsive-range"
+    },
+    {
+      "pair": [
+        "border-radius",
+        "css-custom-property"
+      ],
+      "siteCount": 16,
+      "coupling": "identical-site-set",
+      "covered": false,
+      "coveringFixture": null
+    }
+  ],
+  "instrumentGaps": [
+    {
+      "feature": "focus-trapping",
+      "reason": "measured by proxy only: proxy (modal surface present; trap only observable while open)",
+      "proxySiteCount": 4
+    },
+    {
+      "feature": "focus-restoration",
+      "reason": "measured by proxy only: runtime (wrapped HTMLElement.focus) + proxy",
+      "proxySiteCount": 14
+    },
+    {
+      "feature": "scroll-locking",
+      "reason": "measured by proxy only: proxy (css lock rule / runtime overflow write)",
+      "proxySiteCount": 3
+    },
+    {
+      "feature": "optimistic-update",
+      "reason": "UNDETECTED - no DOM signature",
+      "undetectedSites": 18
+    },
+    {
+      "feature": "media-query",
+      "reason": "stylesheet text retrieval",
+      "styleSheetsRead": 285,
+      "styleSheetsUnreadable": 3
+    },
+    {
+      "feature": "drag-listener-registrations",
+      "reason": "runtime listener count is inflated by framework root event delegation (React registers dragstart/dragover/drop on the container regardless of any drag UI); use drag-target for the DOM signal"
+    },
+    {
+      "feature": "virtualized-list",
+      "reason": "detected only via known library class names and aria-setsize overflow; a hand-rolled virtualizer with neither would read as absent"
+    }
+  ],
+  "corpus": [
+    {
+      "fixture": "accessibility-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "animation-timing",
+      "files": 2
+    },
+    {
+      "fixture": "async-timer",
+      "files": 2
+    },
+    {
+      "fixture": "click-behavior",
+      "files": 2
+    },
+    {
+      "fixture": "console-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "content-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "focus-behavior",
+      "files": 2
+    },
+    {
+      "fixture": "geometry-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "hover-behavior",
+      "files": 2
+    },
+    {
+      "fixture": "layout-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "layout-stability",
+      "files": 2
+    },
+    {
+      "fixture": "motion-behavior",
+      "files": 2
+    },
+    {
+      "fixture": "motion-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "network-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "paint-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "raster-attribution",
+      "files": 2
+    },
+    {
+      "fixture": "responsive-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "responsive-range",
+      "files": 2
+    },
+    {
+      "fixture": "semantic-layout",
+      "files": 2
+    },
+    {
+      "fixture": "structure-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "typography-isolation",
+      "files": 2
+    },
+    {
+      "fixture": "visual-assets",
+      "files": 2
+    }
+  ]
+}

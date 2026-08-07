@@ -1,0 +1,133 @@
+{
+  "id": "wikipedia",
+  "url": "https://en.wikipedia.org/wiki/Web_browser",
+  "framework": "MediaWiki (vanilla JS)",
+  "why": "No modern framework: float-based infoboxes, table layout, legacy CSS.",
+  "ok": true,
+  "meta": {
+    "url": "https://en.wikipedia.org/wiki/Web_browser",
+    "title": "Web browser - Wikipedia",
+    "elementCount": 4138,
+    "maxDepth": 31,
+    "styleSheetCount": 18,
+    "crossOriginSheets": 0,
+    "frameworkSignals": {
+      "react": false,
+      "next": false,
+      "vue": false,
+      "nuxt": false,
+      "angular": false,
+      "svelte": false,
+      "solid": false,
+      "astro": false,
+      "remix": false,
+      "ember": false,
+      "htmx": false,
+      "jquery": true
+    }
+  },
+  "layout": {
+    "flex": 257,
+    "grid": 2,
+    "float": 39,
+    "absolute": 107,
+    "fixed": 2,
+    "sticky": 2,
+    "container-query": 0,
+    "subgrid": 0,
+    "multi-column": 1,
+    "table-layout": 323,
+    "transform": 4,
+    "aspect-ratio": 13,
+    "scroll-snap": 0,
+    "css-custom-property": 1500,
+    "z-index-stacking": 40,
+    "backdrop-filter": 0,
+    "clip-path": 1,
+    "css-gradient": 0,
+    "box-shadow": 11,
+    "border-radius": 1248,
+    "css-transition": 0,
+    "css-animation": 0,
+    "scroll-container": 2,
+    "webfont": 0
+  },
+  "interaction": {
+    "menu": 8,
+    "dialog": 0,
+    "tooltip": 0,
+    "tab-set": 0,
+    "accordion": 2,
+    "carousel": 0,
+    "combobox": 0,
+    "drag-target": 0,
+    "drag-listener-registrations": 0,
+    "virtualized-list": 0,
+    "disclosure-button": 16,
+    "live-region": 1,
+    "form": 5,
+    "custom-element": 0,
+    "shadow-dom": 0,
+    "skip-link": 0,
+    "iframe": 0,
+    "video": 1,
+    "canvas": 0,
+    "svg": 0,
+    "responsive-image": 10
+  },
+  "behavior": {
+    "focus-trapping": {
+      "modalSurfaces": 0,
+      "inert": 0,
+      "showModalCalls": 0,
+      "keyListeners": 32,
+      "focusableInModal": 0
+    },
+    "focus-restoration": {
+      "focusCalls": 0,
+      "focusCallsAfterLoad": 0,
+      "tabindexNegative": 11,
+      "autofocus": 0
+    },
+    "scroll-locking": {
+      "cssLockRules": 3,
+      "runtimeOverflowWrites": 0,
+      "bodyLockedAtRest": false,
+      "overscrollContained": 0
+    },
+    "optimistic-update": {
+      "pushState": 0,
+      "fetchCalls": 0,
+      "abortableFetch": 0,
+      "xhrCalls": 0,
+      "forms": 5,
+      "clientRouterLinks": 0,
+      "mutationObservers": 0
+    },
+    "deferred-load": {
+      "lazyImgs": 2,
+      "asyncDecode": 7,
+      "preload": 0,
+      "intersectionObservers": 3,
+      "ioObservedTargets": 34,
+      "idleCallbacks": 23,
+      "resizeObservers": 0,
+      "deferScripts": 1,
+      "moduleScripts": 0
+    }
+  },
+  "breakpoints": [
+    500,
+    639,
+    640,
+    720,
+    1120,
+    1399,
+    1680
+  ],
+  "mediaConditionCount": 109,
+  "styleSheetsRead": 18,
+  "styleSheetsUnreadable": 1,
+  "cssBytesRead": 464518,
+  "elapsedMs": 13026
+}

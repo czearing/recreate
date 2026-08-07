@@ -1,0 +1,133 @@
+{
+  "id": "nuxt",
+  "url": "https://nuxt.com/",
+  "framework": "Nuxt 3 (Vue)",
+  "why": "Vue meta-framework with island hydration and route-level deferred load.",
+  "ok": true,
+  "meta": {
+    "url": "https://nuxt.com/",
+    "title": "Nuxt: The Full-Stack Vue Framework",
+    "elementCount": 1973,
+    "maxDepth": 25,
+    "styleSheetCount": 21,
+    "crossOriginSheets": 0,
+    "frameworkSignals": {
+      "react": false,
+      "next": false,
+      "vue": true,
+      "nuxt": true,
+      "angular": false,
+      "svelte": false,
+      "solid": false,
+      "astro": false,
+      "remix": false,
+      "ember": false,
+      "htmx": false,
+      "jquery": false
+    }
+  },
+  "layout": {
+    "flex": 432,
+    "grid": 51,
+    "float": 0,
+    "absolute": 90,
+    "fixed": 3,
+    "sticky": 1,
+    "container-query": 0,
+    "subgrid": 0,
+    "multi-column": 0,
+    "table-layout": 30,
+    "transform": 36,
+    "aspect-ratio": 55,
+    "scroll-snap": 0,
+    "css-custom-property": 1500,
+    "z-index-stacking": 19,
+    "backdrop-filter": 2,
+    "clip-path": 16,
+    "css-gradient": 10,
+    "box-shadow": 87,
+    "border-radius": 243,
+    "css-transition": 228,
+    "css-animation": 24,
+    "scroll-container": 0,
+    "webfont": 29
+  },
+  "interaction": {
+    "menu": 1,
+    "dialog": 0,
+    "tooltip": 1,
+    "tab-set": 53,
+    "accordion": 0,
+    "carousel": 2,
+    "combobox": 0,
+    "drag-target": 0,
+    "drag-listener-registrations": 34,
+    "virtualized-list": 0,
+    "disclosure-button": 17,
+    "live-region": 0,
+    "form": 2,
+    "custom-element": 0,
+    "shadow-dom": 0,
+    "skip-link": 0,
+    "iframe": 0,
+    "video": 0,
+    "canvas": 1,
+    "svg": 5,
+    "responsive-image": 55
+  },
+  "behavior": {
+    "focus-trapping": {
+      "modalSurfaces": 0,
+      "inert": 0,
+      "showModalCalls": 0,
+      "keyListeners": 62,
+      "focusableInModal": 0
+    },
+    "focus-restoration": {
+      "focusCalls": 1,
+      "focusCallsAfterLoad": 1,
+      "tabindexNegative": 33,
+      "autofocus": 0
+    },
+    "scroll-locking": {
+      "cssLockRules": 0,
+      "runtimeOverflowWrites": 0,
+      "bodyLockedAtRest": false,
+      "overscrollContained": 0
+    },
+    "optimistic-update": {
+      "pushState": 0,
+      "fetchCalls": 12,
+      "abortableFetch": 2,
+      "xhrCalls": 0,
+      "forms": 2,
+      "clientRouterLinks": 0,
+      "mutationObservers": 35
+    },
+    "deferred-load": {
+      "lazyImgs": 44,
+      "asyncDecode": 0,
+      "preload": 198,
+      "intersectionObservers": 28,
+      "ioObservedTargets": 67,
+      "idleCallbacks": 20,
+      "resizeObservers": 69,
+      "deferScripts": 2,
+      "moduleScripts": 1
+    }
+  },
+  "breakpoints": [
+    320,
+    640,
+    768,
+    1024,
+    1280,
+    1536,
+    2400
+  ],
+  "mediaConditionCount": 55,
+  "styleSheetsRead": 21,
+  "styleSheetsUnreadable": 0,
+  "cssBytesRead": 366970,
+  "elapsedMs": 13064
+}

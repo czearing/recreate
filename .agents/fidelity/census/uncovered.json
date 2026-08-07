@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T06:50:06.615Z",
+  "rule": "feature used by >= 2 surveyed sites with no fixture whose control markup exercises it",
+  "sitesSurveyed": 18,
+  "uncoveredCount": 30,
+  "uncovered": [
+    {
+      "feature": "deferred-load",
+      "group": "behavior",
+      "siteCount": 17,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "rendered + runtime (IntersectionObserver wrap)"
+    },
+    {
+      "feature": "css-custom-property",
+      "group": "layout",
+      "siteCount": 16,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "disclosure-button",
+      "group": "interaction",
+      "siteCount": 15,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "webfont",
+      "group": "layout",
+      "siteCount": 15,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "z-index-stacking",
+      "group": "layout",
+      "siteCount": 15,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "solidjs",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "aspect-ratio",
+      "group": "layout",
+      "siteCount": 14,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "nuxt",
+        "svelte",
+        "astro",
+        "reactrouter",
+        "emberjs",
+        "wikipedia",
+        "hackernews",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "box-shadow",
+      "group": "layout",
+      "siteCount": 14,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "clip-path",
+      "group": "layout",
+      "siteCount": 13,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "svelte",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "responsive-image",
+      "group": "interaction",
+      "siteCount": 11,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "vuejs",
+        "nuxt",
+        "svelte",
+        "solidjs",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "sticky",
+      "group": "layout",
+      "siteCount": 11,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "mdn",
+        "wikipedia",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "custom-element",
+      "group": "interaction",
+      "siteCount": 10,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "angular",
+        "svelte",
+        "astro",
+        "mdn",
+        "bbc"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "drag-listener-registrations",
+      "group": "interaction",
+      "siteCount": 10,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "github",
+        "nuxt",
+        "reactrouter",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "runtime (inflated by framework event delegation - see gaps)"
+    },
+    {
+      "feature": "accordion",
+      "group": "interaction",
+      "siteCount": 8,
+      "sites": [
+        "vercel",
+        "stripe",
+        "github",
+        "solidjs",
+        "astro",
+        "mdn",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "menu",
+      "group": "interaction",
+      "siteCount": 8,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "github",
+        "vuejs",
+        "nuxt",
+        "angular",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "tab-set",
+      "group": "interaction",
+      "siteCount": 8,
+      "sites": [
+        "tailwindcss",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs",
+        "astro",
+        "emberjs",
+        "shopify"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "backdrop-filter",
+      "group": "layout",
+      "siteCount": 7,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "stripe",
+        "github",
+        "nuxt",
+        "angular",
+        "solidjs"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "form",
+      "group": "interaction",
+      "siteCount": 7,
+      "sites": [
+        "nextjs",
+        "github",
+        "nuxt",
+        "svelte",
+        "astro",
+        "wikipedia",
+        "hackernews"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "skip-link",
+      "group": "interaction",
+      "siteCount": 7,
+      "sites": [
+        "github",
+        "vuejs",
+        "svelte",
+        "astro",
+        "mdn",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "container-query",
+      "group": "layout",
+      "siteCount": 5,
+      "sites": [
+        "tailwindcss",
+        "vercel",
+        "stripe",
+        "angular",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "iframe",
+      "group": "interaction",
+      "siteCount": 5,
+      "sites": [
+        "stripe",
+        "vuejs",
+        "solidjs",
+        "bbc",
+        "shopify"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "scroll-container",
+      "group": "layout",
+      "siteCount": 5,
+      "sites": [
+        "angular",
+        "solidjs",
+        "mdn",
+        "wikipedia",
+        "bbc"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "shadow-dom",
+      "group": "interaction",
+      "siteCount": 5,
+      "sites": [
+        "nextjs",
+        "tailwindcss",
+        "vercel",
+        "github",
+        "mdn"
+      ],
+      "detection": "dom+runtime"
+    },
+    {
+      "feature": "tooltip",
+      "group": "interaction",
+      "siteCount": 5,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "github",
+        "nuxt",
+        "astro"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "table-layout",
+      "group": "layout",
+      "siteCount": 4,
+      "sites": [
+        "nuxt",
+        "mdn",
+        "wikipedia",
+        "hackernews"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "video",
+      "group": "interaction",
+      "siteCount": 4,
+      "sites": [
+        "github",
+        "svelte",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "dom"
+    },
+    {
+      "feature": "carousel",
+      "group": "interaction",
+      "siteCount": 3,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "nuxt"
+      ],
+      "detection": "aria/dom"
+    },
+    {
+      "feature": "float",
+      "group": "layout",
+      "siteCount": 3,
+      "sites": [
+        "github",
+        "wikipedia",
+        "bbc"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "multi-column",
+      "group": "layout",
+      "siteCount": 3,
+      "sites": [
+        "vuejs",
+        "wikipedia",
+        "shopify"
+      ],
+      "detection": "computed"
+    },
+    {
+      "feature": "scroll-locking",
+      "group": "behavior",
+      "siteCount": 3,
+      "sites": [
+        "github",
+        "angular",
+        "wikipedia"
+      ],
+      "detection": "proxy (css lock rule / runtime overflow write)"
+    },
+    {
+      "feature": "scroll-snap",
+      "group": "layout",
+      "siteCount": 3,
+      "sites": [
+        "tailwindcss",
+        "stripe",
+        "shopify"
+      ],
+      "detection": "computed"
+    }
+  ],
+  "uncoveredUniversalPairs": [
+    {
+      "feature": "absolute + deferred-load",
+      "group": "feature-pair",
+      "siteCount": 17,
+      "sites": [
+        "identical-site-set"
+      ],
+      "detection": "co-occurrence across the surveyed sample"
+    },
+    {
+      "feature": "absolute + grid",
+      "group": "feature-pair",
+      "siteCount": 17,
+      "sites": [
+        "identical-site-set"
+      ],
+      "detection": "co-occurrence across the surveyed sample"
+    },
+    {
+      "feature": "deferred-load + flex",
+      "group": "feature-pair",
+      "siteCount": 17,
+      "sites": [
+        "identical-site-set"
+      ],
+      "detection": "co-occurrence across the surveyed sample"
+    },
+    {
+      "feature": "deferred-load + grid",
+      "group": "feature-pair",
+      "siteCount": 17,
+      "sites": [
+        "identical-site-set"
+      ],
+      "detection": "co-occurrence across the surveyed sample"
+    },
+    {
+      "feature": "border-radius + css-custom-property",
+      "group": "feature-pair",
+      "siteCount": 16,
+      "sites": [
+        "identical-site-set"
+      ],
+      "detection": "co-occurrence across the surveyed sample"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "id": "solidjs",
+  "url": "https://docs.solidjs.com/",
+  "framework": "SolidJS",
+  "why": "Fine-grained reactivity framework; small-team CSS conventions.",
+  "ok": true,
+  "meta": {
+    "url": "https://docs.solidjs.com/",
+    "title": "Overview",
+    "elementCount": 388,
+    "maxDepth": 21,
+    "styleSheetCount": 2,
+    "crossOriginSheets": 0,
+    "frameworkSignals": {
+      "react": false,
+      "next": false,
+      "vue": false,
+      "nuxt": false,
+      "angular": false,
+      "svelte": false,
+      "solid": true,
+      "astro": false,
+      "remix": false,
+      "ember": false,
+      "htmx": false,
+      "jquery": false
+    }
+  },
+  "layout": {
+    "flex": 31,
+    "grid": 3,
+    "float": 0,
+    "absolute": 13,
+    "fixed": 0,
+    "sticky": 4,
+    "container-query": 0,
+    "subgrid": 0,
+    "multi-column": 0,
+    "table-layout": 0,
+    "transform": 1,
+    "aspect-ratio": 0,
+    "scroll-snap": 0,
+    "css-custom-property": 388,
+    "z-index-stacking": 2,
+    "backdrop-filter": 1,
+    "clip-path": 0,
+    "css-gradient": 9,
+    "box-shadow": 7,
+    "border-radius": 21,
+    "css-transition": 15,
+    "css-animation": 0,
+    "scroll-container": 1,
+    "webfont": 0
+  },
+  "interaction": {
+    "menu": 0,
+    "dialog": 0,
+    "tooltip": 0,
+    "tab-set": 4,
+    "accordion": 9,
+    "carousel": 0,
+    "combobox": 0,
+    "drag-target": 0,
+    "drag-listener-registrations": 0,
+    "virtualized-list": 0,
+    "disclosure-button": 13,
+    "live-region": 1,
+    "form": 0,
+    "custom-element": 0,
+    "shadow-dom": 0,
+    "skip-link": 0,
+    "iframe": 1,
+    "video": 0,
+    "canvas": 0,
+    "svg": 24,
+    "responsive-image": 1
+  },
+  "behavior": {
+    "focus-trapping": {
+      "modalSurfaces": 0,
+      "inert": 0,
+      "showModalCalls": 0,
+      "keyListeners": 4,
+      "focusableInModal": 0
+    },
+    "focus-restoration": {
+      "focusCalls": 0,
+      "focusCallsAfterLoad": 0,
+      "tabindexNegative": 1,
+      "autofocus": 0
+    },
+    "scroll-locking": {
+      "cssLockRules": 0,
+      "runtimeOverflowWrites": 0,
+      "bodyLockedAtRest": false,
+      "overscrollContained": 0
+    },
+    "optimistic-update": {
+      "pushState": 0,
+      "fetchCalls": 0,
+      "abortableFetch": 0,
+      "xhrCalls": 1,
+      "forms": 0,
+      "clientRouterLinks": 0,
+      "mutationObservers": 1
+    },
+    "deferred-load": {
+      "lazyImgs": 0,
+      "asyncDecode": 0,
+      "preload": 5,
+      "intersectionObservers": 2,
+      "ioObservedTargets": 2,
+      "idleCallbacks": 1,
+      "resizeObservers": 1,
+      "deferScripts": 2,
+      "moduleScripts": 3
+    }
+  },
+  "breakpoints": [
+    640,
+    768,
+    1024,
+    1280,
+    1536
+  ],
+  "mediaConditionCount": 20,
+  "styleSheetsRead": 2,
+  "styleSheetsUnreadable": 0,
+  "cssBytesRead": 89420,
+  "elapsedMs": 10914
+}
