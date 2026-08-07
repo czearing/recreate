@@ -48,6 +48,8 @@ pub struct Qualification {
     comparisons: usize,
     passed_comparisons: usize,
     detected_mutations: usize,
+    undetected_mutations: usize,
+    exceeded_budget_mutations: usize,
     total_mutations: usize,
     maximum_ms: u128,
     p95_ms: u128,
@@ -70,6 +72,29 @@ struct MutationResult {
     iterations: usize,
     durations_ms: Vec<u128>,
     finding: String,
+    outcome: MutationOutcome,
+}
+
+/// A mutant that ran out of time never produced a verdict, so folding it into
+/// the undetected count reports evidence that was never gathered. Budget is
+/// therefore decided before content, and both are reported against a
+/// denominator that never shrinks.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+enum MutationOutcome {
+    Detected,
+    Undetected,
+    ExceededBudget,
+}
+
+impl MutationOutcome {
+    fn classify(content_valid: bool, within_budget: bool) -> Self {
+        match (within_budget, content_valid) {
+            (false, _) => Self::ExceededBudget,
+            (true, true) => Self::Detected,
+            (true, false) => Self::Undetected,
+        }
+    }
 }
 
 pub async fn qualify(
@@ -116,6 +141,8 @@ pub async fn qualify(
     let mut duplicate_findings = 0;
     let mut passed_comparisons = 0;
     let mut detected_mutations = 0;
+    let mut undetected_mutations = 0;
+    let mut exceeded_budget_mutations = 0;
     let total_mutations = cases.iter().map(|case| case.mutations.len()).sum();
     let mut case_results = Vec::new();
     for case in cases {
@@ -201,7 +228,8 @@ pub async fn qualify(
             let mut durations = Vec::new();
             let mut stable_text = None;
             let mut stable_json = None;
-            let mut mutation_valid = true;
+            let mut mutation_content_valid = true;
+            let mut mutation_within_budget = true;
             for _ in 0..repeat {
                 let artifact = record_source(mutation.viewport).await?;
                 let candidate_session = session(
@@ -223,25 +251,39 @@ pub async fn qualify(
                     .map(|finding| finding.line.as_str())
                     .unwrap_or_default();
                 let normalized = normalized_json(&report)?;
-                let expected = report.status == Status::Fail
+                let within_budget = report.elapsed_ms <= mutation.maximum_duration_ms
+                    && result.under_five_seconds;
+                // Inconclusive and PreparationRequired mean the comparison was
+                // interrupted, so no verdict exists to call blind.
+                let verdict_reached = matches!(report.status, Status::Fail | Status::Pass);
+                let content_expected = report.status == Status::Fail
                     && report.findings.len() == mutation.primary_findings
                     && mutation.unexpected_primary_findings == 0
                     && duplicates == mutation.duplicates
                     && finding == mutation.finding
-                    && report.elapsed_ms <= mutation.maximum_duration_ms
-                    && result.under_five_seconds
                     && stable_text.as_ref().is_none_or(|value| value == &lines)
                     && stable_json
                         .as_ref()
                         .is_none_or(|value| value == &normalized);
+                let expected = content_expected && within_budget;
                 if expected {
                     passed_comparisons += 1;
+                } else if within_budget && verdict_reached {
+                    mutation_content_valid = false;
                 } else {
-                    mutation_valid = false;
+                    mutation_within_budget = false;
+                }
+                if !expected {
                     failures.push(format!(
-                        "{} {}: expected={} actual={} status={:?} findings={} duplicates={} lines={:?}",
+                        "{} {}: outcome={:?} elapsed={}ms budget={}ms expected={} actual={} status={:?} findings={} duplicates={} lines={:?}",
                         case.case,
                         mutation.id,
+                        MutationOutcome::classify(
+                            content_expected,
+                            within_budget && verdict_reached
+                        ),
+                        report.elapsed_ms,
+                        mutation.maximum_duration_ms,
                         mutation.finding,
                         finding,
                         report.status,
@@ -259,14 +301,19 @@ pub async fn qualify(
                 durations.push(report.elapsed_ms);
                 all_durations.push(report.elapsed_ms);
             }
-            if mutation_valid {
-                detected_mutations += 1;
+            let outcome =
+                MutationOutcome::classify(mutation_content_valid, mutation_within_budget);
+            match outcome {
+                MutationOutcome::Detected => detected_mutations += 1,
+                MutationOutcome::Undetected => undetected_mutations += 1,
+                MutationOutcome::ExceededBudget => exceeded_budget_mutations += 1,
             }
             mutation_results.push(MutationResult {
                 id: mutation.id.clone(),
                 iterations: repeat,
                 durations_ms: durations,
                 finding: mutation.finding.clone(),
+                outcome,
             });
         }
         case_results.push(CaseResult {
@@ -291,9 +338,20 @@ pub async fn qualify(
     if duplicate_findings != 0 {
         failures.push(format!("duplicate findings: {duplicate_findings}"));
     }
-    if detected_mutations != total_mutations {
+    // Every mutant lands in exactly one bucket against a denominator that never
+    // shrinks, so excluding a budget failure from the score cannot hide it.
+    anyhow::ensure!(
+        detected_mutations + undetected_mutations + exceeded_budget_mutations == total_mutations,
+        "mutation outcomes {detected_mutations}+{undetected_mutations}+{exceeded_budget_mutations} do not sum to {total_mutations}"
+    );
+    if undetected_mutations != 0 {
         failures.push(format!(
-            "detected {detected_mutations}/{total_mutations} mutations"
+            "undetected {undetected_mutations}/{total_mutations} mutations"
+        ));
+    }
+    if exceeded_budget_mutations != 0 {
+        failures.push(format!(
+            "exceeded budget {exceeded_budget_mutations}/{total_mutations} mutations (detected {detected_mutations})"
         ));
     }
     if process_evidence
@@ -306,6 +364,8 @@ pub async fn qualify(
         comparisons: all_durations.len(),
         passed_comparisons,
         detected_mutations,
+        undetected_mutations,
+        exceeded_budget_mutations,
         total_mutations,
         maximum_ms: maximum,
         p95_ms: p95,
@@ -493,4 +553,56 @@ fn percentile(values: &[u128], percentile: f64) -> u128 {
     }
     let index = ((values.len() - 1) as f64 * percentile).ceil() as usize;
     values[index]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MutationOutcome;
+
+    #[test]
+    fn a_correct_comparison_that_ran_out_of_time_is_over_budget_not_undetected() {
+        assert_eq!(
+            MutationOutcome::classify(true, false),
+            MutationOutcome::ExceededBudget
+        );
+    }
+
+    #[test]
+    fn a_wrong_comparison_inside_the_budget_is_undetected() {
+        assert_eq!(
+            MutationOutcome::classify(false, true),
+            MutationOutcome::Undetected
+        );
+    }
+
+    #[test]
+    fn budget_is_decided_before_content_so_an_interrupted_run_is_never_called_blind() {
+        assert_eq!(
+            MutationOutcome::classify(false, false),
+            MutationOutcome::ExceededBudget
+        );
+    }
+
+    #[test]
+    fn every_outcome_is_counted_exactly_once_against_a_fixed_denominator() {
+        let outcomes = [
+            MutationOutcome::classify(true, true),
+            MutationOutcome::classify(true, false),
+            MutationOutcome::classify(false, true),
+        ];
+        let detected = outcomes
+            .iter()
+            .filter(|value| **value == MutationOutcome::Detected)
+            .count();
+        let undetected = outcomes
+            .iter()
+            .filter(|value| **value == MutationOutcome::Undetected)
+            .count();
+        let exceeded = outcomes
+            .iter()
+            .filter(|value| **value == MutationOutcome::ExceededBudget)
+            .count();
+        assert_eq!(detected + undetected + exceeded, outcomes.len());
+        assert_eq!((detected, undetected, exceeded), (1, 1, 1));
+    }
 }
