@@ -1,0 +1,182 @@
+{
+  "workItem": "008-inline-js-extraction",
+  "commit": "3b8c488",
+  "baselineCommit": "216c24f",
+  "claim": "Inline JavaScript was extracted from single-line Rust literals into compile-time-included template files, moving syntax-error detection from a ~186s browser gate to a ~1s parse test, with byte-identical generated output.",
+
+  "M1_M2_longestLineChars": {
+    "command": "powershell -c \"foreach ($f in @('src\\generate\\jsx_app.rs','src\\generate\\jsx_state_generation.rs')) { (Get-Content $f | Measure-Object -Property Length -Maximum).Maximum }\"",
+    "required": "< 400",
+    "src/generate/jsx_app.rs": { "before": 8856, "after": 364, "pass": true },
+    "src/generate/jsx_state_generation.rs": { "before": 7088, "after": 283, "pass": true }
+  },
+
+  "extractedFiles": {
+    "directory": "src/generate/templates/",
+    "count": 11,
+    "note": "Three kinds. .mjs = standalone parseable ES modules. .jsx = JSX tails, not JavaScript, so not parseable by node --check. .fragment = unbalanced splice fragments that are syntactically incomplete by construction. Every non-.mjs file is listed in the UNPARSEABLE allowlist in tests/js_templates.rs so that no file can silently escape the parse gate.",
+    "files": [
+      { "name": "app_runtime.mjs", "bytes": 4187, "crlf": 0, "parsed": true },
+      { "name": "state_surfaces.mjs", "bytes": 6285, "crlf": 0, "parsed": true },
+      { "name": "transition_dispatch.mjs", "bytes": 1930, "crlf": 0, "parsed": true },
+      { "name": "sync_active_controls.mjs", "bytes": 1313, "crlf": 0, "parsed": true },
+      { "name": "merge_scroll.mjs", "bytes": 773, "crlf": 0, "parsed": true },
+      { "name": "scroll_extent.mjs", "bytes": 676, "crlf": 0, "parsed": true },
+      { "name": "tab_scroll.mjs", "bytes": 463, "crlf": 0, "parsed": true },
+      { "name": "app_component.jsx", "bytes": 4723, "crlf": 0, "parsed": false, "reason": "JSX, not JavaScript" },
+      { "name": "state_anchored.jsx", "bytes": 712, "crlf": 0, "parsed": false, "reason": "JSX, not JavaScript" },
+      { "name": "activate_transition.fragment", "bytes": 3388, "crlf": 0, "parsed": false, "reason": "unbalanced splice fragment" },
+      { "name": "state_effects.fragment", "bytes": 863, "crlf": 0, "parsed": false, "reason": "unbalanced splice fragment" }
+    ]
+  },
+
+  "interpolationMechanism": {
+    "problem": "A format! region cannot be both valid JavaScript and a format template: format! escapes every literal brace as {{ or }}, and JavaScript is brace-dense.",
+    "resolution": "Templates store real single-brace JavaScript. Interpolation points are placeholders in syntactically legal positions, substituted by ordered .replace via fill() in jsx_app.rs.",
+    "placeholderShapes": [
+      { "shape": "\"__RECREATE_X__\"", "position": "value", "why": "a quoted token parses; a bare {FOO} is a JS syntax error" },
+      { "shape": "//__RECREATE_X__\\n", "position": "statement", "why": "a comment is legal anywhere a statement is" },
+      { "shape": "__RECREATE_IMPORTS__", "position": "identifier", "why": "import { X } from ... admits no string literal, so a bare identifier is the only legal form" }
+    ],
+    "orderingHazard": "format! substitutes simultaneously; .replace substitutes sequentially. fill() therefore carries debug_assert!s that every token is present before substitution and that no substituted value itself contains __RECREATE_, which is what would let one replacement corrupt a later one.",
+    "positionalArguments": "The single positional {} at each of the two former format! sites was preserved in its original argument order."
+  },
+
+  "M3_parseTest": {
+    "required": ">= 1 test per extracted .mjs, all passing",
+    "command": "cargo test --test js_templates",
+    "before": "0 tests",
+    "after": { "tests": 4, "result": "all passed", "runtimeSeconds": 1.32 },
+    "tests": [
+      { "name": "node_is_the_parser_and_must_be_present", "purpose": "Fails if node is absent. A skip would report success for an unrun check, recreating the exact blindness this work item exists to remove." },
+      { "name": "every_mjs_template_parses", "purpose": "Reads the templates directory at RUNTIME rather than from a hardcoded list, so a newly added .mjs is covered automatically. Asserts >= 7 found so an empty or mis-resolved directory cannot pass vacuously." },
+      { "name": "every_template_is_either_parsed_or_documented_as_unparseable", "purpose": "Closes the escape hatch: any file neither parsed nor in the 4-entry UNPARSEABLE allowlist fails the suite." },
+      { "name": "templates_are_lf_only", "purpose": "Guards the byte-identity hazard in M5 directly in CI." }
+    ],
+    "nodeVersion": "v25.9.0",
+    "parserSemantics": "node --check selects ESM from the .mjs extension, never resolves imports, and catches syntax errors only - not semantic ones. It is a parse gate, not a type or link check.",
+    "pass": true
+  },
+
+  "M4_syntaxErrorDetectionSeconds": {
+    "required": "< 5",
+    "before": "~186 (browser gate)",
+    "demonstration": {
+      "method": "Corrupted src/generate/templates/app_runtime.mjs, ran the test, then reverted.",
+      "reportedError": "SyntaxError: Unexpected end of input",
+      "detectedTheOriginalDefect": true
+    },
+    "measured": {
+      "viaCargoTestWarm": { "medianSeconds": 9.09, "range": [9.00, 9.25], "repeats": 3 },
+      "viaPrebuiltTestBinary": { "seconds": 1.03 },
+      "testsOwnRuntimeSeconds": 0.92
+    },
+    "decomposition": {
+      "noChangeRebuildSeconds": 3.9,
+      "buildOnlyAfterMjsEditSeconds": 8.4,
+      "prebuiltBinarySeconds": 1.03,
+      "attributedCause": "cargo test -v prints 'Compiling recreate v0.6.4 ... 7.61s'. include_str! makes every .mjs a compile-time input to the recreate binary, and cargo rebuilds binaries for integration tests to populate CARGO_BIN_EXE_. Editing a template therefore forces a full recompile of the root crate before the 0.92s parse check can run."
+    },
+    "pass": false,
+    "honestStatus": "MISSED against the literal '< 5s via cargo test' bar; MET against the assignment's stated goal of 'about 1 second' when the test binary is already built (1.03s).",
+    "whyUnreachableAsSpecified": "The only two ways below 5s are (a) removing include_str!, which the spec requires be kept, or (b) adding a separate test-only crate that does not depend on the root binary, which the environment rules forbid ('never create a new project, crate, or repo'). The floor is structural to the chosen mechanism, not incidental. Reported rather than worked around.",
+    "improvementFromBaseline": "186s -> 9.09s worst case, a 20.5x reduction; 180x when the harness is warm."
+  },
+
+  "M5_generatedOutputByteIdentical": {
+    "required": "zero differing bytes",
+    "method": "FRESH CLONES, not the working tree. The CRLF divergence is introduced at checkout, so a tree that was never re-checked-out would falsely pass.",
+    "freshClonePaths": {
+      "before": "C:\\Users\\calebzearing\\wi008-scratch2\\m5run\\before (clone at 216c24f)",
+      "after": "C:\\Users\\calebzearing\\wi008-scratch2\\m5run\\after (clone at 3b8c488)"
+    },
+    "specCapturesUsed": [
+      { "spec": "recreate-output/spec.json", "filesGenerated": 20 },
+      { "spec": "fluid-r5/spec.json", "filesGenerated": 112 },
+      { "spec": "review/authenticated-reference-final/spec.json", "filesGenerated": 191 }
+    ],
+    "result": { "beforeFiles": 323, "afterFiles": 323, "differingBytes": 0, "pass": true },
+    "freshCheckoutLineEndings": "The after clone reported 'FRESH CHECKOUT templates: files=11 LF=47 CRLF=0', proving the .gitattributes pin survives checkout on a machine with core.autocrlf=true.",
+    "canary": {
+      "why": "A byte-identity comparison that has never failed is an unverified instrument. The canary reproduces the exact hazard the check exists to guard.",
+      "method": "Converted app_runtime.mjs to CRLF in the after clone, rebuilt release, regenerated, re-compared.",
+      "result": "CANARY DETECTED: 6 differing entries. Clean run produced 20 files, canary produced 18. Differing: react\\src\\App.jsx, react\\src\\generated\\scoped-styles.js; present only in the clean output: react\\src\\views\\Baseline0.css, react\\src\\views\\Baseline0.jsx.",
+      "conclusion": "The M5 oracle fails on CRLF contamination, and .gitattributes is load-bearing rather than decorative - without it the generated output both changes bytes and loses two files."
+    }
+  },
+
+  "lineEndingPin": {
+    "file": ".gitattributes",
+    "rules": "scoped to src/generate/templates/*.{mjs,jsx,fragment} ONLY",
+    "whyNotBlanket": "A blanket *.mjs rule would renormalize the six existing runtime/*.mjs files, which are 100% CRLF on disk and are fs::write'n verbatim into every generated project. .gitattributes does not retroactively renormalize, so the damage would be latent and would surface on someone else's next clone.",
+    "verification": "git check-attr: templates -> 'text: set, eol: lf'; runtime/dom.mjs -> 'unspecified'. The six emitted assets are untouched.",
+    "modulesArray": "The MODULES array in src/generate/runtime_sources.rs was NOT modified. No template was added to it."
+  },
+
+  "M6_qualification": {
+    "required": "detected == total, total >= 44, fixtures >= 28",
+    "command": "cargo run --release -- qualify --output <scratch>/inline-js-after.json",
+    "preCountFixtures": 28,
+    "preCountMutants": 44,
+    "recountMethod": "Counted directly from backtest/fixtures/*/expected.json immediately before measuring, because peers land fixtures continuously and a stale floor permits a silent shrink.",
+    "result": {
+      "detectedMutations": 44,
+      "totalMutations": 44,
+      "undetectedMutations": 0,
+      "exceededBudgetMutations": 0,
+      "fixtures": 28,
+      "comparisons": 72,
+      "passedComparisons": 72,
+      "duplicateFindings": 0,
+      "exitCode": 0,
+      "p95Ms": 930,
+      "p99Ms": 1304,
+      "maximumMs": 1304,
+      "elapsedSeconds": 117.9
+    },
+    "scoreWithDenominator": "44/44 detected across 28/28 fixtures",
+    "pass": true,
+    "independenceArgument": "backtest is its own cargo workspace named recreate-backtest with NO path dependency on the root crate; it never compiles src/generate. WI-008 therefore cannot affect this number by construction, and the measurement confirms it.",
+    "predictionCorrection": "This run was predicted to be 42/44 because commit 216c24f (the enclosure oracle) had widened detection beyond two frozen manifests. It measured 44/44: fixture-author re-froze frozen-offset/frozen-marker-left and wrap-collision/frozen-run-width in the interim. The prediction was reasoned, not measured; the measured number supersedes it."
+  },
+
+  "M7_deadlineConstants": {
+    "required": "unchanged",
+    "command": "Select-String -Path backtest\\src\\deadline.rs -Pattern 'MS: u64'",
+    "COMPARISON_DEADLINE_MS": 4400,
+    "WATCHDOG_MS": 4800,
+    "pass": true
+  },
+
+  "premiseCorrections": [
+    {
+      "claim": "Three lines exceed 2000 chars.",
+      "found": "The line-count framing understated the work. Eleven distinct regions required extraction, not three, because two of the three long literals contain JSX (which node --check cannot parse) and two further literals are unbalanced splice fragments. Hence the three-kind .mjs/.jsx/.fragment split.",
+      "artifact": "src/generate/templates/ (11 files)"
+    },
+    {
+      "claim": "Mirror backtest/tests/interactions_tests.rs.",
+      "found": "That file does not exist. The real backtest test files are budget_reachability.rs and stage_budget.rs. The former's style was mirrored instead: heavy doc comments, CARGO_MANIFEST_DIR path resolution, and panic-never-fallback on a missing tool.",
+      "artifact": "backtest/tests/"
+    },
+    {
+      "claim": "M4 js_syntax_error_detection_seconds -> < 5.",
+      "found": "Unreachable via cargo test for a structural reason, measured and attributed rather than assumed: include_str! makes each template a compile-time input to the recreate binary, and cargo rebuilds that binary for integration tests, costing 7.61s before the 0.92s check runs. Reported rather than worked around, since both escapes (dropping include_str!, or adding a test-only crate) are forbidden by the spec.",
+      "artifact": "cargo test -v output: 'Compiling recreate v0.6.4 ... 7.61s'"
+    }
+  ],
+
+  "peerBlockerObserved": {
+    "note": "Reported, NOT fixed - both files are forbidden to edit.",
+    "symptom": "The shared working tree does not compile.",
+    "cause": "src/generate/css_state_helpers.rs:24 calls super::authored_css::has_property, which verification-gate deleted from src/generate/authored_css.rs as part of an in-flight 3.65x generation speed-up.",
+    "impactOnThisWorkItem": "None, and this is proven rather than assumed: the fresh clone of commit 3b8c488 built release and generated all 323 files successfully, and the backtest crate is a separate workspace that never compiles src/generate.",
+    "owner": "verification-gate"
+  },
+
+  "summary": {
+    "passed": ["M1", "M2", "M3", "M5", "M6", "M7"],
+    "missed": ["M4"],
+    "m4Note": "186s -> 9.09s (cargo test) / 1.03s (prebuilt). Meets the assignment's stated intent of about one second; misses the literal < 5s bar via cargo test for a structural reason documented above. No metric was lowered and no suppression was added."
+  }
+}
