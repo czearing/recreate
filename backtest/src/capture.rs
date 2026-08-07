@@ -5,8 +5,9 @@ use crate::{
     digest, instrumentation,
     model::{
         Action, Artifact, LayoutShiftEvidence, NodeEvidence, RasterTileEvidence, RuntimeEvidence,
-        SCHEMA_VERSION, Session, SourceIdentity, State, StylesheetEvidence, Viewport,
+        SCHEMA_VERSION, Session, SourceIdentity, State, StylesheetEvidence, SweepProbe, Viewport,
     },
+    sweep,
 };
 use anyhow::Context;
 use base64::Engine;
@@ -328,6 +329,52 @@ const EVIDENCE_SCRIPT: &str = r##"
 })()
 "##;
 
+/// Geometry for every measured node at the current width, in one round trip.
+///
+/// A sweep probe is a reflow, never a paint. It reads the same node keys the
+/// full evidence script does, and nothing that costs a screenshot, a raster
+/// tile, an accessibility pass or a settle loop, because a width sweep that
+/// paid for any of those would cost more than the whole comparison budget.
+const SWEEP_SCRIPT: &str = r##"
+(() => {
+  const pathCache = new WeakMap([[document.documentElement, "html"]]);
+  const pathOf = (element) => {
+    if (!element) return "";
+    const authored = element.getAttribute?.("data-backtest-id");
+    if (authored) return authored;
+    if (pathCache.has(element)) return pathCache.get(element);
+    const parent = element.parentElement;
+    const peers = parent
+      ? Array.from(parent.children).filter((value) => value.tagName === element.tagName)
+      : [element];
+    const path = `${pathOf(parent)}>${element.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(element) + 1})`;
+    pathCache.set(element, path);
+    return path;
+  };
+  // Reading a layout property flushes the style and layout the width override
+  // dirtied, so the rects below are this width's rather than the last frame's.
+  document.documentElement.getBoundingClientRect();
+  const nodes = {};
+  for (const element of Array.from(document.querySelectorAll("*"))) {
+    if (element.closest("head")) continue;
+    if (["SCRIPT", "STYLE", "NOSCRIPT"].includes(element.tagName)) continue;
+    const id = pathOf(element);
+    if (Object.prototype.hasOwnProperty.call(nodes, id)) continue;
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    nodes[id] = {
+      visible: style.display !== "none" && style.visibility !== "hidden",
+      x: Math.round(rect.x * 100) / 100,
+      y: Math.round(rect.y * 100) / 100,
+      width: Math.round(rect.width * 100) / 100,
+      height: Math.round(rect.height * 100) / 100,
+      transform: style.transform
+    };
+  }
+  return nodes;
+})()
+"##;
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct RawEvidence {
@@ -346,6 +393,95 @@ struct RawRuntime {
     pending_timers: usize,
     pending_frames: usize,
     layout_shifts: Vec<LayoutShiftEvidence>,
+}
+
+/// How a capture samples the width axis.
+pub enum Sweep<'a> {
+    /// A page whose own declared bands choose the widths.
+    Derive,
+    /// The recreation, which replays exactly the widths the source recorded and
+    /// then refines the endpoints. Deriving its own list would compare two
+    /// different axes and make the interval nondeterministic.
+    Replay(&'a Artifact),
+}
+
+/// Samples geometry across the width axis of an already-navigated tab.
+///
+/// Returns nothing for a page that declares no width-conditional CSS, so such a
+/// page costs exactly what it cost before this existed.
+async fn sweep_widths(
+    cdp: &mut Cdp,
+    base: &State,
+    viewport: &Viewport,
+    mode: &Sweep<'_>,
+    deadline: Deadline,
+) -> anyhow::Result<Vec<SweepProbe>> {
+    let widths = match mode {
+        Sweep::Derive => sweep::probe_widths(&base.stylesheet.viewport_bands, viewport.width),
+        Sweep::Replay(source) => source.sweep.iter().map(|probe| probe.width).collect(),
+    };
+    if widths.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut probes = Vec::with_capacity(widths.len());
+    for width in widths {
+        probes.push(probe_width(cdp, width, viewport, deadline).await?);
+    }
+    if let Sweep::Replay(source) = mode {
+        let mut refiner = sweep::Refiner::plan(&source.sweep, &probes);
+        while let Some(width) = refiner.next_width() {
+            let probe = probe_width(cdp, width, viewport, deadline).await?;
+            refiner.accept(&source.sweep, &probe);
+            probes.push(probe);
+            probes.sort_by_key(|probe| probe.width);
+        }
+    }
+    // The recorded states were captured before the sweep, but leave the tab at
+    // the width the session declares so nothing downstream inherits a probe.
+    set_width(cdp, viewport.width, viewport, deadline).await?;
+    Ok(probes)
+}
+
+async fn probe_width(
+    cdp: &mut Cdp,
+    width: u32,
+    viewport: &Viewport,
+    deadline: Deadline,
+) -> anyhow::Result<SweepProbe> {
+    let nodes = serde_json::from_value(
+        cdp.call_then_evaluate(
+            "Emulation.setDeviceMetricsOverride",
+            metrics(width, viewport),
+            SWEEP_SCRIPT,
+            deadline,
+        )
+        .await?,
+    )?;
+    Ok(SweepProbe { width, nodes })
+}
+
+fn metrics(width: u32, viewport: &Viewport) -> Value {
+    json!({
+        "width": width,
+        "height": viewport.height,
+        "deviceScaleFactor": 1,
+        "mobile": false
+    })
+}
+
+async fn set_width(
+    cdp: &mut Cdp,
+    width: u32,
+    viewport: &Viewport,
+    deadline: Deadline,
+) -> anyhow::Result<()> {
+    cdp.call(
+        "Emulation.setDeviceMetricsOverride",
+        metrics(width, viewport),
+        deadline,
+    )
+    .await?;
+    Ok(())
 }
 
 pub async fn install(cdp: &mut Cdp, deadline: Deadline) -> anyhow::Result<()> {
@@ -491,11 +627,12 @@ pub async fn record_source(session: &Session, baseline_only: bool) -> anyhow::Re
     } else {
         discover_actions(&mut cdp, deadline).await?
     };
-    let states = capture_states(
+    let (states, sweep) = capture_states(
         &mut cdp,
         &session.requested_url,
         &session.viewport,
         &actions,
+        &Sweep::Derive,
         deadline,
     )
     .await?;
@@ -510,6 +647,7 @@ pub async fn record_source(session: &Session, baseline_only: bool) -> anyhow::Re
         },
         actions,
         states,
+        sweep,
         digest: String::new(),
     };
     artifact.seal()?;
@@ -584,8 +722,9 @@ async fn snapshot_states(
     cdp: &mut Cdp,
     requested: &str,
     viewport: &Viewport,
+    mode: &Sweep<'_>,
     deadline: Deadline,
-) -> anyhow::Result<Vec<State>> {
+) -> anyhow::Result<(Vec<State>, Vec<SweepProbe>)> {
     cdp.call("Page.enable", json!({}), deadline).await?;
     cdp.call("Runtime.enable", json!({}), deadline).await?;
     focus_page(cdp, deadline).await?;
@@ -603,11 +742,12 @@ async fn snapshot_states(
     .await?;
     settle(cdp, deadline).await?;
     let base = capture_state(cdp, viewport, "base", false, deadline).await?;
+    let sweep = sweep_widths(cdp, &base, viewport, mode, deadline).await?;
     cdp.call("Emulation.clearDeviceMetricsOverride", json!({}), deadline)
         .await?;
     let mut load = base.clone();
     load.scenario = "load".into();
-    Ok(vec![base, load])
+    Ok((vec![base, load], sweep))
 }
 
 pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifact> {
@@ -619,10 +759,11 @@ pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifac
     let target = browser::target(&session.cdp_url, &session.target_id).await?;
     let mut cdp = Cdp::connect(&target.web_socket_debugger_url, Duration::from_secs(5)).await?;
     let deadline = Deadline::new(30_000);
-    let states = snapshot_states(
+    let (states, sweep) = snapshot_states(
         &mut cdp,
         &session.requested_url,
         &session.viewport,
+        &Sweep::Derive,
         deadline,
     )
     .await?;
@@ -637,6 +778,7 @@ pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifac
         },
         actions: Vec::new(),
         states,
+        sweep,
         digest: String::new(),
     };
     artifact.seal()?;
@@ -644,6 +786,7 @@ pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifac
 }
 
 pub async fn compare_candidate_snapshot(
+    artifact: &Artifact,
     session: &Session,
     target: browser::Target,
     deadline: Deadline,
@@ -664,10 +807,11 @@ pub async fn compare_candidate_snapshot(
         deadline,
     )
     .await?;
-    let states = snapshot_states(
+    let (states, sweep) = snapshot_states(
         &mut cdp,
         &session.requested_url,
         &session.viewport,
+        &Sweep::Replay(artifact),
         deadline,
     )
     .await?;
@@ -681,6 +825,7 @@ pub async fn compare_candidate_snapshot(
         },
         actions: Vec::new(),
         states,
+        sweep,
         digest: String::new(),
     };
     candidate.seal()?;
@@ -716,11 +861,12 @@ pub async fn compare_candidate(
         })
         .await?;
     install(&mut cdp, deadline).await?;
-    let states = capture_states(
+    let (states, sweep) = capture_states(
         &mut cdp,
         &session.requested_url,
         &session.viewport,
         &artifact.actions,
+        &Sweep::Replay(artifact),
         deadline,
     )
     .await?;
@@ -734,6 +880,7 @@ pub async fn compare_candidate(
         },
         actions: artifact.actions.clone(),
         states,
+        sweep,
         digest: String::new(),
     };
     candidate.seal()?;
@@ -827,11 +974,16 @@ async fn capture_states(
     url: &str,
     viewport: &Viewport,
     actions: &[Action],
+    mode: &Sweep<'_>,
     deadline: Deadline,
-) -> anyhow::Result<Vec<State>> {
+) -> anyhow::Result<(Vec<State>, Vec<SweepProbe>)> {
     let mut states = Vec::new();
     navigate(cdp, url, viewport, deadline).await?;
     let base = capture_state(cdp, viewport, "base", false, deadline).await?;
+    // Swept once, from the base state, never per action: an action's evidence is
+    // about what the interaction did, and repeating the axis for each one would
+    // multiply the cost by the action count for no additional signal.
+    let sweep = sweep_widths(cdp, &base, viewport, mode, deadline).await?;
     states.push(base.clone());
     for action in actions {
         navigate(cdp, url, viewport, deadline).await?;
@@ -850,7 +1002,7 @@ async fn capture_states(
     let mut load = base;
     load.scenario = "load".into();
     states.push(load);
-    Ok(states)
+    Ok((states, sweep))
 }
 
 async fn execute(cdp: &mut Cdp, action: &Action, deadline: Deadline) -> anyhow::Result<()> {

@@ -11,6 +11,7 @@ mod instrumentation;
 mod model;
 mod report;
 mod server;
+mod sweep;
 
 use clap::Parser;
 

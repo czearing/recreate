@@ -2,6 +2,7 @@ use crate::model::{
     Artifact, Finding, MotionEvidence, NodeEvidence, RasterTileEvidence, Report, SCHEMA_VERSION,
     State, Status,
 };
+use crate::sweep;
 use std::collections::{BTreeMap, BTreeSet};
 
 pub fn artifacts(source: &Artifact, candidate: &Artifact, elapsed_ms: u128) -> Report {
@@ -51,6 +52,14 @@ pub fn artifacts(source: &Artifact, candidate: &Artifact, elapsed_ms: u128) -> R
         }
     }
     for finding in compare_runtime(source, &candidate_states) {
+        let key = finding.key.clone();
+        if seen_targets.insert(key) {
+            findings.push(finding);
+        } else {
+            suppressed += 1;
+        }
+    }
+    for finding in compare_sweep(source, candidate) {
         let key = finding.key.clone();
         if seen_targets.insert(key) {
             findings.push(finding);
@@ -335,19 +344,7 @@ fn compare_authored_state(source: &State, candidate: &State) -> Vec<Finding> {
         ));
     }
     compare_pending_work(source, candidate, &mut findings);
-    if findings.iter().any(|finding| {
-        !matches!(
-            finding.property.as_str(),
-            "x" | "y" | "height" | "transform" | "pixels"
-        )
-    }) {
-        findings.retain(|finding| {
-            !matches!(
-                finding.property.as_str(),
-                "x" | "y" | "height" | "transform" | "pixels"
-            )
-        });
-    }
+    collapse_consequences(&mut findings);
     if findings.is_empty()
         && !source.screenshot_sha256.is_empty()
         && source.screenshot_sha256 != candidate.screenshot_sha256
@@ -355,6 +352,24 @@ fn compare_authored_state(source: &State, candidate: &State) -> Vec<Finding> {
         findings.extend(compare_raster_tiles(source, candidate, true));
     }
     findings
+}
+
+/// Drops the differences an already-reported difference caused.
+///
+/// An element that appears, disappears or changes size moves everything after
+/// it, so reporting each displaced ancestor and sibling buries the one change
+/// that explains them all. A position or height difference is only worth
+/// stating when nothing else in the same comparison explains it.
+fn collapse_consequences(findings: &mut Vec<Finding>) {
+    let consequence = |finding: &Finding| {
+        matches!(
+            finding.property.as_str(),
+            "x" | "y" | "height" | "transform" | "pixels"
+        )
+    };
+    if findings.iter().any(|finding| !consequence(finding)) {
+        findings.retain(|finding| !consequence(finding));
+    }
 }
 
 fn compare_semantic_state(source: &State, candidate: &State) -> Vec<Finding> {
@@ -1256,7 +1271,7 @@ fn compare_semantic_node(
 }
 
 fn compare_motion(
-    state: &State,
+    state: &dyn Scope,
     target: &str,
     source: &NodeEvidence,
     candidate: &NodeEvidence,
@@ -1864,8 +1879,8 @@ fn push_event_values(
     ));
 }
 
-fn compare_node(
-    state: &State,
+pub(crate) fn compare_node(
+    state: &dyn Scope,
     target: &str,
     source: &NodeEvidence,
     candidate: &NodeEvidence,
@@ -1952,7 +1967,7 @@ fn compare_node(
             None,
         ));
     }
-    if state.scenario.starts_with("animation:") {
+    if state.scenario().starts_with("animation:") {
         if source.animation_duration_ms != candidate.animation_duration_ms {
             return Some(finding(
                 state,
@@ -2012,7 +2027,7 @@ fn compare_node(
             ("width", source.width, candidate.width),
             ("height", source.height, candidate.height),
         ];
-        if (!source.animated && !candidate.animated) || state.scenario.starts_with("animation:") {
+        if (!source.animated && !candidate.animated) || state.scenario().starts_with("animation:") {
             geometry.splice(
                 0..0,
                 [("x", source.x, candidate.x), ("y", source.y, candidate.y)],
@@ -2067,7 +2082,7 @@ fn compare_node(
         ("opacity", &source.opacity, &candidate.opacity),
         (
             "transform",
-            if source.animated && !state.scenario.starts_with("animation:") {
+            if source.animated && !state.scenario().starts_with("animation:") {
                 &candidate.transform
             } else {
                 &source.transform
@@ -2151,8 +2166,69 @@ fn rendered_content_property(
     }
 }
 
+/// Everything a finding needs from whatever it was measured against. A finding
+/// measured at one recorded width and a finding measured across a width
+/// interval differ only in how they are labelled, so both go through one
+/// builder and one property priority order rather than two that can drift.
+pub(crate) trait Scope {
+    /// The `V…` prefix a reader sees.
+    fn label(&self) -> String;
+    /// The width part of the finding key, which keeps interval findings from
+    /// colliding with single-width findings for the same node and property.
+    fn key_prefix(&self) -> String;
+    fn viewport(&self) -> u32;
+    fn scenario(&self) -> &str;
+}
+
+impl Scope for State {
+    fn label(&self) -> String {
+        format!("V{}", self.viewport.width)
+    }
+
+    fn key_prefix(&self) -> String {
+        self.viewport.width.to_string()
+    }
+
+    fn viewport(&self) -> u32 {
+        self.viewport.width
+    }
+
+    fn scenario(&self) -> &str {
+        &self.scenario
+    }
+}
+
+/// The inclusive width interval a swept constraint differs over. A one pixel
+/// band reads as one pixel rather than as `V600-600`.
+pub(crate) struct Span {
+    pub lo: u32,
+    pub hi: u32,
+}
+
+impl Scope for Span {
+    fn label(&self) -> String {
+        if self.lo == self.hi {
+            format!("V{}", self.lo)
+        } else {
+            format!("V{}-{}", self.lo, self.hi)
+        }
+    }
+
+    fn key_prefix(&self) -> String {
+        format!("{}-{}", self.lo, self.hi)
+    }
+
+    fn viewport(&self) -> u32 {
+        self.lo
+    }
+
+    fn scenario(&self) -> &str {
+        "sweep"
+    }
+}
+
 fn finding(
-    state: &State,
+    state: &dyn Scope,
     target: &str,
     property: &str,
     source: &str,
@@ -2164,17 +2240,21 @@ fn finding(
         // "content present->missing" reads as a riddle. An element that exists
         // on only one side is stated in the same words the grouped findings use.
         ("content" | "node", "present", "missing") => format!(
-            "V{} {} {} missing",
-            state.viewport.width, state.scenario, target
+            "{} {} {} missing",
+            state.label(),
+            state.scenario(),
+            target
         ),
         ("content" | "node", "missing", "present") => format!(
-            "V{} {} {} unexpected",
-            state.viewport.width, state.scenario, target
+            "{} {} {} unexpected",
+            state.label(),
+            state.scenario(),
+            target
         ),
         _ => format!(
-            "V{} {} {} {} {}->{}{}",
-            state.viewport.width,
-            state.scenario,
+            "{} {} {} {} {}->{}{}",
+            state.label(),
+            state.scenario(),
             target,
             property,
             round_pixels(source),
@@ -2183,10 +2263,10 @@ fn finding(
         ),
     };
     Finding {
-        key: format!("{}:{}:{}", state.viewport.width, target, property),
+        key: format!("{}:{}:{}", state.key_prefix(), target, property),
         line,
-        viewport: state.viewport.width,
-        scenario: state.scenario.clone(),
+        viewport: state.viewport(),
+        scenario: state.scenario().into(),
         target: target.into(),
         property: property.into(),
         source: source.into(),
@@ -2243,13 +2323,53 @@ fn signed_delta(value: i64) -> String {
 fn scenario_rank(value: &str) -> u8 {
     match value {
         "base" => 0,
-        value if value.starts_with("click:") => 1,
-        value if value.starts_with("hover:") => 2,
-        value if value.starts_with("animation:") => 3,
-        value if value.starts_with("timer:") => 4,
-        "load" => 5,
-        _ => 6,
+        "sweep" => 1,
+        value if value.starts_with("click:") => 2,
+        value if value.starts_with("hover:") => 3,
+        value if value.starts_with("animation:") => 4,
+        value if value.starts_with("timer:") => 5,
+        "load" => 6,
+        _ => 7,
     }
+}
+
+/// Differences that hold over a width interval rather than at one recorded
+/// width.
+///
+/// A node is reported at most once, by the same property priority order the
+/// recorded widths use, so a pure translation reads as `x` or `y` rather than
+/// as `transform`.
+fn compare_sweep(source: &Artifact, candidate: &Artifact) -> Vec<Finding> {
+    if source.sweep.is_empty() || candidate.sweep.is_empty() {
+        return Vec::new();
+    }
+    let mut findings = Vec::new();
+    for target in sweep::diverging_targets(&source.sweep, &candidate.sweep) {
+        let Some((lo, hi)) = sweep::interval(&source.sweep, &candidate.sweep, &target) else {
+            continue;
+        };
+        let span = Span { lo, hi };
+        let expected = sweep::source_at(&source.sweep, lo, &target).flatten();
+        let actual = candidate
+            .sweep
+            .iter()
+            .find(|probe| probe.width == lo)
+            .and_then(|probe| probe.nodes.get(&target));
+        let value = match (expected, actual) {
+            (Some(expected), Some(actual)) => {
+                compare_node(&span, &target, &expected.as_evidence(), &actual.as_evidence())
+            }
+            (Some(_), None) => Some(finding(&span, &target, "node", "present", "missing", None)),
+            (None, Some(_)) => Some(finding(&span, &target, "node", "missing", "present", None)),
+            (None, None) => None,
+        };
+        findings.extend(value);
+    }
+    // A swept difference obeys the same root-cause rule a recorded width does:
+    // when a node appears or resizes, every ancestor it made taller is a
+    // consequence, not a second defect.
+    collapse_consequences(&mut findings);
+    findings
 }
 
 #[cfg(test)]
@@ -2889,6 +3009,7 @@ mod tests {
             },
             actions: Vec::new(),
             states,
+            sweep: Vec::new(),
             digest: String::new(),
         };
         artifact.seal().unwrap();
@@ -3010,6 +3131,163 @@ mod tests {
             assert_eq!(artifacts(&source, &candidate, 0).status, Status::Pass);
         }
         assert!(started.elapsed().as_secs_f64() < 1.0);
+    }
+
+    fn sweep_node(x: f64, y: f64, width: f64, visible: bool) -> crate::model::SweepNode {
+        crate::model::SweepNode {
+            visible,
+            x,
+            y,
+            width,
+            height: 20.0,
+            transform: "none".into(),
+        }
+    }
+
+    fn sweep_probe(width: u32, node: crate::model::SweepNode) -> crate::model::SweepProbe {
+        crate::model::SweepProbe {
+            width,
+            nodes: BTreeMap::from([("p1-mark".into(), node)]),
+        }
+    }
+
+    fn swept(
+        source: Vec<crate::model::SweepProbe>,
+        candidate: Vec<crate::model::SweepProbe>,
+    ) -> Vec<Finding> {
+        let mut left = artifact(vec![state("base", NodeEvidence::default())]);
+        left.sweep = source;
+        left.seal().unwrap();
+        let mut right = artifact(vec![state("base", NodeEvidence::default())]);
+        right.sweep = candidate;
+        right.seal().unwrap();
+        compare_sweep(&left, &right)
+    }
+
+    #[test]
+    fn a_swept_difference_names_the_width_interval_it_holds_over() {
+        let findings = swept(
+            vec![
+                sweep_probe(449, sweep_node(24.0, 0.0, 200.0, true)),
+                sweep_probe(450, sweep_node(24.0, 0.0, 200.0, true)),
+                sweep_probe(479, sweep_node(24.0, 0.0, 200.0, true)),
+                sweep_probe(480, sweep_node(24.0, 0.0, 200.0, true)),
+            ],
+            vec![
+                sweep_probe(449, sweep_node(24.0, 0.0, 200.0, true)),
+                sweep_probe(450, sweep_node(159.0, 0.0, 200.0, true)),
+                sweep_probe(479, sweep_node(159.0, 0.0, 200.0, true)),
+                sweep_probe(480, sweep_node(24.0, 0.0, 200.0, true)),
+            ],
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].line, "V450-479 sweep p1-mark x 24->159 +135px");
+        assert_eq!(findings[0].key, "450-479:p1-mark:x");
+        assert_eq!(findings[0].viewport, 450);
+        assert_eq!(findings[0].scenario, "sweep");
+    }
+
+    /// A band that is already diverging at the lowest probed width has no
+    /// matching probe below it, so its low endpoint is the probe itself. This is
+    /// the responsive-isolation shape: hidden on the source up to its boundary,
+    /// visible on a recreation whose boundary moved.
+    #[test]
+    fn a_band_open_at_the_lowest_probe_reports_from_that_probe() {
+        let hidden = sweep_node(0.0, 0.0, 0.0, false);
+        let shown = sweep_node(24.0, 24.0, 200.0, true);
+        let findings = swept(
+            vec![
+                sweep_probe(540, hidden.clone()),
+                sweep_probe(599, hidden.clone()),
+                sweep_probe(600, hidden.clone()),
+                sweep_probe(601, shown.clone()),
+            ],
+            vec![
+                sweep_probe(540, shown.clone()),
+                sweep_probe(599, shown.clone()),
+                sweep_probe(600, shown.clone()),
+                sweep_probe(601, shown.clone()),
+            ],
+        );
+        assert_eq!(
+            findings.iter().map(|f| f.line.as_str()).collect::<Vec<_>>(),
+            vec!["V540-600 sweep p1-mark visibility hidden->visible"]
+        );
+    }
+
+    /// A defect that lives in a one pixel band must read as one pixel, not as an
+    /// interval whose two endpoints are the same number.
+    #[test]
+    fn a_one_pixel_interval_collapses_to_a_single_width() {
+        let findings = swept(
+            vec![
+                sweep_probe(599, sweep_node(24.0, 204.0, 200.0, true)),
+                sweep_probe(600, sweep_node(24.0, 204.0, 200.0, true)),
+                sweep_probe(601, sweep_node(24.0, 204.0, 200.0, true)),
+            ],
+            vec![
+                sweep_probe(599, sweep_node(24.0, 204.0, 200.0, true)),
+                sweep_probe(600, sweep_node(24.0, 184.0, 200.0, true)),
+                sweep_probe(601, sweep_node(24.0, 204.0, 200.0, true)),
+            ],
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].line, "V600 sweep p1-mark y 204->184 -20px");
+        // The key keeps both endpoints so it can never collide with a finding
+        // recorded at viewport 600.
+        assert_eq!(findings[0].key, "600-600:p1-mark:y");
+    }
+
+    /// A translation moves no layout box, so a comparison built from sizes
+    /// cannot see it. The swept evidence carries the painted rect, and geometry
+    /// precedes transform in the one property order both forms share.
+    #[test]
+    fn a_pure_translation_is_reported_as_a_position_not_as_a_transform() {
+        let mut moved = sweep_node(24.0, 456.0, 200.0, true);
+        moved.transform = "matrix(1, 0, 0, 1, 0, 48)".into();
+        let findings = swept(
+            vec![
+                sweep_probe(600, sweep_node(24.0, 408.0, 200.0, true)),
+                sweep_probe(601, sweep_node(24.0, 408.0, 200.0, true)),
+                sweep_probe(661, sweep_node(24.0, 408.0, 200.0, true)),
+                sweep_probe(662, sweep_node(24.0, 408.0, 200.0, true)),
+            ],
+            vec![
+                sweep_probe(600, sweep_node(24.0, 408.0, 200.0, true)),
+                sweep_probe(601, moved.clone()),
+                sweep_probe(661, moved),
+                sweep_probe(662, sweep_node(24.0, 408.0, 200.0, true)),
+            ],
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].property, "y");
+        assert_eq!(findings[0].line, "V601-661 sweep p1-mark y 408->456 +48px");
+    }
+
+    #[test]
+    fn a_page_that_matches_at_every_swept_width_reports_nothing() {
+        let probes = vec![
+            sweep_probe(599, sweep_node(24.0, 0.0, 200.0, true)),
+            sweep_probe(600, sweep_node(24.0, 0.0, 200.0, true)),
+        ];
+        assert!(swept(probes.clone(), probes).is_empty());
+    }
+
+    /// A comparison whose recreation was never swept must not be treated as a
+    /// clean sweep, and must not invent an interval from one-sided evidence.
+    #[test]
+    fn a_missing_sweep_on_either_side_produces_no_interval_findings() {
+        let probes = vec![sweep_probe(600, sweep_node(24.0, 0.0, 200.0, true))];
+        assert!(swept(probes.clone(), Vec::new()).is_empty());
+        assert!(swept(Vec::new(), probes).is_empty());
+    }
+
+    /// A `V540 base` line must keep sorting ahead of a later interval line.
+    #[test]
+    fn a_recorded_width_sorts_ahead_of_a_later_interval() {
+        assert!(scenario_rank("base") < scenario_rank("sweep"));
+        assert!(scenario_rank("sweep") < scenario_rank("load"));
+        assert!(scenario_rank("sweep") < scenario_rank("click:toggle"));
     }
 }
 

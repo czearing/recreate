@@ -367,7 +367,7 @@ pub async fn compare_snapshot(
             );
         }
     };
-    match capture::compare_candidate_snapshot(session, target, deadline).await {
+    match capture::compare_candidate_snapshot(artifact, session, target, deadline).await {
         Ok(actual) => {
             let report = match focus {
                 Some(focus) => compare::artifacts_focused(

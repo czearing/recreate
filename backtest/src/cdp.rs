@@ -22,6 +22,16 @@ impl Cdp {
         params: Value,
         deadline: Deadline,
     ) -> anyhow::Result<Value> {
+        let id = self.send(method, params, deadline).await?;
+        self.receive(id, method, deadline).await
+    }
+
+    async fn send(
+        &mut self,
+        method: &str,
+        params: Value,
+        deadline: Deadline,
+    ) -> anyhow::Result<u64> {
         let id = self.next_id;
         self.next_id += 1;
         let request = json!({ "id": id, "method": method, "params": params });
@@ -33,6 +43,15 @@ impl Cdp {
                 Ok(())
             })
             .await?;
+        Ok(id)
+    }
+
+    async fn receive(
+        &mut self,
+        id: u64,
+        method: &str,
+        deadline: Deadline,
+    ) -> anyhow::Result<Value> {
         loop {
             let message = deadline
                 .run("CDP response", async {
@@ -55,6 +74,44 @@ impl Cdp {
             }
             return Ok(value.get("result").cloned().unwrap_or(Value::Null));
         }
+    }
+
+    /// Applies a command and reads an expression in one round trip.
+    ///
+    /// Commands on one session are executed in the order they are sent, so the
+    /// expression still observes the command's effect; waiting for the command
+    /// to acknowledge first would only double the number of serialized network
+    /// waits, which is the entire cost of sampling many widths.
+    pub async fn call_then_evaluate(
+        &mut self,
+        method: &str,
+        params: Value,
+        expression: &str,
+        deadline: Deadline,
+    ) -> anyhow::Result<Value> {
+        let command = self.send(method, params, deadline).await?;
+        let evaluation = self
+            .send(
+                "Runtime.evaluate",
+                json!({
+                    "expression": expression,
+                    "returnByValue": true,
+                    "awaitPromise": true
+                }),
+                deadline,
+            )
+            .await?;
+        self.receive(command, method, deadline).await?;
+        let result = self
+            .receive(evaluation, "Runtime.evaluate", deadline)
+            .await?;
+        if let Some(details) = result.get("exceptionDetails") {
+            anyhow::bail!("JavaScript evaluation failed: {details}");
+        }
+        Ok(result
+            .pointer("/result/value")
+            .cloned()
+            .unwrap_or(Value::Null))
     }
 
     pub async fn evaluate(

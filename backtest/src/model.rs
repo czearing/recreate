@@ -224,6 +224,44 @@ pub struct SourceIdentity {
     pub fingerprint: String,
 }
 
+/// Geometry of one node at one swept width. A sweep probe deliberately carries
+/// no screenshot, no raster tile and no accessibility name: a width sweep pays
+/// for a reflow, and anything that costs a paint would price it out entirely.
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SweepNode {
+    pub visible: bool,
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    pub transform: String,
+}
+
+impl SweepNode {
+    /// A sweep node is compared through the same node comparison the recorded
+    /// widths use, so a swept difference names the same property, in the same
+    /// priority order, with the same rounding as a single-width difference.
+    pub fn as_evidence(&self) -> NodeEvidence {
+        NodeEvidence {
+            visible: self.visible,
+            x: self.x,
+            y: self.y,
+            width: self.width,
+            height: self.height,
+            transform: self.transform.clone(),
+            ..NodeEvidence::default()
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SweepProbe {
+    pub width: u32,
+    pub nodes: BTreeMap<String, SweepNode>,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact {
@@ -231,6 +269,11 @@ pub struct Artifact {
     pub source: SourceIdentity,
     pub actions: Vec<Action>,
     pub states: Vec<State>,
+    /// Geometry sampled across the width axis, ordered by width. Empty for a
+    /// page that declares no width-conditional CSS, which keeps both the
+    /// artifact bytes and the comparison cost of such a page unchanged.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sweep: Vec<SweepProbe>,
     pub digest: String,
 }
 
@@ -339,6 +382,7 @@ mod compatibility_tests {
             },
             actions: Vec::new(),
             states: vec![state],
+            sweep: Vec::new(),
             digest: String::new(),
         };
         artifact.seal().unwrap();
@@ -347,6 +391,7 @@ mod compatibility_tests {
         assert!(!json.contains("\"layoutShifts\""));
         assert!(!json.contains("\"rasterKind\""));
         assert!(!json.contains("\"rasterTiles\""));
+        assert!(!json.contains("\"sweep\""));
         serde_json::from_str::<Artifact>(&json)
             .unwrap()
             .verify()

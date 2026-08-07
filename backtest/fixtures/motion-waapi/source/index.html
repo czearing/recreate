@@ -3,23 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Motion behavior source</title>
+  <title>Motion waapi source</title>
   <style>
     body { margin: 40px; font-family: Arial, sans-serif; }
-    button { min-height: 36px; padding: 8px 12px; }
     .panel { width: 240px; height: 80px; margin-top: 20px; padding: 16px; background: #dbeafe; }
-    .transition-panel { opacity: .2; transform: translateY(12px); transition: opacity 240ms ease-out, transform 240ms ease-out; }
-    .transition-panel.open { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
-  <button type="button" data-backtest-id="transition-trigger" data-backtest-action="click">Open panel</button>
-  <div class="panel transition-panel" data-backtest-id="transition-panel">Transition panel</div>
   <div class="panel" data-backtest-id="waapi-panel" data-backtest-action="animation">Animated panel</div>
   <script>
-    const trigger = document.querySelector('[data-backtest-id="transition-trigger"]');
-    const transitionPanel = document.querySelector('[data-backtest-id="transition-panel"]');
-    trigger.addEventListener("click", () => transitionPanel.classList.add("open"));
     const animation = document.querySelector('[data-backtest-id="waapi-panel"]').animate(
       [
         { opacity: .2, transform: "translateX(0)" },

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "case": "motion-behavior",
+  "case": "motion-waapi",
   "source": "source/index.html",
   "control": {
     "path": "control/index.html",
@@ -9,16 +9,6 @@
     "maximumDurationMs": 4999
   },
   "mutations": [
-    {
-      "id": "transition-duration",
-      "path": "mutations/transition-duration/index.html",
-      "viewport": 1440,
-      "finding": "V1440 click:transition-trigger transition-panel / css transition \"opacity\" duration 240ms->420ms +180ms",
-      "primaryFindings": 1,
-      "unexpectedPrimaryFindings": 0,
-      "duplicates": 0,
-      "maximumDurationMs": 4999
-    },
     {
       "id": "waapi-duration",
       "path": "mutations/waapi-duration/index.html",

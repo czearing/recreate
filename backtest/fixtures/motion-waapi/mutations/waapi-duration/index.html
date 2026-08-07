@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Animation duration mutation</title>
+  <style>
+    body { margin: 40px; font-family: Arial, sans-serif; }
+    .panel { width: 240px; height: 80px; margin-top: 20px; padding: 16px; background: #dbeafe; }
+  </style>
+</head>
+<body>
+  <div class="panel" data-backtest-id="waapi-panel" data-backtest-action="animation">Animated panel</div>
+  <script>
+    const animation = document.querySelector('[data-backtest-id="waapi-panel"]').animate(
+      [
+        { opacity: .2, transform: "translateX(0)" },
+        { opacity: 1, transform: "translateX(40px)" }
+      ],
+      { duration: 900, easing: "ease-in-out", fill: "both" }
+    );
+    animation.id = "panel-drift";
+    animation.pause();
+  </script>
+</body>
+</html>
