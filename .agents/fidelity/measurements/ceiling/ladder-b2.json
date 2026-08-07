@@ -1,0 +1,10 @@
+{
+  "nodes": 4500,
+  "exitCode": 0,
+  "ms": 96049,
+  "specBytes": 287815650,
+  "filesWritten": 6,
+  "cdpMessageBytes": 0,
+  "cdpCapBytes": 0,
+  "errorText": "captured 1920x1080 in 30.92s | captured 1440x900 in 14.82s | captured 768x1024 in 15.53s"
+}

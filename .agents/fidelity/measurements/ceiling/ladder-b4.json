@@ -1,0 +1,22 @@
+[
+  {
+    "nodes": 4650,
+    "exitCode": 0,
+    "ms": 101062,
+    "specBytes": 297405111,
+    "filesWritten": 6,
+    "cdpMessageBytes": 0,
+    "cdpCapBytes": 0,
+    "errorText": "captured 1920x1080 in 32.98s | captured 1440x900 in 15.71s | captured 768x1024 in 16.12s"
+  },
+  {
+    "nodes": 4600,
+    "exitCode": 0,
+    "ms": 99029,
+    "specBytes": 294208606,
+    "filesWritten": 6,
+    "cdpMessageBytes": 0,
+    "cdpCapBytes": 0,
+    "errorText": "captured 1920x1080 in 31.86s | captured 1440x900 in 14.98s | captured 768x1024 in 16.19s"
+  }
+]

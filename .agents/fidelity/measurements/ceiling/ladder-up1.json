@@ -1,0 +1,22 @@
+[
+  {
+    "nodes": 4000,
+    "exitCode": 0,
+    "ms": 86066,
+    "specBytes": 255853610,
+    "filesWritten": 6,
+    "cdpMessageBytes": 0,
+    "cdpCapBytes": 0,
+    "errorText": "captured 1920x1080 in 25.93s | captured 1440x900 in 14.50s | captured 768x1024 in 14.18s"
+  },
+  {
+    "nodes": 6000,
+    "exitCode": 1,
+    "ms": 46036,
+    "specBytes": 0,
+    "filesWritten": 0,
+    "cdpMessageBytes": 86462207,
+    "cdpCapBytes": 67108864,
+    "errorText": "Error: Space limit exceeded: Message too long: 86462207 > 67108864 |  | Caused by:"
+  }
+]

@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "artifact": "capture-size-ceiling",
+  "recordedBy": "census-surveyor",
+  "recordedAtUtc": "2026-08-07T00:00:00Z",
+  "gitCommitSha": "62f23db7801267e01be1817e07ca82061d10bc0a",
+  "gitCommitShaShort": "62f23db",
+  "profile": "release",
+  "purpose": "Quantify the capture size ceiling first observed as a footnote in overlap-multi-site.json instrumentGaps, where every MediaWiki page failed with 'Space limit exceeded: Message too long'. The deliverable is the quantified limit. No cap was raised and src/ was not modified.",
+
+  "headlineFindings": [
+    "The cap is OURS, not the transport's and not the browser's. It is written explicitly in browser/src/cdp.rs at two sites.",
+    "The failure is LOUD, not silent. Exit code 1, both sizes named in the error, zero bytes of artifact written. No partial spec is produced and no downstream stage can accept one.",
+    "67108864 is NOT a spec-size ceiling. It bounds a single CDP response message (one viewport read). The spec that the largest passing page produces is 297,405,111 bytes, roughly 4.4x the cap.",
+    "Generation time is superlinear in spec size and is NOT predictable from the single 25.6MB anchor. A linear extrapolation from that anchor overstates the measured time at the ceiling by 28% and overstates a hypothetical 67.1MB spec by nearly 4x."
+  ],
+
+  "capOrigin": {
+    "verdict": "ours",
+    "isOurs": true,
+    "value": 67108864,
+    "valueHuman": "64 MiB (2^26)",
+    "citations": [
+      {
+        "file": "browser/src/cdp.rs",
+        "lines": "27-29",
+        "context": "Cdp::connect_with_timeout",
+        "code": "let config = WebSocketConfig::default().max_message_size(Some(64 * 1024 * 1024)).max_frame_size(Some(64 * 1024 * 1024));"
+      },
+      {
+        "file": "browser/src/cdp.rs",
+        "lines": "102-104",
+        "context": "Cdp::reconnect - the same constant is restated, so a reconnect does not widen the limit",
+        "code": "let config = WebSocketConfig::default().max_message_size(Some(64 * 1024 * 1024)).max_frame_size(Some(64 * 1024 * 1024));"
+      }
+    ],
+    "layerAnalysis": {
+      "chromeDevToolsProtocol": "Imposes no response-size ceiling of its own. Not the source.",
+      "browser": "Edg/151.0.4129.72 produced the oversized response without complaint. The browser serialised and sent it; our client refused to receive it. Not the source.",
+      "transportCrate": "tokio-tungstenite 0.28.0 / tungstenite 0.28.0. Its WebSocketConfig default max_message_size is also 64 MiB, so the value coincides with the library default.",
+      "whyWeStillOwnIt": "Two independent reasons. First, the value is written literally in our code rather than inherited by using the default. Second, the adjacent max_frame_size is set to the same 64 MiB while the library default for that field is 16 MiB, so this call site demonstrably departs from library defaults and is therefore a deliberate authored configuration, not an accepted default.",
+      "raisable": "Yes. max_message_size is an Option<usize> and may be raised or set to None entirely from our own code. Nothing outside the repository prevents it. Deliberately NOT changed under this assignment."
+    },
+    "correctionToPriorRecord": "overlap-multi-site.json instrumentGaps described this as a 'CDP cap'. That attribution is wrong and this record supersedes it. CDP does not impose the limit; browser/src/cdp.rs does."
+  },
+
+  "whatTheCapMeasures": {
+    "unit": "bytes of a single CDP WebSocket response message",
+    "notTheSpec": "The cap applies per Runtime.evaluate response. Capture issues one such read per viewport (5 by default), so total spec size can and does exceed the cap by several multiples on pages that pass.",
+    "evidence": "The 4650-node page passes while writing a 297,405,111 byte spec, which is 4.43x the 67,108,864 byte cap. If the cap bounded the spec, this capture would have failed.",
+    "failingCall": "src/capture/read.rs:64 `let raw = cdp.evaluate(source).await?;` receiving the page_capture.js payload, via browser/src/cdp.rs Cdp::send loop on self.socket.next()."
+  },
+
+  "empiricalThreshold": {
+    "method": "Controlled synthetic ladder. A local server (.agents/fidelity/measurements/ceiling/ladder-server.mjs) serves /n/<count> pages of identical shape and increasing DOM node count, so page size is the only variable. Each rung run with `recreate capture <url> --out <dir> --cdp-url http://127.0.0.1:9344 --spec-only` against a private headless Edge. Bracketed by bisection, not by sampling a list.",
+    "basis": "measured",
+    "largestSuccess": {
+      "nodes": 4650,
+      "url": "http://127.0.0.1:8811/n/4650",
+      "exitCode": 0,
+      "specBytes": 297405111,
+      "filesWritten": 6,
+      "captureMs": 101062,
+      "cdpMessageBytes": "not emitted on success; bounded above by 67108864 by the fact of success"
+    },
+    "smallestFailure": {
+      "nodes": 4700,
+      "url": "http://127.0.0.1:8811/n/4700",
+      "exitCode": 1,
+      "specBytes": 0,
+      "filesWritten": 0,
+      "captureMs": 32054,
+      "cdpMessageBytes": 67734605,
+      "capBytes": 67108864,
+      "overByBytes": 625741,
+      "overByPercent": 0.93
+    },
+    "bracketResolutionNodes": 50,
+    "bracketResolutionBytes": "approximately 720,000 bytes of CDP message per 50 nodes",
+    "ladder": [
+      { "nodes": 2000, "exitCode": 0, "specBytes": 128024571, "filesWritten": 6, "captureMs": 54222, "cdpMessageBytes": null },
+      { "nodes": 4000, "exitCode": 0, "specBytes": 255853610, "filesWritten": 6, "captureMs": 86066, "cdpMessageBytes": null },
+      { "nodes": 4500, "exitCode": 0, "specBytes": 287815650, "filesWritten": 6, "captureMs": 96049, "cdpMessageBytes": null },
+      { "nodes": 4600, "exitCode": 0, "specBytes": 294208606, "filesWritten": 6, "captureMs": 99029, "cdpMessageBytes": null },
+      { "nodes": 4650, "exitCode": 0, "specBytes": 297405111, "filesWritten": 6, "captureMs": 101062, "cdpMessageBytes": null },
+      { "nodes": 4700, "exitCode": 1, "specBytes": 0, "filesWritten": 0, "captureMs": 32054, "cdpMessageBytes": 67734605 },
+      { "nodes": 5000, "exitCode": 1, "specBytes": 0, "filesWritten": 0, "captureMs": 35050, "cdpMessageBytes": 72056351 },
+      { "nodes": 6000, "exitCode": 1, "specBytes": 0, "filesWritten": 0, "captureMs": 46036, "cdpMessageBytes": 86462207 }
+    ],
+    "reproducibility": {
+      "repeatedRung": 4600,
+      "run1SpecBytes": 294208606,
+      "run2SpecBytes": 294208606,
+      "identical": true,
+      "note": "The rung was re-run in a separate invocation and produced a byte-identical spec, so the pass/fail boundary is deterministic rather than a race."
+    },
+    "messageSizePerNode": {
+      "basis": "measured, fitted over the three failing rungs where the size is reported",
+      "points": [
+        { "nodes": 4700, "bytes": 67734605, "bytesPerNode": 14411.6 },
+        { "nodes": 5000, "bytes": 72056351, "bytesPerNode": 14411.3 },
+        { "nodes": 6000, "bytes": 86462207, "bytesPerNode": 14410.4 }
+      ],
+      "bytesPerNode": 14411,
+      "linearity": "Essentially exact across the three points; spread is under 1.2 bytes per node.",
+      "implication": "For this page shape the ceiling falls at roughly 4657 nodes. That constant is shape-specific: the payload is serialised computed style per element, so a page with richer per-element styling hits the cap at a lower node count."
+    },
+    "realWorldAnchors": {
+      "note": "Re-measured at this commit to confirm the synthetic ladder describes the same failure real pages hit, and that the original census observation still reproduces.",
+      "sites": [
+        {
+          "url": "https://en.wikipedia.org/wiki/List_of_largest_cities",
+          "exitCode": 1,
+          "filesWritten": 0,
+          "cdpMessageBytes": 78225611,
+          "capBytes": 67108864,
+          "overByPercent": 16.6,
+          "censusRecordedBytes": 78300708,
+          "driftNote": "Differs from the census figure by 0.1%, consistent with live article content changing between runs."
+        },
+        {
+          "url": "https://simple.wikipedia.org/wiki/List_of_countries_by_population",
+          "exitCode": 1,
+          "filesWritten": 0,
+          "cdpMessageBytes": 119358648,
+          "capBytes": 67108864,
+          "overByPercent": 77.9,
+          "censusRecordedBytes": 119407357,
+          "driftNote": "Differs from the census figure by 0.04%."
+        }
+      ],
+      "headroomRequired": "Raising the cap to 128 MiB would admit both pages. Neither exceeds 120 MB."
+    }
+  },
+
+  "loudOrSilent": {
+    "verdict": "loud",
+    "isCorrectnessBug": false,
+    "severityClass": "limitation, not a correctness defect",
+    "evidence": {
+      "exitCode": 1,
+      "stderr": "Error: Space limit exceeded: Message too long: 67734605 > 67108864\n\nCaused by:\n    Message too long: 67734605 > 67108864",
+      "errorNamesBothSizes": true,
+      "specJsonWritten": false,
+      "filesWrittenOnFailure": 0,
+      "outputDirectoryState": "The --out directory is created but contains zero files, including zero hidden files. There is no truncated spec, no partial screenshot, and no acceptance record.",
+      "downstreamRejects": {
+        "command": "recreate generate --spec out-4700\\spec.json --out gen-4700",
+        "exitCode": 1,
+        "stderr": "Error: The system cannot find the file specified. (os error 2)",
+        "conclusion": "No later stage can consume a partial artifact, because none exists to consume."
+      },
+      "notSwallowedByRetry": {
+        "file": "browser/src/retry.rs",
+        "reasoning": "reconnectable() returns true only for io::ErrorKind ConnectionReset/ConnectionAborted/BrokenPipe/UnexpectedEof/NotConnected, or for a message containing 'timed out' or 'disconnected'. A tungstenite Capacity error is none of these and its message contains neither substring, so the capacity failure is not retried and is not converted into a silent partial read. Verified by reading the predicate, and corroborated by the observed non-zero exit."
+      },
+      "readPathPropagates": {
+        "file": "src/capture/read.rs",
+        "line": 64,
+        "note": "The oversized read uses `?` and propagates. Contrast browser_cookies() in the same file, which uses .ok().unwrap_or_default() and would swallow a failure - but that call is Network.getAllCookies, not the large page-state read, so it is not on the path that hits the cap."
+      }
+    },
+    "residualUntidiness": "The failure leaves behind an empty output directory. Cosmetic only; it contains nothing that could be mistaken for a result.",
+    "whyThisMatters": "A silent truncation that later stages accepted would be a correctness defect of a strictly worse class than a hard limit, because a wrong artifact propagates and the root cause becomes unrecoverable. This was actively probed for and is absent. The finding is therefore a capability gap, not data corruption."
+  },
+
+  "latencyRelationship": {
+    "assignmentPremise": "The task asked what the spec size and generation time would be at the 67.1MB ceiling, extrapolating from end-to-end.json (6204ms for a 25,657,399 byte spec producing 148 files).",
+    "premiseCorrection": "The question assumes 67.1MB is a spec-size ceiling. It is not - it caps one CDP message. The spec size AT the ceiling was therefore measured directly rather than extrapolated, and it is 297,405,111 bytes, about 11.6x the anchor spec and 4.4x the cap itself.",
+
+    "measuredAtTheCeiling": {
+      "basis": "MEASURED",
+      "command": "recreate generate --spec out-4650/spec.json --out gen-4650",
+      "specBytes": 297405111,
+      "generationMs": 56034,
+      "outputFiles": 441,
+      "captureMs": 101062,
+      "endToEndMs": 157096,
+      "runs": 1,
+      "runsCaveat": "Single run per point. No spread is claimed and no percentile is reported. The comparison against the anchor turns on a factor of roughly 4x in the linear check below, which is far larger than the 1881ms run-to-run spread recorded for generation in end-to-end.json, so the conclusion survives that uncertainty."
+    },
+
+    "linearityTest": {
+      "basis": "MEASURED",
+      "purpose": "The assignment says 'if the relationship holds'. It does not hold, and a single anchor point cannot establish that it does, so linearity was tested rather than assumed.",
+      "points": [
+        { "specBytes": 25657399, "generationMs": 6204, "outputFiles": 148, "source": "end-to-end.json, live-r15 real-site spec, p50 of 3 runs" },
+        { "specBytes": 128024571, "generationMs": 13052, "outputFiles": 203, "source": "measured here, synthetic ladder n=2000" },
+        { "specBytes": 297405111, "generationMs": 56034, "outputFiles": 441, "source": "measured here, synthetic ladder n=4650" }
+      ],
+      "linearPredictionFromAnchor": {
+        "at128MB": 30955,
+        "actualAt128MB": 13052,
+        "anchorOverstatesBy": "2.4x",
+        "at297MB": 71911,
+        "actualAt297MB": 56034,
+        "anchorOverstatesBy2": "1.28x"
+      },
+      "withinSyntheticFamily": {
+        "sizeRatio": 2.323,
+        "timeRatio": 4.293,
+        "fittedExponent": 1.73,
+        "shape": "superlinear - time grows as roughly the 1.73 power of spec bytes"
+      },
+      "conclusion": "Two effects are confounded and both matter. Across families, the real-site anchor is more expensive per byte than the synthetic pages, so spec bytes alone do not predict generation time; content shape does. Within a single family, cost is superlinear in size. A linear per-byte rate from one anchor is therefore not a safe basis for any projection, which is exactly why the ceiling figure above was measured instead."
+    },
+
+    "hypothetical67MBSpec": {
+      "basis": "EXTRAPOLATION - NOT MEASURED",
+      "question": "Answering the assignment's question literally: if a spec were 67,108,864 bytes, how long would generation take?",
+      "linearFromAnchor": {
+        "ms": 16225,
+        "assumption": "generation time proportional to spec bytes, rate taken from the single live-r15 anchor"
+      },
+      "powerFitFromSyntheticLadder": {
+        "ms": 4242,
+        "assumption": "time proportional to specBytes^1.73, fitted on the two synthetic points measured here"
+      },
+      "disagreementFactor": 3.8,
+      "interpretation": "These two defensible extrapolations disagree by nearly 4x on the same question. That disagreement is itself the result: no reliable single figure exists for a hypothetical 67MB spec, and any single number quoted for it would be false precision. Neither figure may be cited as a measurement.",
+      "whatIsMeasuredInstead": "At the actual ceiling the measured values are 297,405,111 spec bytes, 56,034ms generation, 441 output files, 101,062ms capture."
+    },
+
+    "budgetContext": {
+      "budgetMs": 5000,
+      "measuredGenerationAtCeilingMs": 56034,
+      "exceedsBudgetByFactor": 11.2,
+      "note": "Stated for scale only. Setting or judging the latency budget is not this record's decision, and end-to-end.json already carries the verdict against it."
+    }
+  },
+
+  "recommendation": {
+    "doNotDoUnderThisAssignment": "No cap was raised and src/ was not touched, as instructed.",
+    "isTheCapRaisable": "Yes. It is our own constant at browser/src/cdp.rs:28 and :103, and tungstenite accepts any usize or None. There is no external layer to negotiate with.",
+    "primary": "Raising the cap alone is not sufficient and is arguably the wrong first move. The measured cost at the current ceiling is a 297MB spec and 56s of generation, already 11x the 5000ms budget. Doubling the cap to 128 MiB would admit both Wikipedia pages, but the pages just past that boundary would produce specs and generation times that are worse still, and the superlinear fit means the pain grows faster than the page does. A raise converts a clean failure into a very slow success.",
+    "recommendedBehaviourAtTheBoundary": [
+      "Make the message size a measured, reported quantity rather than a crash site. The size is already known at the moment of failure; surface it in the error as an actionable number with the page URL, and record it so a size distribution across real sites can be built.",
+      "Chunk the page-state read so no single CDP response carries the whole document. The cap is per message, not per capture, and the capture already performs one read per viewport - so the read is already divisible in principle. Paginating by node range would remove the ceiling without raising any limit and without changing what is captured.",
+      "If chunking is not taken, raise the cap deliberately AND pair it with an explicit page-size budget that fails fast with a clear 'page too large' diagnostic naming the measured size and the limit, so the failure stays loud and never becomes a 3-minute hang.",
+      "Never let this become a partial capture. The single most valuable property of the current behaviour is that it writes nothing on failure. Any fix must preserve that; a fix that emits a truncated spec would trade a limitation for a correctness defect."
+    ],
+    "notInScopeHere": "Ranking this against other work is the planner's job. This record reports the measured limit and its cost, not its priority."
+  },
+
+  "instrumentGaps": [
+    "The CDP message size is only observable on FAILURE, because it is reported by the transport error. On a passing run no message size is emitted, so the pass side of the bracket is expressed in node count and spec bytes rather than in message bytes. The pass-side message size is nevertheless bounded above by 67,108,864 as a logical consequence of the run succeeding. A byte-exact pass-side figure would require a WebSocket proxy between the binary and the browser; this was judged unnecessary because the cap constant already fixes the byte threshold exactly and the open question was which page size reaches it.",
+    "The node-count threshold of roughly 4657 is specific to the synthetic page shape, which carries uniform, modest per-element styling. Pages with heavier computed style per element will hit the cap at fewer nodes. The BYTE threshold is exact and shape-independent; the NODE threshold is not, and must not be quoted as a general page-size limit.",
+    "Generation timings at 128MB and 297MB are single runs each. end-to-end.json records a 1881ms spread on the anchor; the conclusions drawn here rest on ratios of 1.28x to 4x, which exceed that spread, but a tighter per-point figure would need repeats.",
+    "Only one browser was available (Edg/151.0.4129.72; no Chrome on this host). The cap is client-side so the browser should be irrelevant to the threshold, but this was not verified against a second browser."
+  ],
+
+  "reproduction": {
+    "server": ".agents/fidelity/measurements/ceiling/ladder-server.mjs (node ladder-server.mjs 8811)",
+    "browser": "msedge --headless=new --remote-debugging-port=9344 --user-data-dir=<private> --no-first-run --disable-gpu --hide-scrollbars --disable-dev-shm-usage",
+    "runner": ".agents/fidelity/measurements/ceiling/run-ladder.ps1 -Counts 4600,4650,4700 -Tag repro",
+    "binary": "cargo build --release with a private CARGO_TARGET_DIR, at commit 62f23db"
+  },
+
+  "constraintsHonoured": {
+    "srcModified": false,
+    "capRaised": false,
+    "qualifySweepRun": false,
+    "qualifySweepNote": "The role header asks for verification via `cargo run -q -- qualify`, but the standing dashboard instruction reserves that machine for verification-gate and forbids a second browser during its runs. The conflict is resolved in favour of the specific, later instruction: the sweep was not run, and the latency anchor is taken from the committed end-to-end.json artifact rather than re-measured."
+  }
+}
