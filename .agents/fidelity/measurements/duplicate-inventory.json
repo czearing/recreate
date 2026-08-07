@@ -1,0 +1,629 @@
+{
+  "measurement": "duplicate-component-inventory",
+  "commit_sha": "eb01d92d42e7e11ad91673db8f56c00900bf9f62",
+  "measured_at": "2026-08-07T10:33:32.305Z",
+  "source_site": "https://m365sandbox.microsoft.com/protos/staging-vnow/onenoteai",
+  "spec_input": "live-r15\\spec.json",
+  "generate_command": "cargo run --release -q -- generate --spec live-r15\\spec.json --out <private>",
+  "analyzed_tree": "C:\\Users\\calebzearing\\recreate\\.agents\\fidelity\\measurements\\dupcheck\\react\\src",
+  "population_rule": "Every non-nested function declaration in the generated .jsx tree whose name is PascalCase. Includes the four non-exported runtime surface components in states.jsx (three of which render null via an effect and were deliberately NOT excluded, to avoid silently shrinking the denominator). Excludes re-export stubs, lowercase helper functions, and closures nested inside another component body. This yields 48, matching the denominator used by work item 003 and by the stale baseline.",
+  "duplicate_definitions": {
+    "own_name_only": "PRIMARY, as instructed: render bodies identical after replacing only the component's own identifier. Type-1 clone.",
+    "own_name_and_callee_alias": "Additionally strips Variant<N> suffixes from referenced child components, so one aliased leaf does not split every ancestor. Type-2 clone.",
+    "own_name_callee_alias_and_class_hash": "Additionally abstracts generator-minted scoped class hashes (r[0-9a-f]{10}), which are identifiers the generator mints per emitted component. Type-2 clone, identifier-normalized.",
+    "tag_skeleton_within_family": "Reproduces work item 003's adopted Definition D (alias_duplicate_ratio): the alias-normalized JSX tag skeleton, all attributes and text discarded, compared only within one family (name with the Variant<N> suffix stripped). Included so the stale 23/48 baseline is directly checkable against this run.",
+    "raw": "Control: no normalization at all."
+  },
+  "counting_convention": {
+    "duplicate_components": "Every member of a group of size >= 2 (a component whose body is identical to another component's).",
+    "redundant_components": "Members minus one representative per group; the number deletable by collapsing. This is the convention used by work item 003 (23/48)."
+  },
+  "results": {
+    "raw": {
+      "total_components": 48,
+      "distinct_bodies": 48,
+      "duplicate_groups": 0,
+      "duplicate_components": 0,
+      "duplicate_share_percent": 0,
+      "redundant_components": 0,
+      "redundant_share_percent": 0,
+      "largest_groups": [],
+      "all_duplicate_group_members": []
+    },
+    "own_name_only": {
+      "total_components": 48,
+      "distinct_bodies": 48,
+      "duplicate_groups": 0,
+      "duplicate_components": 0,
+      "duplicate_share_percent": 0,
+      "redundant_components": 0,
+      "redundant_share_percent": 0,
+      "largest_groups": [],
+      "all_duplicate_group_members": []
+    },
+    "own_name_and_callee_alias": {
+      "total_components": 48,
+      "distinct_bodies": 48,
+      "duplicate_groups": 0,
+      "duplicate_components": 0,
+      "duplicate_share_percent": 0,
+      "redundant_components": 0,
+      "redundant_share_percent": 0,
+      "largest_groups": [],
+      "all_duplicate_group_members": []
+    },
+    "own_name_callee_alias_and_class_hash": {
+      "total_components": 48,
+      "distinct_bodies": 26,
+      "duplicate_groups": 6,
+      "duplicate_components": 28,
+      "duplicate_share_percent": 58.33,
+      "redundant_components": 22,
+      "redundant_share_percent": 45.83,
+      "largest_groups": [
+        {
+          "member_count": 8,
+          "members": [
+            "ContentSection",
+            "ContentSectionVariant2",
+            "ContentSectionVariant3",
+            "ContentSectionVariant4",
+            "ContentSectionVariant5",
+            "ContentSectionVariant6",
+            "ContentSectionVariant7",
+            "NotebookCard"
+          ],
+          "representative": "ContentSection",
+          "representative_file": "components/ContentSection/ContentSection.jsx",
+          "representative_body": "{return <div className={\"r2939af9376\"} {...props}>{children}</div>}"
+        },
+        {
+          "member_count": 8,
+          "members": [
+            "Icon",
+            "IconVariant2",
+            "IconVariant3",
+            "IconVariant4",
+            "IconVariant5",
+            "IconVariant6",
+            "IconVariant7",
+            "IconVariant8"
+          ],
+          "representative": "Icon",
+          "representative_file": "components/Icon/Icon.jsx",
+          "representative_body": "{return <svg className={\"rfce1dfe385\"} {...props}>{children}</svg>}"
+        },
+        {
+          "member_count": 5,
+          "members": [
+            "ActionButton",
+            "ActionButtonVariant2",
+            "ActionButtonVariant3",
+            "Button",
+            "ButtonVariant2"
+          ],
+          "representative": "ActionButton",
+          "representative_file": "components/ActionButton/ActionButton.jsx",
+          "representative_body": "{return <button className={\"re6c9fcf47f\"} {...props}>{children}</button>}"
+        },
+        {
+          "member_count": 3,
+          "members": [
+            "Paragraph",
+            "ParagraphVariant2",
+            "ParagraphVariant3"
+          ],
+          "representative": "Paragraph",
+          "representative_file": "components/Paragraph/Paragraph.jsx",
+          "representative_body": "{return <p className={\"r98201a0d08\"} {...props}>{children}</p>}"
+        },
+        {
+          "member_count": 2,
+          "members": [
+            "Label",
+            "LabelVariant2"
+          ],
+          "representative": "Label",
+          "representative_file": "components/Label/Label.jsx",
+          "representative_body": "{return <span className={\"r863163db81\"} {...props}>{children}</span>}"
+        }
+      ],
+      "all_duplicate_group_members": [
+        [
+          "ContentSection",
+          "ContentSectionVariant2",
+          "ContentSectionVariant3",
+          "ContentSectionVariant4",
+          "ContentSectionVariant5",
+          "ContentSectionVariant6",
+          "ContentSectionVariant7",
+          "NotebookCard"
+        ],
+        [
+          "Icon",
+          "IconVariant2",
+          "IconVariant3",
+          "IconVariant4",
+          "IconVariant5",
+          "IconVariant6",
+          "IconVariant7",
+          "IconVariant8"
+        ],
+        [
+          "ActionButton",
+          "ActionButtonVariant2",
+          "ActionButtonVariant3",
+          "Button",
+          "ButtonVariant2"
+        ],
+        [
+          "Paragraph",
+          "ParagraphVariant2",
+          "ParagraphVariant3"
+        ],
+        [
+          "Label",
+          "LabelVariant2"
+        ],
+        [
+          "NotebookCardVariant10",
+          "NotebookCardVariant9"
+        ]
+      ]
+    },
+    "tag_skeleton_within_family": {
+      "total_components": 48,
+      "distinct_bodies": 25,
+      "duplicate_groups": 9,
+      "duplicate_components": 32,
+      "duplicate_share_percent": 66.67,
+      "redundant_components": 23,
+      "redundant_share_percent": 47.92,
+      "largest_groups": [
+        {
+          "member_count": 8,
+          "members": [
+            "Icon",
+            "IconVariant2",
+            "IconVariant3",
+            "IconVariant4",
+            "IconVariant5",
+            "IconVariant6",
+            "IconVariant7",
+            "IconVariant8"
+          ],
+          "representative": "Icon",
+          "representative_file": "components/Icon/Icon.jsx",
+          "representative_body": "{return <svg className={\"rfce1dfe385\"} {...props}>{children}</svg>}"
+        },
+        {
+          "member_count": 7,
+          "members": [
+            "ContentSection",
+            "ContentSectionVariant2",
+            "ContentSectionVariant3",
+            "ContentSectionVariant4",
+            "ContentSectionVariant5",
+            "ContentSectionVariant6",
+            "ContentSectionVariant7"
+          ],
+          "representative": "ContentSection",
+          "representative_file": "components/ContentSection/ContentSection.jsx",
+          "representative_body": "{return <div className={\"r2939af9376\"} {...props}>{children}</div>}"
+        },
+        {
+          "member_count": 3,
+          "members": [
+            "ActionButton",
+            "ActionButtonVariant2",
+            "ActionButtonVariant3"
+          ],
+          "representative": "ActionButton",
+          "representative_file": "components/ActionButton/ActionButton.jsx",
+          "representative_body": "{return <button className={\"re6c9fcf47f\"} {...props}>{children}</button>}"
+        },
+        {
+          "member_count": 3,
+          "members": [
+            "NotebookCardVariant5",
+            "NotebookCardVariant6",
+            "NotebookCardVariant7"
+          ],
+          "representative": "NotebookCardVariant5",
+          "representative_file": "components/CollectionItems/NotebookCardVariant5.jsx",
+          "representative_body": "{\n  return (\n    <div className={containerClassName} aria-label={ariaLabel} data-testid={\"notebook-card\"} role={\"button\"} tabIndex={\"0\"}>\n      <Icon aria-hidden={\"true\"} height={\"100%\"} preserveAspectRatio={\"none\"} viewBox={viewbox} width={\"100%\"} xmlns={\"http://www.w3.org/2000/svg\"}>\n        <rect className={rectClassName} fill={fill} height={\"179\"} rx={\"27\"} width={width} x={\"1\"} y={\"0\"}>\n        </rect>\n        <path className={\"rdccbda6518\"} d={d} fill={\"white\"} stroke={\"none\"}>\n        </path>\n        <path className={\"r8c3d6b8ca1\"} d={d2} fill={\"none\"} strokeWidth={\"1\"}>\n        </path>\n      </Icon>\n      <Button aria-expanded={\"false\"} aria-label={label} data-tabster={\"{\\\"restorer\\\":{\\\"type\\\":1}}\"} role={\"button\"} tabIndex={\"0\"} type={\"button\"}>\n        <LabelVariant2>\n          {icon}\n        </LabelVariant2>\n      </Button>\n      <ContentSectionVariant6>\n        {updatedTime}\n      </ContentSectionVariant6>\n      <ParagraphVariant2>\n        <span className={\"rc57077d738\"} aria-hidden={\"true\"}>\n        </span>\n        <Label data-title-text={\"true\"}>\n          {text}\n        </Label>\n      </ParagraphVariant2>\n      <ContentSectionVariant3>\n        {count}\n        {icon2}\n        {text2}\n      </ContentSectionVariant3>\n      <ContentSection>\n        <ActionButtonVariant3 aria-haspopup={\"menu\"} aria-label={label2} id={elementId}>\n          <IconVariant8 aria-hidden={\"true\"} fill={\"currentColor\"} height={\"20\"} viewBox={\"0 0 20 20\"} width={\"20\"} xmlns={\"http://www.w3.org/2000/svg\"}>\n            <path className={\"re0932c3eb6\"} d={\"M6.25 10a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm5 0a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0ZM15 11.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z\"} fill={\"currentColor\"}>\n            </path>\n          </IconVariant8>\n        </ActionButtonVariant3>\n      </ContentSection>\n    </div>\n  );\n}"
+        },
+        {
+          "member_count": 3,
+          "members": [
+            "Paragraph",
+            "ParagraphVariant2",
+            "ParagraphVariant3"
+          ],
+          "representative": "Paragraph",
+          "representative_file": "components/Paragraph/Paragraph.jsx",
+          "representative_body": "{return <p className={\"r98201a0d08\"} {...props}>{children}</p>}"
+        }
+      ],
+      "all_duplicate_group_members": [
+        [
+          "Icon",
+          "IconVariant2",
+          "IconVariant3",
+          "IconVariant4",
+          "IconVariant5",
+          "IconVariant6",
+          "IconVariant7",
+          "IconVariant8"
+        ],
+        [
+          "ContentSection",
+          "ContentSectionVariant2",
+          "ContentSectionVariant3",
+          "ContentSectionVariant4",
+          "ContentSectionVariant5",
+          "ContentSectionVariant6",
+          "ContentSectionVariant7"
+        ],
+        [
+          "ActionButton",
+          "ActionButtonVariant2",
+          "ActionButtonVariant3"
+        ],
+        [
+          "NotebookCardVariant5",
+          "NotebookCardVariant6",
+          "NotebookCardVariant7"
+        ],
+        [
+          "Paragraph",
+          "ParagraphVariant2",
+          "ParagraphVariant3"
+        ],
+        [
+          "Button",
+          "ButtonVariant2"
+        ],
+        [
+          "Label",
+          "LabelVariant2"
+        ],
+        [
+          "NotebookCardVariant10",
+          "NotebookCardVariant9"
+        ],
+        [
+          "NotebookCardVariant4",
+          "NotebookCardVariant8"
+        ]
+      ]
+    }
+  },
+  "headline": {
+    "total_components": 48,
+    "primary_metric": "own_name_only",
+    "primary_duplicate_components": 0,
+    "primary_duplicate_share_percent": 0,
+    "stale_claim_checked": "25 duplicates of 48 components, 52 percent",
+    "stale_claim_verdict": "Not reproduced under the definition it was stated with. The denominator 48 is confirmed exactly. Under the literal definition (render body identical ignoring only the component name) the count is 0, because every emitted component carries a unique generated scoped class hash in its body. The 52 percent figure is only approached under a much looser structural definition: the alias-normalized tag skeleton within a family gives 23 of 48 (47.92 percent), which reproduces work item 003 Definition D to the unit.",
+    "structural_duplicate_components": 32,
+    "structural_redundant_components": 23,
+    "structural_redundant_share_percent": 47.92,
+    "behaviour_preserving_collapsible_total": 0,
+    "caveat": "behaviour_preserving_collapsible_total is 0: within every structurally identical group, each member resolves to a different set of CSS declarations. The aliases are not dead copies; each one exists to carry a distinct style bundle. A dedup fix that merges them by identity will change rendering. The fix has to lift the scoped class into a prop, not delete components."
+  },
+  "strict_zero_evidence": [
+    {
+      "pair": [
+        "ContentSection",
+        "ContentSectionVariant2"
+      ],
+      "tokens_only_in_first": [
+        "r2939af9376"
+      ],
+      "tokens_only_in_second": [
+        "r24549059ea"
+      ],
+      "all_differences_are_generated_class_hashes": true,
+      "css_equivalence_subgroups": [
+        [
+          "ContentSection"
+        ],
+        [
+          "ContentSectionVariant2"
+        ],
+        [
+          "ContentSectionVariant3"
+        ],
+        [
+          "ContentSectionVariant4"
+        ],
+        [
+          "ContentSectionVariant5"
+        ],
+        [
+          "ContentSectionVariant6"
+        ],
+        [
+          "ContentSectionVariant7"
+        ],
+        [
+          "NotebookCard"
+        ]
+      ],
+      "behaviour_preserving_collapsible": 0
+    },
+    {
+      "pair": [
+        "Icon",
+        "IconVariant2"
+      ],
+      "tokens_only_in_first": [
+        "rfce1dfe385"
+      ],
+      "tokens_only_in_second": [
+        "rf0914c0a25"
+      ],
+      "all_differences_are_generated_class_hashes": true,
+      "css_equivalence_subgroups": [
+        [
+          "Icon"
+        ],
+        [
+          "IconVariant2"
+        ],
+        [
+          "IconVariant3"
+        ],
+        [
+          "IconVariant4"
+        ],
+        [
+          "IconVariant5"
+        ],
+        [
+          "IconVariant6"
+        ],
+        [
+          "IconVariant7"
+        ],
+        [
+          "IconVariant8"
+        ]
+      ],
+      "behaviour_preserving_collapsible": 0
+    },
+    {
+      "pair": [
+        "ActionButton",
+        "ActionButtonVariant2"
+      ],
+      "tokens_only_in_first": [
+        "re6c9fcf47f"
+      ],
+      "tokens_only_in_second": [
+        "rbc1711149f"
+      ],
+      "all_differences_are_generated_class_hashes": true,
+      "css_equivalence_subgroups": [
+        [
+          "ActionButton"
+        ],
+        [
+          "ActionButtonVariant2"
+        ],
+        [
+          "ActionButtonVariant3"
+        ],
+        [
+          "Button"
+        ],
+        [
+          "ButtonVariant2"
+        ]
+      ],
+      "behaviour_preserving_collapsible": 0
+    },
+    {
+      "pair": [
+        "Paragraph",
+        "ParagraphVariant2"
+      ],
+      "tokens_only_in_first": [
+        "r98201a0d08"
+      ],
+      "tokens_only_in_second": [
+        "r60a76af08b"
+      ],
+      "all_differences_are_generated_class_hashes": true,
+      "css_equivalence_subgroups": [
+        [
+          "Paragraph"
+        ],
+        [
+          "ParagraphVariant2"
+        ],
+        [
+          "ParagraphVariant3"
+        ]
+      ],
+      "behaviour_preserving_collapsible": 0
+    },
+    {
+      "pair": [
+        "Label",
+        "LabelVariant2"
+      ],
+      "tokens_only_in_first": [
+        "r863163db81"
+      ],
+      "tokens_only_in_second": [
+        "r819d1c3d92"
+      ],
+      "all_differences_are_generated_class_hashes": true,
+      "css_equivalence_subgroups": [
+        [
+          "Label"
+        ],
+        [
+          "LabelVariant2"
+        ]
+      ],
+      "behaviour_preserving_collapsible": 0
+    }
+  ],
+  "behaviour_preserving_collapsible_total": 0,
+  "dead_classes": [],
+  "components_by_file": {
+    "App.jsx": [
+      "App"
+    ],
+    "components/ActionButton/ActionButton.jsx": [
+      "ActionButton"
+    ],
+    "components/ActionButtonVariant2/ActionButtonVariant2.jsx": [
+      "ActionButtonVariant2"
+    ],
+    "components/ActionButtonVariant3/ActionButtonVariant3.jsx": [
+      "ActionButtonVariant3"
+    ],
+    "components/Button/Button.jsx": [
+      "Button"
+    ],
+    "components/ButtonVariant2/ButtonVariant2.jsx": [
+      "ButtonVariant2"
+    ],
+    "components/CollectionItems/NotebookCardVariant10.jsx": [
+      "NotebookCardVariant10"
+    ],
+    "components/CollectionItems/NotebookCardVariant11.jsx": [
+      "NotebookCardVariant11"
+    ],
+    "components/CollectionItems/NotebookCardVariant2.jsx": [
+      "NotebookCardVariant2"
+    ],
+    "components/CollectionItems/NotebookCardVariant3.jsx": [
+      "NotebookCardVariant3"
+    ],
+    "components/CollectionItems/NotebookCardVariant4.jsx": [
+      "NotebookCardVariant4"
+    ],
+    "components/CollectionItems/NotebookCardVariant5.jsx": [
+      "NotebookCardVariant5"
+    ],
+    "components/CollectionItems/NotebookCardVariant6.jsx": [
+      "NotebookCardVariant6"
+    ],
+    "components/CollectionItems/NotebookCardVariant7.jsx": [
+      "NotebookCardVariant7"
+    ],
+    "components/CollectionItems/NotebookCardVariant8.jsx": [
+      "NotebookCardVariant8"
+    ],
+    "components/CollectionItems/NotebookCardVariant9.jsx": [
+      "NotebookCardVariant9"
+    ],
+    "components/ContentSection/ContentSection.jsx": [
+      "ContentSection"
+    ],
+    "components/ContentSectionVariant2/ContentSectionVariant2.jsx": [
+      "ContentSectionVariant2"
+    ],
+    "components/ContentSectionVariant3/ContentSectionVariant3.jsx": [
+      "ContentSectionVariant3"
+    ],
+    "components/ContentSectionVariant4/ContentSectionVariant4.jsx": [
+      "ContentSectionVariant4"
+    ],
+    "components/ContentSectionVariant5/ContentSectionVariant5.jsx": [
+      "ContentSectionVariant5"
+    ],
+    "components/ContentSectionVariant6/ContentSectionVariant6.jsx": [
+      "ContentSectionVariant6"
+    ],
+    "components/ContentSectionVariant7/ContentSectionVariant7.jsx": [
+      "ContentSectionVariant7"
+    ],
+    "components/Icon/Icon.jsx": [
+      "Icon"
+    ],
+    "components/IconLinearGradient/IconLinearGradient.jsx": [
+      "IconLinearGradient"
+    ],
+    "components/IconVariant2/IconVariant2.jsx": [
+      "IconVariant2"
+    ],
+    "components/IconVariant3/IconVariant3.jsx": [
+      "IconVariant3"
+    ],
+    "components/IconVariant4/IconVariant4.jsx": [
+      "IconVariant4"
+    ],
+    "components/IconVariant5/IconVariant5.jsx": [
+      "IconVariant5"
+    ],
+    "components/IconVariant6/IconVariant6.jsx": [
+      "IconVariant6"
+    ],
+    "components/IconVariant7/IconVariant7.jsx": [
+      "IconVariant7"
+    ],
+    "components/IconVariant8/IconVariant8.jsx": [
+      "IconVariant8"
+    ],
+    "components/Label/Label.jsx": [
+      "Label"
+    ],
+    "components/LabelVariant2/LabelVariant2.jsx": [
+      "LabelVariant2"
+    ],
+    "components/NotebookCard/NotebookCard.jsx": [
+      "NotebookCard"
+    ],
+    "components/Paragraph/Paragraph.jsx": [
+      "Paragraph"
+    ],
+    "components/ParagraphVariant2/ParagraphVariant2.jsx": [
+      "ParagraphVariant2"
+    ],
+    "components/ParagraphVariant3/ParagraphVariant3.jsx": [
+      "ParagraphVariant3"
+    ],
+    "components/SharedComponents/ReusableBlockfaccaefa70.jsx": [
+      "ReusableBlockfaccaefa70"
+    ],
+    "states.jsx": [
+      "ExistingSurface",
+      "ReplacementSurface",
+      "InsertedSurface",
+      "AnchoredSurface"
+    ],
+    "views/Baseline0.jsx": [
+      "Baseline0"
+    ],
+    "views/Baseline1.jsx": [
+      "Baseline1"
+    ],
+    "views/Baseline2.jsx": [
+      "Baseline2"
+    ],
+    "views/Baseline3.jsx": [
+      "Baseline3"
+    ],
+    "views/Baseline4.jsx": [
+      "Baseline4"
+    ]
+  },
+  "skipped_files": [
+    {
+      "file": "components/SharedComponents.jsx",
+      "name": null,
+      "reason": "no component declaration"
+    },
+    {
+      "file": "main.jsx",
+      "name": null,
+      "reason": "no component declaration"
+    }
+  ]
+}

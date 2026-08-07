@@ -1,43 +1,87 @@
 {
-  "schema": "fidelity-qualification-baseline/1",
-  "recordedAtUtc": "2026-08-07T09:25:00Z",
   "recordedBy": "verification-gate",
-  "gitCommitSha": "ee52274",
-  "gitCommitShaVerifiedBy": "git hash-object of the measured snapshot's fixture.rs equals rev-parse ee52274:backtest/src/fixture.rs (8eea864be8772c7842edd4b69685b77ea310c363); it does NOT equal f2a2584's blob, so these numbers describe work item 007's landed code.",
-  "workingTreeClean": false,
-  "workingTreeNote": "backtest/src matched ee52274 exactly at measurement time. Fixture corpus carries uncommitted isolation fixtures owned by fixture-author.",
-  "sourceSnapshotSha256Prefix": "594F260399EFC4AE39F7F2E2",
-  "command": "cargo run -q -- qualify",
-  "runsMedianOf": 3,
-  "measurement": {
-    "detectedMutations": 33,
-    "undetectedMutations": 0,
-    "exceededBudgetMutations": 0,
-    "totalMutations": 33,
-    "cases": 23,
-    "comparisons": 56,
-    "passedComparisons": 55,
-    "p95Ms": 4005,
-    "p99Ms": 4404,
-    "maximumMs": 4404,
-    "duplicateFindings": 0,
-    "failures": 2
-  },
-  "samples": [
-    { "run": 1, "detectedMutations": 33, "undetectedMutations": 0, "exceededBudgetMutations": 0, "p95Ms": 4005, "p99Ms": 4404, "maximumMs": 4404, "duplicateFindings": 0, "failures": 2, "elapsedS": 253.9 },
-    { "run": 2, "detectedMutations": 33, "undetectedMutations": 0, "exceededBudgetMutations": 0, "p95Ms": 3401, "p99Ms": 3745, "maximumMs": 3745, "duplicateFindings": 0, "failures": 0, "elapsedS": 251.7 },
-    { "run": 3, "detectedMutations": 30, "undetectedMutations": 0, "exceededBudgetMutations": 3, "p95Ms": 4917, "p99Ms": 5284, "maximumMs": 5284, "duplicateFindings": 0, "failures": 9, "elapsedS": 296.9 }
-  ],
-  "spread": {
-    "p95Ms": 1516,
-    "p99Ms": 1539,
-    "note": "Observed run-to-run spread exceeds the remaining headroom to the 4000ms p95 budget. A ratchet threshold tighter than the median plus this spread will manufacture regressions that no code change caused."
-  },
-  "attempts": { "attempted": 3, "completed": 3, "aborted": 0 },
-  "host": { "exclusive": true, "concurrentHarnessBrowsersAtStart": 0, "note": "Measured only after the concurrent agent's run finished, per the one-run-at-a-time rule." },
-  "consoleErrors": 0,
-  "denominators": { "mutationsNeverShrankBelow": 33, "casesNeverShrankBelow": 23, "comparisonsNeverShrankBelow": 56 },
-  "gateConstants": { "COMPARISON_DEADLINE_MS": 4400, "WATCHDOG_MS": 4800 },
+  "recordedAtUtc": "2026-08-07T10:34:03.1929598Z",
+  "workItem": "002 responsive range mutants + multi-width sweep",
   "verdict": "REJECT",
-  "verdictReason": "Median p95 4005ms exceeds the 4000ms budget by 5ms. Detection is perfect: undetectedMutations is 0 in every run, so every miss is a budget exceedance, not comparator blindness."
+  "reason": "Run 3 of 3 failed the gate (p99 4635ms > 4500ms). Detection is perfect and load-independent (36/36, undetected 0, in all three runs); the failure is latency measured on a host at CPU 100% with 36-98 concurrent browsers, which violates the one-at-a-time rule. Not approvable as measured; re-measure on a quiet host.",
+  "measuredSnapshotAggregateSha256": "14A7F635BEA50053CC73EDF447FA986A",
+  "snapshotFileCount": 123,
+  "snapshotReHashMatched": true,
+  "gitCommitShaAtMeasurement": "eb01d92",
+  "denominatorMutants": 36,
+  "denominatorFixtures": 24,
+  "comparisons": 60,
+  "medianOfRuns": 3,
+  "medianP95Ms": 3561,
+  "medianP99Ms": 3942,
+  "medianMaximumMs": 3942,
+  "p95SpreadMs": 922.0,
+  "runs": {
+    "run3": {
+      "comparisons": 60,
+      "maximumMs": 4635,
+      "detected": 36,
+      "duplicateFindings": 0,
+      "exceededBudget": 0,
+      "p99Ms": 4635,
+      "total": 36,
+      "failures": [
+        "p99 4635ms > 4500ms"
+      ],
+      "undetected": 0,
+      "p95Ms": 3756
+    },
+    "run2": {
+      "comparisons": 60,
+      "maximumMs": 3942,
+      "detected": 36,
+      "duplicateFindings": 0,
+      "exceededBudget": 0,
+      "p99Ms": 3942,
+      "total": 36,
+      "failures": [],
+      "undetected": 0,
+      "p95Ms": 3561
+    },
+    "run1": {
+      "comparisons": 60,
+      "maximumMs": 3898,
+      "detected": 36,
+      "duplicateFindings": 0,
+      "exceededBudget": 0,
+      "p99Ms": 3898,
+      "total": 36,
+      "failures": [],
+      "undetected": 0,
+      "p95Ms": 2834
+    }
+  },
+  "negativeCase": {
+    "detected": 26,
+    "predictedBeforeRunning": "28/36 detected, 8 sweep-attributable",
+    "sweepAttributableUndetected": 8,
+    "predictionHeld": true,
+    "undetected": 8,
+    "exceededBudget": 2
+  },
+  "restoreRun": {
+    "detected": 32,
+    "undetected": 0,
+    "browsers": 98,
+    "exceededBudget": 4
+  },
+  "gateConstants": {
+    "WATCHDOG_MS": 4800,
+    "COMPARISON_DEADLINE_MS": 4400,
+    "unchanged": true
+  },
+  "priorMutantStringsLostOrLoosened": 0,
+  "comprehensiveSplitConserved": "14/14 verbatim",
+  "cargoTestRealTree": "79 passed; 0 failed; 0 ignored",
+  "hostContaminated": true,
+  "browsersDuringRuns": [
+    36,
+    36,
+    56
+  ]
 }
