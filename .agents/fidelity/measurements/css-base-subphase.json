@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "artifact": "css-base-subphase",
+  "recordedBy": "verification-gate",
+  "recordedAtUtc": "2026-08-07T14:55:00Z",
+  "gitCommitSha": "3be8ea0f2e9755fad7e23ac8364b1956497b8b10",
+  "gitCommitShaShort": "3be8ea0",
+  "profile": "release",
+  "profileNote": "Every number here is from a --release binary built in a detached worktree with a private CARGO_TARGET_DIR. No debug timing appears in this record.",
+  "host": "Contended shared machine. All timings are upper bounds. The central effect measured here is a 4.2 second difference, which is roughly five times the ~900ms host noise band established in generation-profile.json, so the conclusion survives the contention by a wide margin.",
+  "purpose": "Attribute css_base's 4582ms (67.2% of generation, per generation-profile.json) to the work inside it, and name a single target with the milliseconds it would return.",
+
+  "headlineFindings": [
+    "The cost is not in the node loop and not in CSS generation at all. 89.1% of css_base::build is ONE setup call: css_state_helpers::fluid_height_paths.",
+    "Inside that call, 99.7% is authored_css::has_property, which rebuilds the entire authored-CSS Index from scratch on every invocation and is invoked once per (state x node) - 2586 times for live-r15, scanning 3,626,124 rules in total.",
+    "The defect is a one-line wrapper. authored_css.rs:82-84 reads `has_property(node, rules, property) { has_property_indexed(node, &Index::new(rules), property) }`. The indexed variant it delegates to is already public, and css_base.rs:57 already builds exactly such an Index for the loop - the hot call site simply does not use it.",
+    "Hoisting the Index out of the loop was MEASURED, not estimated: fluid_height_paths falls 4135ms -> 34ms and whole-generation wall falls 6699ms -> 1835ms, while output stays byte-identical across 5 specs and 615 files.",
+    "That single change brings generation to 1835ms against the 3896ms it needed to reach, and brings the end-to-end sum to roughly 2939ms against the 5000ms budget. The budget verdict in end-to-end.json flips from over to under.",
+    "The superlinearity reported in capture-size-ceiling.json lives here. Cost is linear in (nodes x rules), and since both grow with page size the term is quadratic in page size. A 19MB spec with zero authored CSS rules costs 3ms; a 15MB spec with 1337 rules costs 2005ms."
+  ],
+
+  "premiseCorrections": [
+    {
+      "claim": "Instruction 1: css_base::build 'takes a prefix and an optional reuse, which suggests it runs more than once per generation'.",
+      "finding": "PARTLY TRUE IN GENERAL, FALSE FOR THE SUBJECT. Measured call counts by a static counter: live-r15 = 1 call, fluid-r1 = 1, fluid-r5 = 1, review = 2 (prefixes r,s), recreate-output = 3 (prefixes r,s,s). The extra calls come from css_interactions::append, which calls css::build_scoped once per RENDERED interaction. live-r15 - the spec that carries the entire latency budget - has no rendered interactions and therefore exactly ONE call.",
+      "consequence": "There is no repeated call to blame on the budget spec. Per instruction 1, the rest of this task applies to that single dominating call."
+    },
+    {
+      "claim": "Instruction 2 hypothesis: 'setup is rebuilt on every call over the WHOLE specification while the loop is guarded by cache.emitted, so repeated calls pay full setup for little marginal output'.",
+      "finding": "REFUTED as stated, but the underlying instinct was right one level down. It cannot be repeated CALLS on live-r15 because there is only one call. The hypothesis is nevertheless correct in structure: a setup step IS being rebuilt per unit over the whole rule set - just per NODE inside fluid_height_paths, not per call of css_base::build. Setup is 4199ms of 4641ms (90.5%) and the loop is 72.9ms (1.6%), so the setup-versus-loop framing was correct even though the mechanism was not.",
+      "consequence": "The fix is not call-level memoisation of css_base setup. It is hoisting Index::new out of the per-node loop inside fluid_height_paths."
+    },
+    {
+      "claim": "Instruction 3: 'If most nodes hit the cache, the always-paid path is the target; if few do, the declaration builder is.'",
+      "finding": "NEITHER. The premise assumes the loop is where the time is. The entire loop is 72.9ms - 1.6% of css_base::build. Within it the always-paid path is 2.6ms and the cached declaration builder is 59.7ms, so the emitter dominates the loop, but both are rounding error against 4135ms of fluid_height_paths. Deleting the whole loop, emitter and signature path together, would return 1.6%.",
+      "consequence": "Reported for completeness below, but no loop-level optimisation is worth doing. Measuring the call count and the setup/loop split before drilling into the loop is what prevented this task from optimising 1.6% of the problem."
+    },
+    {
+      "claim": "generation-profile.json attributed 4582ms to the phase marker named css_base.",
+      "finding": "CONFIRMED and slightly extended. That marker fires at css_base.rs before append_filtered and append_authored_media, so it understates the FUNCTION. Measured here, css_base::build total is 4641ms median, of which the marker covers setup+loop (4272ms) and the remaining 361ms is the filtered/media tail previously attributed to css_responsive. Both records agree within their spreads.",
+      "consequence": "No correction needed to generation-profile.json. The function's true cost is 4641ms, marginally larger than the marker suggested."
+    }
+  ],
+
+  "callCount": {
+    "question": "How many times is css_base::build called per generation, with what prefixes, and what is each call's self time?",
+    "method": "A static AtomicUsize incremented on entry, printed with the prefix and include_interactions flag on every invocation.",
+    "perSpec": [
+      { "spec": "live-r15", "calls": 1, "prefixes": ["r"], "note": "The budget spec. No rendered interactions." },
+      { "spec": "fluid-r1", "calls": 1, "prefixes": ["r"] },
+      { "spec": "fluid-r5", "calls": 1, "prefixes": ["r"] },
+      { "spec": "review/authenticated-reference-v1", "calls": 2, "prefixes": ["r", "s"] },
+      { "spec": "recreate-output", "calls": 3, "prefixes": ["r", "s", "s"] }
+    ],
+    "perCallSelfTimeLiveR15": {
+      "call1": { "prefix": "r", "includeInteractions": true, "totalMsMedian": 4641.3, "shareOfFunction": "100% - it is the only call" }
+    },
+    "conclusion": "One expensive call, not many cheap ones. The fix is therefore to make that call cheaper, not to deduplicate calls."
+  },
+
+  "subphaseTable": {
+    "subject": "css_base::build on live-r15/spec.json",
+    "runs": 4,
+    "statistic": "median, min and worst observed. No percentile is reported at n=4.",
+    "unit": "milliseconds of self time",
+    "stock": {
+      "total": { "median": 4641.3, "min": 4154.5, "worst": 5490.9 },
+      "parts": [
+        { "part": "setup (everything before the node loop)", "median": 4199.0, "min": 3831.7, "worst": 5016.9, "share": "90.5%" },
+        { "part": "node loop", "median": 72.9, "min": 55.6, "worst": 84.8, "share": "1.6%" },
+        { "part": "append_filtered (responsive, after timing marker)", "median": 302.7, "min": 214.9, "worst": 340.7, "share": "6.5%" },
+        { "part": "append_authored_media", "median": 58.0, "min": 50.8, "worst": 67.1, "share": "1.2%" }
+      ],
+      "accounting": { "sumOfParts": 4632.6, "total": 4641.3, "residualMs": 8.7, "residualPercent": "0.2%" }
+    },
+    "setupBreakdown": [
+      { "step": "css_state_helpers::fluid_height_paths", "median": 4154.6, "min": 3800.2, "worst": 4982.1, "shareOfBuild": "89.5%" },
+      { "step": "responsive_signatures_for", "median": 31.4, "min": 28.7, "worst": 54.2, "shareOfBuild": "0.7%" },
+      { "step": "authored_css::Index::new (the ONE hoisted index, for the loop)", "median": 1.3, "min": 1.2, "worst": 1.6, "shareOfBuild": "0.03%" },
+      { "step": "global @font-face/@keyframes rules", "median": 0.5, "shareOfBuild": "0.01%" },
+      { "step": "css_visual::child_nodes", "median": 0.2, "shareOfBuild": "0.004%" },
+      { "step": "node path HashMap", "median": 0.1, "shareOfBuild": "0.002%" },
+      { "step": "css_paths::changed", "median": 0.0, "note": "zero on call 1: reuse is None" },
+      { "step": "css_paths::contextual_widths", "median": 0.0, "note": "zero on call 1: reuse is None" }
+    ],
+    "fluidHeightBreakdown": {
+      "total": { "median": 4135.2, "min": 3781.7, "worst": 4962.5 },
+      "parts": [
+        { "part": "authored_css::has_property calls", "median": 4124.2, "min": 3770.5, "worst": 4948.3, "shareOfFluid": "99.7%" },
+        { "part": "the filter/collect pass (including the nested states.iter().find scan)", "median": 4.9, "min": 3.8, "worst": 8.1, "shareOfFluid": "0.1%" }
+      ],
+      "note": "The nested `state.nodes.iter().find(|node| &node.path == path)` inside the filter is also quadratic in nodes, but at 4.9ms it is not worth touching. It is recorded so a future reader does not mistake it for the problem."
+    },
+    "loopBreakdown": {
+      "note": "Reported because instruction 3 asked for it. The whole loop is 1.6% of the function, so none of this is a target.",
+      "alwaysPaid": { "what": "flex_direction, inferred_float, css_layout::role, the signature format!, and the signature_classes cache entry", "median": 2.6, "perNodeMicros": 6.2 },
+      "behindCacheEmitted": { "what": "base_declarations_indexed + css_base_style::append_indexed + push_str", "median": 59.7, "perEmissionMicros": 357.5 },
+      "appendPseudo": { "median": 4.9 },
+      "verdict": "The emitter dominates the loop at 82%, not the always-paid path. Both are negligible against setup."
+    },
+    "counts": {
+      "nodesInBaseState": 516,
+      "textNodesSkipped": 94,
+      "reuseSkipped": 0,
+      "signaturesBuilt": 422,
+      "uniqueClassesEmitted": 167,
+      "cacheHits": 255,
+      "cacheHitRate": "60.4%",
+      "nodesToUniqueClassesRatio": 2.53,
+      "authoredCssRules": 1397,
+      "states": 5,
+      "hasPropertyCalls": 2586,
+      "totalRuleVisits": 3626124,
+      "microsecondsPerRuleVisit": 1.137
+    }
+  },
+
+  "namedTarget": {
+    "target": "authored_css::has_property rebuilding the authored-CSS Index on every call, from the per-node loop in css_state_helpers::fluid_height_paths",
+    "defectSites": [
+      { "file": "src/generate/authored_css.rs", "lines": "82-84", "code": "pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool { has_property_indexed(node, &Index::new(rules), property) }", "problem": "Index::new(rules) is O(rules) and is rebuilt on every call." },
+      { "file": "src/generate/css_state_helpers.rs", "line": 24, "code": "if super::authored_css::has_property(node, &state.css_rules, \"height\")", "problem": "Called once per node per state, so the O(rules) index construction is multiplied by (states x nodes)." }
+    ],
+    "shape": "A setup step that is linear in the whole rule set, re-executed once per item. Cost = states x nodes x rules, measured at 1.137 microseconds per rule visit.",
+    "proposedFix": "Build the Index once per state, outside the node loop, and call the already-public has_property_indexed. No new API is required; both the Index type and the indexed entry point already exist and are already used by css_base.rs:57.",
+    "millisecondsReturned": {
+      "basis": "MEASURED, not extrapolated. Implemented behind an env flag in a throwaway worktree and A/B tested against the stock path.",
+      "fluidHeightPathsMs": { "before": 4135.2, "after": 33.9, "savedMs": 4101.3, "speedup": "122x" },
+      "hasPropertyMs": { "before": 4124.2, "after": 20.8, "savedMs": 4103.4, "speedup": "198x" },
+      "cssBaseBuildTotalMs": { "before": 4641.3, "after": 420.5, "savedMs": 4220.8, "speedup": "11.0x" },
+      "wholeGenerationWallMs": { "before": 6699, "after": 1835, "savedMs": 4864, "speedup": "3.65x" }
+    },
+    "correctnessEvidence": {
+      "method": "Aggregate SHA256 over the per-file SHA256 of every emitted file, sorted by path, compared between the stock and hoisted paths.",
+      "specsChecked": 5,
+      "filesCompared": 615,
+      "allByteIdentical": true,
+      "perSpec": [
+        { "spec": "live-r15", "files": 148, "identical": true },
+        { "spec": "fluid-r1", "files": 148, "identical": true },
+        { "spec": "fluid-r5", "files": 112, "identical": true },
+        { "spec": "review/authenticated-reference-v1", "files": 187, "identical": true },
+        { "spec": "recreate-output", "files": 20, "identical": true }
+      ],
+      "semanticInvariants": "fluid_height_paths returned authored=84 and result=17 identically in both arms on live-r15.",
+      "caveat": "Byte-identical output on five specs is strong evidence of a pure refactor but is NOT a substitute for the mutation qualification. This record proposes the change and does not land it."
+    },
+    "budgetConsequence": {
+      "generationTargetMs": 3896,
+      "generationBeforeMs": 6699,
+      "generationAfterMs": 1835,
+      "meetsTarget": true,
+      "marginMs": 2061,
+      "endToEndEstimateMs": 2939,
+      "endToEndComponents": "generation 1835 (measured here) + comparison 1104 (medianP95 from end-to-end.json)",
+      "budgetMs": 5000,
+      "statement": "This single change is on its own sufficient to bring the stated end-to-end budget from missed by 2308ms to met with roughly 2061ms of headroom. No other optimisation is required to reach 5000ms.",
+      "unitsCaveat": "The two stages count different units, as end-to-end.json records; 2939 is an upper-bound style sum, not a percentile, and the verdict does not depend on it because generation alone now sits far below the whole budget."
+    }
+  },
+
+  "superlinearity": {
+    "question": "capture-size-ceiling.json found generation superlinear in spec size (fitted exponent 1.73 within the synthetic family). Does that superlinearity live in css_base, and in which part?",
+    "answer": "YES, and specifically in authored_css::has_property inside fluid_height_paths. It is not in the node loop, not in parsing, and not in file writing.",
+    "mechanism": "has_property cost = calls x rules = (states x nodes) x rules_per_state. Both nodes and authored rules grow with page size, so the term is quadratic in page size. A fitted whole-generation exponent of 1.73 is exactly what a quadratic term diluted by linear parsing and writing terms produces.",
+    "evidence": {
+      "model": "hasPropertyMs = k x totalRuleVisits, with totalRuleVisits = sum over calls of rules-per-state",
+      "points": [
+        { "spec": "recreate-output", "specMB": 1.20, "nodes": 28, "rules": 0, "ruleVisits": 0, "hasPropertyMs": 0.0 },
+        { "spec": "fluid-r5", "specMB": 19.03, "nodes": 464, "rules": 0, "ruleVisits": 0, "hasPropertyMs": 3.0 },
+        { "spec": "review/authenticated-reference-v1", "specMB": 15.05, "nodes": 719, "rules": 1337, "ruleVisits": 1922606, "hasPropertyMs": 2005.0, "kMicros": 1.043 },
+        { "spec": "fluid-r1", "specMB": 24.48, "nodes": 516, "rules": 1397, "ruleVisits": 3626124, "hasPropertyMs": 4059.0, "kMicros": 1.119 },
+        { "spec": "live-r15", "specMB": 24.47, "nodes": 516, "rules": 1397, "ruleVisits": 3626124, "hasPropertyMs": 4124.2, "kMicros": 1.137, "note": "median of 4 runs; the others are single runs" }
+      ],
+      "fittedK": "1.04 to 1.14 microseconds per rule visit, consistent across two independent specs with different node and rule counts",
+      "decisiveControl": "fluid-r5 is a 19.03MB spec with 464 nodes and ZERO authored CSS rules, and costs 3ms. review is a SMALLER 15.05MB spec with 1337 rules and costs 2005ms. Spec bytes therefore do not predict this cost at all; the product of nodes and rules does. This also explains capture-size-ceiling.json's observation that the real-site anchor is more expensive per byte than the synthetic ladder pages: real sites carry authored stylesheets, synthetic ladder pages carry almost none.",
+      "constantVersusSuperlinear": "This is a superlinear term, not a large constant. Cost per node is not flat: it rises in proportion to the rule count of the page, so the same fix pays off more on larger pages, and the current behaviour degrades quadratically as pages grow."
+    }
+  },
+
+  "instrumentationOverhead": {
+    "design": "Counterbalanced interleaved A/B, 4 pairs, alternating which arm ran first (OFF,ON / ON,OFF / OFF,ON / ON,OFF), so ordering could not be confounded with the treatment.",
+    "stockWallMs": [5720, 6547, 6851, 7388],
+    "hoistedWallMs": [1718, 1768, 1901, 1943],
+    "separation": "Complete. The slowest hoisted run (1943ms) is faster than the fastest stock run (5720ms) by 3777ms, and the sign is consistent in 4 of 4 pairs. There is no overlap between the two distributions, so the effect is not attributable to host noise.",
+    "instrumentedVersusUninstrumented": "The stock instrumented median (6699ms) sits within the uninstrumented band recorded in generation-profile.json (10 runs, 5796-6695ms). Instrumentation therefore costs on the order of a few hundred milliseconds against a 4221ms effect, and every figure above is reported from the instrumented binary in BOTH arms so the overhead cancels from the comparison."
+  },
+
+  "additionalFindings": {
+    "systemicPattern": "The rebuild-the-index-per-call shape is not unique to has_property. Every non-indexed convenience wrapper in this area constructs an Index and immediately delegates to its _indexed twin: authored_css.rs:6 (normalize), authored_css.rs:83 (has_property), authored_css.rs:92 (positive_integer_property, test-only), inherited_styles.rs:10, responsive_output.rs:20, responsive_node_rules.rs:28. Only has_property is currently hot, because only it is called from a loop over states x nodes. The others are latent instances of the same defect and would become hot if ever called from a per-node loop.",
+    "ownershipNote": "responsive_output.rs and responsive_node_rules.rs are owned by work item 006 per the standing file-ownership list. They are named here as observations only; they were not edited, and nothing in this record requires editing them.",
+    "nextLargestRemaining": "With the target fixed, css_base::build falls to 420.5ms, of which append_filtered is 227.4ms (54%). That becomes the largest remaining piece inside css_base, but at 227ms against a 5000ms budget it is not worth pursuing and no work is recommended on it."
+  },
+
+  "baseline": {
+    "note": "Recorded per the standing requirement that a baseline is written whether or not a change is approved.",
+    "cssBaseBuildMsStock": { "median": 4641.3, "min": 4154.5, "worst": 5490.9, "runs": 4, "profile": "release", "spec": "live-r15" },
+    "generationWallMsStock": { "median": 6699, "min": 5720, "worst": 7388, "runs": 4, "profile": "release" },
+    "generationWallMsWithProposedFix": { "median": 1835, "min": 1718, "worst": 1943, "runs": 4, "profile": "release" },
+    "priorGenerationBaseline": { "source": "generation-profile.json", "medianMs": 6821, "cssBaseMarkerMs": 4582 },
+    "mutantDenominator": 38,
+    "fixtureDenominator": 26,
+    "denominatorSource": "end-to-end.json at commit e91b566; NOT re-measured in this record - see constraintsHonoured.",
+    "COMPARISON_DEADLINE_MS": 4400,
+    "WATCHDOG_MS": 4800
+  },
+
+  "verdict": {
+    "decision": "no change submitted for approval - this is a measurement record",
+    "reason": "The assignment was to profile and to change no behaviour. No work item was submitted, no src/ file was modified in the shared tree, and nothing is being landed. The proposed hoist is handed to fidelity-developer as a specification with a measured payoff and a byte-identity proof; implementing it is not this role's job.",
+    "requiredBeforeLanding": "The hoist must pass the full mutation qualification with the mutant denominator at 38 or above and the fixture denominator at 26 or above, and must not change any expected value, manifest, mutant, or gate constant. Byte-identical output on five specs is supporting evidence, not a substitute for that run."
+  },
+
+  "constraintsHonoured": {
+    "sharedTreeSrcModified": false,
+    "sharedTreeEvidence": "git status --porcelain -- src backtest/src browser in the shared tree lists only src/generate/jsx_render.rs, src/generate/tree.rs and backtest/src/fixture.rs, all owned by other agents and all untouched by this work. The only file this record commits is .agents/fidelity/measurements/css-base-subphase.json.",
+    "instrumentationLocation": "detached worktree at C:\\Users\\calebzearing\\cssprof, commit 3be8ea0, containing exactly two modified files (src/generate/css_base.rs, src/generate/css_state_helpers.rs). The worktree was removed after measurement, so the instrumentation does not exist anywhere in the repository.",
+    "behaviourChanged": false,
+    "capsOrConstantsChanged": false,
+    "qualifySweepRun": false,
+    "qualifySweepNote": "Not run, deliberately. This record lands no behaviour change, so a qualification run would measure nothing about it, and the standing instruction is that timing runs must not overlap with the qualification machine. The denominators above are carried forward from the last recorded run rather than re-measured, and are labelled as such rather than presented as fresh measurements."
+  },
+
+  "reproduction": {
+    "instrumentEnv": "RECREATE_CSSBASE=1 emits one `CB ...` line per css_base::build call and one `FH ...` line per fluid_height_paths call, both to stderr.",
+    "abEnv": "RECREATE_FLUID_HOIST=1 selects the hoisted-Index path inside fluid_height_paths.",
+    "command": "recreate generate --spec <spec> --out <dir>",
+    "build": "cargo build --release --bin recreate with a private CARGO_TARGET_DIR, in a detached worktree at 3be8ea0",
+    "specsUsed": [
+      "live-r15/spec.json (25,657,399 bytes)",
+      "fluid-r1/spec.json (25,664,600 bytes)",
+      "fluid-r5/spec.json (19,952,171 bytes)",
+      "review/authenticated-reference-v1/spec.json (15,785,602 bytes)",
+      "recreate-output/spec.json (1,254,947 bytes)"
+    ]
+  }
+}
