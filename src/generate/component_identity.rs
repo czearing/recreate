@@ -36,7 +36,15 @@ fn noise(segment: &str) -> bool {
     segment.is_empty()
         || matches!(
             segment.to_ascii_lowercase().as_str(),
-            "module" | "modules" | "src" | "lib" | "packages" | "styles" | "style" | "index" | "css"
+            "module"
+                | "modules"
+                | "src"
+                | "lib"
+                | "packages"
+                | "styles"
+                | "style"
+                | "index"
+                | "css"
         )
         || hash_like(segment)
 }
@@ -71,13 +79,12 @@ mod tests {
     #[test]
     fn reads_css_modules_names_across_bundler_conventions() {
         assert_eq!(
-            from_class("------packages-new-office-ux-src-NotebookCard-NotebookCard-module__createCard-fs8I4M"),
+            from_class(
+                "------packages-new-office-ux-src-NotebookCard-NotebookCard-module__createCard-fs8I4M"
+            ),
             Some("NotebookCard".into())
         );
-        assert_eq!(
-            from_class("Button_primary__jhu84"),
-            Some("Button".into())
-        );
+        assert_eq!(from_class("Button_primary__jhu84"), Some("Button".into()));
         assert_eq!(
             from_class("SegmentedControl-module__root___2Kj3f"),
             Some("SegmentedControl".into())

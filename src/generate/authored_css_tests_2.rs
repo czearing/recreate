@@ -332,13 +332,17 @@ fn ignores_cascade_keywords_when_reading_authored_values() {
         before: None,
         after: None,
     };
-    node.attributes.insert("class".into(), "filterButton".into());
+    node.attributes
+        .insert("class".into(), "filterButton".into());
     let rules = [
         ".filterButton { all: unset; }".to_string(),
         ".filterButton { padding: 6px 10px; }".to_string(),
     ];
     let index = crate::generate::authored_css_index::Index::new(&rules);
-    assert_eq!(index.authored_value(&node, "padding"), Some("6px 10px".into()));
+    assert_eq!(
+        index.authored_value(&node, "padding"),
+        Some("6px 10px".into())
+    );
     for keyword in ["unset", "initial", "inherit", "revert", "revert-layer"] {
         let rules = [format!(".filterButton {{ padding: {keyword}; }}")];
         let only = crate::generate::authored_css_index::Index::new(&rules);
@@ -418,11 +422,19 @@ fn ignores_authored_values_the_captured_style_contradicts() {
         ".card { padding: 12px; }".to_string(),
     ];
     let agreeing = crate::generate::authored_css_index::Index::new(&agreeing);
-    assert_eq!(agreeing.authored_value(&node, "padding"), Some("12px".into()));
+    assert_eq!(
+        agreeing.authored_value(&node, "padding"),
+        Some("12px".into())
+    );
 
     let losing_only = [".card { padding: 0px; }".to_string()];
     let losing_only = crate::generate::authored_css_index::Index::new(&losing_only);
-    assert_eq!(losing_only.authored_value(&node, "padding"), Some("12px".into()));
-    assert_eq!(losing_only.declarations(&node).get("padding"), Some(&"12px".to_string()));
+    assert_eq!(
+        losing_only.authored_value(&node, "padding"),
+        Some("12px".into())
+    );
+    assert_eq!(
+        losing_only.declarations(&node).get("padding"),
+        Some(&"12px".to_string())
+    );
 }
-

@@ -1,4 +1,9 @@
-use super::source;
+use super::source_with_sheets;
+
+/// The capture script as the page receives it when it can read its own stylesheets.
+fn source() -> String {
+    source_with_sheets(&[])
+}
 
 #[test]
 fn preserves_media_scope_for_dynamic_state_rules() {

@@ -1,10 +1,6 @@
 use crate::{asset_script, style_contract};
 const CAPTURE: &str = include_str!("page_capture.js");
 
-pub fn source() -> String {
-    with_sheets(&source_template(), &[])
-}
-
 /// The stylesheet text the page is not allowed to read for itself, injected as data so the
 /// capture script keeps its single top-level form. Wrapping the script in another function
 /// instead would change what it evaluates to, and the failure is silent.

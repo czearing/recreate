@@ -372,7 +372,7 @@ pub fn app(
         &[
             ("//__RECREATE_COMPONENT_IMPORT__\n", &component_import),
             ("//__RECREATE_STATE_IMPORT__\n", &state_import),
-            ("\"__RECREATE_POSITIONAL__\"", &selector),
+            ("\"__RECREATE_POSITIONAL__\"", selector),
             ("\"__RECREATE_WIDTHS__\"", &widths),
             ("\"__RECREATE_CLOSABLE__\"", &closable),
             ("\"__RECREATE_STATEFUL__\"", &stateful),
@@ -388,7 +388,10 @@ pub fn app(
                 "\"__RECREATE_RESPONSIVE_ATTRIBUTE_VALUES__\"",
                 &responsive_attribute_values,
             ),
-            ("\"__RECREATE_RESPONSIVE_ATTRIBUTES__\"", &responsive_attributes),
+            (
+                "\"__RECREATE_RESPONSIVE_ATTRIBUTES__\"",
+                &responsive_attributes,
+            ),
             ("//__RECREATE_VIEWS__\n", &views),
             ("\"__RECREATE_VIEW_NAMES__\"", &view_names),
             ("\"__RECREATE_RENDER_STATE__\"", &render_state),

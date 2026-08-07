@@ -15,7 +15,12 @@ fn probe(path: &str, tag: &str) -> Node {
         tag: tag.into(),
         text: String::new(),
         attributes: crate::model::Attributes::new(),
-        rect: crate::model::Rect { x: 0.0, y: 0.0, width: 1.0, height: 1.0 },
+        rect: crate::model::Rect {
+            x: 0.0,
+            y: 0.0,
+            width: 1.0,
+            height: 1.0,
+        },
         style: crate::model::Styles::new(),
         before: None,
         after: None,

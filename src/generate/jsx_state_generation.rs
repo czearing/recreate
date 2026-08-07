@@ -33,7 +33,7 @@ pub fn interaction_states(
         STATE_TEMPLATE,
         &[
             ("__RECREATE_IMPORTS__", &imports),
-            ("\"__RECREATE_POSITIONAL__\"", &selector),
+            ("\"__RECREATE_POSITIONAL__\"", selector),
         ],
     );
     output = output

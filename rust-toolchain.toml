@@ -1,0 +1,7 @@
+# Formatting and lint rules change between stable Rust releases, so an unpinned
+# toolchain turns committed code red with no commit at all. Pinning makes
+# `cargo fmt --check` and `cargo clippy` decide the same way here and in CI, and
+# makes a toolchain upgrade an explicit change to this file.
+[toolchain]
+channel = "1.96.0"
+components = ["clippy", "rustfmt"]

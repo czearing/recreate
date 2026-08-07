@@ -62,15 +62,6 @@ fn flatten_static_pseudo_classes(selectors: &str) -> Option<Cow<'_, str>> {
     (!flattened.contains(':')).then_some(Cow::Owned(flattened))
 }
 
-/// A value the generator cannot compare against a sampled pixel measurement, because it
-/// depends on a custom property, arithmetic, or the containing block. Such a value can
-/// never be shown to have lost the cascade, so it stays a candidate.
-fn unresolvable(value: &str) -> bool {
-    ["var(", "calc(", "clamp(", "min(", "max("]
-        .into_iter()
-        .any(|token| value.contains(token))
-}
-
 /// A value made only of absolute pixel lengths. It resolves to itself, so comparing it
 /// against the captured computed value is exact — unlike `1fr`, `auto`, or a percentage,
 /// which resolve against the layout and legitimately differ from the sample.
@@ -176,7 +167,10 @@ impl<'a> Index<'a> {
             {
                 if value.contains("var(") && !super::authored_css_rules::fluid_authored_value(value)
                 {
-                    references.entry(name.into()).or_default().push(value.into());
+                    references
+                        .entry(name.into())
+                        .or_default()
+                        .push(value.into());
                     continue;
                 }
                 values.entry(name.into()).or_default().push(value.into());
@@ -185,12 +179,9 @@ impl<'a> Index<'a> {
         values
             .into_iter()
             .filter_map(|(name, values)| {
-                let picked = values
-                    .iter()
-                    .rev()
-                    .find(|value| {
-                        super::authored_css_rules::resolved_matches(node, &name, value)
-                    })?;
+                let picked = values.iter().rev().find(|value| {
+                    super::authored_css_rules::resolved_matches(node, &name, value)
+                })?;
                 // A pixel literal that disagrees with the captured computed value lost
                 // the cascade to a rule this index cannot order, such as one in a later
                 // `@layer`. The author did declare the property, so it is authored — but
@@ -242,9 +233,7 @@ impl<'a> Index<'a> {
                 (if physical.is_empty() { *name } else { physical }) == property
             })
             .map(|(_, value)| value.trim().trim_end_matches('}').trim().to_string())
-            .filter(|value| {
-                !value.is_empty() && !super::authored_css_rules::cascade_keyword(value)
-            })
+            .filter(|value| !value.is_empty() && !super::authored_css_rules::cascade_keyword(value))
             .collect::<Vec<_>>();
         let Some(sampled) = node.style.get(property) else {
             return candidates.into_iter().next_back();

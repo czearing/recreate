@@ -80,7 +80,11 @@ fn is_rtl(node: &Node) -> bool {
 /// stand for. A longhand already in the map came from the same sample and is at least as
 /// specific, so it is left alone.
 fn expand_inset_shorthands(styles: &mut Styles, rtl: bool) {
-    let (inline_start, inline_end) = if rtl { ("right", "left") } else { ("left", "right") };
+    let (inline_start, inline_end) = if rtl {
+        ("right", "left")
+    } else {
+        ("left", "right")
+    };
     for shorthand in ["inset", "inset-block", "inset-inline"] {
         let Some(value) = styles.get(shorthand).cloned() else {
             continue;
