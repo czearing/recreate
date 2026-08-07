@@ -1,0 +1,43 @@
+{
+  "schema": "fidelity-qualification-baseline/1",
+  "recordedAtUtc": "2026-08-07T09:25:00Z",
+  "recordedBy": "verification-gate",
+  "gitCommitSha": "ee52274",
+  "gitCommitShaVerifiedBy": "git hash-object of the measured snapshot's fixture.rs equals rev-parse ee52274:backtest/src/fixture.rs (8eea864be8772c7842edd4b69685b77ea310c363); it does NOT equal f2a2584's blob, so these numbers describe work item 007's landed code.",
+  "workingTreeClean": false,
+  "workingTreeNote": "backtest/src matched ee52274 exactly at measurement time. Fixture corpus carries uncommitted isolation fixtures owned by fixture-author.",
+  "sourceSnapshotSha256Prefix": "594F260399EFC4AE39F7F2E2",
+  "command": "cargo run -q -- qualify",
+  "runsMedianOf": 3,
+  "measurement": {
+    "detectedMutations": 33,
+    "undetectedMutations": 0,
+    "exceededBudgetMutations": 0,
+    "totalMutations": 33,
+    "cases": 23,
+    "comparisons": 56,
+    "passedComparisons": 55,
+    "p95Ms": 4005,
+    "p99Ms": 4404,
+    "maximumMs": 4404,
+    "duplicateFindings": 0,
+    "failures": 2
+  },
+  "samples": [
+    { "run": 1, "detectedMutations": 33, "undetectedMutations": 0, "exceededBudgetMutations": 0, "p95Ms": 4005, "p99Ms": 4404, "maximumMs": 4404, "duplicateFindings": 0, "failures": 2, "elapsedS": 253.9 },
+    { "run": 2, "detectedMutations": 33, "undetectedMutations": 0, "exceededBudgetMutations": 0, "p95Ms": 3401, "p99Ms": 3745, "maximumMs": 3745, "duplicateFindings": 0, "failures": 0, "elapsedS": 251.7 },
+    { "run": 3, "detectedMutations": 30, "undetectedMutations": 0, "exceededBudgetMutations": 3, "p95Ms": 4917, "p99Ms": 5284, "maximumMs": 5284, "duplicateFindings": 0, "failures": 9, "elapsedS": 296.9 }
+  ],
+  "spread": {
+    "p95Ms": 1516,
+    "p99Ms": 1539,
+    "note": "Observed run-to-run spread exceeds the remaining headroom to the 4000ms p95 budget. A ratchet threshold tighter than the median plus this spread will manufacture regressions that no code change caused."
+  },
+  "attempts": { "attempted": 3, "completed": 3, "aborted": 0 },
+  "host": { "exclusive": true, "concurrentHarnessBrowsersAtStart": 0, "note": "Measured only after the concurrent agent's run finished, per the one-run-at-a-time rule." },
+  "consoleErrors": 0,
+  "denominators": { "mutationsNeverShrankBelow": 33, "casesNeverShrankBelow": 23, "comparisonsNeverShrankBelow": 56 },
+  "gateConstants": { "COMPARISON_DEADLINE_MS": 4400, "WATCHDOG_MS": 4800 },
+  "verdict": "REJECT",
+  "verdictReason": "Median p95 4005ms exceeds the 4000ms budget by 5ms. Detection is perfect: undetectedMutations is 0 in every run, so every miss is a budget exceedance, not comparator blindness."
+}

@@ -1,0 +1,463 @@
+{
+  "cases": [
+    {
+      "case": "accessibility-isolation",
+      "control_durations_ms": [
+        1354
+      ],
+      "mutations": [
+        {
+          "id": "accessibility-role",
+          "iterations": 1,
+          "durations_ms": [
+            1108
+          ],
+          "finding": "V1440 base live-region role status->alert"
+        }
+      ]
+    },
+    {
+      "case": "animation-timing",
+      "control_durations_ms": [
+        2156
+      ],
+      "mutations": [
+        {
+          "id": "animation-duration",
+          "iterations": 1,
+          "durations_ms": [
+            2014
+          ],
+          "finding": "V1440 animation:animation-box animation-box duration 30000ms->20000ms -10000ms"
+        }
+      ]
+    },
+    {
+      "case": "async-timer",
+      "control_durations_ms": [
+        2179
+      ],
+      "mutations": [
+        {
+          "id": "async-timer-result",
+          "iterations": 1,
+          "durations_ms": [
+            2118
+          ],
+          "finding": "V1440 timer:60000 async-result text \"ready\"->\"stale\""
+        }
+      ]
+    },
+    {
+      "case": "click-behavior",
+      "control_durations_ms": [
+        2359
+      ],
+      "mutations": [
+        {
+          "id": "click-interaction",
+          "iterations": 1,
+          "durations_ms": [
+            2141
+          ],
+          "finding": "V1440 click:click-toggle click-result text \"clicked\"->\"idle\""
+        }
+      ]
+    },
+    {
+      "case": "console-isolation",
+      "control_durations_ms": [
+        1093
+      ],
+      "mutations": [
+        {
+          "id": "console-error",
+          "iterations": 1,
+          "durations_ms": [
+            1088
+          ],
+          "finding": "V1440 load window console-errors 0->1 +1"
+        }
+      ]
+    },
+    {
+      "case": "content-isolation",
+      "control_durations_ms": [
+        1145
+      ],
+      "mutations": [
+        {
+          "id": "text-content",
+          "iterations": 1,
+          "durations_ms": [
+            1144
+          ],
+          "finding": "V1440 base page-title text \"Canonical fixture\"->\"Candidate fixture\""
+        }
+      ]
+    },
+    {
+      "case": "focus-behavior",
+      "control_durations_ms": [
+        2148
+      ],
+      "mutations": [
+        {
+          "id": "focus-restoration",
+          "iterations": 1,
+          "durations_ms": [
+            2085
+          ],
+          "finding": "V1440 click:dialog-close active-element focus dialog-open->focus-fallback"
+        }
+      ]
+    },
+    {
+      "case": "geometry-isolation",
+      "control_durations_ms": [
+        1188
+      ],
+      "mutations": [
+        {
+          "id": "geometry-width",
+          "iterations": 1,
+          "durations_ms": [
+            1140
+          ],
+          "finding": "V1440 base geometry-panel width 480->456 -24px"
+        }
+      ]
+    },
+    {
+      "case": "hover-behavior",
+      "control_durations_ms": [
+        2323
+      ],
+      "mutations": [
+        {
+          "id": "hover-interaction",
+          "iterations": 1,
+          "durations_ms": [
+            2488
+          ],
+          "finding": "V1440 hover:hover-card hover-card background #dbeafe->#fee2e2"
+        }
+      ]
+    },
+    {
+      "case": "layout-isolation",
+      "control_durations_ms": [
+        3373
+      ],
+      "mutations": [
+        {
+          "id": "single-control-shift",
+          "iterations": 1,
+          "durations_ms": [
+            3314
+          ],
+          "finding": "V1440 base content / button \"Gamma\" x 1100->1000 -100px"
+        }
+      ]
+    },
+    {
+      "case": "layout-stability",
+      "control_durations_ms": [
+        2141
+      ],
+      "mutations": [
+        {
+          "id": "missing-shift",
+          "iterations": 1,
+          "durations_ms": [
+            2229
+          ],
+          "finding": "V1440 timer:100 layout near main \"Notebook content\" shift-score 0.01->0 -0.01"
+        }
+      ]
+    },
+    {
+      "case": "motion-behavior",
+      "control_durations_ms": [
+        3350
+      ],
+      "mutations": [
+        {
+          "id": "transition-duration",
+          "iterations": 1,
+          "durations_ms": [
+            3545
+          ],
+          "finding": "V1440 click:transition-trigger transition-panel / css transition \"opacity\" duration 240ms->420ms +180ms"
+        },
+        {
+          "id": "waapi-duration",
+          "iterations": 1,
+          "durations_ms": [
+            3427
+          ],
+          "finding": "V1440 base waapi-panel / web animation \"panel-drift\" duration 600ms->900ms +300ms"
+        }
+      ]
+    },
+    {
+      "case": "motion-isolation",
+      "control_durations_ms": [
+        1118
+      ],
+      "mutations": [
+        {
+          "id": "duration-change",
+          "iterations": 1,
+          "durations_ms": [
+            1140
+          ],
+          "finding": "V1440 base content / image \"Motion tile\" / css animation \"drift-source\" duration 500ms->700ms +200ms"
+        }
+      ]
+    },
+    {
+      "case": "network-isolation",
+      "control_durations_ms": [
+        1181
+      ],
+      "mutations": [
+        {
+          "id": "unexpected-network-request",
+          "iterations": 1,
+          "durations_ms": [
+            1204
+          ],
+          "finding": "V1440 load network unexpected-requests 0->1 +1"
+        }
+      ]
+    },
+    {
+      "case": "paint-isolation",
+      "control_durations_ms": [
+        1163
+      ],
+      "mutations": [
+        {
+          "id": "paint-color",
+          "iterations": 1,
+          "durations_ms": [
+            1153
+          ],
+          "finding": "V1440 base paint-swatch background #2563eb->#dc2626"
+        }
+      ]
+    },
+    {
+      "case": "raster-attribution",
+      "control_durations_ms": [
+        1187
+      ],
+      "mutations": [
+        {
+          "id": "background-content",
+          "iterations": 1,
+          "durations_ms": [
+            1174
+          ],
+          "finding": "V1440 base main / region \"Hero artwork\" background-content expected->different"
+        },
+        {
+          "id": "pseudo-content",
+          "iterations": 1,
+          "durations_ms": [
+            1181
+          ],
+          "finding": "V1440 base main / region \"Status mark\" pseudo-content expected->different"
+        },
+        {
+          "id": "canvas-content",
+          "iterations": 1,
+          "durations_ms": [
+            1068
+          ],
+          "finding": "V1440 base main / Canvas \"Usage chart\" canvas-content expected->different"
+        }
+      ]
+    },
+    {
+      "case": "responsive-isolation",
+      "control_durations_ms": [
+        1011
+      ],
+      "mutations": [
+        {
+          "id": "responsive-visibility",
+          "iterations": 1,
+          "durations_ms": [
+            603
+          ],
+          "finding": "V540 base responsive-note visibility hidden->visible"
+        }
+      ]
+    },
+    {
+      "case": "responsive-range",
+      "control_durations_ms": [
+        1082
+      ],
+      "mutations": [
+        {
+          "id": "range-450-translate",
+          "iterations": 1,
+          "durations_ms": [
+            1018
+          ],
+          "finding": "V450-479 sweep p1-mark x 24->159 +135px"
+        },
+        {
+          "id": "range-480-track-width",
+          "iterations": 1,
+          "durations_ms": [
+            1047
+          ],
+          "finding": "V480-499 sweep p2-mark width 180->240 +60px"
+        },
+        {
+          "id": "range-600-point",
+          "iterations": 1,
+          "durations_ms": [
+            1077
+          ],
+          "finding": "V600 sweep p3-mark y 204->184 -20px"
+        },
+        {
+          "id": "range-661-align",
+          "iterations": 1,
+          "durations_ms": [
+            1097
+          ],
+          "finding": "V601-661 sweep p4-mark y 240->250 +10px"
+        },
+        {
+          "id": "range-662-offset",
+          "iterations": 1,
+          "durations_ms": [
+            1038
+          ],
+          "finding": "V662-900 sweep p5-mark x 24->48 +24px"
+        },
+        {
+          "id": "range-midband-visibility",
+          "iterations": 1,
+          "durations_ms": [
+            1036
+          ],
+          "finding": "V662-900 sweep p6-mark visibility visible->hidden"
+        },
+        {
+          "id": "range-601-translate-y",
+          "iterations": 1,
+          "durations_ms": [
+            1098
+          ],
+          "finding": "V601-661 sweep p7-mark y 408->456 +48px"
+        }
+      ]
+    },
+    {
+      "case": "semantic-layout",
+      "control_durations_ms": [
+        1045
+      ],
+      "mutations": [
+        {
+          "id": "grid-reflow",
+          "iterations": 1,
+          "durations_ms": [
+            988
+          ],
+          "finding": "V1440 base main \"Notebook grid\" article layout flow 3 columns / 2 rows->2 columns / 3 rows"
+        },
+        {
+          "id": "grid-gap",
+          "iterations": 1,
+          "durations_ms": [
+            1030
+          ],
+          "finding": "V1440 base main \"Notebook grid\" article layout column-gap 20px->32px +12px"
+        }
+      ]
+    },
+    {
+      "case": "structure-isolation",
+      "control_durations_ms": [
+        1018
+      ],
+      "mutations": [
+        {
+          "id": "structure-missing-node",
+          "iterations": 1,
+          "durations_ms": [
+            1004
+          ],
+          "finding": "V1440 base status-badge missing"
+        }
+      ]
+    },
+    {
+      "case": "typography-isolation",
+      "control_durations_ms": [
+        991
+      ],
+      "mutations": [
+        {
+          "id": "typography-weight",
+          "iterations": 1,
+          "durations_ms": [
+            1027
+          ],
+          "finding": "V1440 base typography-sample font-weight 700->600"
+        }
+      ]
+    },
+    {
+      "case": "visual-assets",
+      "control_durations_ms": [
+        1160
+      ],
+      "mutations": [
+        {
+          "id": "image-content",
+          "iterations": 1,
+          "durations_ms": [
+            1107
+          ],
+          "finding": "V1440 base product-image image-content expected->different"
+        },
+        {
+          "id": "svg-content",
+          "iterations": 1,
+          "durations_ms": [
+            1067
+          ],
+          "finding": "V1440 base brand-mark svg-content expected->different"
+        }
+      ]
+    }
+  ],
+  "comparisons": 55,
+  "passedComparisons": 48,
+  "detectedMutations": 26,
+  "totalMutations": 33,
+  "maximumMs": 3545,
+  "p95Ms": 3373,
+  "p99Ms": 3545,
+  "duplicateFindings": 0,
+  "processEvidence": null,
+  "failures": [
+    "responsive-range range-450-translate: expected=V450-479 sweep p1-mark x 24->159 +135px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-480-track-width: expected=V480-499 sweep p2-mark width 180->240 +60px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-600-point: expected=V600 sweep p3-mark y 204->184 -20px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-661-align: expected=V601-661 sweep p4-mark y 240->250 +10px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-662-offset: expected=V662-900 sweep p5-mark x 24->48 +24px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-midband-visibility: expected=V662-900 sweep p6-mark visibility visible->hidden actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "responsive-range range-601-translate-y: expected=V601-661 sweep p7-mark y 408->456 +48px actual= status=Pass findings=0 duplicates=0 lines=[]",
+    "detected 26/33 mutations"
+  ]
+}
