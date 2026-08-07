@@ -1,0 +1,6 @@
+       "interactions": 0,
+       "nodes": 4635,
+       "states": 5
+     }
+   }
+   completed capture in 72.60s

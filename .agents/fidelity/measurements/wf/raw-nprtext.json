@@ -1,0 +1,2981 @@
+{
+ "site": {
+  "key": "nprtext",
+  "recreationUrl": "http://127.0.0.1:8846/",
+  "sourceUrl": "https://text.npr.org/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 33,
+    "protruding": 4,
+    "scrollWidth": 570,
+    "clientWidth": 400
+   },
+   "recreationOnly": 3,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "contact us ||| privacy policy",
+    "privacy policy ||| terms of use",
+    "permissions ||| privacy policy"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 3,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      20,
+      360
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      360
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      360
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      308
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      359
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      302
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      346
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      350
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      359
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      306
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      331
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      352
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      325
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      321
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      359
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      345
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      332
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      327
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      322
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      333
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      324
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      342
+     ],
+     [
+      "topics",
+      20,
+      360
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      121,
+      91
+     ],
+     [
+      "permissions",
+      236,
+      83
+     ],
+     [
+      "privacy policy",
+      20,
+      94
+     ],
+     [
+      "© npr",
+      20,
+      360
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      20,
+      360
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      360
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      360
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      308
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      359
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      302
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      346
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      350
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      359
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      306
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      331
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      352
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      325
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      321
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      359
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      345
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      332
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      327
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      322
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      333
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      324
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      342
+     ],
+     [
+      "topics",
+      20,
+      360
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      117,
+      91
+     ],
+     [
+      "permissions",
+      228,
+      83
+     ],
+     [
+      "privacy policy",
+      20,
+      359
+     ],
+     [
+      "© npr",
+      20,
+      360
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 3,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 33,
+    "protruding": 4,
+    "scrollWidth": 570,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      20,
+      410
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      410
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      410
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      390
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      401
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      388
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      377
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      350
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      359
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      388
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      383
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      382
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      403
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      386
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      400
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      402
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      403
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      402
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      389
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      324
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      366
+     ],
+     [
+      "topics",
+      20,
+      410
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      121,
+      91
+     ],
+     [
+      "permissions",
+      236,
+      83
+     ],
+     [
+      "privacy policy",
+      20,
+      373
+     ],
+     [
+      "© npr",
+      20,
+      410
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      20,
+      410
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      410
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      410
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      390
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      401
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      388
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      377
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      350
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      359
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      388
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      383
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      382
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      403
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      386
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      400
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      402
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      403
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      402
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      389
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      324
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      366
+     ],
+     [
+      "topics",
+      20,
+      410
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      117,
+      91
+     ],
+     [
+      "permissions",
+      228,
+      83
+     ],
+     [
+      "privacy policy",
+      20,
+      359
+     ],
+     [
+      "© npr",
+      20,
+      410
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 4,
+    "scrollWidth": 570,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      20,
+      440
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      440
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      440
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      438
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      401
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      388
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      428
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      439
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      420
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      388
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      383
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      416
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      434
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      434
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      431
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      429
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      421
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      430
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      421
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      414
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      439
+     ],
+     [
+      "topics",
+      20,
+      440
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      121,
+      91
+     ],
+     [
+      "permissions",
+      236,
+      83
+     ],
+     [
+      "privacy policy",
+      343,
+      94
+     ],
+     [
+      "© npr",
+      20,
+      440
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      20,
+      440
+     ],
+     [
+      "go to full site",
+      163,
+      120
+     ],
+     [
+      "npr : national public radio",
+      20,
+      440
+     ],
+     [
+      "friday, august 7, 2026",
+      20,
+      440
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      20,
+      438
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      20,
+      401
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      20,
+      388
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      20,
+      428
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      20,
+      439
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      20,
+      420
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      20,
+      388
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      20,
+      383
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      20,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      20,
+      416
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      20,
+      434
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      20,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      20,
+      434
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      20,
+      431
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      20,
+      429
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      20,
+      421
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      20,
+      430
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      20,
+      421
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      20,
+      414
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      20,
+      439
+     ],
+     [
+      "topics",
+      20,
+      440
+     ],
+     [
+      "news",
+      60,
+      39
+     ],
+     [
+      "culture",
+      60,
+      51
+     ],
+     [
+      "music",
+      60,
+      41
+     ],
+     [
+      "contact us",
+      20,
+      77
+     ],
+     [
+      "terms of use",
+      117,
+      91
+     ],
+     [
+      "permissions",
+      228,
+      83
+     ],
+     [
+      "privacy policy",
+      330,
+      94
+     ],
+     [
+      "© npr",
+      20,
+      440
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      25,
+      550
+     ],
+     [
+      "go to full site",
+      168,
+      120
+     ],
+     [
+      "npr : national public radio",
+      25,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      25,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      25,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      25,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      25,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      25,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      25,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      25,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      25,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      25,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      25,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      25,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      25,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      25,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      25,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      25,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      25,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      25,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      25,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      25,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      25,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      25,
+      534
+     ],
+     [
+      "topics",
+      25,
+      550
+     ],
+     [
+      "news",
+      65,
+      39
+     ],
+     [
+      "culture",
+      65,
+      51
+     ],
+     [
+      "music",
+      65,
+      41
+     ],
+     [
+      "contact us",
+      25,
+      77
+     ],
+     [
+      "terms of use",
+      126,
+      91
+     ],
+     [
+      "permissions",
+      241,
+      83
+     ],
+     [
+      "privacy policy",
+      348,
+      94
+     ],
+     [
+      "© npr",
+      25,
+      550
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      25,
+      550
+     ],
+     [
+      "go to full site",
+      168,
+      120
+     ],
+     [
+      "npr : national public radio",
+      25,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      25,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      25,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      25,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      25,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      25,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      25,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      25,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      25,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      25,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      25,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      25,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      25,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      25,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      25,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      25,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      25,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      25,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      25,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      25,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      25,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      25,
+      534
+     ],
+     [
+      "topics",
+      25,
+      550
+     ],
+     [
+      "news",
+      65,
+      39
+     ],
+     [
+      "culture",
+      65,
+      51
+     ],
+     [
+      "music",
+      65,
+      41
+     ],
+     [
+      "contact us",
+      25,
+      77
+     ],
+     [
+      "terms of use",
+      122,
+      91
+     ],
+     [
+      "permissions",
+      233,
+      83
+     ],
+     [
+      "privacy policy",
+      335,
+      94
+     ],
+     [
+      "© npr",
+      25,
+      550
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      56,
+      550
+     ],
+     [
+      "go to full site",
+      198,
+      120
+     ],
+     [
+      "npr : national public radio",
+      56,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      56,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      56,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      56,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      56,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      56,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      56,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      56,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      56,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      56,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      56,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      56,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      56,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      56,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      56,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      56,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      56,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      56,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      56,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      56,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      56,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      56,
+      534
+     ],
+     [
+      "topics",
+      56,
+      550
+     ],
+     [
+      "news",
+      96,
+      39
+     ],
+     [
+      "culture",
+      96,
+      51
+     ],
+     [
+      "music",
+      96,
+      41
+     ],
+     [
+      "contact us",
+      56,
+      77
+     ],
+     [
+      "terms of use",
+      157,
+      91
+     ],
+     [
+      "permissions",
+      272,
+      83
+     ],
+     [
+      "privacy policy",
+      379,
+      94
+     ],
+     [
+      "© npr",
+      56,
+      550
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      56,
+      550
+     ],
+     [
+      "go to full site",
+      198,
+      120
+     ],
+     [
+      "npr : national public radio",
+      56,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      56,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      56,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      56,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      56,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      56,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      56,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      56,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      56,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      56,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      56,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      56,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      56,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      56,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      56,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      56,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      56,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      56,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      56,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      56,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      56,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      56,
+      534
+     ],
+     [
+      "topics",
+      56,
+      550
+     ],
+     [
+      "news",
+      96,
+      39
+     ],
+     [
+      "culture",
+      96,
+      51
+     ],
+     [
+      "music",
+      96,
+      41
+     ],
+     [
+      "contact us",
+      56,
+      77
+     ],
+     [
+      "terms of use",
+      152,
+      91
+     ],
+     [
+      "permissions",
+      263,
+      83
+     ],
+     [
+      "privacy policy",
+      366,
+      94
+     ],
+     [
+      "© npr",
+      56,
+      550
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      125,
+      550
+     ],
+     [
+      "go to full site",
+      268,
+      120
+     ],
+     [
+      "npr : national public radio",
+      125,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      125,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      125,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      125,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      125,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      125,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      125,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      125,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      125,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      125,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      125,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      125,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      125,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      125,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      125,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      125,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      125,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      125,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      125,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      125,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      125,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      125,
+      534
+     ],
+     [
+      "topics",
+      125,
+      550
+     ],
+     [
+      "news",
+      165,
+      39
+     ],
+     [
+      "culture",
+      165,
+      51
+     ],
+     [
+      "music",
+      165,
+      41
+     ],
+     [
+      "contact us",
+      125,
+      77
+     ],
+     [
+      "terms of use",
+      226,
+      91
+     ],
+     [
+      "permissions",
+      341,
+      83
+     ],
+     [
+      "privacy policy",
+      448,
+      94
+     ],
+     [
+      "© npr",
+      125,
+      550
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      125,
+      550
+     ],
+     [
+      "go to full site",
+      268,
+      120
+     ],
+     [
+      "npr : national public radio",
+      125,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      125,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      125,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      125,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      125,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      125,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      125,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      125,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      125,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      125,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      125,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      125,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      125,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      125,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      125,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      125,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      125,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      125,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      125,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      125,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      125,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      125,
+      534
+     ],
+     [
+      "topics",
+      125,
+      550
+     ],
+     [
+      "news",
+      165,
+      39
+     ],
+     [
+      "culture",
+      165,
+      51
+     ],
+     [
+      "music",
+      165,
+      41
+     ],
+     [
+      "contact us",
+      125,
+      77
+     ],
+     [
+      "terms of use",
+      222,
+      91
+     ],
+     [
+      "permissions",
+      333,
+      83
+     ],
+     [
+      "privacy policy",
+      435,
+      94
+     ],
+     [
+      "© npr",
+      125,
+      550
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      263,
+      550
+     ],
+     [
+      "go to full site",
+      406,
+      120
+     ],
+     [
+      "npr : national public radio",
+      263,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      263,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      263,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      263,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      263,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      263,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      263,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      263,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      263,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      263,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      263,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      263,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      263,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      263,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      263,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      263,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      263,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      263,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      263,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      263,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      263,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      263,
+      534
+     ],
+     [
+      "topics",
+      263,
+      550
+     ],
+     [
+      "news",
+      303,
+      39
+     ],
+     [
+      "culture",
+      303,
+      51
+     ],
+     [
+      "music",
+      303,
+      41
+     ],
+     [
+      "contact us",
+      263,
+      77
+     ],
+     [
+      "terms of use",
+      364,
+      91
+     ],
+     [
+      "permissions",
+      479,
+      83
+     ],
+     [
+      "privacy policy",
+      586,
+      94
+     ],
+     [
+      "© npr",
+      263,
+      550
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      263,
+      550
+     ],
+     [
+      "go to full site",
+      406,
+      120
+     ],
+     [
+      "npr : national public radio",
+      263,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      263,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      263,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      263,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      263,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      263,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      263,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      263,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      263,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      263,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      263,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      263,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      263,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      263,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      263,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      263,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      263,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      263,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      263,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      263,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      263,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      263,
+      534
+     ],
+     [
+      "topics",
+      263,
+      550
+     ],
+     [
+      "news",
+      303,
+      39
+     ],
+     [
+      "culture",
+      303,
+      51
+     ],
+     [
+      "music",
+      303,
+      41
+     ],
+     [
+      "contact us",
+      263,
+      77
+     ],
+     [
+      "terms of use",
+      360,
+      91
+     ],
+     [
+      "permissions",
+      471,
+      83
+     ],
+     [
+      "privacy policy",
+      573,
+      94
+     ],
+     [
+      "© npr",
+      263,
+      550
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 33,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 33,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    },
+    "recreation": {
+     "inlineSiblingPairs": 6,
+     "rowParents": 1,
+     "maxRowMembers": 4,
+     "navInlinePairs": 6
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "text-only version",
+      445,
+      550
+     ],
+     [
+      "go to full site",
+      588,
+      120
+     ],
+     [
+      "npr : national public radio",
+      445,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      445,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      445,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      445,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      445,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      445,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      445,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      445,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      445,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      445,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      445,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      445,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      445,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      445,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      445,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      445,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      445,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      445,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      445,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      445,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      445,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      445,
+      534
+     ],
+     [
+      "topics",
+      445,
+      550
+     ],
+     [
+      "news",
+      485,
+      39
+     ],
+     [
+      "culture",
+      485,
+      51
+     ],
+     [
+      "music",
+      485,
+      41
+     ],
+     [
+      "contact us",
+      445,
+      77
+     ],
+     [
+      "terms of use",
+      546,
+      91
+     ],
+     [
+      "permissions",
+      661,
+      83
+     ],
+     [
+      "privacy policy",
+      768,
+      94
+     ],
+     [
+      "© npr",
+      445,
+      550
+     ]
+    ],
+    "recreation": [
+     [
+      "text-only version",
+      445,
+      550
+     ],
+     [
+      "go to full site",
+      588,
+      120
+     ],
+     [
+      "npr : national public radio",
+      445,
+      550
+     ],
+     [
+      "friday, august 7, 2026",
+      445,
+      550
+     ],
+     [
+      "trump signs new orders targeting birthright citizenship, weeks after scotus ruling",
+      445,
+      536
+     ],
+     [
+      "some critics of birthright citizenship say it's a fraud issue. what does that mean?",
+      445,
+      514
+     ],
+     [
+      "kalshi and polymarket bets on clinical trials criticized as 'ghastly'",
+      445,
+      450
+     ],
+     [
+      "employers unexpectedly cut 23,000 jobs in a sign of a wilting labor market",
+      445,
+      523
+     ],
+     [
+      "blanche's path to confirmation appears clear after winning key republican's support",
+      445,
+      531
+     ],
+     [
+      "iran aims to ban u.s. and israeli ships from strait of hormuz and charge others a toll",
+      445,
+      503
+     ],
+     [
+      "amid cost of living stress, many parents are supporting children well into adulthood",
+      445,
+      513
+     ],
+     [
+      "a new vaccine could vanquish a major cause of deadly diarrheal disease",
+      445,
+      505
+     ],
+     [
+      "why andy cohen is a deadhead for life",
+      445,
+      277
+     ],
+     [
+      "who or what is 'taking a step back from visibility'? the quiz knows",
+      445,
+      465
+     ],
+     [
+      "colombia's new president vows to remake the country — and challenge its fragile peace",
+      445,
+      527
+     ],
+     [
+      "student gunman kills at least 7 near bangkok, officials say",
+      445,
+      406
+     ],
+     [
+      "the new movie about anthony bourdain is none of the things you fear it could be",
+      445,
+      510
+     ],
+     [
+      "when tragedy strikes, america's wildland firefighters ask, was it 'somebody that we loved?'",
+      445,
+      527
+     ],
+     [
+      "next gen crabbers use social media to tell their story and sell their catch",
+      445,
+      508
+     ],
+     [
+      "senate homeland security committee votes to hold fauci in contempt of congress",
+      445,
+      512
+     ],
+     [
+      "besieged sudanese city faces relentless drone strikes and risk of mass atrocities, u.n. warns",
+      445,
+      489
+     ],
+     [
+      "can role model move past his viral moment by leaning into authenticity?",
+      445,
+      516
+     ],
+     [
+      "everyone's talking about hormone therapy for menopause. should i be on it?",
+      445,
+      542
+     ],
+     [
+      "court orders instagram and facebook's meta to pay $567m to address kids' mental health online",
+      445,
+      534
+     ],
+     [
+      "topics",
+      445,
+      550
+     ],
+     [
+      "news",
+      485,
+      39
+     ],
+     [
+      "culture",
+      485,
+      51
+     ],
+     [
+      "music",
+      485,
+      41
+     ],
+     [
+      "contact us",
+      445,
+      77
+     ],
+     [
+      "terms of use",
+      542,
+      91
+     ],
+     [
+      "permissions",
+      653,
+      83
+     ],
+     [
+      "privacy policy",
+      755,
+      94
+     ],
+     [
+      "© npr",
+      445,
+      550
+     ]
+    ]
+   }
+  }
+ }
+}

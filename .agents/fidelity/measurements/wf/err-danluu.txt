@@ -1,0 +1,6 @@
+       "assets": 0,
+       "interactions": 0,
+       "nodes": 5065,
+       "states": 5
+     }
+   }

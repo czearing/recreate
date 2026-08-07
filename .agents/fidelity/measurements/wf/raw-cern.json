@@ -1,0 +1,3311 @@
+{
+ "site": {
+  "key": "cern",
+  "recreationUrl": "http://127.0.0.1:8844/",
+  "sourceUrl": "https://info.cern.ch/hypertext/WWW/TheProject.html"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 2,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 760,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 13,
+     "rowParents": 2,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 14,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      384
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      384
+     ],
+     [
+      "executive\nsummary",
+      8,
+      325
+     ],
+     [
+      "mailing lists",
+      165,
+      80
+     ],
+     [
+      "policy",
+      257,
+      41
+     ],
+     [
+      "w3  news",
+      8,
+      60
+     ],
+     [
+      "frequently asked questions",
+      80,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      344
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      48,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      344
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      344
+     ],
+     [
+      "line mode",
+      118,
+      71
+     ],
+     [
+      "viola",
+      227,
+      35
+     ],
+     [
+      "nextstep",
+      274,
+      68
+     ],
+     [
+      "servers",
+      48,
+      48
+     ],
+     [
+      "tools",
+      108,
+      35
+     ],
+     [
+      "mail robot",
+      151,
+      72
+     ],
+     [
+      "library",
+      231,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      344
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      344
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      344
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      344
+     ],
+     [
+      "?",
+      8,
+      384
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      344
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      344
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      384
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      384
+     ],
+     [
+      "executive summary",
+      8,
+      325
+     ],
+     [
+      "mailing lists",
+      165,
+      80
+     ],
+     [
+      "policy",
+      257,
+      41
+     ],
+     [
+      "w3 news",
+      8,
+      60
+     ],
+     [
+      "frequently asked questions",
+      80,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      712
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      712
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      712
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      48,
+      35
+     ],
+     [
+      "mail robot",
+      91,
+      72
+     ],
+     [
+      "library",
+      171,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      712
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      712
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      712
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      712
+     ],
+     [
+      "?",
+      8,
+      384
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      712
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      712
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 10,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 760,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 7,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [
+    "subjects ||| w3 servers",
+    "line mode ||| mail robot",
+    "mail robot ||| viola",
+    "mail robot ||| nextstep",
+    "mail robot ||| servers",
+    "mail robot ||| tools",
+    "library ||| mail robot"
+   ],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 23,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 16,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      434
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      434
+     ],
+     [
+      "executive\nsummary",
+      206,
+      125
+     ],
+     [
+      "mailing lists",
+      8,
+      80
+     ],
+     [
+      "policy",
+      100,
+      41
+     ],
+     [
+      "w3  news",
+      234,
+      60
+     ],
+     [
+      "frequently asked questions",
+      8,
+      411
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      394
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      48,
+      361
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      394
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      394
+     ],
+     [
+      "line mode",
+      48,
+      71
+     ],
+     [
+      "viola",
+      157,
+      35
+     ],
+     [
+      "nextstep",
+      204,
+      68
+     ],
+     [
+      "servers",
+      284,
+      48
+     ],
+     [
+      "tools",
+      344,
+      35
+     ],
+     [
+      "mail robot",
+      48,
+      374
+     ],
+     [
+      "library",
+      90,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      394
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      394
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      394
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      394
+     ],
+     [
+      "?",
+      8,
+      434
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      394
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      394
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      434
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      434
+     ],
+     [
+      "executive summary",
+      206,
+      125
+     ],
+     [
+      "mailing lists",
+      8,
+      80
+     ],
+     [
+      "policy",
+      100,
+      41
+     ],
+     [
+      "w3 news",
+      234,
+      60
+     ],
+     [
+      "frequently asked questions",
+      8,
+      411
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      712
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      712
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      712
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      48,
+      35
+     ],
+     [
+      "mail robot",
+      91,
+      72
+     ],
+     [
+      "library",
+      171,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      712
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      712
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      712
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      712
+     ],
+     [
+      "?",
+      8,
+      434
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      712
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      712
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 9,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 4,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 760,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 5,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [
+    "line mode ||| viola",
+    "line mode ||| nextstep",
+    "line mode ||| servers",
+    "line mode ||| tools",
+    "line mode ||| mail robot"
+   ],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 23,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 17,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      464
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      464
+     ],
+     [
+      "executive\nsummary",
+      190,
+      125
+     ],
+     [
+      "mailing lists",
+      8,
+      455
+     ],
+     [
+      "policy",
+      46,
+      41
+     ],
+     [
+      "w3  news",
+      179,
+      60
+     ],
+     [
+      "frequently asked questions",
+      251,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      424
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      424
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      424
+     ],
+     [
+      "line mode",
+      48,
+      421
+     ],
+     [
+      "viola",
+      124,
+      35
+     ],
+     [
+      "nextstep",
+      171,
+      68
+     ],
+     [
+      "servers",
+      251,
+      48
+     ],
+     [
+      "tools",
+      311,
+      35
+     ],
+     [
+      "mail robot",
+      354,
+      72
+     ],
+     [
+      "library",
+      48,
+      48
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      424
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      424
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      424
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      424
+     ],
+     [
+      "?",
+      8,
+      464
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      424
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      424
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      464
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      464
+     ],
+     [
+      "executive summary",
+      190,
+      125
+     ],
+     [
+      "mailing lists",
+      8,
+      455
+     ],
+     [
+      "policy",
+      46,
+      41
+     ],
+     [
+      "w3 news",
+      179,
+      60
+     ],
+     [
+      "frequently asked questions",
+      251,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      712
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      712
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      712
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      48,
+      35
+     ],
+     [
+      "mail robot",
+      91,
+      72
+     ],
+     [
+      "library",
+      171,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      712
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      712
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      712
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      712
+     ],
+     [
+      "?",
+      8,
+      464
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      712
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      712
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 4,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 4,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 760,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 19,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 17,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      584
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      584
+     ],
+     [
+      "executive\nsummary",
+      92,
+      125
+     ],
+     [
+      "mailing lists",
+      314,
+      80
+     ],
+     [
+      "policy",
+      406,
+      41
+     ],
+     [
+      "w3  news",
+      8,
+      555
+     ],
+     [
+      "frequently asked questions",
+      53,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      544
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      544
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      544
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      48,
+      68
+     ],
+     [
+      "servers",
+      128,
+      48
+     ],
+     [
+      "tools",
+      188,
+      35
+     ],
+     [
+      "mail robot",
+      231,
+      72
+     ],
+     [
+      "library",
+      311,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      544
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      544
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      544
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      544
+     ],
+     [
+      "?",
+      8,
+      584
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      544
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      544
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      584
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      584
+     ],
+     [
+      "executive summary",
+      92,
+      125
+     ],
+     [
+      "mailing lists",
+      314,
+      80
+     ],
+     [
+      "policy",
+      406,
+      41
+     ],
+     [
+      "w3 news",
+      8,
+      555
+     ],
+     [
+      "frequently asked questions",
+      53,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      712
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      712
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      712
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      48,
+      35
+     ],
+     [
+      "mail robot",
+      91,
+      72
+     ],
+     [
+      "library",
+      171,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      712
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      712
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      712
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      712
+     ],
+     [
+      "?",
+      8,
+      584
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      712
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      712
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 4,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 4,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 760,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 22,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 20,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      645
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      645
+     ],
+     [
+      "executive\nsummary",
+      8,
+      125
+     ],
+     [
+      "mailing lists",
+      230,
+      80
+     ],
+     [
+      "policy",
+      323,
+      41
+     ],
+     [
+      "w3  news",
+      456,
+      60
+     ],
+     [
+      "frequently asked questions",
+      8,
+      633
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      605
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      605
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      605
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      48,
+      68
+     ],
+     [
+      "servers",
+      128,
+      48
+     ],
+     [
+      "tools",
+      188,
+      35
+     ],
+     [
+      "mail robot",
+      231,
+      72
+     ],
+     [
+      "library",
+      311,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      605
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      605
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      605
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      605
+     ],
+     [
+      "?",
+      8,
+      645
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      605
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      605
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      645
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      645
+     ],
+     [
+      "executive summary",
+      8,
+      125
+     ],
+     [
+      "mailing lists",
+      230,
+      80
+     ],
+     [
+      "policy",
+      323,
+      41
+     ],
+     [
+      "w3 news",
+      456,
+      60
+     ],
+     [
+      "frequently asked questions",
+      8,
+      633
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      712
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      712
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      712
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      48,
+      35
+     ],
+     [
+      "mail robot",
+      91,
+      72
+     ],
+     [
+      "library",
+      171,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      712
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      712
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      712
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      712
+     ],
+     [
+      "?",
+      8,
+      645
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      712
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      712
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 1432,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 18,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 28,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      784
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      784
+     ],
+     [
+      "executive\nsummary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      84,
+      80
+     ],
+     [
+      "policy",
+      176,
+      41
+     ],
+     [
+      "w3  news",
+      310,
+      60
+     ],
+     [
+      "frequently asked questions",
+      382,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      744
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      744
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      744
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      48,
+      68
+     ],
+     [
+      "library",
+      124,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      744
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      744
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      744
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      744
+     ],
+     [
+      "?",
+      8,
+      784
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      744
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      744
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      784
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      784
+     ],
+     [
+      "executive summary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      84,
+      80
+     ],
+     [
+      "policy",
+      176,
+      41
+     ],
+     [
+      "w3 news",
+      310,
+      60
+     ],
+     [
+      "frequently asked questions",
+      382,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      1384
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      1384
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      1384
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      779,
+      72
+     ],
+     [
+      "library",
+      859,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      1384
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      1384
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      1384
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      1384
+     ],
+     [
+      "?",
+      8,
+      784
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      1384
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      1384
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 1,
+    "scrollWidth": 1432,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 26,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 26,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      1060
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      1060
+     ],
+     [
+      "executive\nsummary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      859,
+      80
+     ],
+     [
+      "policy",
+      951,
+      41
+     ],
+     [
+      "w3  news",
+      88,
+      60
+     ],
+     [
+      "frequently asked questions",
+      160,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      1020
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      1020
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      1020
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      779,
+      72
+     ],
+     [
+      "library",
+      859,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      1020
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      1020
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      1020
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      1020
+     ],
+     [
+      "?",
+      8,
+      1060
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      1020
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      1020
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      1060
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      1060
+     ],
+     [
+      "executive summary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      859,
+      80
+     ],
+     [
+      "policy",
+      951,
+      41
+     ],
+     [
+      "w3 news",
+      88,
+      60
+     ],
+     [
+      "frequently asked questions",
+      160,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      1384
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      1384
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      1384
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      779,
+      72
+     ],
+     [
+      "library",
+      859,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      1384
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      1384
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      1384
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      1384
+     ],
+     [
+      "?",
+      8,
+      1060
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      1384
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      1384
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 37,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 27,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 32,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 32,
+     "rowParents": 3,
+     "maxRowMembers": 7,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "world wide web",
+      8,
+      1424
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about\nw3 is linked directly or indirectly\nto this document, including an  of the project, \n,  , november's   ,\n .",
+      8,
+      1424
+     ],
+     [
+      "executive\nsummary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      859,
+      80
+     ],
+     [
+      "policy",
+      951,
+      41
+     ],
+     [
+      "w3  news",
+      1084,
+      60
+     ],
+     [
+      "frequently asked questions",
+      1156,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the\nworld's online information,\n, , etc.",
+      48,
+      1384
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      1384
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project\ncomponents and their current state.\n(e.g.  ,x11  ,  \n,  ,  , , )",
+      48,
+      1384
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      779,
+      72
+     ],
+     [
+      "library",
+      859,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats,\nprogram internals etc",
+      48,
+      1384
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation\non  w3 and references.",
+      48,
+      1384
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved\nin the project.",
+      48,
+      1384
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history\nof the project.",
+      48,
+      1384
+     ],
+     [
+      "?",
+      8,
+      1424
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like\nto support the web..",
+      48,
+      1384
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      1384
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ],
+    "recreation": [
+     [
+      "world wide web",
+      8,
+      1424
+     ],
+     [
+      "hypermedia",
+      270,
+      80
+     ],
+     [
+      "everything there is online about w3 is linked directly or indirectly to this document, including an  of the project,  ,  , november's  ,  .",
+      8,
+      1424
+     ],
+     [
+      "executive summary",
+      636,
+      125
+     ],
+     [
+      "mailing lists",
+      859,
+      80
+     ],
+     [
+      "policy",
+      951,
+      41
+     ],
+     [
+      "w3 news",
+      1084,
+      60
+     ],
+     [
+      "frequently asked questions",
+      1156,
+      181
+     ],
+     [
+      "what's out there?",
+      8,
+      111
+     ],
+     [
+      "pointers to the world's online information, , , etc.",
+      48,
+      1384
+     ],
+     [
+      "subjects",
+      318,
+      56
+     ],
+     [
+      "w3 servers",
+      386,
+      72
+     ],
+     [
+      "help",
+      8,
+      31
+     ],
+     [
+      "on the browser you are using",
+      48,
+      1384
+     ],
+     [
+      "software products",
+      8,
+      118
+     ],
+     [
+      "a list of w3 project components and their current state. (e.g.  ,x11  ,  ,  ,  , , )",
+      48,
+      1384
+     ],
+     [
+      "line mode",
+      440,
+      71
+     ],
+     [
+      "viola",
+      549,
+      35
+     ],
+     [
+      "nextstep",
+      596,
+      68
+     ],
+     [
+      "servers",
+      676,
+      48
+     ],
+     [
+      "tools",
+      736,
+      35
+     ],
+     [
+      "mail robot",
+      779,
+      72
+     ],
+     [
+      "library",
+      859,
+      52
+     ],
+     [
+      "technical",
+      8,
+      62
+     ],
+     [
+      "details of protocols, formats, program internals etc",
+      48,
+      1384
+     ],
+     [
+      "bibliography",
+      8,
+      84
+     ],
+     [
+      "paper documentation on w3 and references.",
+      48,
+      1384
+     ],
+     [
+      "people",
+      8,
+      44
+     ],
+     [
+      "a list of some people involved in the project.",
+      48,
+      1384
+     ],
+     [
+      "history",
+      8,
+      48
+     ],
+     [
+      "a summary of the history of the project.",
+      48,
+      1384
+     ],
+     [
+      "?",
+      8,
+      1424
+     ],
+     [
+      "how can i help",
+      8,
+      98
+     ],
+     [
+      "if you would like to support the web..",
+      48,
+      1384
+     ],
+     [
+      "getting code",
+      8,
+      82
+     ],
+     [
+      "getting the code by , etc.",
+      48,
+      1384
+     ],
+     [
+      "anonymous ftp",
+      174,
+      109
+     ]
+    ]
+   }
+  }
+ }
+}

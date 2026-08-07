@@ -1,0 +1,6227 @@
+{
+ "site": {
+  "key": "vuejs",
+  "recreationUrl": "http://127.0.0.1:8843/",
+  "sourceUrl": "https://vuejs.org/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 68,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 74,
+    "protruding": 4,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 48,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 4
+    },
+    "recreation": {
+     "inlineSiblingPairs": 70,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 26
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      48,
+      57
+     ],
+     [
+      "the javascript framework",
+      32,
+      336
+     ],
+     [
+      "progressive",
+      62,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      336
+     ],
+     [
+      "why vue",
+      125,
+      150
+     ],
+     [
+      "get started",
+      70,
+      141
+     ],
+     [
+      "install",
+      229,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      49,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      352
+     ],
+     [
+      "versatile",
+      68,
+      264
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      264
+     ],
+     [
+      "user-friendly",
+      68,
+      264
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      264
+     ],
+     [
+      "efficient",
+      68,
+      264
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      264
+     ],
+     [
+      "platinum sponsors",
+      32,
+      336
+     ],
+     [
+      "become a sponsor",
+      32,
+      166
+     ],
+     [
+      "gold sponsors",
+      32,
+      336
+     ],
+     [
+      "become a sponsor",
+      202,
+      166
+     ],
+     [
+      "docs",
+      64,
+      272
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      272
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      272
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      272
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      272
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      272
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      272
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      272
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      352
+     ],
+     [
+      "mit license",
+      221,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      352
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "main navigation",
+      215,
+      1
+     ],
+     [
+      "docs",
+      -161,
+      50
+     ],
+     [
+      "playground",
+      -100,
+      96
+     ],
+     [
+      "ecosystem",
+      9,
+      86
+     ],
+     [
+      "about",
+      119,
+      55
+     ],
+     [
+      "support",
+      198,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      336
+     ],
+     [
+      "progressive",
+      62,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      336
+     ],
+     [
+      "why vue",
+      125,
+      150
+     ],
+     [
+      "get started",
+      70,
+      141
+     ],
+     [
+      "install",
+      229,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      49,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      352
+     ],
+     [
+      "versatile",
+      68,
+      264
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      264
+     ],
+     [
+      "user-friendly",
+      68,
+      264
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      264
+     ],
+     [
+      "efficient",
+      68,
+      264
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      264
+     ],
+     [
+      "platinum sponsors",
+      32,
+      336
+     ],
+     [
+      "become a sponsor",
+      32,
+      166
+     ],
+     [
+      "gold sponsors",
+      32,
+      336
+     ],
+     [
+      "become a sponsor",
+      202,
+      166
+     ],
+     [
+      "docs",
+      64,
+      312
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      312
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      312
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      312
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      312
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      312
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      312
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      312
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      352
+     ],
+     [
+      "mit license",
+      221,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      352
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 68,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 74,
+    "protruding": 3,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 66,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 4
+    },
+    "recreation": {
+     "inlineSiblingPairs": 88,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 26
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      48,
+      57
+     ],
+     [
+      "the javascript framework",
+      32,
+      386
+     ],
+     [
+      "progressive",
+      135,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      386
+     ],
+     [
+      "why vue",
+      150,
+      150
+     ],
+     [
+      "get started",
+      95,
+      141
+     ],
+     [
+      "install",
+      254,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      74,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      45,
+      359
+     ],
+     [
+      "versatile",
+      68,
+      314
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      314
+     ],
+     [
+      "user-friendly",
+      68,
+      314
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      314
+     ],
+     [
+      "efficient",
+      68,
+      314
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      314
+     ],
+     [
+      "platinum sponsors",
+      32,
+      386
+     ],
+     [
+      "become a sponsor",
+      32,
+      191
+     ],
+     [
+      "gold sponsors",
+      32,
+      386
+     ],
+     [
+      "become a sponsor",
+      292,
+      126
+     ],
+     [
+      "docs",
+      64,
+      322
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      322
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      322
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      322
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      322
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      322
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      322
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      322
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      402
+     ],
+     [
+      "mit license",
+      246,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      402
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "main navigation",
+      215,
+      1
+     ],
+     [
+      "docs",
+      -111,
+      50
+     ],
+     [
+      "playground",
+      -50,
+      96
+     ],
+     [
+      "ecosystem",
+      59,
+      86
+     ],
+     [
+      "about",
+      169,
+      55
+     ],
+     [
+      "support",
+      248,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      386
+     ],
+     [
+      "progressive",
+      135,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      386
+     ],
+     [
+      "why vue",
+      150,
+      150
+     ],
+     [
+      "get started",
+      95,
+      141
+     ],
+     [
+      "install",
+      254,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      74,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      402
+     ],
+     [
+      "versatile",
+      68,
+      314
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      314
+     ],
+     [
+      "user-friendly",
+      68,
+      314
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      314
+     ],
+     [
+      "efficient",
+      68,
+      314
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      314
+     ],
+     [
+      "platinum sponsors",
+      32,
+      386
+     ],
+     [
+      "become a sponsor",
+      32,
+      191
+     ],
+     [
+      "gold sponsors",
+      32,
+      386
+     ],
+     [
+      "become a sponsor",
+      292,
+      126
+     ],
+     [
+      "docs",
+      64,
+      312
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      312
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      312
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      312
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      312
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      312
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      312
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      312
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      402
+     ],
+     [
+      "mit license",
+      246,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      402
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 68,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 74,
+    "protruding": 3,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 66,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 4
+    },
+    "recreation": {
+     "inlineSiblingPairs": 88,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 26
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      48,
+      57
+     ],
+     [
+      "the javascript framework",
+      32,
+      416
+     ],
+     [
+      "progressive",
+      150,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      416
+     ],
+     [
+      "why vue",
+      165,
+      150
+     ],
+     [
+      "get started",
+      110,
+      141
+     ],
+     [
+      "install",
+      269,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      89,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      60,
+      359
+     ],
+     [
+      "versatile",
+      68,
+      344
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      344
+     ],
+     [
+      "user-friendly",
+      68,
+      344
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      344
+     ],
+     [
+      "efficient",
+      68,
+      344
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      344
+     ],
+     [
+      "platinum sponsors",
+      32,
+      416
+     ],
+     [
+      "become a sponsor",
+      32,
+      206
+     ],
+     [
+      "gold sponsors",
+      32,
+      416
+     ],
+     [
+      "become a sponsor",
+      312,
+      136
+     ],
+     [
+      "docs",
+      64,
+      352
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      352
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      352
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      352
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      352
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      352
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      352
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      352
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      432
+     ],
+     [
+      "mit license",
+      261,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      432
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "main navigation",
+      215,
+      1
+     ],
+     [
+      "docs",
+      -81,
+      50
+     ],
+     [
+      "playground",
+      -20,
+      96
+     ],
+     [
+      "ecosystem",
+      89,
+      86
+     ],
+     [
+      "about",
+      199,
+      55
+     ],
+     [
+      "support",
+      278,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      416
+     ],
+     [
+      "progressive",
+      150,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      416
+     ],
+     [
+      "why vue",
+      165,
+      150
+     ],
+     [
+      "get started",
+      110,
+      141
+     ],
+     [
+      "install",
+      269,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      89,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      432
+     ],
+     [
+      "versatile",
+      68,
+      344
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      344
+     ],
+     [
+      "user-friendly",
+      68,
+      344
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      344
+     ],
+     [
+      "efficient",
+      68,
+      344
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      344
+     ],
+     [
+      "platinum sponsors",
+      32,
+      416
+     ],
+     [
+      "become a sponsor",
+      32,
+      206
+     ],
+     [
+      "gold sponsors",
+      32,
+      416
+     ],
+     [
+      "become a sponsor",
+      312,
+      136
+     ],
+     [
+      "docs",
+      64,
+      312
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      312
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      312
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      312
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      312
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      312
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      312
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      312
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      432
+     ],
+     [
+      "mit license",
+      261,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      432
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 68,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 74,
+    "protruding": 3,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreationOnly": 2,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "docs ||| skip to content",
+    "docs ||| vue.js"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 68,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 4
+    },
+    "recreation": {
+     "inlineSiblingPairs": 90,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 26
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      48,
+      57
+     ],
+     [
+      "the javascript framework",
+      32,
+      536
+     ],
+     [
+      "progressive",
+      210,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      536
+     ],
+     [
+      "why vue",
+      94,
+      135
+     ],
+     [
+      "get started",
+      247,
+      141
+     ],
+     [
+      "install",
+      406,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      149,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      552
+     ],
+     [
+      "versatile",
+      68,
+      464
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      464
+     ],
+     [
+      "user-friendly",
+      68,
+      464
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      464
+     ],
+     [
+      "efficient",
+      68,
+      464
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      464
+     ],
+     [
+      "platinum sponsors",
+      32,
+      536
+     ],
+     [
+      "become a sponsor",
+      32,
+      266
+     ],
+     [
+      "gold sponsors",
+      32,
+      536
+     ],
+     [
+      "become a sponsor",
+      392,
+      176
+     ],
+     [
+      "docs",
+      64,
+      472
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      472
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      472
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      472
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      472
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      472
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      472
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      472
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      552
+     ],
+     [
+      "mit license",
+      321,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      552
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "main navigation",
+      215,
+      1
+     ],
+     [
+      "docs",
+      39,
+      50
+     ],
+     [
+      "playground",
+      100,
+      96
+     ],
+     [
+      "ecosystem",
+      209,
+      86
+     ],
+     [
+      "about",
+      319,
+      55
+     ],
+     [
+      "support",
+      398,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      536
+     ],
+     [
+      "progressive",
+      210,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      536
+     ],
+     [
+      "why vue",
+      94,
+      135
+     ],
+     [
+      "get started",
+      247,
+      141
+     ],
+     [
+      "install",
+      406,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      149,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      552
+     ],
+     [
+      "versatile",
+      68,
+      464
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      464
+     ],
+     [
+      "user-friendly",
+      68,
+      464
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      464
+     ],
+     [
+      "efficient",
+      68,
+      464
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      464
+     ],
+     [
+      "platinum sponsors",
+      32,
+      536
+     ],
+     [
+      "become a sponsor",
+      32,
+      266
+     ],
+     [
+      "gold sponsors",
+      32,
+      536
+     ],
+     [
+      "become a sponsor",
+      392,
+      176
+     ],
+     [
+      "docs",
+      64,
+      312
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      312
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      312
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      312
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      312
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      312
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      312
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      312
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      552
+     ],
+     [
+      "mit license",
+      321,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      552
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 68,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 74,
+    "protruding": 3,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreationOnly": 1,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "docs ||| vue.js"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 91,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 4
+    },
+    "recreation": {
+     "inlineSiblingPairs": 113,
+     "rowParents": 26,
+     "maxRowMembers": 36,
+     "navInlinePairs": 26
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      48,
+      57
+     ],
+     [
+      "the javascript framework",
+      32,
+      597
+     ],
+     [
+      "progressive",
+      241,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      597
+     ],
+     [
+      "why vue",
+      124,
+      135
+     ],
+     [
+      "get started",
+      277,
+      141
+     ],
+     [
+      "install",
+      436,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      179,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      613
+     ],
+     [
+      "versatile",
+      68,
+      525
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      525
+     ],
+     [
+      "user-friendly",
+      68,
+      525
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      525
+     ],
+     [
+      "efficient",
+      68,
+      525
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      525
+     ],
+     [
+      "platinum sponsors",
+      32,
+      597
+     ],
+     [
+      "become a sponsor",
+      232,
+      196
+     ],
+     [
+      "gold sponsors",
+      32,
+      597
+     ],
+     [
+      "become a sponsor",
+      483,
+      146
+     ],
+     [
+      "docs",
+      64,
+      533
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      533
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      533
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      533
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      533
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      533
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      533
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      533
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      613
+     ],
+     [
+      "mit license",
+      352,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      613
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "main navigation",
+      215,
+      1
+     ],
+     [
+      "docs",
+      100,
+      50
+     ],
+     [
+      "playground",
+      161,
+      96
+     ],
+     [
+      "ecosystem",
+      270,
+      86
+     ],
+     [
+      "about",
+      380,
+      55
+     ],
+     [
+      "support",
+      459,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      597
+     ],
+     [
+      "progressive",
+      241,
+      275
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      597
+     ],
+     [
+      "why vue",
+      124,
+      135
+     ],
+     [
+      "get started",
+      277,
+      141
+     ],
+     [
+      "install",
+      436,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      179,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      613
+     ],
+     [
+      "versatile",
+      68,
+      525
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      525
+     ],
+     [
+      "user-friendly",
+      68,
+      525
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      68,
+      525
+     ],
+     [
+      "efficient",
+      68,
+      525
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      68,
+      525
+     ],
+     [
+      "platinum sponsors",
+      32,
+      597
+     ],
+     [
+      "become a sponsor",
+      232,
+      196
+     ],
+     [
+      "gold sponsors",
+      32,
+      597
+     ],
+     [
+      "become a sponsor",
+      483,
+      146
+     ],
+     [
+      "docs",
+      64,
+      312
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      312
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      312
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      64,
+      312
+     ],
+     [
+      "themes",
+      64,
+      56
+     ],
+     [
+      "ui components",
+      64,
+      123
+     ],
+     [
+      "plugins collection",
+      64,
+      140
+     ],
+     [
+      "certification",
+      64,
+      101
+     ],
+     [
+      "jobs",
+      64,
+      49
+     ],
+     [
+      "t-shirt shop",
+      64,
+      103
+     ],
+     [
+      "official libraries",
+      64,
+      312
+     ],
+     [
+      "vue router",
+      64,
+      92
+     ],
+     [
+      "pinia",
+      64,
+      49
+     ],
+     [
+      "tooling guide",
+      64,
+      96
+     ],
+     [
+      "video courses",
+      64,
+      312
+     ],
+     [
+      "vue mastery",
+      64,
+      103
+     ],
+     [
+      "vue school",
+      64,
+      95
+     ],
+     [
+      "help",
+      64,
+      312
+     ],
+     [
+      "discord chat",
+      64,
+      106
+     ],
+     [
+      "github discussions",
+      64,
+      151
+     ],
+     [
+      "dev community",
+      64,
+      128
+     ],
+     [
+      "news",
+      64,
+      312
+     ],
+     [
+      "blog",
+      64,
+      46
+     ],
+     [
+      "twitter",
+      64,
+      63
+     ],
+     [
+      "events",
+      64,
+      62
+     ],
+     [
+      "newsletters",
+      64,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      613
+     ],
+     [
+      "mit license",
+      352,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      613
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 76,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 77,
+    "protruding": 6,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 72,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 128,
+     "rowParents": 33,
+     "maxRowMembers": 36,
+     "navInlinePairs": 33
+    },
+    "recreation": {
+     "inlineSiblingPairs": 151,
+     "rowParents": 31,
+     "maxRowMembers": 36,
+     "navInlinePairs": 39
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "ctrl",
+      169,
+      21
+     ],
+     [
+      "k",
+      191,
+      8
+     ],
+     [
+      "main navigation",
+      227,
+      1
+     ],
+     [
+      "docs",
+      239,
+      50
+     ],
+     [
+      "playground",
+      300,
+      96
+     ],
+     [
+      "ecosystem",
+      409,
+      86
+     ],
+     [
+      "about",
+      519,
+      55
+     ],
+     [
+      "support",
+      598,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      736
+     ],
+     [
+      "progressive",
+      280,
+      369
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      736
+     ],
+     [
+      "why vue",
+      43,
+      135
+     ],
+     [
+      "get started",
+      196,
+      141
+     ],
+     [
+      "install",
+      355,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      455,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      752
+     ],
+     [
+      "versatile",
+      68,
+      164
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      164
+     ],
+     [
+      "user-friendly",
+      318,
+      164
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      318,
+      164
+     ],
+     [
+      "efficient",
+      568,
+      164
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      568,
+      164
+     ],
+     [
+      "platinum sponsors",
+      32,
+      736
+     ],
+     [
+      "become a sponsor",
+      279,
+      243
+     ],
+     [
+      "gold sponsors",
+      32,
+      736
+     ],
+     [
+      "become a sponsor",
+      587,
+      181
+     ],
+     [
+      "docs",
+      64,
+      328
+     ],
+     [
+      "quick start",
+      64,
+      78
+     ],
+     [
+      "guide",
+      64,
+      41
+     ],
+     [
+      "tutorial",
+      64,
+      52
+     ],
+     [
+      "examples",
+      64,
+      67
+     ],
+     [
+      "api",
+      64,
+      24
+     ],
+     [
+      "glossary",
+      64,
+      61
+     ],
+     [
+      "error reference",
+      64,
+      110
+     ],
+     [
+      "vue 2 docs",
+      64,
+      95
+     ],
+     [
+      "migration from vue 2",
+      64,
+      162
+     ],
+     [
+      "about",
+      64,
+      328
+     ],
+     [
+      "faq",
+      64,
+      28
+     ],
+     [
+      "team",
+      64,
+      38
+     ],
+     [
+      "releases",
+      64,
+      63
+     ],
+     [
+      "community guide",
+      64,
+      125
+     ],
+     [
+      "code of conduct",
+      64,
+      119
+     ],
+     [
+      "privacy policy",
+      64,
+      98
+     ],
+     [
+      "the documentary",
+      64,
+      140
+     ],
+     [
+      "support",
+      64,
+      328
+     ],
+     [
+      "sponsor",
+      64,
+      58
+     ],
+     [
+      "partners",
+      64,
+      59
+     ],
+     [
+      "resources",
+      408,
+      328
+     ],
+     [
+      "themes",
+      408,
+      56
+     ],
+     [
+      "ui components",
+      408,
+      123
+     ],
+     [
+      "plugins collection",
+      408,
+      140
+     ],
+     [
+      "certification",
+      408,
+      101
+     ],
+     [
+      "jobs",
+      408,
+      49
+     ],
+     [
+      "t-shirt shop",
+      408,
+      103
+     ],
+     [
+      "official libraries",
+      408,
+      328
+     ],
+     [
+      "vue router",
+      408,
+      92
+     ],
+     [
+      "pinia",
+      408,
+      49
+     ],
+     [
+      "tooling guide",
+      408,
+      96
+     ],
+     [
+      "video courses",
+      408,
+      328
+     ],
+     [
+      "vue mastery",
+      408,
+      103
+     ],
+     [
+      "vue school",
+      408,
+      95
+     ],
+     [
+      "help",
+      408,
+      328
+     ],
+     [
+      "discord chat",
+      408,
+      106
+     ],
+     [
+      "github discussions",
+      408,
+      151
+     ],
+     [
+      "dev community",
+      408,
+      128
+     ],
+     [
+      "news",
+      408,
+      328
+     ],
+     [
+      "blog",
+      408,
+      46
+     ],
+     [
+      "twitter",
+      408,
+      63
+     ],
+     [
+      "events",
+      408,
+      62
+     ],
+     [
+      "newsletters",
+      408,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      752
+     ],
+     [
+      "mit license",
+      421,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      752
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "search",
+      162,
+      54
+     ],
+     [
+      "ctrl",
+      222,
+      21
+     ],
+     [
+      "k",
+      250,
+      8
+     ],
+     [
+      "main navigation",
+      733,
+      1
+     ],
+     [
+      "docs",
+      290,
+      50
+     ],
+     [
+      "playground",
+      352,
+      96
+     ],
+     [
+      "ecosystem",
+      460,
+      86
+     ],
+     [
+      "about",
+      570,
+      55
+     ],
+     [
+      "support",
+      649,
+      68
+     ],
+     [
+      "the javascript framework",
+      32,
+      736
+     ],
+     [
+      "progressive",
+      250,
+      428
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      32,
+      736
+     ],
+     [
+      "why vue",
+      43,
+      135
+     ],
+     [
+      "get started",
+      196,
+      141
+     ],
+     [
+      "install",
+      355,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      455,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      752
+     ],
+     [
+      "versatile",
+      68,
+      164
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      68,
+      164
+     ],
+     [
+      "user-friendly",
+      318,
+      164
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      318,
+      164
+     ],
+     [
+      "efficient",
+      568,
+      164
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      568,
+      164
+     ],
+     [
+      "platinum sponsors",
+      32,
+      736
+     ],
+     [
+      "become a sponsor",
+      279,
+      243
+     ],
+     [
+      "gold sponsors",
+      32,
+      736
+     ],
+     [
+      "become a sponsor",
+      32,
+      144
+     ],
+     [
+      "docs",
+      302,
+      196
+     ],
+     [
+      "quick start",
+      302,
+      78
+     ],
+     [
+      "guide",
+      302,
+      41
+     ],
+     [
+      "tutorial",
+      302,
+      52
+     ],
+     [
+      "examples",
+      302,
+      67
+     ],
+     [
+      "api",
+      302,
+      24
+     ],
+     [
+      "glossary",
+      302,
+      61
+     ],
+     [
+      "error reference",
+      302,
+      110
+     ],
+     [
+      "vue 2 docs",
+      302,
+      95
+     ],
+     [
+      "migration from vue 2",
+      302,
+      162
+     ],
+     [
+      "about",
+      302,
+      196
+     ],
+     [
+      "faq",
+      302,
+      28
+     ],
+     [
+      "team",
+      302,
+      38
+     ],
+     [
+      "releases",
+      302,
+      63
+     ],
+     [
+      "community guide",
+      302,
+      125
+     ],
+     [
+      "code of conduct",
+      302,
+      119
+     ],
+     [
+      "privacy policy",
+      302,
+      98
+     ],
+     [
+      "the documentary",
+      302,
+      140
+     ],
+     [
+      "support",
+      302,
+      196
+     ],
+     [
+      "sponsor",
+      302,
+      58
+     ],
+     [
+      "partners",
+      302,
+      59
+     ],
+     [
+      "resources",
+      302,
+      196
+     ],
+     [
+      "themes",
+      302,
+      56
+     ],
+     [
+      "ui components",
+      302,
+      123
+     ],
+     [
+      "plugins collection",
+      302,
+      140
+     ],
+     [
+      "certification",
+      302,
+      101
+     ],
+     [
+      "jobs",
+      302,
+      49
+     ],
+     [
+      "t-shirt shop",
+      302,
+      103
+     ],
+     [
+      "official libraries",
+      302,
+      196
+     ],
+     [
+      "vue router",
+      302,
+      92
+     ],
+     [
+      "pinia",
+      302,
+      49
+     ],
+     [
+      "tooling guide",
+      302,
+      96
+     ],
+     [
+      "video courses",
+      302,
+      196
+     ],
+     [
+      "vue mastery",
+      302,
+      103
+     ],
+     [
+      "vue school",
+      302,
+      95
+     ],
+     [
+      "help",
+      302,
+      196
+     ],
+     [
+      "discord chat",
+      302,
+      106
+     ],
+     [
+      "github discussions",
+      302,
+      151
+     ],
+     [
+      "dev community",
+      302,
+      128
+     ],
+     [
+      "news",
+      302,
+      196
+     ],
+     [
+      "blog",
+      302,
+      46
+     ],
+     [
+      "twitter",
+      302,
+      63
+     ],
+     [
+      "events",
+      302,
+      62
+     ],
+     [
+      "newsletters",
+      302,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      752
+     ],
+     [
+      "mit license",
+      421,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      752
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 77,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 77,
+    "protruding": 6,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 73,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 139,
+     "rowParents": 34,
+     "maxRowMembers": 36,
+     "navInlinePairs": 34
+    },
+    "recreation": {
+     "inlineSiblingPairs": 171,
+     "rowParents": 31,
+     "maxRowMembers": 36,
+     "navInlinePairs": 39
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "search",
+      162,
+      54
+     ],
+     [
+      "ctrl",
+      222,
+      21
+     ],
+     [
+      "k",
+      245,
+      8
+     ],
+     [
+      "main navigation",
+      503,
+      1
+     ],
+     [
+      "docs",
+      515,
+      50
+     ],
+     [
+      "playground",
+      576,
+      96
+     ],
+     [
+      "ecosystem",
+      685,
+      86
+     ],
+     [
+      "about",
+      795,
+      55
+     ],
+     [
+      "support",
+      874,
+      68
+     ],
+     [
+      "the javascript framework",
+      58,
+      960
+     ],
+     [
+      "progressive",
+      399,
+      428
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      58,
+      960
+     ],
+     [
+      "why vue",
+      181,
+      135
+     ],
+     [
+      "get started",
+      334,
+      141
+     ],
+     [
+      "install",
+      493,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      593,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      1028
+     ],
+     [
+      "versatile",
+      126,
+      215
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      126,
+      215
+     ],
+     [
+      "user-friendly",
+      431,
+      215
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      431,
+      215
+     ],
+     [
+      "efficient",
+      735,
+      215
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      735,
+      215
+     ],
+     [
+      "platinum sponsors",
+      120,
+      836
+     ],
+     [
+      "become a sponsor",
+      400,
+      276
+     ],
+     [
+      "gold sponsors",
+      120,
+      836
+     ],
+     [
+      "become a sponsor",
+      750,
+      206
+     ],
+     [
+      "docs",
+      120,
+      268
+     ],
+     [
+      "quick start",
+      120,
+      78
+     ],
+     [
+      "guide",
+      120,
+      41
+     ],
+     [
+      "tutorial",
+      120,
+      52
+     ],
+     [
+      "examples",
+      120,
+      67
+     ],
+     [
+      "api",
+      120,
+      24
+     ],
+     [
+      "glossary",
+      120,
+      61
+     ],
+     [
+      "error reference",
+      120,
+      110
+     ],
+     [
+      "vue 2 docs",
+      120,
+      95
+     ],
+     [
+      "migration from vue 2",
+      120,
+      162
+     ],
+     [
+      "about",
+      120,
+      268
+     ],
+     [
+      "faq",
+      120,
+      28
+     ],
+     [
+      "team",
+      120,
+      38
+     ],
+     [
+      "releases",
+      120,
+      63
+     ],
+     [
+      "community guide",
+      120,
+      125
+     ],
+     [
+      "code of conduct",
+      120,
+      119
+     ],
+     [
+      "privacy policy",
+      120,
+      98
+     ],
+     [
+      "the documentary",
+      120,
+      140
+     ],
+     [
+      "support",
+      404,
+      268
+     ],
+     [
+      "sponsor",
+      404,
+      58
+     ],
+     [
+      "partners",
+      404,
+      59
+     ],
+     [
+      "resources",
+      404,
+      268
+     ],
+     [
+      "themes",
+      404,
+      56
+     ],
+     [
+      "ui components",
+      404,
+      123
+     ],
+     [
+      "plugins collection",
+      404,
+      140
+     ],
+     [
+      "certification",
+      404,
+      101
+     ],
+     [
+      "jobs",
+      404,
+      49
+     ],
+     [
+      "t-shirt shop",
+      404,
+      103
+     ],
+     [
+      "official libraries",
+      404,
+      268
+     ],
+     [
+      "vue router",
+      404,
+      92
+     ],
+     [
+      "pinia",
+      404,
+      49
+     ],
+     [
+      "tooling guide",
+      404,
+      96
+     ],
+     [
+      "video courses",
+      688,
+      268
+     ],
+     [
+      "vue mastery",
+      688,
+      103
+     ],
+     [
+      "vue school",
+      688,
+      95
+     ],
+     [
+      "help",
+      688,
+      268
+     ],
+     [
+      "discord chat",
+      688,
+      106
+     ],
+     [
+      "github discussions",
+      688,
+      151
+     ],
+     [
+      "dev community",
+      688,
+      128
+     ],
+     [
+      "news",
+      688,
+      268
+     ],
+     [
+      "blog",
+      688,
+      46
+     ],
+     [
+      "twitter",
+      688,
+      63
+     ],
+     [
+      "events",
+      688,
+      62
+     ],
+     [
+      "newsletters",
+      688,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      1028
+     ],
+     [
+      "mit license",
+      559,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      1028
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "search",
+      162,
+      54
+     ],
+     [
+      "ctrl",
+      222,
+      21
+     ],
+     [
+      "k",
+      250,
+      8
+     ],
+     [
+      "main navigation",
+      733,
+      1
+     ],
+     [
+      "docs",
+      357,
+      50
+     ],
+     [
+      "playground",
+      418,
+      96
+     ],
+     [
+      "ecosystem",
+      527,
+      86
+     ],
+     [
+      "about",
+      637,
+      55
+     ],
+     [
+      "support",
+      716,
+      68
+     ],
+     [
+      "the javascript framework",
+      58,
+      960
+     ],
+     [
+      "progressive",
+      399,
+      428
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      58,
+      960
+     ],
+     [
+      "why vue",
+      181,
+      135
+     ],
+     [
+      "get started",
+      334,
+      141
+     ],
+     [
+      "install",
+      493,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      593,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      1028
+     ],
+     [
+      "versatile",
+      126,
+      215
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      126,
+      215
+     ],
+     [
+      "user-friendly",
+      431,
+      215
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      431,
+      215
+     ],
+     [
+      "efficient",
+      735,
+      215
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      735,
+      215
+     ],
+     [
+      "platinum sponsors",
+      120,
+      836
+     ],
+     [
+      "become a sponsor",
+      400,
+      276
+     ],
+     [
+      "gold sponsors",
+      120,
+      836
+     ],
+     [
+      "become a sponsor",
+      820,
+      136
+     ],
+     [
+      "docs",
+      302,
+      472
+     ],
+     [
+      "quick start",
+      302,
+      78
+     ],
+     [
+      "guide",
+      302,
+      41
+     ],
+     [
+      "tutorial",
+      302,
+      52
+     ],
+     [
+      "examples",
+      302,
+      67
+     ],
+     [
+      "api",
+      302,
+      24
+     ],
+     [
+      "glossary",
+      302,
+      61
+     ],
+     [
+      "error reference",
+      302,
+      110
+     ],
+     [
+      "vue 2 docs",
+      302,
+      95
+     ],
+     [
+      "migration from vue 2",
+      302,
+      162
+     ],
+     [
+      "about",
+      302,
+      472
+     ],
+     [
+      "faq",
+      302,
+      28
+     ],
+     [
+      "team",
+      302,
+      38
+     ],
+     [
+      "releases",
+      302,
+      63
+     ],
+     [
+      "community guide",
+      302,
+      125
+     ],
+     [
+      "code of conduct",
+      302,
+      119
+     ],
+     [
+      "privacy policy",
+      302,
+      98
+     ],
+     [
+      "the documentary",
+      302,
+      140
+     ],
+     [
+      "support",
+      302,
+      472
+     ],
+     [
+      "sponsor",
+      302,
+      58
+     ],
+     [
+      "partners",
+      302,
+      59
+     ],
+     [
+      "resources",
+      302,
+      472
+     ],
+     [
+      "themes",
+      302,
+      56
+     ],
+     [
+      "ui components",
+      302,
+      123
+     ],
+     [
+      "plugins collection",
+      302,
+      140
+     ],
+     [
+      "certification",
+      302,
+      101
+     ],
+     [
+      "jobs",
+      302,
+      49
+     ],
+     [
+      "t-shirt shop",
+      302,
+      103
+     ],
+     [
+      "official libraries",
+      302,
+      472
+     ],
+     [
+      "vue router",
+      302,
+      92
+     ],
+     [
+      "pinia",
+      302,
+      49
+     ],
+     [
+      "tooling guide",
+      302,
+      96
+     ],
+     [
+      "video courses",
+      302,
+      472
+     ],
+     [
+      "vue mastery",
+      302,
+      103
+     ],
+     [
+      "vue school",
+      302,
+      95
+     ],
+     [
+      "help",
+      302,
+      472
+     ],
+     [
+      "discord chat",
+      302,
+      106
+     ],
+     [
+      "github discussions",
+      302,
+      151
+     ],
+     [
+      "dev community",
+      302,
+      128
+     ],
+     [
+      "news",
+      302,
+      472
+     ],
+     [
+      "blog",
+      302,
+      46
+     ],
+     [
+      "twitter",
+      302,
+      63
+     ],
+     [
+      "events",
+      302,
+      62
+     ],
+     [
+      "newsletters",
+      302,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      1028
+     ],
+     [
+      "mit license",
+      559,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      1028
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 80,
+    "protruding": 2,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 80,
+    "protruding": 2,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 75,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 150,
+     "rowParents": 38,
+     "maxRowMembers": 36,
+     "navInlinePairs": 45
+    },
+    "recreation": {
+     "inlineSiblingPairs": 170,
+     "rowParents": 34,
+     "maxRowMembers": 36,
+     "navInlinePairs": 38
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "search",
+      162,
+      54
+     ],
+     [
+      "ctrl",
+      222,
+      21
+     ],
+     [
+      "k",
+      245,
+      8
+     ],
+     [
+      "main navigation",
+      733,
+      1
+     ],
+     [
+      "docs",
+      745,
+      50
+     ],
+     [
+      "playground",
+      806,
+      96
+     ],
+     [
+      "ecosystem",
+      915,
+      86
+     ],
+     [
+      "about",
+      1025,
+      55
+     ],
+     [
+      "support",
+      1104,
+      68
+     ],
+     [
+      "github",
+      1328,
+      1
+     ],
+     [
+      "twitter",
+      1364,
+      1
+     ],
+     [
+      "discord",
+      1400,
+      1
+     ],
+     [
+      "the javascript framework",
+      240,
+      960
+     ],
+     [
+      "progressive",
+      581,
+      428
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      240,
+      960
+     ],
+     [
+      "why vue",
+      363,
+      135
+     ],
+     [
+      "get started",
+      516,
+      141
+     ],
+     [
+      "install",
+      675,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      775,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      1392
+     ],
+     [
+      "versatile",
+      308,
+      215
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      308,
+      215
+     ],
+     [
+      "user-friendly",
+      613,
+      215
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      613,
+      215
+     ],
+     [
+      "efficient",
+      917,
+      215
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      917,
+      215
+     ],
+     [
+      "platinum sponsors",
+      302,
+      836
+     ],
+     [
+      "become a sponsor",
+      582,
+      276
+     ],
+     [
+      "gold sponsors",
+      302,
+      836
+     ],
+     [
+      "become a sponsor",
+      932,
+      206
+     ],
+     [
+      "docs",
+      302,
+      268
+     ],
+     [
+      "quick start",
+      302,
+      78
+     ],
+     [
+      "guide",
+      302,
+      41
+     ],
+     [
+      "tutorial",
+      302,
+      52
+     ],
+     [
+      "examples",
+      302,
+      67
+     ],
+     [
+      "api",
+      302,
+      24
+     ],
+     [
+      "glossary",
+      302,
+      61
+     ],
+     [
+      "error reference",
+      302,
+      110
+     ],
+     [
+      "vue 2 docs",
+      302,
+      95
+     ],
+     [
+      "migration from vue 2",
+      302,
+      162
+     ],
+     [
+      "about",
+      302,
+      268
+     ],
+     [
+      "faq",
+      302,
+      28
+     ],
+     [
+      "team",
+      302,
+      38
+     ],
+     [
+      "releases",
+      302,
+      63
+     ],
+     [
+      "community guide",
+      302,
+      125
+     ],
+     [
+      "code of conduct",
+      302,
+      119
+     ],
+     [
+      "privacy policy",
+      302,
+      98
+     ],
+     [
+      "the documentary",
+      302,
+      140
+     ],
+     [
+      "support",
+      586,
+      268
+     ],
+     [
+      "sponsor",
+      586,
+      58
+     ],
+     [
+      "partners",
+      586,
+      59
+     ],
+     [
+      "resources",
+      586,
+      268
+     ],
+     [
+      "themes",
+      586,
+      56
+     ],
+     [
+      "ui components",
+      586,
+      123
+     ],
+     [
+      "plugins collection",
+      586,
+      140
+     ],
+     [
+      "certification",
+      586,
+      101
+     ],
+     [
+      "jobs",
+      586,
+      49
+     ],
+     [
+      "t-shirt shop",
+      586,
+      103
+     ],
+     [
+      "official libraries",
+      586,
+      268
+     ],
+     [
+      "vue router",
+      586,
+      92
+     ],
+     [
+      "pinia",
+      586,
+      49
+     ],
+     [
+      "tooling guide",
+      586,
+      96
+     ],
+     [
+      "video courses",
+      870,
+      268
+     ],
+     [
+      "vue mastery",
+      870,
+      103
+     ],
+     [
+      "vue school",
+      870,
+      95
+     ],
+     [
+      "help",
+      870,
+      268
+     ],
+     [
+      "discord chat",
+      870,
+      106
+     ],
+     [
+      "github discussions",
+      870,
+      151
+     ],
+     [
+      "dev community",
+      870,
+      128
+     ],
+     [
+      "news",
+      870,
+      268
+     ],
+     [
+      "blog",
+      870,
+      46
+     ],
+     [
+      "twitter",
+      870,
+      63
+     ],
+     [
+      "events",
+      870,
+      62
+     ],
+     [
+      "newsletters",
+      870,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      1392
+     ],
+     [
+      "mit license",
+      741,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      1392
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      4,
+      48
+     ],
+     [
+      "vue.js",
+      56,
+      57
+     ],
+     [
+      "search",
+      162,
+      54
+     ],
+     [
+      "ctrl",
+      222,
+      21
+     ],
+     [
+      "k",
+      250,
+      8
+     ],
+     [
+      "main navigation",
+      733,
+      1
+     ],
+     [
+      "docs",
+      745,
+      50
+     ],
+     [
+      "playground",
+      806,
+      96
+     ],
+     [
+      "ecosystem",
+      915,
+      86
+     ],
+     [
+      "about",
+      1025,
+      55
+     ],
+     [
+      "support",
+      1104,
+      68
+     ],
+     [
+      "github",
+      1328,
+      1
+     ],
+     [
+      "twitter",
+      1364,
+      1
+     ],
+     [
+      "discord",
+      1400,
+      1
+     ],
+     [
+      "the javascript framework",
+      240,
+      960
+     ],
+     [
+      "progressive",
+      581,
+      428
+     ],
+     [
+      "an approachable, performant and versatile framework for building web user interfaces.",
+      240,
+      960
+     ],
+     [
+      "why vue",
+      363,
+      135
+     ],
+     [
+      "get started",
+      516,
+      141
+     ],
+     [
+      "install",
+      675,
+      82
+     ],
+     [
+      "get security updates for vue 2",
+      775,
+      302
+     ],
+     [
+      "special sponsor slot is now vacant - inquire now",
+      24,
+      1392
+     ],
+     [
+      "versatile",
+      308,
+      215
+     ],
+     [
+      "a rich, incrementally adoptable ecosystem that scales between a library and a full-featured framework.",
+      308,
+      215
+     ],
+     [
+      "user-friendly",
+      613,
+      215
+     ],
+     [
+      "builds on top of standard html, css and javascript with intuitive api and world-class documentation.",
+      613,
+      215
+     ],
+     [
+      "efficient",
+      917,
+      215
+     ],
+     [
+      "truly reactive, compiler-optimized rendering system that rarely requires manual optimization.",
+      917,
+      215
+     ],
+     [
+      "platinum sponsors",
+      302,
+      836
+     ],
+     [
+      "become a sponsor",
+      582,
+      276
+     ],
+     [
+      "gold sponsors",
+      302,
+      836
+     ],
+     [
+      "become a sponsor",
+      1002,
+      136
+     ],
+     [
+      "docs",
+      302,
+      836
+     ],
+     [
+      "quick start",
+      302,
+      78
+     ],
+     [
+      "guide",
+      302,
+      41
+     ],
+     [
+      "tutorial",
+      302,
+      52
+     ],
+     [
+      "examples",
+      302,
+      67
+     ],
+     [
+      "api",
+      302,
+      24
+     ],
+     [
+      "glossary",
+      302,
+      61
+     ],
+     [
+      "error reference",
+      302,
+      110
+     ],
+     [
+      "vue 2 docs",
+      302,
+      95
+     ],
+     [
+      "migration from vue 2",
+      302,
+      162
+     ],
+     [
+      "about",
+      302,
+      836
+     ],
+     [
+      "faq",
+      302,
+      28
+     ],
+     [
+      "team",
+      302,
+      38
+     ],
+     [
+      "releases",
+      302,
+      63
+     ],
+     [
+      "community guide",
+      302,
+      125
+     ],
+     [
+      "code of conduct",
+      302,
+      119
+     ],
+     [
+      "privacy policy",
+      302,
+      98
+     ],
+     [
+      "the documentary",
+      302,
+      140
+     ],
+     [
+      "support",
+      302,
+      836
+     ],
+     [
+      "sponsor",
+      302,
+      58
+     ],
+     [
+      "partners",
+      302,
+      59
+     ],
+     [
+      "resources",
+      302,
+      836
+     ],
+     [
+      "themes",
+      302,
+      56
+     ],
+     [
+      "ui components",
+      302,
+      123
+     ],
+     [
+      "plugins collection",
+      302,
+      140
+     ],
+     [
+      "certification",
+      302,
+      101
+     ],
+     [
+      "jobs",
+      302,
+      49
+     ],
+     [
+      "t-shirt shop",
+      302,
+      103
+     ],
+     [
+      "official libraries",
+      302,
+      836
+     ],
+     [
+      "vue router",
+      302,
+      92
+     ],
+     [
+      "pinia",
+      302,
+      49
+     ],
+     [
+      "tooling guide",
+      302,
+      96
+     ],
+     [
+      "video courses",
+      302,
+      836
+     ],
+     [
+      "vue mastery",
+      302,
+      103
+     ],
+     [
+      "vue school",
+      302,
+      95
+     ],
+     [
+      "help",
+      302,
+      836
+     ],
+     [
+      "discord chat",
+      302,
+      106
+     ],
+     [
+      "github discussions",
+      302,
+      151
+     ],
+     [
+      "dev community",
+      302,
+      128
+     ],
+     [
+      "news",
+      302,
+      836
+     ],
+     [
+      "blog",
+      302,
+      46
+     ],
+     [
+      "twitter",
+      302,
+      63
+     ],
+     [
+      "events",
+      302,
+      62
+     ],
+     [
+      "newsletters",
+      302,
+      83
+     ],
+     [
+      "released under the .",
+      24,
+      1392
+     ],
+     [
+      "mit license",
+      741,
+      72
+     ],
+     [
+      "copyright © 2014-2026 evan you",
+      24,
+      1392
+     ],
+     [
+      "vue.js - the progressive javascript framework has loaded",
+      0,
+      1
+     ]
+    ]
+   }
+  }
+ }
+}

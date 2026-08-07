@@ -1,0 +1,321 @@
+{
+ "site": {
+  "key": "gnu",
+  "recreationUrl": "http://127.0.0.1:8848/",
+  "sourceUrl": "https://www.gnu.org/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 0,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 0,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [],
+    "recreation": []
+   }
+  }
+ }
+}

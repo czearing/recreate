@@ -1,0 +1,7501 @@
+{
+ "site": {
+  "key": "sourcehut",
+  "recreationUrl": "http://127.0.0.1:8850/",
+  "sourceUrl": "https://sourcehut.org/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 4,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 6,
+    "candidates": 89,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 400
+   },
+   "recreationOnly": 2,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "logo & media resources ||| source code",
+    "(agpl, bsd et al) ||| source code"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 14,
+     "rowParents": 5,
+     "maxRowMembers": 5,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 15,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      32,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      400
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      368
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      328
+     ],
+     [
+      "all features work without javascript",
+      56,
+      328
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      328
+     ],
+     [
+      "many features work without an account",
+      56,
+      328
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      368
+     ],
+     [
+      "what should i expect?",
+      16,
+      158
+     ],
+     [
+      "or",
+      16,
+      368
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      400
+     ],
+     [
+      "browse projects",
+      246,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      368
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      328
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      328
+     ],
+     [
+      "first-class  also available",
+      56,
+      328
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      368
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      368
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      328
+     ],
+     [
+      "various linux distros and bsds",
+      56,
+      314
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      328
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      328
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      328
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      368
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      368
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      328
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      328
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      328
+     ],
+     [
+      "powered by",
+      56,
+      328
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      368
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      368
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      328
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      328
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      328
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      368
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      328
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      328
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      328
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      368
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      368
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      328
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      328
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      328
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      328
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      368
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      328
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      328
+     ],
+     [
+      "hosts the detailed",
+      56,
+      328
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      368
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      328
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      328
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      328
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      328
+     ],
+     [
+      "and more!",
+      16,
+      368
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      328
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      328
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      368
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      328
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      328
+     ],
+     [
+      "all features work without javascript",
+      56,
+      328
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      328
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      368
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      20,
+      131
+     ],
+     [
+      "privacy policy",
+      183,
+      100
+     ],
+     [
+      "terms of use",
+      16,
+      364
+     ],
+     [
+      "logo & media resources",
+      81,
+      173
+     ],
+     [
+      "source code",
+      291,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      146,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      0,
+      400
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      0,
+      400
+     ],
+     [
+      "sr.ht-support",
+      164,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      93
+     ],
+     [
+      "blog",
+      32,
+      30
+     ],
+     [
+      "pricing",
+      78,
+      47
+     ],
+     [
+      "community",
+      141,
+      77
+     ],
+     [
+      "merchandise",
+      235,
+      92
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      368
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      328
+     ],
+     [
+      "all features work without javascript",
+      56,
+      328
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      328
+     ],
+     [
+      "many features work without an account",
+      56,
+      328
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      368
+     ],
+     [
+      "what should i expect?",
+      16,
+      158
+     ],
+     [
+      "or",
+      16,
+      368
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      614,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      368
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      328
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      328
+     ],
+     [
+      "all features work without javascript",
+      56,
+      328
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      328
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      368
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      22,
+      131
+     ],
+     [
+      "privacy policy",
+      185,
+      100
+     ],
+     [
+      "terms of use",
+      42,
+      336
+     ],
+     [
+      "logo & media resources",
+      102,
+      173
+     ],
+     [
+      "source code",
+      127,
+      232
+     ],
+     [
+      "(agpl, bsd et al)",
+      165,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      440
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      440
+     ],
+     [
+      "sr.ht-support",
+      164,
+      71
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 7,
+    "candidates": 89,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 450
+   },
+   "recreationOnly": 7,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "terms of use ||| © 2026 sourcehut",
+    "privacy policy ||| terms of use",
+    "logo & media resources ||| terms of use",
+    "source code ||| terms of use",
+    "(agpl, bsd et al) ||| terms of use",
+    "(agpl, bsd et al) ||| logo & media resources",
+    "(agpl, bsd et al) ||| source code"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 14,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 19,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      32,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      450
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      418
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      378
+     ],
+     [
+      "all features work without javascript",
+      56,
+      378
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      378
+     ],
+     [
+      "many features work without an account",
+      56,
+      378
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      418
+     ],
+     [
+      "what should i expect?",
+      16,
+      393
+     ],
+     [
+      "or",
+      16,
+      418
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      450
+     ],
+     [
+      "browse projects",
+      296,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      418
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      378
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      378
+     ],
+     [
+      "first-class  also available",
+      56,
+      378
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      418
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      418
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      378
+     ],
+     [
+      "various linux distros and bsds",
+      56,
+      366
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      378
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      378
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      378
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      418
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      418
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      378
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      378
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      378
+     ],
+     [
+      "powered by",
+      56,
+      378
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      418
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      418
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      378
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      378
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      378
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      418
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      378
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      378
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      378
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      418
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      418
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      378
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      378
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      378
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      378
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      418
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      378
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      378
+     ],
+     [
+      "hosts the detailed",
+      56,
+      378
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      418
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      378
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      378
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      378
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      378
+     ],
+     [
+      "and more!",
+      16,
+      418
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      378
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      378
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      418
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      378
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      378
+     ],
+     [
+      "all features work without javascript",
+      56,
+      378
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      378
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      418
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      13,
+      131
+     ],
+     [
+      "privacy policy",
+      176,
+      100
+     ],
+     [
+      "terms of use",
+      311,
+      94
+     ],
+     [
+      "logo & media resources",
+      17,
+      173
+     ],
+     [
+      "source code",
+      227,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      325,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      0,
+      450
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      0,
+      450
+     ],
+     [
+      "sr.ht-support",
+      189,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      99
+     ],
+     [
+      "blog",
+      139,
+      30
+     ],
+     [
+      "pricing",
+      185,
+      47
+     ],
+     [
+      "community",
+      248,
+      77
+     ],
+     [
+      "merchandise",
+      342,
+      92
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      418
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      378
+     ],
+     [
+      "all features work without javascript",
+      56,
+      378
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      378
+     ],
+     [
+      "many features work without an account",
+      56,
+      378
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      418
+     ],
+     [
+      "what should i expect?",
+      16,
+      393
+     ],
+     [
+      "or",
+      16,
+      418
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      614,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      418
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      378
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      378
+     ],
+     [
+      "all features work without javascript",
+      56,
+      378
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      378
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      418
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      47,
+      131
+     ],
+     [
+      "privacy policy",
+      210,
+      100
+     ],
+     [
+      "terms of use",
+      1,
+      402
+     ],
+     [
+      "logo & media resources",
+      61,
+      173
+     ],
+     [
+      "source code",
+      266,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      218,
+      232
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      490
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      490
+     ],
+     [
+      "sr.ht-support",
+      189,
+      71
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 5,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 5,
+    "candidates": 89,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 21,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    },
+    "recreation": {
+     "inlineSiblingPairs": 21,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      366,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      480
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      448
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      408
+     ],
+     [
+      "all features work without javascript",
+      56,
+      408
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      408
+     ],
+     [
+      "many features work without an account",
+      56,
+      408
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      448
+     ],
+     [
+      "what should i expect?",
+      16,
+      445
+     ],
+     [
+      "or",
+      16,
+      448
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      480
+     ],
+     [
+      "browse projects",
+      326,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      448
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      408
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      408
+     ],
+     [
+      "first-class  also available",
+      56,
+      408
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      448
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      448
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      408
+     ],
+     [
+      "various linux distros and bsds",
+      56,
+      397
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      408
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      408
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      408
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      448
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      448
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      408
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      408
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      408
+     ],
+     [
+      "powered by",
+      56,
+      408
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      448
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      448
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      408
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      408
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      408
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      448
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      408
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      408
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      408
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      448
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      448
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      408
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      408
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      408
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      408
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      448
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      408
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      408
+     ],
+     [
+      "hosts the detailed",
+      56,
+      408
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      448
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      408
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      408
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      408
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      408
+     ],
+     [
+      "and more!",
+      16,
+      448
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      408
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      408
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      448
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      408
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      408
+     ],
+     [
+      "all features work without javascript",
+      56,
+      408
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      408
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      448
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      7,
+      131
+     ],
+     [
+      "privacy policy",
+      170,
+      100
+     ],
+     [
+      "terms of use",
+      306,
+      94
+     ],
+     [
+      "logo & media resources",
+      52,
+      420
+     ],
+     [
+      "source code",
+      222,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      320,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      0,
+      480
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      0,
+      480
+     ],
+     [
+      "sr.ht-support",
+      204,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      99
+     ],
+     [
+      "blog",
+      139,
+      30
+     ],
+     [
+      "pricing",
+      185,
+      47
+     ],
+     [
+      "community",
+      248,
+      77
+     ],
+     [
+      "merchandise",
+      342,
+      92
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      448
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      408
+     ],
+     [
+      "all features work without javascript",
+      56,
+      408
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      408
+     ],
+     [
+      "many features work without an account",
+      56,
+      408
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      448
+     ],
+     [
+      "what should i expect?",
+      16,
+      445
+     ],
+     [
+      "or",
+      16,
+      448
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      614,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      448
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      408
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      408
+     ],
+     [
+      "all features work without javascript",
+      56,
+      408
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      408
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      448
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      4,
+      131
+     ],
+     [
+      "privacy policy",
+      167,
+      100
+     ],
+     [
+      "terms of use",
+      299,
+      94
+     ],
+     [
+      "logo & media resources",
+      64,
+      412
+     ],
+     [
+      "source code",
+      214,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      308,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      520
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      520
+     ],
+     [
+      "sr.ht-support",
+      204,
+      71
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 5,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 5,
+    "candidates": 89,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 21,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    },
+    "recreation": {
+     "inlineSiblingPairs": 21,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      366,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      600
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      568
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      528
+     ],
+     [
+      "all features work without javascript",
+      56,
+      528
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      528
+     ],
+     [
+      "many features work without an account",
+      56,
+      528
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      568
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      568
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      600
+     ],
+     [
+      "browse projects",
+      446,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      568
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      528
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      528
+     ],
+     [
+      "first-class  also available",
+      56,
+      528
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      568
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      568
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      528
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      528
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      528
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      528
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      568
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      568
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      528
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      528
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      528
+     ],
+     [
+      "powered by",
+      56,
+      528
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      568
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      568
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      528
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      528
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      528
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      568
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      528
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      528
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      528
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      568
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      568
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      528
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      528
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      528
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      528
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      568
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      528
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      528
+     ],
+     [
+      "hosts the detailed",
+      56,
+      528
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      568
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      528
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      528
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      528
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      528
+     ],
+     [
+      "and more!",
+      16,
+      568
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      528
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      528
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      568
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      528
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      528
+     ],
+     [
+      "all features work without javascript",
+      56,
+      528
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      528
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      568
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      36,
+      131
+     ],
+     [
+      "privacy policy",
+      199,
+      100
+     ],
+     [
+      "terms of use",
+      335,
+      94
+     ],
+     [
+      "logo & media resources",
+      144,
+      420
+     ],
+     [
+      "source code",
+      250,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      348,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      0,
+      600
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      0,
+      600
+     ],
+     [
+      "sr.ht-support",
+      264,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      99
+     ],
+     [
+      "blog",
+      139,
+      30
+     ],
+     [
+      "pricing",
+      185,
+      47
+     ],
+     [
+      "community",
+      248,
+      77
+     ],
+     [
+      "merchandise",
+      342,
+      92
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      568
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      528
+     ],
+     [
+      "all features work without javascript",
+      56,
+      528
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      528
+     ],
+     [
+      "many features work without an account",
+      56,
+      528
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      568
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      568
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      614,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      568
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      528
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      528
+     ],
+     [
+      "all features work without javascript",
+      56,
+      528
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      528
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      568
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      40,
+      131
+     ],
+     [
+      "privacy policy",
+      203,
+      100
+     ],
+     [
+      "terms of use",
+      335,
+      94
+     ],
+     [
+      "logo & media resources",
+      148,
+      412
+     ],
+     [
+      "source code",
+      250,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      344,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      640
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      640
+     ],
+     [
+      "sr.ht-support",
+      264,
+      71
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 5,
+    "candidates": 89,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 661
+   },
+   "recreationOnly": 5,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "logo & media resources ||| © 2026 sourcehut",
+    "logo & media resources ||| privacy policy",
+    "logo & media resources ||| terms of use",
+    "logo & media resources ||| source code",
+    "(agpl, bsd et al) ||| logo & media resources"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 20,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    },
+    "recreation": {
+     "inlineSiblingPairs": 21,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      366,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      661
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      589
+     ],
+     [
+      "all features work without javascript",
+      56,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      589
+     ],
+     [
+      "many features work without an account",
+      56,
+      589
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      629
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      629
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      661
+     ],
+     [
+      "browse projects",
+      507,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      629
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      589
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      589
+     ],
+     [
+      "first-class  also available",
+      56,
+      589
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      629
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      629
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      589
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      589
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      589
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      589
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      629
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      629
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      589
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      589
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      589
+     ],
+     [
+      "powered by",
+      56,
+      589
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      629
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      629
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      589
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      589
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      589
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      629
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      589
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      589
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      589
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      629
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      629
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      589
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      589
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      589
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      589
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      629
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      589
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      589
+     ],
+     [
+      "hosts the detailed",
+      56,
+      589
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      629
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      589
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      589
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      589
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      589
+     ],
+     [
+      "and more!",
+      16,
+      629
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      589
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      589
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      589
+     ],
+     [
+      "all features work without javascript",
+      56,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      589
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      629
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      13,
+      131
+     ],
+     [
+      "privacy policy",
+      176,
+      100
+     ],
+     [
+      "terms of use",
+      312,
+      94
+     ],
+     [
+      "logo & media resources",
+      442,
+      173
+     ],
+     [
+      "source code",
+      227,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      325,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      15,
+      632
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      15,
+      632
+     ],
+     [
+      "sr.ht-support",
+      295,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      99
+     ],
+     [
+      "blog",
+      139,
+      30
+     ],
+     [
+      "pricing",
+      185,
+      47
+     ],
+     [
+      "community",
+      248,
+      77
+     ],
+     [
+      "merchandise",
+      342,
+      92
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      589
+     ],
+     [
+      "all features work without javascript",
+      56,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      589
+     ],
+     [
+      "many features work without an account",
+      56,
+      589
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      629
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      629
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      614,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      589
+     ],
+     [
+      "all features work without javascript",
+      56,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      589
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      629
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      71,
+      131
+     ],
+     [
+      "privacy policy",
+      234,
+      100
+     ],
+     [
+      "terms of use",
+      365,
+      94
+     ],
+     [
+      "logo & media resources",
+      179,
+      412
+     ],
+     [
+      "source code",
+      281,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      374,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      701
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      701
+     ],
+     [
+      "sr.ht-support",
+      295,
+      71
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 3,
+    "candidates": 89,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 90,
+    "protruding": 16,
+    "scrollWidth": 996,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 1,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [
+    "(agpl, bsd et al) ||| terms of use"
+   ],
+   "sharedTextKeys": 71,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 24,
+     "rowParents": 6,
+     "maxRowMembers": 5,
+     "navInlinePairs": 11
+    },
+    "recreation": {
+     "inlineSiblingPairs": 29,
+     "rowParents": 6,
+     "maxRowMembers": 6,
+     "navInlinePairs": 16
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      41,
+      93
+     ],
+     [
+      "blog",
+      150,
+      30
+     ],
+     [
+      "pricing",
+      201,
+      47
+     ],
+     [
+      "community",
+      268,
+      77
+     ],
+     [
+      "merchandise",
+      366,
+      92
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      0,
+      800
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      17,
+      363
+     ],
+     [
+      "from the blog",
+      17,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      16,
+      768
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      728
+     ],
+     [
+      "all features work without javascript",
+      56,
+      728
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      728
+     ],
+     [
+      "many features work without an account",
+      56,
+      728
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      768
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      768
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      0,
+      800
+     ],
+     [
+      "browse projects",
+      646,
+      138
+     ],
+     [
+      "hosted git repositories",
+      16,
+      768
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      728
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      728
+     ],
+     [
+      "first-class  also available",
+      56,
+      728
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      16,
+      768
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      768
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      728
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      728
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      728
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      728
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      16,
+      768
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      768
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      728
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      728
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      728
+     ],
+     [
+      "powered by",
+      56,
+      728
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      16,
+      768
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      768
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      728
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      728
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      728
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      768
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      728
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      728
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      728
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      16,
+      768
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      768
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      728
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      728
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      728
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      728
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      768
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      728
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      728
+     ],
+     [
+      "hosts the detailed",
+      56,
+      728
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      768
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      728
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      728
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      728
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      728
+     ],
+     [
+      "and more!",
+      16,
+      768
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      728
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      728
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      16,
+      768
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      56,
+      728
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      728
+     ],
+     [
+      "all features work without javascript",
+      56,
+      728
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      728
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      768
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      10,
+      131
+     ],
+     [
+      "privacy policy",
+      173,
+      100
+     ],
+     [
+      "terms of use",
+      308,
+      94
+     ],
+     [
+      "logo & media resources",
+      439,
+      173
+     ],
+     [
+      "source code",
+      649,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      370,
+      421
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      84,
+      632
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      84,
+      632
+     ],
+     [
+      "sr.ht-support",
+      364,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      24,
+      99
+     ],
+     [
+      "blog",
+      139,
+      30
+     ],
+     [
+      "pricing",
+      185,
+      47
+     ],
+     [
+      "community",
+      248,
+      77
+     ],
+     [
+      "merchandise",
+      342,
+      92
+     ],
+     [
+      "go to sr.ht",
+      682,
+      102
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      16,
+      768
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      728
+     ],
+     [
+      "all features work without javascript",
+      56,
+      728
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      728
+     ],
+     [
+      "many features work without an account",
+      56,
+      728
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      56,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      16,
+      768
+     ],
+     [
+      "what should i expect?",
+      372,
+      158
+     ],
+     [
+      "or",
+      16,
+      768
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "log in",
+      181,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      0,
+      992
+     ],
+     [
+      "browse projects",
+      16,
+      960
+     ],
+     [
+      "hosted git repositories",
+      16,
+      960
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      56,
+      920
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      56,
+      920
+     ],
+     [
+      "first-class  also available",
+      56,
+      920
+     ],
+     [
+      "mercurial support",
+      133,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      -4,
+      1000
+     ],
+     [
+      "powerful continuous integration",
+      16,
+      960
+     ],
+     [
+      "runs fully virtualised builds on",
+      56,
+      920
+     ],
+     [
+      "various linux distros and bsds",
+      276,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      56,
+      920
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      56,
+      920
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      56,
+      920
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      -4,
+      1000
+     ],
+     [
+      "mailing lists & code review tools",
+      16,
+      960
+     ],
+     [
+      "patch review tools on the web",
+      56,
+      920
+     ],
+     [
+      "threaded, searchable mail archives",
+      56,
+      920
+     ],
+     [
+      "tools for working with third party mailing lists",
+      56,
+      920
+     ],
+     [
+      "powered by",
+      56,
+      920
+     ],
+     [
+      "git send-email",
+      145,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      -4,
+      1000
+     ],
+     [
+      "focused ticket tracking",
+      16,
+      960
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      56,
+      920
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      56,
+      920
+     ],
+     [
+      "participation via email, with or without an account",
+      56,
+      920
+     ],
+     [
+      "hosted real-time chat services",
+      16,
+      960
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      56,
+      920
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      56,
+      920
+     ],
+     [
+      "online and offline chat log management",
+      56,
+      920
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      -4,
+      1000
+     ],
+     [
+      "sophisticated account management & security",
+      16,
+      960
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      56,
+      920
+     ],
+     [
+      "two-factor authentication with totp",
+      56,
+      920
+     ],
+     [
+      "detailed audit logs of account activity",
+      56,
+      920
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      56,
+      920
+     ],
+     [
+      "markdown- and git-driven wikis",
+      16,
+      960
+     ],
+     [
+      "use git to version control and manage your wiki",
+      56,
+      920
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      56,
+      920
+     ],
+     [
+      "hosts the detailed",
+      56,
+      920
+     ],
+     [
+      "sourcehut manual",
+      189,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      16,
+      960
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      56,
+      920
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      56,
+      920
+     ],
+     [
+      "run custom graphql queries",
+      56,
+      920
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      56,
+      920
+     ],
+     [
+      "and more!",
+      16,
+      960
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      56,
+      920
+     ],
+     [
+      "static web hosting via srht.site",
+      56,
+      920
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      16,
+      768
+     ],
+     [
+      "welcome to sourcehut!",
+      16,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      56,
+      728
+     ],
+     [
+      "absolutely no tracking or advertising",
+      56,
+      728
+     ],
+     [
+      "all features work without javascript",
+      56,
+      728
+     ],
+     [
+      "no ai features whatsoever",
+      56,
+      728
+     ],
+     [
+      "100% free and open source software",
+      56,
+      262
+     ],
+     [
+      "or",
+      16,
+      768
+     ],
+     [
+      "register for sr.ht",
+      16,
+      141
+     ],
+     [
+      "learn more",
+      181,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      3,
+      131
+     ],
+     [
+      "privacy policy",
+      166,
+      100
+     ],
+     [
+      "terms of use",
+      297,
+      94
+     ],
+     [
+      "logo & media resources",
+      424,
+      173
+     ],
+     [
+      "source code",
+      629,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      385,
+      412
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      840
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      840
+     ],
+     [
+      "sr.ht-support",
+      364,
+      71
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 90,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 90,
+    "protruding": 6,
+    "scrollWidth": 1096,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 72,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 39,
+     "rowParents": 16,
+     "maxRowMembers": 6,
+     "navInlinePairs": 16
+    },
+    "recreation": {
+     "inlineSiblingPairs": 39,
+     "rowParents": 16,
+     "maxRowMembers": 6,
+     "navInlinePairs": 16
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      83,
+      93
+     ],
+     [
+      "blog",
+      192,
+      30
+     ],
+     [
+      "pricing",
+      243,
+      47
+     ],
+     [
+      "community",
+      310,
+      77
+     ],
+     [
+      "merchandise",
+      408,
+      92
+     ],
+     [
+      "go to sr.ht",
+      916,
+      102
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      42,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      59,
+      363
+     ],
+     [
+      "from the blog",
+      59,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      58,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      58,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      98,
+      589
+     ],
+     [
+      "all features work without javascript",
+      98,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      98,
+      589
+     ],
+     [
+      "many features work without an account",
+      98,
+      589
+     ],
+     [
+      "100% free and open source software",
+      98,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      98,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      58,
+      629
+     ],
+     [
+      "what should i expect?",
+      414,
+      158
+     ],
+     [
+      "or",
+      703,
+      315
+     ],
+     [
+      "register for sr.ht",
+      703,
+      141
+     ],
+     [
+      "log in",
+      868,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      42,
+      992
+     ],
+     [
+      "browse projects",
+      880,
+      138
+     ],
+     [
+      "hosted git repositories",
+      58,
+      629
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      98,
+      589
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      98,
+      589
+     ],
+     [
+      "first-class  also available",
+      98,
+      589
+     ],
+     [
+      "mercurial support",
+      175,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      58,
+      629
+     ],
+     [
+      "powerful continuous integration",
+      58,
+      629
+     ],
+     [
+      "runs fully virtualised builds on",
+      98,
+      589
+     ],
+     [
+      "various linux distros and bsds",
+      318,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      98,
+      589
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      98,
+      589
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      98,
+      589
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      58,
+      629
+     ],
+     [
+      "mailing lists & code review tools",
+      58,
+      629
+     ],
+     [
+      "patch review tools on the web",
+      98,
+      589
+     ],
+     [
+      "threaded, searchable mail archives",
+      98,
+      589
+     ],
+     [
+      "tools for working with third party mailing lists",
+      98,
+      589
+     ],
+     [
+      "powered by",
+      98,
+      589
+     ],
+     [
+      "git send-email",
+      187,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      58,
+      629
+     ],
+     [
+      "focused ticket tracking",
+      58,
+      629
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      98,
+      589
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      98,
+      589
+     ],
+     [
+      "participation via email, with or without an account",
+      98,
+      589
+     ],
+     [
+      "hosted real-time chat services",
+      58,
+      629
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      98,
+      589
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      98,
+      589
+     ],
+     [
+      "online and offline chat log management",
+      98,
+      589
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      58,
+      629
+     ],
+     [
+      "sophisticated account management & security",
+      58,
+      629
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      98,
+      589
+     ],
+     [
+      "two-factor authentication with totp",
+      98,
+      589
+     ],
+     [
+      "detailed audit logs of account activity",
+      98,
+      589
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      98,
+      589
+     ],
+     [
+      "markdown- and git-driven wikis",
+      58,
+      629
+     ],
+     [
+      "use git to version control and manage your wiki",
+      98,
+      589
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      98,
+      589
+     ],
+     [
+      "hosts the detailed",
+      98,
+      589
+     ],
+     [
+      "sourcehut manual",
+      231,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      58,
+      629
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      98,
+      589
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      98,
+      589
+     ],
+     [
+      "run custom graphql queries",
+      98,
+      589
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      98,
+      589
+     ],
+     [
+      "and more!",
+      58,
+      629
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      98,
+      589
+     ],
+     [
+      "static web hosting via srht.site",
+      98,
+      589
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      58,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      58,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      98,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      98,
+      589
+     ],
+     [
+      "all features work without javascript",
+      98,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      98,
+      589
+     ],
+     [
+      "100% free and open source software",
+      98,
+      262
+     ],
+     [
+      "or",
+      703,
+      315
+     ],
+     [
+      "register for sr.ht",
+      703,
+      141
+     ],
+     [
+      "learn more",
+      868,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      115,
+      131
+     ],
+     [
+      "privacy policy",
+      278,
+      100
+     ],
+     [
+      "terms of use",
+      414,
+      94
+     ],
+     [
+      "logo & media resources",
+      545,
+      173
+     ],
+     [
+      "source code",
+      755,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      852,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      222,
+      632
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      222,
+      632
+     ],
+     [
+      "sr.ht-support",
+      502,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      66,
+      99
+     ],
+     [
+      "blog",
+      181,
+      30
+     ],
+     [
+      "pricing",
+      227,
+      47
+     ],
+     [
+      "community",
+      290,
+      77
+     ],
+     [
+      "merchandise",
+      384,
+      92
+     ],
+     [
+      "go to sr.ht",
+      916,
+      102
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      58,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      58,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      98,
+      589
+     ],
+     [
+      "all features work without javascript",
+      98,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      98,
+      589
+     ],
+     [
+      "many features work without an account",
+      98,
+      589
+     ],
+     [
+      "100% free and open source software",
+      98,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      98,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      58,
+      629
+     ],
+     [
+      "what should i expect?",
+      414,
+      158
+     ],
+     [
+      "or",
+      703,
+      315
+     ],
+     [
+      "register for sr.ht",
+      703,
+      141
+     ],
+     [
+      "log in",
+      868,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      42,
+      992
+     ],
+     [
+      "browse projects",
+      58,
+      960
+     ],
+     [
+      "hosted git repositories",
+      58,
+      629
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      98,
+      589
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      98,
+      589
+     ],
+     [
+      "first-class  also available",
+      98,
+      589
+     ],
+     [
+      "mercurial support",
+      175,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      38,
+      669
+     ],
+     [
+      "powerful continuous integration",
+      58,
+      629
+     ],
+     [
+      "runs fully virtualised builds on",
+      98,
+      589
+     ],
+     [
+      "various linux distros and bsds",
+      318,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      98,
+      589
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      98,
+      589
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      98,
+      589
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      38,
+      669
+     ],
+     [
+      "mailing lists & code review tools",
+      58,
+      629
+     ],
+     [
+      "patch review tools on the web",
+      98,
+      589
+     ],
+     [
+      "threaded, searchable mail archives",
+      98,
+      589
+     ],
+     [
+      "tools for working with third party mailing lists",
+      98,
+      589
+     ],
+     [
+      "powered by",
+      98,
+      589
+     ],
+     [
+      "git send-email",
+      187,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      38,
+      669
+     ],
+     [
+      "focused ticket tracking",
+      58,
+      629
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      98,
+      589
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      98,
+      589
+     ],
+     [
+      "participation via email, with or without an account",
+      98,
+      589
+     ],
+     [
+      "hosted real-time chat services",
+      58,
+      629
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      98,
+      589
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      98,
+      589
+     ],
+     [
+      "online and offline chat log management",
+      98,
+      589
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      38,
+      669
+     ],
+     [
+      "sophisticated account management & security",
+      58,
+      629
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      98,
+      589
+     ],
+     [
+      "two-factor authentication with totp",
+      98,
+      589
+     ],
+     [
+      "detailed audit logs of account activity",
+      98,
+      589
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      98,
+      589
+     ],
+     [
+      "markdown- and git-driven wikis",
+      58,
+      629
+     ],
+     [
+      "use git to version control and manage your wiki",
+      98,
+      589
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      98,
+      589
+     ],
+     [
+      "hosts the detailed",
+      98,
+      589
+     ],
+     [
+      "sourcehut manual",
+      231,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      58,
+      629
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      98,
+      589
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      98,
+      589
+     ],
+     [
+      "run custom graphql queries",
+      98,
+      589
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      98,
+      589
+     ],
+     [
+      "and more!",
+      58,
+      629
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      98,
+      589
+     ],
+     [
+      "static web hosting via srht.site",
+      98,
+      589
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      58,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      58,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      98,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      98,
+      589
+     ],
+     [
+      "all features work without javascript",
+      98,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      98,
+      589
+     ],
+     [
+      "100% free and open source software",
+      98,
+      262
+     ],
+     [
+      "or",
+      703,
+      315
+     ],
+     [
+      "register for sr.ht",
+      703,
+      141
+     ],
+     [
+      "learn more",
+      868,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      124,
+      131
+     ],
+     [
+      "privacy policy",
+      287,
+      100
+     ],
+     [
+      "terms of use",
+      419,
+      94
+     ],
+     [
+      "logo & media resources",
+      545,
+      173
+     ],
+     [
+      "source code",
+      750,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      844,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      1116
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      1116
+     ],
+     [
+      "sr.ht-support",
+      502,
+      71
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 90,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 90,
+    "protruding": 6,
+    "scrollWidth": 1460,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 72,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 39,
+     "rowParents": 16,
+     "maxRowMembers": 6,
+     "navInlinePairs": 16
+    },
+    "recreation": {
+     "inlineSiblingPairs": 39,
+     "rowParents": 16,
+     "maxRowMembers": 6,
+     "navInlinePairs": 16
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "sourcehut",
+      265,
+      93
+     ],
+     [
+      "blog",
+      374,
+      30
+     ],
+     [
+      "pricing",
+      425,
+      47
+     ],
+     [
+      "community",
+      492,
+      77
+     ],
+     [
+      "merchandise",
+      590,
+      92
+     ],
+     [
+      "go to sr.ht",
+      1098,
+      102
+     ],
+     [
+      "may 28, 2026\n              by drew devault & conrad hoffmann",
+      224,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      241,
+      363
+     ],
+     [
+      "from the blog",
+      241,
+      118
+     ],
+     [
+      "this suite of open source\n                  tools is the software development platform you've been waiting for.\n                  we've taken the wisdom of the most successful open-source\n                  communities and turned it into a platform of efficient engineering\n                  tools.",
+      240,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      240,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      280,
+      589
+     ],
+     [
+      "all features work without javascript",
+      280,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      280,
+      589
+     ],
+     [
+      "many features work without an account",
+      280,
+      589
+     ],
+     [
+      "100% free and open source software",
+      280,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      280,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      240,
+      629
+     ],
+     [
+      "what should i expect?",
+      596,
+      158
+     ],
+     [
+      "or",
+      885,
+      315
+     ],
+     [
+      "register for sr.ht",
+      885,
+      141
+     ],
+     [
+      "log in",
+      1050,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric\n          programming languages for music creation, and novel smartphone\n          operating systems? these projects and more are waiting to be found on\n          the sourcehut project index.",
+      224,
+      992
+     ],
+     [
+      "browse projects",
+      1062,
+      138
+     ],
+     [
+      "hosted git repositories",
+      240,
+      629
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      280,
+      589
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      280,
+      589
+     ],
+     [
+      "first-class  also available",
+      280,
+      589
+     ],
+     [
+      "mercurial support",
+      357,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to\n        sourcehut. the speed, functionality, integrations, and\n        minimal-yet-friendly ui makes it easy to use and work with.\n        \n        \n        — peter sanchez, netlandish inc.",
+      240,
+      629
+     ],
+     [
+      "powerful continuous integration",
+      240,
+      629
+     ],
+     [
+      "runs fully virtualised builds on",
+      280,
+      589
+     ],
+     [
+      "various linux distros and bsds",
+      500,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      280,
+      589
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      280,
+      589
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      280,
+      589
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds\n        and ssh'ing in is saving me multiple hours.\n        \n        \n        — andrew kelley, author of the zig programming language",
+      240,
+      629
+     ],
+     [
+      "mailing lists & code review tools",
+      240,
+      629
+     ],
+     [
+      "patch review tools on the web",
+      280,
+      589
+     ],
+     [
+      "threaded, searchable mail archives",
+      280,
+      589
+     ],
+     [
+      "tools for working with third party mailing lists",
+      280,
+      589
+     ],
+     [
+      "powered by",
+      280,
+      589
+     ],
+     [
+      "git send-email",
+      369,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of\n        reviewing patches.\n        \n        \n        — martijn braam, postmarketos developer",
+      240,
+      629
+     ],
+     [
+      "focused ticket tracking",
+      240,
+      629
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      280,
+      589
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      280,
+      589
+     ],
+     [
+      "participation via email, with or without an account",
+      280,
+      589
+     ],
+     [
+      "hosted real-time chat services",
+      240,
+      629
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      280,
+      589
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      280,
+      589
+     ],
+     [
+      "online and offline chat log management",
+      280,
+      589
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their\n        communities, while still betting on standards instead of building new\n        walled gardens.\n        \n        \n        — pedro lucas porcellis",
+      240,
+      629
+     ],
+     [
+      "sophisticated account management & security",
+      240,
+      629
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      280,
+      589
+     ],
+     [
+      "two-factor authentication with totp",
+      280,
+      589
+     ],
+     [
+      "detailed audit logs of account activity",
+      280,
+      589
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      280,
+      589
+     ],
+     [
+      "markdown- and git-driven wikis",
+      240,
+      629
+     ],
+     [
+      "use git to version control and manage your wiki",
+      280,
+      589
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      280,
+      589
+     ],
+     [
+      "hosts the detailed",
+      280,
+      589
+     ],
+     [
+      "sourcehut manual",
+      413,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      240,
+      629
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      280,
+      589
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      280,
+      589
+     ],
+     [
+      "run custom graphql queries",
+      280,
+      589
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      280,
+      589
+     ],
+     [
+      "and more!",
+      240,
+      629
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      280,
+      589
+     ],
+     [
+      "static web hosting via srht.site",
+      280,
+      589
+     ],
+     [
+      "this suite of open source tools is\n          the software development platform you've been waiting for.",
+      240,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      240,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous\n            integration, and more",
+      280,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      280,
+      589
+     ],
+     [
+      "all features work without javascript",
+      280,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      280,
+      589
+     ],
+     [
+      "100% free and open source software",
+      280,
+      262
+     ],
+     [
+      "or",
+      885,
+      315
+     ],
+     [
+      "register for sr.ht",
+      885,
+      141
+     ],
+     [
+      "learn more",
+      1050,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      297,
+      131
+     ],
+     [
+      "privacy policy",
+      460,
+      100
+     ],
+     [
+      "terms of use",
+      596,
+      94
+     ],
+     [
+      "logo & media resources",
+      727,
+      173
+     ],
+     [
+      "source code",
+      937,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      1034,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent,\n    and empathetic. we care for our users, and we will not exploit them, and\n    we hope that they will reward our care and diligence with success.",
+      404,
+      632
+     ],
+     [
+      "sourcehut\n    postbus 3068\n    1620gb hoorn\n    netherlands\n    kvk-nummer: 84165251\n    btw-nummer: nl003921490b16",
+      404,
+      632
+     ],
+     [
+      "sr.ht-support",
+      684,
+      71
+     ]
+    ],
+    "recreation": [
+     [
+      "sourcehut",
+      248,
+      99
+     ],
+     [
+      "blog",
+      363,
+      30
+     ],
+     [
+      "pricing",
+      409,
+      47
+     ],
+     [
+      "community",
+      472,
+      77
+     ],
+     [
+      "merchandise",
+      566,
+      92
+     ],
+     [
+      "go to sr.ht",
+      1098,
+      102
+     ],
+     [
+      "may 28, 2026 by drew devault & conrad hoffmann",
+      0,
+      992
+     ],
+     [
+      "what's cooking on sourcehut? q2 2026",
+      33,
+      363
+     ],
+     [
+      "from the blog",
+      33,
+      118
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for. we've taken the wisdom of the most successful open-source communities and turned it into a platform of efficient engineering tools.",
+      240,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      240,
+      177
+     ],
+     [
+      "absolutely no tracking or advertising",
+      280,
+      589
+     ],
+     [
+      "all features work without javascript",
+      280,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      280,
+      589
+     ],
+     [
+      "many features work without an account",
+      280,
+      589
+     ],
+     [
+      "100% free and open source software",
+      280,
+      262
+     ],
+     [
+      "supports hundreds of free software projects",
+      280,
+      310
+     ],
+     [
+      "sourcehut is currently available as a public alpha.",
+      240,
+      629
+     ],
+     [
+      "what should i expect?",
+      596,
+      158
+     ],
+     [
+      "or",
+      885,
+      315
+     ],
+     [
+      "register for sr.ht",
+      885,
+      141
+     ],
+     [
+      "log in",
+      1050,
+      49
+     ],
+     [
+      "\"small internet\" protocols? the plan 9 renaissance? esoteric programming languages for music creation, and novel smartphone operating systems? these projects and more are waiting to be found on the sourcehut project index.",
+      224,
+      992
+     ],
+     [
+      "browse projects",
+      240,
+      960
+     ],
+     [
+      "hosted git repositories",
+      240,
+      629
+     ],
+     [
+      "public, private, and \"unlisted\" repositories",
+      280,
+      589
+     ],
+     [
+      "fine grained access control, including access for users without accounts",
+      280,
+      589
+     ],
+     [
+      "first-class  also available",
+      280,
+      589
+     ],
+     [
+      "mercurial support",
+      357,
+      124
+     ],
+     [
+      "we've completely migrated our repo hosting, both git and mercurial, to sourcehut. the speed, functionality, integrations, and minimal-yet-friendly ui makes it easy to use and work with.  — peter sanchez, netlandish inc.",
+      220,
+      669
+     ],
+     [
+      "powerful continuous integration",
+      240,
+      629
+     ],
+     [
+      "runs fully virtualised builds on",
+      280,
+      589
+     ],
+     [
+      "various linux distros and bsds",
+      500,
+      222
+     ],
+     [
+      "submit ad-hoc jobs without pushing to your repository",
+      280,
+      589
+     ],
+     [
+      "post-build triggers for email, webhooks, etc",
+      280,
+      589
+     ],
+     [
+      "log in with ssh after build failures to investigate further",
+      280,
+      589
+     ],
+     [
+      "this ci experience is leagues ahead of all others. resubmitting builds and ssh'ing in is saving me multiple hours.  — andrew kelley, author of the zig programming language",
+      220,
+      669
+     ],
+     [
+      "mailing lists & code review tools",
+      240,
+      629
+     ],
+     [
+      "patch review tools on the web",
+      280,
+      589
+     ],
+     [
+      "threaded, searchable mail archives",
+      280,
+      589
+     ],
+     [
+      "tools for working with third party mailing lists",
+      280,
+      589
+     ],
+     [
+      "powered by",
+      280,
+      589
+     ],
+     [
+      "git send-email",
+      369,
+      100
+     ],
+     [
+      "sourcehut mailing lists are the best thing since the invention of reviewing patches.  — martijn braam, postmarketos developer",
+      220,
+      669
+     ],
+     [
+      "focused ticket tracking",
+      240,
+      629
+     ],
+     [
+      "actionable tasks only — no discussions, questions, or duplicates",
+      280,
+      589
+     ],
+     [
+      "private bug reports and bug trackers for security issues",
+      280,
+      589
+     ],
+     [
+      "participation via email, with or without an account",
+      280,
+      589
+     ],
+     [
+      "hosted real-time chat services",
+      240,
+      629
+     ],
+     [
+      "provides a hosted internet relay chat bouncer",
+      280,
+      589
+     ],
+     [
+      "connect with any irc client, or use our web chat",
+      280,
+      589
+     ],
+     [
+      "online and offline chat log management",
+      280,
+      589
+     ],
+     [
+      "i like that chat.sr.ht allows people to easily engage in their communities, while still betting on standards instead of building new walled gardens.  — pedro lucas porcellis",
+      220,
+      669
+     ],
+     [
+      "sophisticated account management & security",
+      240,
+      629
+     ],
+     [
+      "pgp encrypted and signed emails from each service",
+      280,
+      589
+     ],
+     [
+      "two-factor authentication with totp",
+      280,
+      589
+     ],
+     [
+      "detailed audit logs of account activity",
+      280,
+      589
+     ],
+     [
+      "fine-grained third-party oauth access controls",
+      280,
+      589
+     ],
+     [
+      "markdown- and git-driven wikis",
+      240,
+      629
+     ],
+     [
+      "use git to version control and manage your wiki",
+      280,
+      589
+     ],
+     [
+      "use any organizational hierarchy you like, a flat wiki is not imposed",
+      280,
+      589
+     ],
+     [
+      "hosts the detailed",
+      280,
+      589
+     ],
+     [
+      "sourcehut manual",
+      413,
+      127
+     ],
+     [
+      "full control of your data with the hut cli tool",
+      240,
+      629
+     ],
+     [
+      "backup all your data with a single 'hut export' command",
+      280,
+      589
+     ],
+     [
+      "move to or from a self hosted sourcehut instance",
+      280,
+      589
+     ],
+     [
+      "run custom graphql queries",
+      280,
+      589
+     ],
+     [
+      "manage builds/git/hg/lists/meta/pages/paste/todo",
+      280,
+      589
+     ],
+     [
+      "and more!",
+      240,
+      629
+     ],
+     [
+      "ad-hoc source code hosting via paste.sr.ht",
+      280,
+      589
+     ],
+     [
+      "static web hosting via srht.site",
+      280,
+      589
+     ],
+     [
+      "this suite of open source tools is the software development platform you've been waiting for.",
+      240,
+      629
+     ],
+     [
+      "welcome to sourcehut!",
+      240,
+      177
+     ],
+     [
+      "git and mercurial hosting, mailing lists, bug tracking, continuous integration, and more",
+      280,
+      589
+     ],
+     [
+      "absolutely no tracking or advertising",
+      280,
+      589
+     ],
+     [
+      "all features work without javascript",
+      280,
+      589
+     ],
+     [
+      "no ai features whatsoever",
+      280,
+      589
+     ],
+     [
+      "100% free and open source software",
+      280,
+      262
+     ],
+     [
+      "or",
+      885,
+      315
+     ],
+     [
+      "register for sr.ht",
+      885,
+      141
+     ],
+     [
+      "learn more",
+      1050,
+      87
+     ],
+     [
+      "© 2026 sourcehut",
+      306,
+      131
+     ],
+     [
+      "privacy policy",
+      469,
+      100
+     ],
+     [
+      "terms of use",
+      601,
+      94
+     ],
+     [
+      "logo & media resources",
+      727,
+      173
+     ],
+     [
+      "source code",
+      932,
+      93
+     ],
+     [
+      "(agpl, bsd et al)",
+      1026,
+      108
+     ],
+     [
+      "we are here to make free software better. we will be honest, transparent, and empathetic. we care for our users, and we will not exploit them, and we hope that they will reward our care and diligence with success.",
+      -20,
+      1480
+     ],
+     [
+      "sourcehut postbus 3068 1620gb hoorn netherlands kvk-nummer: 84165251 btw-nummer: nl003921490b16",
+      -20,
+      1480
+     ],
+     [
+      "sr.ht-support",
+      684,
+      71
+     ]
+    ]
+   }
+  }
+ }
+}

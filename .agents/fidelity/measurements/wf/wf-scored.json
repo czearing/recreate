@@ -1,0 +1,1815 @@
+{
+  "pages": {
+    "reactdev": {
+      "url": "https://react.dev/",
+      "stack": "React + Next.js + Tailwind",
+      "predictedLabel": "DIVERGENT",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 1,
+        "480": 1,
+        "600": 1,
+        "661": 0,
+        "800": 3,
+        "1076": 3,
+        "1440": 3
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 28,
+        "450": 22,
+        "480": 23,
+        "600": 23,
+        "661": 27,
+        "800": 17,
+        "1076": 16,
+        "1440": 16
+      },
+      "totals": {
+        "recreationOnly": 12,
+        "sourceOnly": 172
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 130,
+          "widthMismatched": 44,
+          "widthMismatchPct": 33.8,
+          "maxWidthDeltaPx": 438,
+          "maxWidthDeltaText": "search"
+        },
+        "450": {
+          "sharedTexts": 130,
+          "widthMismatched": 43,
+          "widthMismatchPct": 33.1,
+          "maxWidthDeltaPx": 438,
+          "maxWidthDeltaText": "search"
+        },
+        "480": {
+          "sharedTexts": 130,
+          "widthMismatched": 43,
+          "widthMismatchPct": 33.1,
+          "maxWidthDeltaPx": 438,
+          "maxWidthDeltaText": "search"
+        },
+        "600": {
+          "sharedTexts": 130,
+          "widthMismatched": 42,
+          "widthMismatchPct": 32.3,
+          "maxWidthDeltaPx": 438,
+          "maxWidthDeltaText": "search"
+        },
+        "661": {
+          "sharedTexts": 130,
+          "widthMismatched": 44,
+          "widthMismatchPct": 33.8,
+          "maxWidthDeltaPx": 476,
+          "maxWidthDeltaText": "react router"
+        },
+        "800": {
+          "sharedTexts": 132,
+          "widthMismatched": 51,
+          "widthMismatchPct": 38.6,
+          "maxWidthDeltaPx": 542,
+          "maxWidthDeltaText": "learn react"
+        },
+        "1076": {
+          "sharedTexts": 136,
+          "widthMismatched": 39,
+          "widthMismatchPct": 28.7,
+          "maxWidthDeltaPx": 542,
+          "maxWidthDeltaText": "learn react"
+        },
+        "1440": {
+          "sharedTexts": 136,
+          "widthMismatched": 24,
+          "widthMismatchPct": 17.6,
+          "maxWidthDeltaPx": 542,
+          "maxWidthDeltaText": "learn react"
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 28,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 523,
+          "recreationCandidates": 528,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 22,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 523,
+          "recreationCandidates": 528,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 23,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 523,
+          "recreationCandidates": 528,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 23,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 523,
+          "recreationCandidates": 528,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 27,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 525,
+          "recreationCandidates": 528,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 17,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 528,
+          "recreationCandidates": 532,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 16,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 532,
+          "recreationCandidates": 532,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 16,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 532,
+          "recreationCandidates": 532,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 135,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 136,
+          "movedPct": 100
+        }
+      },
+      "inlineRowCapacityMaxSource": 37,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "sveltedev": {
+      "url": "https://svelte.dev/",
+      "stack": "Svelte + SvelteKit",
+      "predictedLabel": "DIVERGENT",
+      "recreationOnlyPairsPerWidth": {
+        "400": 5,
+        "450": 6,
+        "480": 9,
+        "600": 5,
+        "661": 6,
+        "800": 0,
+        "1076": 0,
+        "1440": 1
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 1,
+        "1440": 1
+      },
+      "totals": {
+        "recreationOnly": 32,
+        "sourceOnly": 2
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 110,
+          "widthMismatched": 104,
+          "widthMismatchPct": 94.5,
+          "maxWidthDeltaPx": 180,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        },
+        "450": {
+          "sharedTexts": 110,
+          "widthMismatched": 103,
+          "widthMismatchPct": 93.6,
+          "maxWidthDeltaPx": 247,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        },
+        "480": {
+          "sharedTexts": 110,
+          "widthMismatched": 100,
+          "widthMismatchPct": 90.9,
+          "maxWidthDeltaPx": 247,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        },
+        "600": {
+          "sharedTexts": 110,
+          "widthMismatched": 100,
+          "widthMismatchPct": 90.9,
+          "maxWidthDeltaPx": 138,
+          "maxWidthDeltaText": "skip to main content"
+        },
+        "661": {
+          "sharedTexts": 110,
+          "widthMismatched": 100,
+          "widthMismatchPct": 90.9,
+          "maxWidthDeltaPx": 428,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        },
+        "800": {
+          "sharedTexts": 110,
+          "widthMismatched": 100,
+          "widthMismatchPct": 90.9,
+          "maxWidthDeltaPx": 268,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        },
+        "1076": {
+          "sharedTexts": 120,
+          "widthMismatched": 102,
+          "widthMismatchPct": 85,
+          "maxWidthDeltaPx": 138,
+          "maxWidthDeltaText": "skip to main content"
+        },
+        "1440": {
+          "sharedTexts": 120,
+          "widthMismatched": 6,
+          "widthMismatchPct": 5,
+          "maxWidthDeltaPx": 244,
+          "maxWidthDeltaText": "it’s a love letter to web development."
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 5,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 116,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 6,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 116,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 9,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 116,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 5,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 116,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 6,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 116,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 116,
+          "recreationCandidates": 125,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 1,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 127,
+          "recreationCandidates": 127,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 1,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 127,
+          "recreationCandidates": 127,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 115,
+          "movedPct": 99.1
+        },
+        "recreation": {
+          "compared": 115,
+          "movedPct": 100
+        }
+      },
+      "inlineRowCapacityMaxSource": 96,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "vuejs": {
+      "url": "https://vuejs.org/",
+      "stack": "Vue + VitePress",
+      "predictedLabel": "DIVERGENT",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 2,
+        "661": 1,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 3,
+        "sourceOnly": 0
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 67,
+          "widthMismatched": 8,
+          "widthMismatchPct": 11.9,
+          "maxWidthDeltaPx": 222,
+          "maxWidthDeltaText": "docs"
+        },
+        "450": {
+          "sharedTexts": 67,
+          "widthMismatched": 9,
+          "widthMismatchPct": 13.4,
+          "maxWidthDeltaPx": 272,
+          "maxWidthDeltaText": "docs"
+        },
+        "480": {
+          "sharedTexts": 67,
+          "widthMismatched": 9,
+          "widthMismatchPct": 13.4,
+          "maxWidthDeltaPx": 302,
+          "maxWidthDeltaText": "docs"
+        },
+        "600": {
+          "sharedTexts": 67,
+          "widthMismatched": 8,
+          "widthMismatchPct": 11.9,
+          "maxWidthDeltaPx": 422,
+          "maxWidthDeltaText": "docs"
+        },
+        "661": {
+          "sharedTexts": 67,
+          "widthMismatched": 8,
+          "widthMismatchPct": 11.9,
+          "maxWidthDeltaPx": 483,
+          "maxWidthDeltaText": "docs"
+        },
+        "800": {
+          "sharedTexts": 72,
+          "widthMismatched": 6,
+          "widthMismatchPct": 8.3,
+          "maxWidthDeltaPx": 132,
+          "maxWidthDeltaText": "resources"
+        },
+        "1076": {
+          "sharedTexts": 73,
+          "widthMismatched": 5,
+          "widthMismatchPct": 6.8,
+          "maxWidthDeltaPx": 204,
+          "maxWidthDeltaText": "resources"
+        },
+        "1440": {
+          "sharedTexts": 75,
+          "widthMismatched": 5,
+          "widthMismatchPct": 6.7,
+          "maxWidthDeltaPx": 568,
+          "maxWidthDeltaText": "resources"
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 68,
+          "recreationCandidates": 74,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 68,
+          "recreationCandidates": 74,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 68,
+          "recreationCandidates": 74,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 2,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 68,
+          "recreationCandidates": 74,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 68,
+          "recreationCandidates": 74,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 76,
+          "recreationCandidates": 77,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 77,
+          "recreationCandidates": 77,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 80,
+          "recreationCandidates": 80,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 67,
+          "movedPct": 97
+        },
+        "recreation": {
+          "compared": 70,
+          "movedPct": 95.7
+        }
+      },
+      "inlineRowCapacityMaxSource": 36,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "cern": {
+      "url": "https://info.cern.ch/hypertext/WWW/TheProject.html",
+      "stack": "raw HTML, no stylesheet at all",
+      "predictedLabel": "CLEAN",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 7,
+        "480": 5,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 0,
+        "sourceOnly": 12
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 27,
+          "widthMismatched": 2,
+          "widthMismatchPct": 7.4,
+          "maxWidthDeltaPx": 368,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "450": {
+          "sharedTexts": 27,
+          "widthMismatched": 4,
+          "widthMismatchPct": 14.8,
+          "maxWidthDeltaPx": 318,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "480": {
+          "sharedTexts": 27,
+          "widthMismatched": 4,
+          "widthMismatchPct": 14.8,
+          "maxWidthDeltaPx": 350,
+          "maxWidthDeltaText": "line mode"
+        },
+        "600": {
+          "sharedTexts": 27,
+          "widthMismatched": 2,
+          "widthMismatchPct": 7.4,
+          "maxWidthDeltaPx": 168,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "661": {
+          "sharedTexts": 27,
+          "widthMismatched": 2,
+          "widthMismatchPct": 7.4,
+          "maxWidthDeltaPx": 107,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "800": {
+          "sharedTexts": 27,
+          "widthMismatched": 3,
+          "widthMismatchPct": 11.1,
+          "maxWidthDeltaPx": 640,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "1076": {
+          "sharedTexts": 27,
+          "widthMismatched": 2,
+          "widthMismatchPct": 7.4,
+          "maxWidthDeltaPx": 364,
+          "maxWidthDeltaText": "on the browser you are using"
+        },
+        "1440": {
+          "sharedTexts": 27,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 7,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 5,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 37,
+          "recreationCandidates": 37,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 37,
+          "movedPct": 67.6
+        },
+        "recreation": {
+          "compared": 37,
+          "movedPct": 54.1
+        }
+      },
+      "inlineRowCapacityMaxSource": 7,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": false
+    },
+    "danluu": {
+      "url": "https://danluu.com/",
+      "stack": "static HTML, deliberately minimal CSS",
+      "predictedLabel": "CLEAN",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 0,
+        "sourceOnly": 0
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "450": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "480": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "600": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "661": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "800": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1076": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1440": {
+          "sharedTexts": 303,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "widthsWithNonzeroMismatch": [],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 401,
+          "recreationCandidates": 401,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 303,
+          "movedPct": 20.8
+        },
+        "recreation": {
+          "compared": 303,
+          "movedPct": 20.8
+        }
+      },
+      "inlineRowCapacityMaxSource": 3,
+      "grade": "weak",
+      "gradeReason": "capable but the predicate never fired on either side at any width: the zero is instrument silence.",
+      "ruleSaysLabel": "CLEAN",
+      "measuredOutcome": "CLEAN",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "nprtext": {
+      "url": "https://text.npr.org/",
+      "stack": "server-rendered text-only edition, tiny stylesheet",
+      "predictedLabel": "CLEAN",
+      "recreationOnlyPairsPerWidth": {
+        "400": 3,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 3,
+        "sourceOnly": 0
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 33,
+          "widthMismatched": 1,
+          "widthMismatchPct": 3,
+          "maxWidthDeltaPx": 265,
+          "maxWidthDeltaText": "privacy policy"
+        },
+        "450": {
+          "sharedTexts": 33,
+          "widthMismatched": 1,
+          "widthMismatchPct": 3,
+          "maxWidthDeltaPx": 14,
+          "maxWidthDeltaText": "privacy policy"
+        },
+        "480": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "600": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "661": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "800": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1076": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1440": {
+          "sharedTexts": 33,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 33,
+          "recreationCandidates": 33,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 33,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 33,
+          "movedPct": 100
+        }
+      },
+      "inlineRowCapacityMaxSource": 4,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": false
+    },
+    "lobsters": {
+      "url": "https://lobste.rs/",
+      "stack": "Ruby on Rails, hand-authored CSS, table-driven story list",
+      "predictedLabel": "CLEAN",
+      "recreationOnlyPairsPerWidth": {
+        "400": 28,
+        "450": 18,
+        "480": 15,
+        "600": 5,
+        "661": 4,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 48,
+        "450": 58,
+        "480": 52,
+        "600": 12,
+        "661": 7,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 70,
+        "sourceOnly": 177
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 154,
+          "widthMismatched": 27,
+          "widthMismatchPct": 17.5,
+          "maxWidthDeltaPx": 422,
+          "maxWidthDeltaText": "introducing kitesurf: the agent-first browser that runs in v8 isolates on cloudflare workers"
+        },
+        "450": {
+          "sharedTexts": 154,
+          "widthMismatched": 25,
+          "widthMismatchPct": 16.2,
+          "maxWidthDeltaPx": 345,
+          "maxWidthDeltaText": "introducing kitesurf: the agent-first browser that runs in v8 isolates on cloudflare workers"
+        },
+        "480": {
+          "sharedTexts": 154,
+          "widthMismatched": 23,
+          "widthMismatchPct": 14.9,
+          "maxWidthDeltaPx": 322,
+          "maxWidthDeltaText": "introducing kitesurf: the agent-first browser that runs in v8 isolates on cloudflare workers"
+        },
+        "600": {
+          "sharedTexts": 171,
+          "widthMismatched": 6,
+          "widthMismatchPct": 3.5,
+          "maxWidthDeltaPx": 432,
+          "maxWidthDeltaText": "w.on-t.work"
+        },
+        "661": {
+          "sharedTexts": 171,
+          "widthMismatched": 5,
+          "widthMismatchPct": 2.9,
+          "maxWidthDeltaPx": 152,
+          "maxWidthDeltaText": "introducing kitesurf: the agent-first browser that runs in v8 isolates on cloudflare workers"
+        },
+        "800": {
+          "sharedTexts": 171,
+          "widthMismatched": 4,
+          "widthMismatchPct": 2.3,
+          "maxWidthDeltaPx": 17,
+          "maxWidthDeltaText": "caches"
+        },
+        "1076": {
+          "sharedTexts": 171,
+          "widthMismatched": 4,
+          "widthMismatchPct": 2.3,
+          "maxWidthDeltaPx": 17,
+          "maxWidthDeltaText": "caches"
+        },
+        "1440": {
+          "sharedTexts": 171,
+          "widthMismatched": 4,
+          "widthMismatchPct": 2.3,
+          "maxWidthDeltaPx": 17,
+          "maxWidthDeltaText": "caches"
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 28,
+          "sourceOnlyPairs": 48,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 321,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 18,
+          "sourceOnlyPairs": 58,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 321,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 15,
+          "sourceOnlyPairs": 52,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 321,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 5,
+          "sourceOnlyPairs": 12,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 346,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 4,
+          "sourceOnlyPairs": 7,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 346,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 346,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 346,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 346,
+          "recreationCandidates": 346,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 155,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 172,
+          "movedPct": 100
+        }
+      },
+      "inlineRowCapacityMaxSource": 7,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": false
+    },
+    "gnu": {
+      "url": "https://www.gnu.org/",
+      "stack": "static HTML, long-lived hand-authored CSS",
+      "predictedLabel": "CLEAN",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 0,
+        "sourceOnly": 0
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "450": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "480": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "600": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "661": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "800": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1076": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1440": {
+          "sharedTexts": 0,
+          "widthMismatched": 0,
+          "widthMismatchPct": null,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "widthsWithNonzeroMismatch": [],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 0,
+          "recreationCandidates": 0,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 0,
+          "movedPct": null
+        },
+        "recreation": {
+          "compared": 0,
+          "movedPct": null
+        }
+      },
+      "inlineRowCapacityMaxSource": 0,
+      "grade": "weak",
+      "gradeReason": "inline-row capacity 0 at every width: structurally incapable of overlap.",
+      "ruleSaysLabel": "CLEAN",
+      "measuredOutcome": "CLEAN",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "w3c": {
+      "url": "https://www.w3.org/",
+      "stack": "static site, hand-authored CSS",
+      "predictedLabel": "DIVERGENT",
+      "recreationOnlyPairsPerWidth": {
+        "400": 4,
+        "450": 3,
+        "480": 5,
+        "600": 1,
+        "661": 0,
+        "800": 1,
+        "1076": 2,
+        "1440": 3
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 6,
+        "450": 8,
+        "480": 6,
+        "600": 4,
+        "661": 3,
+        "800": 17,
+        "1076": 15,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 19,
+        "sourceOnly": 59
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 60,
+          "widthMismatched": 30,
+          "widthMismatchPct": 50,
+          "maxWidthDeltaPx": 291,
+          "maxWidthDeltaText": "get involved"
+        },
+        "450": {
+          "sharedTexts": 60,
+          "widthMismatched": 28,
+          "widthMismatchPct": 46.7,
+          "maxWidthDeltaPx": 333,
+          "maxWidthDeltaText": "support us"
+        },
+        "480": {
+          "sharedTexts": 60,
+          "widthMismatched": 29,
+          "widthMismatchPct": 48.3,
+          "maxWidthDeltaPx": 360,
+          "maxWidthDeltaText": "support us"
+        },
+        "600": {
+          "sharedTexts": 60,
+          "widthMismatched": 26,
+          "widthMismatchPct": 43.3,
+          "maxWidthDeltaPx": 468,
+          "maxWidthDeltaText": "support us"
+        },
+        "661": {
+          "sharedTexts": 60,
+          "widthMismatched": 26,
+          "widthMismatchPct": 43.3,
+          "maxWidthDeltaPx": 523,
+          "maxWidthDeltaText": "support us"
+        },
+        "800": {
+          "sharedTexts": 67,
+          "widthMismatched": 31,
+          "widthMismatchPct": 46.3,
+          "maxWidthDeltaPx": 652,
+          "maxWidthDeltaText": "about"
+        },
+        "1076": {
+          "sharedTexts": 67,
+          "widthMismatched": 29,
+          "widthMismatchPct": 43.3,
+          "maxWidthDeltaPx": 900,
+          "maxWidthDeltaText": "about"
+        },
+        "1440": {
+          "sharedTexts": 69,
+          "widthMismatched": 26,
+          "widthMismatchPct": 37.7,
+          "maxWidthDeltaPx": 472,
+          "maxWidthDeltaText": "making the web work"
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 4,
+          "sourceOnlyPairs": 6,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 67,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 8,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 67,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 5,
+          "sourceOnlyPairs": 6,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 67,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 4,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 67,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 3,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 67,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 1,
+          "sourceOnlyPairs": 17,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 75,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 2,
+          "sourceOnlyPairs": 15,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 75,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 3,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 78,
+          "recreationCandidates": 77,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 72,
+          "movedPct": 98.6
+        },
+        "recreation": {
+          "compared": 62,
+          "movedPct": 98.4
+        }
+      },
+      "inlineRowCapacityMaxSource": 8,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    },
+    "sourcehut": {
+      "url": "https://sourcehut.org/",
+      "stack": "Go-served static pages, Bootstrap-style grid",
+      "predictedLabel": "DIVERGENT",
+      "recreationOnlyPairsPerWidth": {
+        "400": 2,
+        "450": 7,
+        "480": 0,
+        "600": 0,
+        "661": 5,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 1,
+        "1076": 0,
+        "1440": 0
+      },
+      "totals": {
+        "recreationOnly": 14,
+        "sourceOnly": 1
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 71,
+          "widthMismatched": 42,
+          "widthMismatchPct": 59.2,
+          "maxWidthDeltaPx": 592,
+          "maxWidthDeltaText": "hosted git repositories"
+        },
+        "450": {
+          "sharedTexts": 71,
+          "widthMismatched": 43,
+          "widthMismatchPct": 60.6,
+          "maxWidthDeltaPx": 542,
+          "maxWidthDeltaText": "hosted git repositories"
+        },
+        "480": {
+          "sharedTexts": 71,
+          "widthMismatched": 42,
+          "widthMismatchPct": 59.2,
+          "maxWidthDeltaPx": 512,
+          "maxWidthDeltaText": "hosted git repositories"
+        },
+        "600": {
+          "sharedTexts": 71,
+          "widthMismatched": 41,
+          "widthMismatchPct": 57.7,
+          "maxWidthDeltaPx": 392,
+          "maxWidthDeltaText": "hosted git repositories"
+        },
+        "661": {
+          "sharedTexts": 71,
+          "widthMismatched": 41,
+          "widthMismatchPct": 57.7,
+          "maxWidthDeltaPx": 331,
+          "maxWidthDeltaText": "hosted git repositories"
+        },
+        "800": {
+          "sharedTexts": 71,
+          "widthMismatched": 42,
+          "widthMismatchPct": 59.2,
+          "maxWidthDeltaPx": 822,
+          "maxWidthDeltaText": "browse projects"
+        },
+        "1076": {
+          "sharedTexts": 72,
+          "widthMismatched": 2,
+          "widthMismatchPct": 2.8,
+          "maxWidthDeltaPx": 822,
+          "maxWidthDeltaText": "browse projects"
+        },
+        "1440": {
+          "sharedTexts": 72,
+          "widthMismatched": 2,
+          "widthMismatchPct": 2.8,
+          "maxWidthDeltaPx": 822,
+          "maxWidthDeltaText": "browse projects"
+        }
+      },
+      "widthsWithNonzeroMismatch": [
+        400,
+        450,
+        480,
+        600,
+        661,
+        800,
+        1076,
+        1440
+      ],
+      "exposurePerWidth": {
+        "400": {
+          "recreationOnlyPairs": 2,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 89,
+          "examplesCapped": 8
+        },
+        "450": {
+          "recreationOnlyPairs": 7,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 89,
+          "examplesCapped": 8
+        },
+        "480": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 89,
+          "examplesCapped": 8
+        },
+        "600": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 89,
+          "examplesCapped": 8
+        },
+        "661": {
+          "recreationOnlyPairs": 5,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 89,
+          "examplesCapped": 8
+        },
+        "800": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 1,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 89,
+          "recreationCandidates": 90,
+          "examplesCapped": 8
+        },
+        "1076": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 90,
+          "recreationCandidates": 90,
+          "examplesCapped": 8
+        },
+        "1440": {
+          "recreationOnlyPairs": 0,
+          "sourceOnlyPairs": 0,
+          "distinctTextsInExamples": 0,
+          "sourceCandidates": 90,
+          "recreationCandidates": 90,
+          "examplesCapped": 8
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 82,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 82,
+          "movedPct": 96.3
+        }
+      },
+      "inlineRowCapacityMaxSource": 6,
+      "grade": "informative-positive",
+      "gradeReason": "capable, reflows, and divergence was recorded.",
+      "ruleSaysLabel": "DIVERGENT",
+      "measuredOutcome": "DIVERGENT",
+      "ruleCorrect": true,
+      "predictionCorrect": true
+    }
+  },
+  "summary": {
+    "totalPagesRegistered": 11,
+    "pagesMeasured": 10,
+    "informativePages": 8,
+    "informativePageList": [
+      "reactdev",
+      "sveltedev",
+      "vuejs",
+      "cern",
+      "nprtext",
+      "lobsters",
+      "w3c",
+      "sourcehut"
+    ],
+    "weakPages": [
+      "danluu",
+      "gnu"
+    ],
+    "scoredDenominator": 8,
+    "widthFidelityRule": {
+      "hits": "8 of 8",
+      "wrongOn": []
+    },
+    "mechanismPrediction": {
+      "hits": "5 of 8",
+      "wrongOn": [
+        "cern",
+        "nprtext",
+        "lobsters"
+      ]
+    },
+    "baselines": {
+      "alwaysDivergent": "8 of 8",
+      "alwaysClean": "0 of 8"
+    }
+  }
+}

@@ -1,0 +1,9923 @@
+{
+ "site": {
+  "key": "sveltedev",
+  "recreationUrl": "http://127.0.0.1:8842/",
+  "sourceUrl": "https://svelte.dev/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 1,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 17,
+    "candidates": 116,
+    "protruding": 21,
+    "scrollWidth": 1454,
+    "clientWidth": 400
+   },
+   "recreationOnly": 5,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "free and open source software ||| github sponsors",
+    "dabble ||| free and open source software",
+    "free and open source software ||| frontend masters",
+    "free and open source software ||| threema open source fund",
+    "free and open source software ||| pintura"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 574,
+     "rowParents": 17,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 570,
+     "rowParents": 16,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      38,
+      324
+     ],
+     [
+      "get started",
+      130,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      184,
+      160
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      16,
+      368
+     ],
+     [
+      "it’s a love letter to web development.",
+      16,
+      348
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      16,
+      368
+     ],
+     [
+      "used by companies you’ve heard of",
+      50,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      16,
+      305
+     ],
+     [
+      "join our friendly community",
+      16,
+      368
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      16,
+      368
+     ],
+     [
+      "svelte society",
+      239,
+      109
+     ],
+     [
+      "our discord server",
+      212,
+      147
+     ],
+     [
+      "photos by",
+      16,
+      368
+     ],
+     [
+      "marcel cutts",
+      193,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      400
+     ],
+     [
+      "vercel",
+      129,
+      50
+     ],
+     [
+      "rich-harris",
+      169,
+      26
+     ],
+     [
+      "conduitry",
+      205,
+      26
+     ],
+     [
+      "dummdidumm",
+      133,
+      26
+     ],
+     [
+      "trueadm",
+      241,
+      26
+     ],
+     [
+      "tanhauhau",
+      98,
+      26
+     ],
+     [
+      "paoloricciuti",
+      277,
+      26
+     ],
+     [
+      "benmccann",
+      62,
+      26
+     ],
+     [
+      "puruvj",
+      313,
+      26
+     ],
+     [
+      "baseballyama",
+      26,
+      26
+     ],
+     [
+      "gtm-nayan",
+      348,
+      26
+     ],
+     [
+      "ocean-os",
+      -10,
+      26
+     ],
+     [
+      "7nik",
+      384,
+      26
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      169,
+      26
+     ],
+     [
+      "swatinem",
+      205,
+      26
+     ],
+     [
+      "jacwright",
+      133,
+      26
+     ],
+     [
+      "lukeed",
+      241,
+      26
+     ],
+     [
+      "mrkishi",
+      98,
+      26
+     ],
+     [
+      "dreamindani",
+      277,
+      26
+     ],
+     [
+      "adiguba",
+      62,
+      26
+     ],
+     [
+      "mindrones",
+      313,
+      26
+     ],
+     [
+      "pngwn",
+      26,
+      26
+     ],
+     [
+      "ngtr6788",
+      348,
+      26
+     ],
+     [
+      "navorite",
+      -10,
+      26
+     ],
+     [
+      "geoffrich",
+      384,
+      26
+     ],
+     [
+      "ekhaled",
+      169,
+      26
+     ],
+     [
+      "ignatiusmb",
+      205,
+      26
+     ],
+     [
+      "emiltholin",
+      133,
+      26
+     ],
+     [
+      "antony",
+      241,
+      26
+     ],
+     [
+      "dominikg",
+      98,
+      26
+     ],
+     [
+      "mathiaswp",
+      277,
+      26
+     ],
+     [
+      "tivac",
+      62,
+      26
+     ],
+     [
+      "jches",
+      313,
+      26
+     ],
+     [
+      "zxbodya",
+      26,
+      26
+     ],
+     [
+      "btk5h",
+      348,
+      26
+     ],
+     [
+      "paulbgd",
+      -10,
+      26
+     ],
+     [
+      "halfnelson",
+      384,
+      26
+     ],
+     [
+      "pushkine",
+      169,
+      26
+     ],
+     [
+      "garrettgeorge",
+      205,
+      26
+     ],
+     [
+      "btakita",
+      133,
+      26
+     ],
+     [
+      "brunnerh",
+      241,
+      26
+     ],
+     [
+      "fweinb",
+      98,
+      26
+     ],
+     [
+      "tehshrike",
+      277,
+      26
+     ],
+     [
+      "evs-chris",
+      62,
+      26
+     ],
+     [
+      "colincasey",
+      313,
+      26
+     ],
+     [
+      "jamesbirtles",
+      26,
+      26
+     ],
+     [
+      "bluwy",
+      348,
+      26
+     ],
+     [
+      "jacobmischka",
+      -10,
+      26
+     ],
+     [
+      "fcrozatier",
+      384,
+      26
+     ],
+     [
+      "drips",
+      169,
+      26
+     ],
+     [
+      "datawrapper",
+      205,
+      26
+     ],
+     [
+      "vercel",
+      133,
+      26
+     ],
+     [
+      "github sponsors",
+      241,
+      26
+     ],
+     [
+      "cohere",
+      98,
+      26
+     ],
+     [
+      "dabble",
+      277,
+      26
+     ],
+     [
+      "monogram",
+      62,
+      26
+     ],
+     [
+      "frontend masters",
+      313,
+      26
+     ],
+     [
+      "hugging face",
+      26,
+      26
+     ],
+     [
+      "threema open source fund",
+      348,
+      26
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      -10,
+      26
+     ],
+     [
+      "pintura",
+      384,
+      26
+     ],
+     [
+      "codesmith",
+      169,
+      26
+     ],
+     [
+      "raster",
+      205,
+      26
+     ],
+     [
+      "avast",
+      133,
+      26
+     ],
+     [
+      "wondertax labs",
+      241,
+      26
+     ],
+     [
+      "jeff moe",
+      98,
+      26
+     ],
+     [
+      "invisr",
+      277,
+      26
+     ],
+     [
+      "matt",
+      62,
+      26
+     ],
+     [
+      "sanity",
+      313,
+      26
+     ],
+     [
+      "metafy",
+      26,
+      26
+     ],
+     [
+      "changelog",
+      348,
+      26
+     ],
+     [
+      "kohei yoshino",
+      -10,
+      26
+     ],
+     [
+      "clancy digital",
+      384,
+      26
+     ],
+     [
+      "kenoxa gmbh",
+      169,
+      26
+     ],
+     [
+      "level up tutorials",
+      205,
+      26
+     ],
+     [
+      "the pudding",
+      133,
+      26
+     ],
+     [
+      "jason hetherington",
+      241,
+      26
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      98,
+      26
+     ],
+     [
+      "zev averbach",
+      277,
+      26
+     ],
+     [
+      "donovan dikaio",
+      62,
+      26
+     ],
+     [
+      "bun",
+      313,
+      26
+     ],
+     [
+      "hyunbin",
+      26,
+      26
+     ],
+     [
+      "multi",
+      348,
+      26
+     ],
+     [
+      "evidence",
+      -10,
+      26
+     ],
+     [
+      "scott spence",
+      384,
+      26
+     ],
+     [
+      "david stevens",
+      169,
+      26
+     ],
+     [
+      "0+x",
+      205,
+      26
+     ],
+     [
+      "handsontable - javascript data grid",
+      133,
+      26
+     ],
+     [
+      "dong-won jeffrey lee",
+      241,
+      26
+     ],
+     [
+      "cain voong",
+      98,
+      26
+     ],
+     [
+      "nicky hajal",
+      277,
+      26
+     ],
+     [
+      "dean papastrat",
+      62,
+      26
+     ],
+     [
+      "robert balfre",
+      313,
+      26
+     ],
+     [
+      "sentry",
+      26,
+      26
+     ],
+     [
+      "cliff johnson",
+      348,
+      26
+     ],
+     [
+      "sourcegraph",
+      -10,
+      26
+     ],
+     [
+      "emma agering",
+      384,
+      26
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      16,
+      368
+     ],
+     [
+      "free and open source software",
+      23,
+      341
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      38,
+      324
+     ],
+     [
+      "get started",
+      119,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      864,
+      77
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      736,
+      205
+     ],
+     [
+      "it’s a love letter to web development.",
+      736,
+      168
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      736,
+      205
+     ],
+     [
+      "used by companies you’ve heard of",
+      50,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      297
+     ],
+     [
+      "join our friendly community",
+      32,
+      336
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      32,
+      336
+     ],
+     [
+      "svelte society",
+      239,
+      109
+     ],
+     [
+      "our discord server",
+      173,
+      183
+     ],
+     [
+      "photos by",
+      32,
+      336
+     ],
+     [
+      "marcel cutts",
+      193,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      400
+     ],
+     [
+      "vercel",
+      129,
+      50
+     ],
+     [
+      "rich-harris",
+      716,
+      57
+     ],
+     [
+      "conduitry",
+      -16,
+      57
+     ],
+     [
+      "dummdidumm",
+      649,
+      57
+     ],
+     [
+      "trueadm",
+      51,
+      57
+     ],
+     [
+      "tanhauhau",
+      583,
+      57
+     ],
+     [
+      "paoloricciuti",
+      117,
+      57
+     ],
+     [
+      "benmccann",
+      516,
+      57
+     ],
+     [
+      "puruvj",
+      184,
+      57
+     ],
+     [
+      "baseballyama",
+      450,
+      57
+     ],
+     [
+      "gtm-nayan",
+      250,
+      57
+     ],
+     [
+      "ocean-os",
+      383,
+      57
+     ],
+     [
+      "7nik",
+      317,
+      57
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      317,
+      57
+     ],
+     [
+      "swatinem",
+      383,
+      57
+     ],
+     [
+      "jacwright",
+      250,
+      57
+     ],
+     [
+      "lukeed",
+      450,
+      57
+     ],
+     [
+      "mrkishi",
+      184,
+      57
+     ],
+     [
+      "dreamindani",
+      516,
+      57
+     ],
+     [
+      "adiguba",
+      117,
+      57
+     ],
+     [
+      "mindrones",
+      583,
+      57
+     ],
+     [
+      "pngwn",
+      51,
+      57
+     ],
+     [
+      "ngtr6788",
+      649,
+      57
+     ],
+     [
+      "navorite",
+      -16,
+      57
+     ],
+     [
+      "geoffrich",
+      716,
+      57
+     ],
+     [
+      "ekhaled",
+      716,
+      57
+     ],
+     [
+      "ignatiusmb",
+      -16,
+      57
+     ],
+     [
+      "emiltholin",
+      649,
+      57
+     ],
+     [
+      "antony",
+      51,
+      57
+     ],
+     [
+      "dominikg",
+      583,
+      57
+     ],
+     [
+      "mathiaswp",
+      117,
+      57
+     ],
+     [
+      "tivac",
+      516,
+      57
+     ],
+     [
+      "jches",
+      184,
+      57
+     ],
+     [
+      "zxbodya",
+      450,
+      57
+     ],
+     [
+      "btk5h",
+      250,
+      57
+     ],
+     [
+      "paulbgd",
+      383,
+      57
+     ],
+     [
+      "halfnelson",
+      317,
+      57
+     ],
+     [
+      "pushkine",
+      317,
+      57
+     ],
+     [
+      "garrettgeorge",
+      383,
+      57
+     ],
+     [
+      "btakita",
+      250,
+      57
+     ],
+     [
+      "brunnerh",
+      450,
+      57
+     ],
+     [
+      "fweinb",
+      184,
+      57
+     ],
+     [
+      "tehshrike",
+      516,
+      57
+     ],
+     [
+      "evs-chris",
+      117,
+      57
+     ],
+     [
+      "colincasey",
+      583,
+      57
+     ],
+     [
+      "jamesbirtles",
+      51,
+      57
+     ],
+     [
+      "bluwy",
+      649,
+      57
+     ],
+     [
+      "jacobmischka",
+      -16,
+      57
+     ],
+     [
+      "fcrozatier",
+      716,
+      57
+     ],
+     [
+      "drips",
+      716,
+      57
+     ],
+     [
+      "datawrapper",
+      -16,
+      57
+     ],
+     [
+      "vercel",
+      649,
+      57
+     ],
+     [
+      "github sponsors",
+      51,
+      57
+     ],
+     [
+      "cohere",
+      583,
+      57
+     ],
+     [
+      "dabble",
+      117,
+      57
+     ],
+     [
+      "monogram",
+      516,
+      57
+     ],
+     [
+      "frontend masters",
+      184,
+      57
+     ],
+     [
+      "hugging face",
+      450,
+      57
+     ],
+     [
+      "threema open source fund",
+      250,
+      57
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      383,
+      57
+     ],
+     [
+      "pintura",
+      317,
+      57
+     ],
+     [
+      "codesmith",
+      317,
+      57
+     ],
+     [
+      "raster",
+      383,
+      57
+     ],
+     [
+      "avast",
+      250,
+      57
+     ],
+     [
+      "wondertax labs",
+      450,
+      57
+     ],
+     [
+      "jeff moe",
+      184,
+      57
+     ],
+     [
+      "invisr",
+      516,
+      57
+     ],
+     [
+      "matt",
+      117,
+      57
+     ],
+     [
+      "sanity",
+      583,
+      57
+     ],
+     [
+      "metafy",
+      51,
+      57
+     ],
+     [
+      "changelog",
+      649,
+      57
+     ],
+     [
+      "kohei yoshino",
+      -16,
+      57
+     ],
+     [
+      "clancy digital",
+      716,
+      57
+     ],
+     [
+      "kenoxa gmbh",
+      716,
+      57
+     ],
+     [
+      "level up tutorials",
+      -16,
+      57
+     ],
+     [
+      "the pudding",
+      649,
+      57
+     ],
+     [
+      "jason hetherington",
+      51,
+      57
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      583,
+      57
+     ],
+     [
+      "zev averbach",
+      117,
+      57
+     ],
+     [
+      "donovan dikaio",
+      516,
+      57
+     ],
+     [
+      "bun",
+      184,
+      57
+     ],
+     [
+      "hyunbin",
+      450,
+      57
+     ],
+     [
+      "multi",
+      250,
+      57
+     ],
+     [
+      "evidence",
+      383,
+      57
+     ],
+     [
+      "scott spence",
+      317,
+      57
+     ],
+     [
+      "david stevens",
+      317,
+      57
+     ],
+     [
+      "0+x",
+      383,
+      57
+     ],
+     [
+      "handsontable - javascript data grid",
+      250,
+      57
+     ],
+     [
+      "dong-won jeffrey lee",
+      450,
+      57
+     ],
+     [
+      "cain voong",
+      184,
+      57
+     ],
+     [
+      "nicky hajal",
+      516,
+      57
+     ],
+     [
+      "dean papastrat",
+      117,
+      57
+     ],
+     [
+      "robert balfre",
+      583,
+      57
+     ],
+     [
+      "sentry",
+      51,
+      57
+     ],
+     [
+      "cliff johnson",
+      649,
+      57
+     ],
+     [
+      "sourcegraph",
+      -16,
+      57
+     ],
+     [
+      "emma agering",
+      716,
+      57
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      32,
+      336
+     ],
+     [
+      "free and open source software",
+      38,
+      326
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 1,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 20,
+    "candidates": 116,
+    "protruding": 21,
+    "scrollWidth": 1454,
+    "clientWidth": 450
+   },
+   "recreationOnly": 6,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "free and open source software ||| github sponsors",
+    "dabble ||| free and open source software",
+    "free and open source software ||| frontend masters",
+    "free and open source software ||| threema open source fund",
+    "free and open source software ||| pintura",
+    "free and open source software ||| raster"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 574,
+     "rowParents": 17,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 570,
+     "rowParents": 16,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      63,
+      324
+     ],
+     [
+      "get started",
+      155,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      209,
+      160
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      16,
+      418
+     ],
+     [
+      "it’s a love letter to web development.",
+      16,
+      415
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      16,
+      418
+     ],
+     [
+      "used by companies you’ve heard of",
+      75,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      16,
+      305
+     ],
+     [
+      "join our friendly community",
+      16,
+      418
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      16,
+      418
+     ],
+     [
+      "svelte society",
+      224,
+      109
+     ],
+     [
+      "our discord server",
+      170,
+      147
+     ],
+     [
+      "photos by",
+      16,
+      418
+     ],
+     [
+      "marcel cutts",
+      218,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      450
+     ],
+     [
+      "vercel",
+      154,
+      50
+     ],
+     [
+      "rich-harris",
+      190,
+      30
+     ],
+     [
+      "conduitry",
+      230,
+      30
+     ],
+     [
+      "dummdidumm",
+      150,
+      30
+     ],
+     [
+      "trueadm",
+      270,
+      30
+     ],
+     [
+      "tanhauhau",
+      110,
+      30
+     ],
+     [
+      "paoloricciuti",
+      310,
+      30
+     ],
+     [
+      "benmccann",
+      70,
+      30
+     ],
+     [
+      "puruvj",
+      350,
+      30
+     ],
+     [
+      "baseballyama",
+      30,
+      30
+     ],
+     [
+      "gtm-nayan",
+      390,
+      30
+     ],
+     [
+      "ocean-os",
+      -10,
+      30
+     ],
+     [
+      "7nik",
+      430,
+      30
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      190,
+      30
+     ],
+     [
+      "swatinem",
+      230,
+      30
+     ],
+     [
+      "jacwright",
+      150,
+      30
+     ],
+     [
+      "lukeed",
+      270,
+      30
+     ],
+     [
+      "mrkishi",
+      110,
+      30
+     ],
+     [
+      "dreamindani",
+      310,
+      30
+     ],
+     [
+      "adiguba",
+      70,
+      30
+     ],
+     [
+      "mindrones",
+      350,
+      30
+     ],
+     [
+      "pngwn",
+      30,
+      30
+     ],
+     [
+      "ngtr6788",
+      390,
+      30
+     ],
+     [
+      "navorite",
+      -10,
+      30
+     ],
+     [
+      "geoffrich",
+      430,
+      30
+     ],
+     [
+      "ekhaled",
+      190,
+      30
+     ],
+     [
+      "ignatiusmb",
+      230,
+      30
+     ],
+     [
+      "emiltholin",
+      150,
+      30
+     ],
+     [
+      "antony",
+      270,
+      30
+     ],
+     [
+      "dominikg",
+      110,
+      30
+     ],
+     [
+      "mathiaswp",
+      310,
+      30
+     ],
+     [
+      "tivac",
+      70,
+      30
+     ],
+     [
+      "jches",
+      350,
+      30
+     ],
+     [
+      "zxbodya",
+      30,
+      30
+     ],
+     [
+      "btk5h",
+      390,
+      30
+     ],
+     [
+      "paulbgd",
+      -10,
+      30
+     ],
+     [
+      "halfnelson",
+      430,
+      30
+     ],
+     [
+      "pushkine",
+      190,
+      30
+     ],
+     [
+      "garrettgeorge",
+      230,
+      30
+     ],
+     [
+      "btakita",
+      150,
+      30
+     ],
+     [
+      "brunnerh",
+      270,
+      30
+     ],
+     [
+      "fweinb",
+      110,
+      30
+     ],
+     [
+      "tehshrike",
+      310,
+      30
+     ],
+     [
+      "evs-chris",
+      70,
+      30
+     ],
+     [
+      "colincasey",
+      350,
+      30
+     ],
+     [
+      "jamesbirtles",
+      30,
+      30
+     ],
+     [
+      "bluwy",
+      390,
+      30
+     ],
+     [
+      "jacobmischka",
+      -10,
+      30
+     ],
+     [
+      "fcrozatier",
+      430,
+      30
+     ],
+     [
+      "drips",
+      190,
+      30
+     ],
+     [
+      "datawrapper",
+      230,
+      30
+     ],
+     [
+      "vercel",
+      150,
+      30
+     ],
+     [
+      "github sponsors",
+      270,
+      30
+     ],
+     [
+      "cohere",
+      110,
+      30
+     ],
+     [
+      "dabble",
+      310,
+      30
+     ],
+     [
+      "monogram",
+      70,
+      30
+     ],
+     [
+      "frontend masters",
+      350,
+      30
+     ],
+     [
+      "hugging face",
+      30,
+      30
+     ],
+     [
+      "threema open source fund",
+      390,
+      30
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      -10,
+      30
+     ],
+     [
+      "pintura",
+      430,
+      30
+     ],
+     [
+      "codesmith",
+      190,
+      30
+     ],
+     [
+      "raster",
+      230,
+      30
+     ],
+     [
+      "avast",
+      150,
+      30
+     ],
+     [
+      "wondertax labs",
+      270,
+      30
+     ],
+     [
+      "jeff moe",
+      110,
+      30
+     ],
+     [
+      "invisr",
+      310,
+      30
+     ],
+     [
+      "matt",
+      70,
+      30
+     ],
+     [
+      "sanity",
+      350,
+      30
+     ],
+     [
+      "metafy",
+      30,
+      30
+     ],
+     [
+      "changelog",
+      390,
+      30
+     ],
+     [
+      "kohei yoshino",
+      -10,
+      30
+     ],
+     [
+      "clancy digital",
+      430,
+      30
+     ],
+     [
+      "kenoxa gmbh",
+      190,
+      30
+     ],
+     [
+      "level up tutorials",
+      230,
+      30
+     ],
+     [
+      "the pudding",
+      150,
+      30
+     ],
+     [
+      "jason hetherington",
+      270,
+      30
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      110,
+      30
+     ],
+     [
+      "zev averbach",
+      310,
+      30
+     ],
+     [
+      "donovan dikaio",
+      70,
+      30
+     ],
+     [
+      "bun",
+      350,
+      30
+     ],
+     [
+      "hyunbin",
+      30,
+      30
+     ],
+     [
+      "multi",
+      390,
+      30
+     ],
+     [
+      "evidence",
+      -10,
+      30
+     ],
+     [
+      "scott spence",
+      430,
+      30
+     ],
+     [
+      "david stevens",
+      190,
+      30
+     ],
+     [
+      "0+x",
+      230,
+      30
+     ],
+     [
+      "handsontable - javascript data grid",
+      150,
+      30
+     ],
+     [
+      "dong-won jeffrey lee",
+      270,
+      30
+     ],
+     [
+      "cain voong",
+      110,
+      30
+     ],
+     [
+      "nicky hajal",
+      310,
+      30
+     ],
+     [
+      "dean papastrat",
+      70,
+      30
+     ],
+     [
+      "robert balfre",
+      350,
+      30
+     ],
+     [
+      "sentry",
+      30,
+      30
+     ],
+     [
+      "cliff johnson",
+      390,
+      30
+     ],
+     [
+      "sourcegraph",
+      -10,
+      30
+     ],
+     [
+      "emma agering",
+      430,
+      30
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      16,
+      418
+     ],
+     [
+      "free and open source software",
+      36,
+      392
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      63,
+      324
+     ],
+     [
+      "get started",
+      144,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      864,
+      77
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      736,
+      205
+     ],
+     [
+      "it’s a love letter to web development.",
+      736,
+      168
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      736,
+      205
+     ],
+     [
+      "used by companies you’ve heard of",
+      75,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      297
+     ],
+     [
+      "join our friendly community",
+      32,
+      386
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      32,
+      386
+     ],
+     [
+      "svelte society",
+      224,
+      109
+     ],
+     [
+      "our discord server",
+      188,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      386
+     ],
+     [
+      "marcel cutts",
+      218,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      450
+     ],
+     [
+      "vercel",
+      154,
+      50
+     ],
+     [
+      "rich-harris",
+      716,
+      57
+     ],
+     [
+      "conduitry",
+      -16,
+      57
+     ],
+     [
+      "dummdidumm",
+      649,
+      57
+     ],
+     [
+      "trueadm",
+      51,
+      57
+     ],
+     [
+      "tanhauhau",
+      583,
+      57
+     ],
+     [
+      "paoloricciuti",
+      117,
+      57
+     ],
+     [
+      "benmccann",
+      516,
+      57
+     ],
+     [
+      "puruvj",
+      184,
+      57
+     ],
+     [
+      "baseballyama",
+      450,
+      57
+     ],
+     [
+      "gtm-nayan",
+      250,
+      57
+     ],
+     [
+      "ocean-os",
+      383,
+      57
+     ],
+     [
+      "7nik",
+      317,
+      57
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      317,
+      57
+     ],
+     [
+      "swatinem",
+      383,
+      57
+     ],
+     [
+      "jacwright",
+      250,
+      57
+     ],
+     [
+      "lukeed",
+      450,
+      57
+     ],
+     [
+      "mrkishi",
+      184,
+      57
+     ],
+     [
+      "dreamindani",
+      516,
+      57
+     ],
+     [
+      "adiguba",
+      117,
+      57
+     ],
+     [
+      "mindrones",
+      583,
+      57
+     ],
+     [
+      "pngwn",
+      51,
+      57
+     ],
+     [
+      "ngtr6788",
+      649,
+      57
+     ],
+     [
+      "navorite",
+      -16,
+      57
+     ],
+     [
+      "geoffrich",
+      716,
+      57
+     ],
+     [
+      "ekhaled",
+      716,
+      57
+     ],
+     [
+      "ignatiusmb",
+      -16,
+      57
+     ],
+     [
+      "emiltholin",
+      649,
+      57
+     ],
+     [
+      "antony",
+      51,
+      57
+     ],
+     [
+      "dominikg",
+      583,
+      57
+     ],
+     [
+      "mathiaswp",
+      117,
+      57
+     ],
+     [
+      "tivac",
+      516,
+      57
+     ],
+     [
+      "jches",
+      184,
+      57
+     ],
+     [
+      "zxbodya",
+      450,
+      57
+     ],
+     [
+      "btk5h",
+      250,
+      57
+     ],
+     [
+      "paulbgd",
+      383,
+      57
+     ],
+     [
+      "halfnelson",
+      317,
+      57
+     ],
+     [
+      "pushkine",
+      317,
+      57
+     ],
+     [
+      "garrettgeorge",
+      383,
+      57
+     ],
+     [
+      "btakita",
+      250,
+      57
+     ],
+     [
+      "brunnerh",
+      450,
+      57
+     ],
+     [
+      "fweinb",
+      184,
+      57
+     ],
+     [
+      "tehshrike",
+      516,
+      57
+     ],
+     [
+      "evs-chris",
+      117,
+      57
+     ],
+     [
+      "colincasey",
+      583,
+      57
+     ],
+     [
+      "jamesbirtles",
+      51,
+      57
+     ],
+     [
+      "bluwy",
+      649,
+      57
+     ],
+     [
+      "jacobmischka",
+      -16,
+      57
+     ],
+     [
+      "fcrozatier",
+      716,
+      57
+     ],
+     [
+      "drips",
+      716,
+      57
+     ],
+     [
+      "datawrapper",
+      -16,
+      57
+     ],
+     [
+      "vercel",
+      649,
+      57
+     ],
+     [
+      "github sponsors",
+      51,
+      57
+     ],
+     [
+      "cohere",
+      583,
+      57
+     ],
+     [
+      "dabble",
+      117,
+      57
+     ],
+     [
+      "monogram",
+      516,
+      57
+     ],
+     [
+      "frontend masters",
+      184,
+      57
+     ],
+     [
+      "hugging face",
+      450,
+      57
+     ],
+     [
+      "threema open source fund",
+      250,
+      57
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      383,
+      57
+     ],
+     [
+      "pintura",
+      317,
+      57
+     ],
+     [
+      "codesmith",
+      317,
+      57
+     ],
+     [
+      "raster",
+      383,
+      57
+     ],
+     [
+      "avast",
+      250,
+      57
+     ],
+     [
+      "wondertax labs",
+      450,
+      57
+     ],
+     [
+      "jeff moe",
+      184,
+      57
+     ],
+     [
+      "invisr",
+      516,
+      57
+     ],
+     [
+      "matt",
+      117,
+      57
+     ],
+     [
+      "sanity",
+      583,
+      57
+     ],
+     [
+      "metafy",
+      51,
+      57
+     ],
+     [
+      "changelog",
+      649,
+      57
+     ],
+     [
+      "kohei yoshino",
+      -16,
+      57
+     ],
+     [
+      "clancy digital",
+      716,
+      57
+     ],
+     [
+      "kenoxa gmbh",
+      716,
+      57
+     ],
+     [
+      "level up tutorials",
+      -16,
+      57
+     ],
+     [
+      "the pudding",
+      649,
+      57
+     ],
+     [
+      "jason hetherington",
+      51,
+      57
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      583,
+      57
+     ],
+     [
+      "zev averbach",
+      117,
+      57
+     ],
+     [
+      "donovan dikaio",
+      516,
+      57
+     ],
+     [
+      "bun",
+      184,
+      57
+     ],
+     [
+      "hyunbin",
+      450,
+      57
+     ],
+     [
+      "multi",
+      250,
+      57
+     ],
+     [
+      "evidence",
+      383,
+      57
+     ],
+     [
+      "scott spence",
+      317,
+      57
+     ],
+     [
+      "david stevens",
+      317,
+      57
+     ],
+     [
+      "0+x",
+      383,
+      57
+     ],
+     [
+      "handsontable - javascript data grid",
+      250,
+      57
+     ],
+     [
+      "dong-won jeffrey lee",
+      450,
+      57
+     ],
+     [
+      "cain voong",
+      184,
+      57
+     ],
+     [
+      "nicky hajal",
+      516,
+      57
+     ],
+     [
+      "dean papastrat",
+      117,
+      57
+     ],
+     [
+      "robert balfre",
+      583,
+      57
+     ],
+     [
+      "sentry",
+      51,
+      57
+     ],
+     [
+      "cliff johnson",
+      649,
+      57
+     ],
+     [
+      "sourcegraph",
+      -16,
+      57
+     ],
+     [
+      "emma agering",
+      716,
+      57
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      32,
+      386
+     ],
+     [
+      "free and open source software",
+      46,
+      360
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 1,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 19,
+    "candidates": 116,
+    "protruding": 47,
+    "scrollWidth": 1454,
+    "clientWidth": 480
+   },
+   "recreationOnly": 9,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "cohere ||| free and open source software",
+    "free and open source software ||| monogram",
+    "free and open source software ||| hugging face",
+    "free and open source software ||| xyflow - react flow | svelte flow",
+    "codesmith ||| free and open source software",
+    "avast ||| free and open source software",
+    "free and open source software ||| jeff moe",
+    "free and open source software ||| matt"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 766,
+     "rowParents": 17,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 762,
+     "rowParents": 16,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      78,
+      324
+     ],
+     [
+      "get started",
+      170,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      224,
+      160
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      32,
+      416
+     ],
+     [
+      "it’s a love letter to web development.",
+      32,
+      415
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      32,
+      416
+     ],
+     [
+      "used by companies you’ve heard of",
+      90,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      305
+     ],
+     [
+      "join our friendly community",
+      32,
+      416
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      32,
+      416
+     ],
+     [
+      "svelte society",
+      239,
+      109
+     ],
+     [
+      "our discord server",
+      185,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      416
+     ],
+     [
+      "marcel cutts",
+      233,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      480
+     ],
+     [
+      "vercel",
+      169,
+      50
+     ],
+     [
+      "rich-harris",
+      213,
+      22
+     ],
+     [
+      "conduitry",
+      245,
+      22
+     ],
+     [
+      "dummdidumm",
+      181,
+      22
+     ],
+     [
+      "trueadm",
+      277,
+      22
+     ],
+     [
+      "tanhauhau",
+      149,
+      22
+     ],
+     [
+      "paoloricciuti",
+      309,
+      22
+     ],
+     [
+      "benmccann",
+      118,
+      22
+     ],
+     [
+      "puruvj",
+      341,
+      22
+     ],
+     [
+      "baseballyama",
+      86,
+      22
+     ],
+     [
+      "gtm-nayan",
+      373,
+      22
+     ],
+     [
+      "ocean-os",
+      54,
+      22
+     ],
+     [
+      "7nik",
+      404,
+      22
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      22,
+      22
+     ],
+     [
+      "swatinem",
+      436,
+      22
+     ],
+     [
+      "jacwright",
+      -10,
+      22
+     ],
+     [
+      "lukeed",
+      468,
+      22
+     ],
+     [
+      "mrkishi",
+      213,
+      22
+     ],
+     [
+      "dreamindani",
+      245,
+      22
+     ],
+     [
+      "adiguba",
+      181,
+      22
+     ],
+     [
+      "mindrones",
+      277,
+      22
+     ],
+     [
+      "pngwn",
+      149,
+      22
+     ],
+     [
+      "ngtr6788",
+      309,
+      22
+     ],
+     [
+      "navorite",
+      118,
+      22
+     ],
+     [
+      "geoffrich",
+      341,
+      22
+     ],
+     [
+      "ekhaled",
+      86,
+      22
+     ],
+     [
+      "ignatiusmb",
+      373,
+      22
+     ],
+     [
+      "emiltholin",
+      54,
+      22
+     ],
+     [
+      "antony",
+      404,
+      22
+     ],
+     [
+      "dominikg",
+      22,
+      22
+     ],
+     [
+      "mathiaswp",
+      436,
+      22
+     ],
+     [
+      "tivac",
+      -10,
+      22
+     ],
+     [
+      "jches",
+      468,
+      22
+     ],
+     [
+      "zxbodya",
+      213,
+      22
+     ],
+     [
+      "btk5h",
+      245,
+      22
+     ],
+     [
+      "paulbgd",
+      181,
+      22
+     ],
+     [
+      "halfnelson",
+      277,
+      22
+     ],
+     [
+      "pushkine",
+      149,
+      22
+     ],
+     [
+      "garrettgeorge",
+      309,
+      22
+     ],
+     [
+      "btakita",
+      118,
+      22
+     ],
+     [
+      "brunnerh",
+      341,
+      22
+     ],
+     [
+      "fweinb",
+      86,
+      22
+     ],
+     [
+      "tehshrike",
+      373,
+      22
+     ],
+     [
+      "evs-chris",
+      54,
+      22
+     ],
+     [
+      "colincasey",
+      404,
+      22
+     ],
+     [
+      "jamesbirtles",
+      22,
+      22
+     ],
+     [
+      "bluwy",
+      436,
+      22
+     ],
+     [
+      "jacobmischka",
+      -10,
+      22
+     ],
+     [
+      "fcrozatier",
+      468,
+      22
+     ],
+     [
+      "drips",
+      213,
+      22
+     ],
+     [
+      "datawrapper",
+      245,
+      22
+     ],
+     [
+      "vercel",
+      181,
+      22
+     ],
+     [
+      "github sponsors",
+      277,
+      22
+     ],
+     [
+      "cohere",
+      149,
+      22
+     ],
+     [
+      "dabble",
+      309,
+      22
+     ],
+     [
+      "monogram",
+      118,
+      22
+     ],
+     [
+      "frontend masters",
+      341,
+      22
+     ],
+     [
+      "hugging face",
+      86,
+      22
+     ],
+     [
+      "threema open source fund",
+      373,
+      22
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      54,
+      22
+     ],
+     [
+      "pintura",
+      404,
+      22
+     ],
+     [
+      "codesmith",
+      22,
+      22
+     ],
+     [
+      "raster",
+      436,
+      22
+     ],
+     [
+      "avast",
+      -10,
+      22
+     ],
+     [
+      "wondertax labs",
+      468,
+      22
+     ],
+     [
+      "jeff moe",
+      213,
+      22
+     ],
+     [
+      "invisr",
+      245,
+      22
+     ],
+     [
+      "matt",
+      181,
+      22
+     ],
+     [
+      "sanity",
+      277,
+      22
+     ],
+     [
+      "metafy",
+      149,
+      22
+     ],
+     [
+      "changelog",
+      309,
+      22
+     ],
+     [
+      "kohei yoshino",
+      118,
+      22
+     ],
+     [
+      "clancy digital",
+      341,
+      22
+     ],
+     [
+      "kenoxa gmbh",
+      86,
+      22
+     ],
+     [
+      "level up tutorials",
+      373,
+      22
+     ],
+     [
+      "the pudding",
+      54,
+      22
+     ],
+     [
+      "jason hetherington",
+      404,
+      22
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      22,
+      22
+     ],
+     [
+      "zev averbach",
+      436,
+      22
+     ],
+     [
+      "donovan dikaio",
+      -10,
+      22
+     ],
+     [
+      "bun",
+      468,
+      22
+     ],
+     [
+      "hyunbin",
+      213,
+      22
+     ],
+     [
+      "multi",
+      245,
+      22
+     ],
+     [
+      "evidence",
+      181,
+      22
+     ],
+     [
+      "scott spence",
+      277,
+      22
+     ],
+     [
+      "david stevens",
+      149,
+      22
+     ],
+     [
+      "0+x",
+      309,
+      22
+     ],
+     [
+      "handsontable - javascript data grid",
+      118,
+      22
+     ],
+     [
+      "dong-won jeffrey lee",
+      341,
+      22
+     ],
+     [
+      "cain voong",
+      86,
+      22
+     ],
+     [
+      "nicky hajal",
+      373,
+      22
+     ],
+     [
+      "dean papastrat",
+      54,
+      22
+     ],
+     [
+      "robert balfre",
+      404,
+      22
+     ],
+     [
+      "sentry",
+      22,
+      22
+     ],
+     [
+      "cliff johnson",
+      436,
+      22
+     ],
+     [
+      "sourcegraph",
+      -10,
+      22
+     ],
+     [
+      "emma agering",
+      468,
+      22
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      32,
+      416
+     ],
+     [
+      "free and open source software",
+      51,
+      392
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      78,
+      324
+     ],
+     [
+      "get started",
+      159,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      864,
+      77
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      736,
+      205
+     ],
+     [
+      "it’s a love letter to web development.",
+      736,
+      168
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      736,
+      205
+     ],
+     [
+      "used by companies you’ve heard of",
+      90,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      297
+     ],
+     [
+      "join our friendly community",
+      32,
+      416
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      32,
+      416
+     ],
+     [
+      "svelte society",
+      239,
+      109
+     ],
+     [
+      "our discord server",
+      185,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      416
+     ],
+     [
+      "marcel cutts",
+      233,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      0,
+      480
+     ],
+     [
+      "vercel",
+      126,
+      50
+     ],
+     [
+      "rich-harris",
+      533,
+      40
+     ],
+     [
+      "conduitry",
+      583,
+      40
+     ],
+     [
+      "dummdidumm",
+      483,
+      40
+     ],
+     [
+      "trueadm",
+      632,
+      40
+     ],
+     [
+      "tanhauhau",
+      433,
+      40
+     ],
+     [
+      "paoloricciuti",
+      682,
+      40
+     ],
+     [
+      "benmccann",
+      383,
+      40
+     ],
+     [
+      "puruvj",
+      732,
+      40
+     ],
+     [
+      "baseballyama",
+      333,
+      40
+     ],
+     [
+      "gtm-nayan",
+      -16,
+      40
+     ],
+     [
+      "ocean-os",
+      283,
+      40
+     ],
+     [
+      "7nik",
+      34,
+      40
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      233,
+      40
+     ],
+     [
+      "swatinem",
+      84,
+      40
+     ],
+     [
+      "jacwright",
+      184,
+      40
+     ],
+     [
+      "lukeed",
+      134,
+      40
+     ],
+     [
+      "mrkishi",
+      134,
+      40
+     ],
+     [
+      "dreamindani",
+      184,
+      40
+     ],
+     [
+      "adiguba",
+      84,
+      40
+     ],
+     [
+      "mindrones",
+      233,
+      40
+     ],
+     [
+      "pngwn",
+      34,
+      40
+     ],
+     [
+      "ngtr6788",
+      283,
+      40
+     ],
+     [
+      "navorite",
+      -16,
+      40
+     ],
+     [
+      "geoffrich",
+      333,
+      40
+     ],
+     [
+      "ekhaled",
+      134,
+      40
+     ],
+     [
+      "ignatiusmb",
+      184,
+      40
+     ],
+     [
+      "emiltholin",
+      84,
+      40
+     ],
+     [
+      "antony",
+      233,
+      40
+     ],
+     [
+      "dominikg",
+      34,
+      40
+     ],
+     [
+      "mathiaswp",
+      283,
+      40
+     ],
+     [
+      "tivac",
+      -16,
+      40
+     ],
+     [
+      "jches",
+      333,
+      40
+     ],
+     [
+      "zxbodya",
+      732,
+      40
+     ],
+     [
+      "btk5h",
+      383,
+      40
+     ],
+     [
+      "paulbgd",
+      682,
+      40
+     ],
+     [
+      "halfnelson",
+      433,
+      40
+     ],
+     [
+      "pushkine",
+      632,
+      40
+     ],
+     [
+      "garrettgeorge",
+      483,
+      40
+     ],
+     [
+      "btakita",
+      583,
+      40
+     ],
+     [
+      "brunnerh",
+      533,
+      40
+     ],
+     [
+      "fweinb",
+      533,
+      40
+     ],
+     [
+      "tehshrike",
+      583,
+      40
+     ],
+     [
+      "evs-chris",
+      483,
+      40
+     ],
+     [
+      "colincasey",
+      632,
+      40
+     ],
+     [
+      "jamesbirtles",
+      433,
+      40
+     ],
+     [
+      "bluwy",
+      682,
+      40
+     ],
+     [
+      "jacobmischka",
+      383,
+      40
+     ],
+     [
+      "fcrozatier",
+      732,
+      40
+     ],
+     [
+      "drips",
+      533,
+      40
+     ],
+     [
+      "datawrapper",
+      583,
+      40
+     ],
+     [
+      "vercel",
+      483,
+      40
+     ],
+     [
+      "github sponsors",
+      632,
+      40
+     ],
+     [
+      "cohere",
+      433,
+      40
+     ],
+     [
+      "dabble",
+      682,
+      40
+     ],
+     [
+      "monogram",
+      383,
+      40
+     ],
+     [
+      "frontend masters",
+      732,
+      40
+     ],
+     [
+      "hugging face",
+      333,
+      40
+     ],
+     [
+      "threema open source fund",
+      -16,
+      40
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      283,
+      40
+     ],
+     [
+      "pintura",
+      34,
+      40
+     ],
+     [
+      "codesmith",
+      233,
+      40
+     ],
+     [
+      "raster",
+      84,
+      40
+     ],
+     [
+      "avast",
+      184,
+      40
+     ],
+     [
+      "wondertax labs",
+      134,
+      40
+     ],
+     [
+      "jeff moe",
+      134,
+      40
+     ],
+     [
+      "invisr",
+      184,
+      40
+     ],
+     [
+      "matt",
+      84,
+      40
+     ],
+     [
+      "sanity",
+      233,
+      40
+     ],
+     [
+      "metafy",
+      34,
+      40
+     ],
+     [
+      "changelog",
+      283,
+      40
+     ],
+     [
+      "kohei yoshino",
+      -16,
+      40
+     ],
+     [
+      "clancy digital",
+      333,
+      40
+     ],
+     [
+      "kenoxa gmbh",
+      134,
+      40
+     ],
+     [
+      "level up tutorials",
+      184,
+      40
+     ],
+     [
+      "the pudding",
+      84,
+      40
+     ],
+     [
+      "jason hetherington",
+      233,
+      40
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      34,
+      40
+     ],
+     [
+      "zev averbach",
+      283,
+      40
+     ],
+     [
+      "donovan dikaio",
+      -16,
+      40
+     ],
+     [
+      "bun",
+      333,
+      40
+     ],
+     [
+      "hyunbin",
+      732,
+      40
+     ],
+     [
+      "multi",
+      383,
+      40
+     ],
+     [
+      "evidence",
+      682,
+      40
+     ],
+     [
+      "scott spence",
+      433,
+      40
+     ],
+     [
+      "david stevens",
+      632,
+      40
+     ],
+     [
+      "0+x",
+      483,
+      40
+     ],
+     [
+      "handsontable - javascript data grid",
+      583,
+      40
+     ],
+     [
+      "dong-won jeffrey lee",
+      533,
+      40
+     ],
+     [
+      "cain voong",
+      533,
+      40
+     ],
+     [
+      "nicky hajal",
+      583,
+      40
+     ],
+     [
+      "dean papastrat",
+      483,
+      40
+     ],
+     [
+      "robert balfre",
+      632,
+      40
+     ],
+     [
+      "sentry",
+      433,
+      40
+     ],
+     [
+      "cliff johnson",
+      682,
+      40
+     ],
+     [
+      "sourcegraph",
+      383,
+      40
+     ],
+     [
+      "emma agering",
+      732,
+      40
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      32,
+      416
+     ],
+     [
+      "free and open source software",
+      51,
+      392
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 2,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 17,
+    "candidates": 116,
+    "protruding": 47,
+    "scrollWidth": 1454,
+    "clientWidth": 600
+   },
+   "recreationOnly": 5,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "drips ||| free and open source software",
+    "free and open source software ||| vercel",
+    "cohere ||| free and open source software",
+    "free and open source software ||| monogram",
+    "free and open source software ||| hugging face"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 769,
+     "rowParents": 18,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 762,
+     "rowParents": 16,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      138,
+      324
+     ],
+     [
+      "get started",
+      230,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      284,
+      160
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      32,
+      536
+     ],
+     [
+      "it’s a love letter to web development.",
+      125,
+      291
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      32,
+      536
+     ],
+     [
+      "used by companies you’ve heard of",
+      150,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      305
+     ],
+     [
+      "join our friendly community",
+      32,
+      536
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      48,
+      504
+     ],
+     [
+      "svelte society",
+      241,
+      109
+     ],
+     [
+      "our discord server",
+      394,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      536
+     ],
+     [
+      "marcel cutts",
+      293,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      57,
+      486
+     ],
+     [
+      "vercel",
+      229,
+      50
+     ],
+     [
+      "rich-harris",
+      266,
+      29
+     ],
+     [
+      "conduitry",
+      305,
+      29
+     ],
+     [
+      "dummdidumm",
+      226,
+      29
+     ],
+     [
+      "trueadm",
+      344,
+      29
+     ],
+     [
+      "tanhauhau",
+      187,
+      29
+     ],
+     [
+      "paoloricciuti",
+      384,
+      29
+     ],
+     [
+      "benmccann",
+      148,
+      29
+     ],
+     [
+      "puruvj",
+      423,
+      29
+     ],
+     [
+      "baseballyama",
+      108,
+      29
+     ],
+     [
+      "gtm-nayan",
+      463,
+      29
+     ],
+     [
+      "ocean-os",
+      69,
+      29
+     ],
+     [
+      "7nik",
+      502,
+      29
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      29,
+      29
+     ],
+     [
+      "swatinem",
+      541,
+      29
+     ],
+     [
+      "jacwright",
+      -10,
+      29
+     ],
+     [
+      "lukeed",
+      581,
+      29
+     ],
+     [
+      "mrkishi",
+      266,
+      29
+     ],
+     [
+      "dreamindani",
+      305,
+      29
+     ],
+     [
+      "adiguba",
+      226,
+      29
+     ],
+     [
+      "mindrones",
+      344,
+      29
+     ],
+     [
+      "pngwn",
+      187,
+      29
+     ],
+     [
+      "ngtr6788",
+      384,
+      29
+     ],
+     [
+      "navorite",
+      148,
+      29
+     ],
+     [
+      "geoffrich",
+      423,
+      29
+     ],
+     [
+      "ekhaled",
+      108,
+      29
+     ],
+     [
+      "ignatiusmb",
+      463,
+      29
+     ],
+     [
+      "emiltholin",
+      69,
+      29
+     ],
+     [
+      "antony",
+      502,
+      29
+     ],
+     [
+      "dominikg",
+      29,
+      29
+     ],
+     [
+      "mathiaswp",
+      541,
+      29
+     ],
+     [
+      "tivac",
+      -10,
+      29
+     ],
+     [
+      "jches",
+      581,
+      29
+     ],
+     [
+      "zxbodya",
+      266,
+      29
+     ],
+     [
+      "btk5h",
+      305,
+      29
+     ],
+     [
+      "paulbgd",
+      226,
+      29
+     ],
+     [
+      "halfnelson",
+      344,
+      29
+     ],
+     [
+      "pushkine",
+      187,
+      29
+     ],
+     [
+      "garrettgeorge",
+      384,
+      29
+     ],
+     [
+      "btakita",
+      148,
+      29
+     ],
+     [
+      "brunnerh",
+      423,
+      29
+     ],
+     [
+      "fweinb",
+      108,
+      29
+     ],
+     [
+      "tehshrike",
+      463,
+      29
+     ],
+     [
+      "evs-chris",
+      69,
+      29
+     ],
+     [
+      "colincasey",
+      502,
+      29
+     ],
+     [
+      "jamesbirtles",
+      29,
+      29
+     ],
+     [
+      "bluwy",
+      541,
+      29
+     ],
+     [
+      "jacobmischka",
+      -10,
+      29
+     ],
+     [
+      "fcrozatier",
+      581,
+      29
+     ],
+     [
+      "drips",
+      266,
+      29
+     ],
+     [
+      "datawrapper",
+      305,
+      29
+     ],
+     [
+      "vercel",
+      226,
+      29
+     ],
+     [
+      "github sponsors",
+      344,
+      29
+     ],
+     [
+      "cohere",
+      187,
+      29
+     ],
+     [
+      "dabble",
+      384,
+      29
+     ],
+     [
+      "monogram",
+      148,
+      29
+     ],
+     [
+      "frontend masters",
+      423,
+      29
+     ],
+     [
+      "hugging face",
+      108,
+      29
+     ],
+     [
+      "threema open source fund",
+      463,
+      29
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      69,
+      29
+     ],
+     [
+      "pintura",
+      502,
+      29
+     ],
+     [
+      "codesmith",
+      29,
+      29
+     ],
+     [
+      "raster",
+      541,
+      29
+     ],
+     [
+      "avast",
+      -10,
+      29
+     ],
+     [
+      "wondertax labs",
+      581,
+      29
+     ],
+     [
+      "jeff moe",
+      266,
+      29
+     ],
+     [
+      "invisr",
+      305,
+      29
+     ],
+     [
+      "matt",
+      226,
+      29
+     ],
+     [
+      "sanity",
+      344,
+      29
+     ],
+     [
+      "metafy",
+      187,
+      29
+     ],
+     [
+      "changelog",
+      384,
+      29
+     ],
+     [
+      "kohei yoshino",
+      148,
+      29
+     ],
+     [
+      "clancy digital",
+      423,
+      29
+     ],
+     [
+      "kenoxa gmbh",
+      108,
+      29
+     ],
+     [
+      "level up tutorials",
+      463,
+      29
+     ],
+     [
+      "the pudding",
+      69,
+      29
+     ],
+     [
+      "jason hetherington",
+      502,
+      29
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      29,
+      29
+     ],
+     [
+      "zev averbach",
+      541,
+      29
+     ],
+     [
+      "donovan dikaio",
+      -10,
+      29
+     ],
+     [
+      "bun",
+      581,
+      29
+     ],
+     [
+      "hyunbin",
+      266,
+      29
+     ],
+     [
+      "multi",
+      305,
+      29
+     ],
+     [
+      "evidence",
+      226,
+      29
+     ],
+     [
+      "scott spence",
+      344,
+      29
+     ],
+     [
+      "david stevens",
+      187,
+      29
+     ],
+     [
+      "0+x",
+      384,
+      29
+     ],
+     [
+      "handsontable - javascript data grid",
+      148,
+      29
+     ],
+     [
+      "dong-won jeffrey lee",
+      423,
+      29
+     ],
+     [
+      "cain voong",
+      108,
+      29
+     ],
+     [
+      "nicky hajal",
+      463,
+      29
+     ],
+     [
+      "dean papastrat",
+      69,
+      29
+     ],
+     [
+      "robert balfre",
+      502,
+      29
+     ],
+     [
+      "sentry",
+      29,
+      29
+     ],
+     [
+      "cliff johnson",
+      541,
+      29
+     ],
+     [
+      "sourcegraph",
+      -10,
+      29
+     ],
+     [
+      "emma agering",
+      581,
+      29
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      32,
+      536
+     ],
+     [
+      "free and open source software",
+      330,
+      237
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      138,
+      324
+     ],
+     [
+      "get started",
+      219,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      864,
+      77
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      736,
+      205
+     ],
+     [
+      "it’s a love letter to web development.",
+      736,
+      168
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      736,
+      205
+     ],
+     [
+      "used by companies you’ve heard of",
+      150,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      297
+     ],
+     [
+      "join our friendly community",
+      32,
+      536
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      48,
+      504
+     ],
+     [
+      "svelte society",
+      241,
+      109
+     ],
+     [
+      "our discord server",
+      394,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      536
+     ],
+     [
+      "marcel cutts",
+      293,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      57,
+      486
+     ],
+     [
+      "vercel",
+      174,
+      50
+     ],
+     [
+      "rich-harris",
+      533,
+      40
+     ],
+     [
+      "conduitry",
+      583,
+      40
+     ],
+     [
+      "dummdidumm",
+      483,
+      40
+     ],
+     [
+      "trueadm",
+      632,
+      40
+     ],
+     [
+      "tanhauhau",
+      433,
+      40
+     ],
+     [
+      "paoloricciuti",
+      682,
+      40
+     ],
+     [
+      "benmccann",
+      383,
+      40
+     ],
+     [
+      "puruvj",
+      732,
+      40
+     ],
+     [
+      "baseballyama",
+      333,
+      40
+     ],
+     [
+      "gtm-nayan",
+      -16,
+      40
+     ],
+     [
+      "ocean-os",
+      283,
+      40
+     ],
+     [
+      "7nik",
+      34,
+      40
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      233,
+      40
+     ],
+     [
+      "swatinem",
+      84,
+      40
+     ],
+     [
+      "jacwright",
+      184,
+      40
+     ],
+     [
+      "lukeed",
+      134,
+      40
+     ],
+     [
+      "mrkishi",
+      134,
+      40
+     ],
+     [
+      "dreamindani",
+      184,
+      40
+     ],
+     [
+      "adiguba",
+      84,
+      40
+     ],
+     [
+      "mindrones",
+      233,
+      40
+     ],
+     [
+      "pngwn",
+      34,
+      40
+     ],
+     [
+      "ngtr6788",
+      283,
+      40
+     ],
+     [
+      "navorite",
+      -16,
+      40
+     ],
+     [
+      "geoffrich",
+      333,
+      40
+     ],
+     [
+      "ekhaled",
+      134,
+      40
+     ],
+     [
+      "ignatiusmb",
+      184,
+      40
+     ],
+     [
+      "emiltholin",
+      84,
+      40
+     ],
+     [
+      "antony",
+      233,
+      40
+     ],
+     [
+      "dominikg",
+      34,
+      40
+     ],
+     [
+      "mathiaswp",
+      283,
+      40
+     ],
+     [
+      "tivac",
+      -16,
+      40
+     ],
+     [
+      "jches",
+      333,
+      40
+     ],
+     [
+      "zxbodya",
+      732,
+      40
+     ],
+     [
+      "btk5h",
+      383,
+      40
+     ],
+     [
+      "paulbgd",
+      682,
+      40
+     ],
+     [
+      "halfnelson",
+      433,
+      40
+     ],
+     [
+      "pushkine",
+      632,
+      40
+     ],
+     [
+      "garrettgeorge",
+      483,
+      40
+     ],
+     [
+      "btakita",
+      583,
+      40
+     ],
+     [
+      "brunnerh",
+      533,
+      40
+     ],
+     [
+      "fweinb",
+      533,
+      40
+     ],
+     [
+      "tehshrike",
+      583,
+      40
+     ],
+     [
+      "evs-chris",
+      483,
+      40
+     ],
+     [
+      "colincasey",
+      632,
+      40
+     ],
+     [
+      "jamesbirtles",
+      433,
+      40
+     ],
+     [
+      "bluwy",
+      682,
+      40
+     ],
+     [
+      "jacobmischka",
+      383,
+      40
+     ],
+     [
+      "fcrozatier",
+      732,
+      40
+     ],
+     [
+      "drips",
+      533,
+      40
+     ],
+     [
+      "datawrapper",
+      583,
+      40
+     ],
+     [
+      "vercel",
+      483,
+      40
+     ],
+     [
+      "github sponsors",
+      632,
+      40
+     ],
+     [
+      "cohere",
+      433,
+      40
+     ],
+     [
+      "dabble",
+      682,
+      40
+     ],
+     [
+      "monogram",
+      383,
+      40
+     ],
+     [
+      "frontend masters",
+      732,
+      40
+     ],
+     [
+      "hugging face",
+      333,
+      40
+     ],
+     [
+      "threema open source fund",
+      -16,
+      40
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      283,
+      40
+     ],
+     [
+      "pintura",
+      34,
+      40
+     ],
+     [
+      "codesmith",
+      233,
+      40
+     ],
+     [
+      "raster",
+      84,
+      40
+     ],
+     [
+      "avast",
+      184,
+      40
+     ],
+     [
+      "wondertax labs",
+      134,
+      40
+     ],
+     [
+      "jeff moe",
+      134,
+      40
+     ],
+     [
+      "invisr",
+      184,
+      40
+     ],
+     [
+      "matt",
+      84,
+      40
+     ],
+     [
+      "sanity",
+      233,
+      40
+     ],
+     [
+      "metafy",
+      34,
+      40
+     ],
+     [
+      "changelog",
+      283,
+      40
+     ],
+     [
+      "kohei yoshino",
+      -16,
+      40
+     ],
+     [
+      "clancy digital",
+      333,
+      40
+     ],
+     [
+      "kenoxa gmbh",
+      134,
+      40
+     ],
+     [
+      "level up tutorials",
+      184,
+      40
+     ],
+     [
+      "the pudding",
+      84,
+      40
+     ],
+     [
+      "jason hetherington",
+      233,
+      40
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      34,
+      40
+     ],
+     [
+      "zev averbach",
+      283,
+      40
+     ],
+     [
+      "donovan dikaio",
+      -16,
+      40
+     ],
+     [
+      "bun",
+      333,
+      40
+     ],
+     [
+      "hyunbin",
+      732,
+      40
+     ],
+     [
+      "multi",
+      383,
+      40
+     ],
+     [
+      "evidence",
+      682,
+      40
+     ],
+     [
+      "scott spence",
+      433,
+      40
+     ],
+     [
+      "david stevens",
+      632,
+      40
+     ],
+     [
+      "0+x",
+      483,
+      40
+     ],
+     [
+      "handsontable - javascript data grid",
+      583,
+      40
+     ],
+     [
+      "dong-won jeffrey lee",
+      533,
+      40
+     ],
+     [
+      "cain voong",
+      533,
+      40
+     ],
+     [
+      "nicky hajal",
+      583,
+      40
+     ],
+     [
+      "dean papastrat",
+      483,
+      40
+     ],
+     [
+      "robert balfre",
+      632,
+      40
+     ],
+     [
+      "sentry",
+      433,
+      40
+     ],
+     [
+      "cliff johnson",
+      682,
+      40
+     ],
+     [
+      "sourcegraph",
+      383,
+      40
+     ],
+     [
+      "emma agering",
+      732,
+      40
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      32,
+      536
+     ],
+     [
+      "free and open source software",
+      330,
+      237
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 2,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 19,
+    "candidates": 116,
+    "protruding": 47,
+    "scrollWidth": 1454,
+    "clientWidth": 661
+   },
+   "recreationOnly": 6,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "drips ||| free and open source software",
+    "datawrapper ||| free and open source software",
+    "free and open source software ||| vercel",
+    "cohere ||| free and open source software",
+    "free and open source software ||| monogram",
+    "free and open source software ||| hugging face"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 769,
+     "rowParents": 18,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 762,
+     "rowParents": 16,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      169,
+      324
+     ],
+     [
+      "get started",
+      260,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      315,
+      160
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      32,
+      597
+     ],
+     [
+      "it’s a love letter to web development.",
+      32,
+      596
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      32,
+      597
+     ],
+     [
+      "used by companies you’ve heard of",
+      181,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      305
+     ],
+     [
+      "join our friendly community",
+      32,
+      597
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      79,
+      504
+     ],
+     [
+      "svelte society",
+      271,
+      109
+     ],
+     [
+      "our discord server",
+      425,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      597
+     ],
+     [
+      "marcel cutts",
+      324,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      88,
+      486
+     ],
+     [
+      "vercel",
+      259,
+      50
+     ],
+     [
+      "rich-harris",
+      292,
+      33
+     ],
+     [
+      "conduitry",
+      336,
+      33
+     ],
+     [
+      "dummdidumm",
+      249,
+      33
+     ],
+     [
+      "trueadm",
+      379,
+      33
+     ],
+     [
+      "tanhauhau",
+      206,
+      33
+     ],
+     [
+      "paoloricciuti",
+      422,
+      33
+     ],
+     [
+      "benmccann",
+      163,
+      33
+     ],
+     [
+      "puruvj",
+      465,
+      33
+     ],
+     [
+      "baseballyama",
+      120,
+      33
+     ],
+     [
+      "gtm-nayan",
+      508,
+      33
+     ],
+     [
+      "ocean-os",
+      76,
+      33
+     ],
+     [
+      "7nik",
+      551,
+      33
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      33,
+      33
+     ],
+     [
+      "swatinem",
+      595,
+      33
+     ],
+     [
+      "jacwright",
+      -10,
+      33
+     ],
+     [
+      "lukeed",
+      638,
+      33
+     ],
+     [
+      "mrkishi",
+      292,
+      33
+     ],
+     [
+      "dreamindani",
+      336,
+      33
+     ],
+     [
+      "adiguba",
+      249,
+      33
+     ],
+     [
+      "mindrones",
+      379,
+      33
+     ],
+     [
+      "pngwn",
+      206,
+      33
+     ],
+     [
+      "ngtr6788",
+      422,
+      33
+     ],
+     [
+      "navorite",
+      163,
+      33
+     ],
+     [
+      "geoffrich",
+      465,
+      33
+     ],
+     [
+      "ekhaled",
+      120,
+      33
+     ],
+     [
+      "ignatiusmb",
+      508,
+      33
+     ],
+     [
+      "emiltholin",
+      76,
+      33
+     ],
+     [
+      "antony",
+      551,
+      33
+     ],
+     [
+      "dominikg",
+      33,
+      33
+     ],
+     [
+      "mathiaswp",
+      595,
+      33
+     ],
+     [
+      "tivac",
+      -10,
+      33
+     ],
+     [
+      "jches",
+      638,
+      33
+     ],
+     [
+      "zxbodya",
+      292,
+      33
+     ],
+     [
+      "btk5h",
+      336,
+      33
+     ],
+     [
+      "paulbgd",
+      249,
+      33
+     ],
+     [
+      "halfnelson",
+      379,
+      33
+     ],
+     [
+      "pushkine",
+      206,
+      33
+     ],
+     [
+      "garrettgeorge",
+      422,
+      33
+     ],
+     [
+      "btakita",
+      163,
+      33
+     ],
+     [
+      "brunnerh",
+      465,
+      33
+     ],
+     [
+      "fweinb",
+      120,
+      33
+     ],
+     [
+      "tehshrike",
+      508,
+      33
+     ],
+     [
+      "evs-chris",
+      76,
+      33
+     ],
+     [
+      "colincasey",
+      551,
+      33
+     ],
+     [
+      "jamesbirtles",
+      33,
+      33
+     ],
+     [
+      "bluwy",
+      595,
+      33
+     ],
+     [
+      "jacobmischka",
+      -10,
+      33
+     ],
+     [
+      "fcrozatier",
+      638,
+      33
+     ],
+     [
+      "drips",
+      292,
+      33
+     ],
+     [
+      "datawrapper",
+      336,
+      33
+     ],
+     [
+      "vercel",
+      249,
+      33
+     ],
+     [
+      "github sponsors",
+      379,
+      33
+     ],
+     [
+      "cohere",
+      206,
+      33
+     ],
+     [
+      "dabble",
+      422,
+      33
+     ],
+     [
+      "monogram",
+      163,
+      33
+     ],
+     [
+      "frontend masters",
+      465,
+      33
+     ],
+     [
+      "hugging face",
+      120,
+      33
+     ],
+     [
+      "threema open source fund",
+      508,
+      33
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      76,
+      33
+     ],
+     [
+      "pintura",
+      551,
+      33
+     ],
+     [
+      "codesmith",
+      33,
+      33
+     ],
+     [
+      "raster",
+      595,
+      33
+     ],
+     [
+      "avast",
+      -10,
+      33
+     ],
+     [
+      "wondertax labs",
+      638,
+      33
+     ],
+     [
+      "jeff moe",
+      292,
+      33
+     ],
+     [
+      "invisr",
+      336,
+      33
+     ],
+     [
+      "matt",
+      249,
+      33
+     ],
+     [
+      "sanity",
+      379,
+      33
+     ],
+     [
+      "metafy",
+      206,
+      33
+     ],
+     [
+      "changelog",
+      422,
+      33
+     ],
+     [
+      "kohei yoshino",
+      163,
+      33
+     ],
+     [
+      "clancy digital",
+      465,
+      33
+     ],
+     [
+      "kenoxa gmbh",
+      120,
+      33
+     ],
+     [
+      "level up tutorials",
+      508,
+      33
+     ],
+     [
+      "the pudding",
+      76,
+      33
+     ],
+     [
+      "jason hetherington",
+      551,
+      33
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      33,
+      33
+     ],
+     [
+      "zev averbach",
+      595,
+      33
+     ],
+     [
+      "donovan dikaio",
+      -10,
+      33
+     ],
+     [
+      "bun",
+      638,
+      33
+     ],
+     [
+      "hyunbin",
+      292,
+      33
+     ],
+     [
+      "multi",
+      336,
+      33
+     ],
+     [
+      "evidence",
+      249,
+      33
+     ],
+     [
+      "scott spence",
+      379,
+      33
+     ],
+     [
+      "david stevens",
+      206,
+      33
+     ],
+     [
+      "0+x",
+      422,
+      33
+     ],
+     [
+      "handsontable - javascript data grid",
+      163,
+      33
+     ],
+     [
+      "dong-won jeffrey lee",
+      465,
+      33
+     ],
+     [
+      "cain voong",
+      120,
+      33
+     ],
+     [
+      "nicky hajal",
+      508,
+      33
+     ],
+     [
+      "dean papastrat",
+      76,
+      33
+     ],
+     [
+      "robert balfre",
+      551,
+      33
+     ],
+     [
+      "sentry",
+      33,
+      33
+     ],
+     [
+      "cliff johnson",
+      595,
+      33
+     ],
+     [
+      "sourcegraph",
+      -10,
+      33
+     ],
+     [
+      "emma agering",
+      638,
+      33
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      32,
+      597
+     ],
+     [
+      "free and open source software",
+      360,
+      237
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      63
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      169,
+      324
+     ],
+     [
+      "get started",
+      249,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      864,
+      77
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      736,
+      205
+     ],
+     [
+      "it’s a love letter to web development.",
+      736,
+      168
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      736,
+      205
+     ],
+     [
+      "used by companies you’ve heard of",
+      181,
+      300
+     ],
+     [
+      "watch the full svelte origins documentary",
+      32,
+      297
+     ],
+     [
+      "join our friendly community",
+      32,
+      597
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      79,
+      504
+     ],
+     [
+      "svelte society",
+      271,
+      109
+     ],
+     [
+      "our discord server",
+      425,
+      147
+     ],
+     [
+      "photos by",
+      32,
+      597
+     ],
+     [
+      "marcel cutts",
+      323,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      88,
+      486
+     ],
+     [
+      "vercel",
+      205,
+      50
+     ],
+     [
+      "rich-harris",
+      533,
+      40
+     ],
+     [
+      "conduitry",
+      583,
+      40
+     ],
+     [
+      "dummdidumm",
+      483,
+      40
+     ],
+     [
+      "trueadm",
+      632,
+      40
+     ],
+     [
+      "tanhauhau",
+      433,
+      40
+     ],
+     [
+      "paoloricciuti",
+      682,
+      40
+     ],
+     [
+      "benmccann",
+      383,
+      40
+     ],
+     [
+      "puruvj",
+      732,
+      40
+     ],
+     [
+      "baseballyama",
+      333,
+      40
+     ],
+     [
+      "gtm-nayan",
+      -16,
+      40
+     ],
+     [
+      "ocean-os",
+      283,
+      40
+     ],
+     [
+      "7nik",
+      34,
+      40
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      233,
+      40
+     ],
+     [
+      "swatinem",
+      84,
+      40
+     ],
+     [
+      "jacwright",
+      184,
+      40
+     ],
+     [
+      "lukeed",
+      134,
+      40
+     ],
+     [
+      "mrkishi",
+      134,
+      40
+     ],
+     [
+      "dreamindani",
+      184,
+      40
+     ],
+     [
+      "adiguba",
+      84,
+      40
+     ],
+     [
+      "mindrones",
+      233,
+      40
+     ],
+     [
+      "pngwn",
+      34,
+      40
+     ],
+     [
+      "ngtr6788",
+      283,
+      40
+     ],
+     [
+      "navorite",
+      -16,
+      40
+     ],
+     [
+      "geoffrich",
+      333,
+      40
+     ],
+     [
+      "ekhaled",
+      134,
+      40
+     ],
+     [
+      "ignatiusmb",
+      184,
+      40
+     ],
+     [
+      "emiltholin",
+      84,
+      40
+     ],
+     [
+      "antony",
+      233,
+      40
+     ],
+     [
+      "dominikg",
+      34,
+      40
+     ],
+     [
+      "mathiaswp",
+      283,
+      40
+     ],
+     [
+      "tivac",
+      -16,
+      40
+     ],
+     [
+      "jches",
+      333,
+      40
+     ],
+     [
+      "zxbodya",
+      732,
+      40
+     ],
+     [
+      "btk5h",
+      383,
+      40
+     ],
+     [
+      "paulbgd",
+      682,
+      40
+     ],
+     [
+      "halfnelson",
+      433,
+      40
+     ],
+     [
+      "pushkine",
+      632,
+      40
+     ],
+     [
+      "garrettgeorge",
+      483,
+      40
+     ],
+     [
+      "btakita",
+      583,
+      40
+     ],
+     [
+      "brunnerh",
+      533,
+      40
+     ],
+     [
+      "fweinb",
+      533,
+      40
+     ],
+     [
+      "tehshrike",
+      583,
+      40
+     ],
+     [
+      "evs-chris",
+      483,
+      40
+     ],
+     [
+      "colincasey",
+      632,
+      40
+     ],
+     [
+      "jamesbirtles",
+      433,
+      40
+     ],
+     [
+      "bluwy",
+      682,
+      40
+     ],
+     [
+      "jacobmischka",
+      383,
+      40
+     ],
+     [
+      "fcrozatier",
+      732,
+      40
+     ],
+     [
+      "drips",
+      533,
+      40
+     ],
+     [
+      "datawrapper",
+      583,
+      40
+     ],
+     [
+      "vercel",
+      483,
+      40
+     ],
+     [
+      "github sponsors",
+      632,
+      40
+     ],
+     [
+      "cohere",
+      433,
+      40
+     ],
+     [
+      "dabble",
+      682,
+      40
+     ],
+     [
+      "monogram",
+      383,
+      40
+     ],
+     [
+      "frontend masters",
+      732,
+      40
+     ],
+     [
+      "hugging face",
+      333,
+      40
+     ],
+     [
+      "threema open source fund",
+      -16,
+      40
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      283,
+      40
+     ],
+     [
+      "pintura",
+      34,
+      40
+     ],
+     [
+      "codesmith",
+      233,
+      40
+     ],
+     [
+      "raster",
+      84,
+      40
+     ],
+     [
+      "avast",
+      184,
+      40
+     ],
+     [
+      "wondertax labs",
+      134,
+      40
+     ],
+     [
+      "jeff moe",
+      134,
+      40
+     ],
+     [
+      "invisr",
+      184,
+      40
+     ],
+     [
+      "matt",
+      84,
+      40
+     ],
+     [
+      "sanity",
+      233,
+      40
+     ],
+     [
+      "metafy",
+      34,
+      40
+     ],
+     [
+      "changelog",
+      283,
+      40
+     ],
+     [
+      "kohei yoshino",
+      -16,
+      40
+     ],
+     [
+      "clancy digital",
+      333,
+      40
+     ],
+     [
+      "kenoxa gmbh",
+      134,
+      40
+     ],
+     [
+      "level up tutorials",
+      184,
+      40
+     ],
+     [
+      "the pudding",
+      84,
+      40
+     ],
+     [
+      "jason hetherington",
+      233,
+      40
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      34,
+      40
+     ],
+     [
+      "zev averbach",
+      283,
+      40
+     ],
+     [
+      "donovan dikaio",
+      -16,
+      40
+     ],
+     [
+      "bun",
+      333,
+      40
+     ],
+     [
+      "hyunbin",
+      732,
+      40
+     ],
+     [
+      "multi",
+      383,
+      40
+     ],
+     [
+      "evidence",
+      682,
+      40
+     ],
+     [
+      "scott spence",
+      433,
+      40
+     ],
+     [
+      "david stevens",
+      632,
+      40
+     ],
+     [
+      "0+x",
+      483,
+      40
+     ],
+     [
+      "handsontable - javascript data grid",
+      583,
+      40
+     ],
+     [
+      "dong-won jeffrey lee",
+      533,
+      40
+     ],
+     [
+      "cain voong",
+      533,
+      40
+     ],
+     [
+      "nicky hajal",
+      583,
+      40
+     ],
+     [
+      "dean papastrat",
+      483,
+      40
+     ],
+     [
+      "robert balfre",
+      632,
+      40
+     ],
+     [
+      "sentry",
+      433,
+      40
+     ],
+     [
+      "cliff johnson",
+      682,
+      40
+     ],
+     [
+      "sourcegraph",
+      383,
+      40
+     ],
+     [
+      "emma agering",
+      732,
+      40
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      32,
+      597
+     ],
+     [
+      "free and open source software",
+      360,
+      237
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 116,
+    "protruding": 2,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 125,
+    "protruding": 25,
+    "scrollWidth": 1440,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 110,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 1153,
+     "rowParents": 18,
+     "maxRowMembers": 96,
+     "navInlinePairs": 7
+    },
+    "recreation": {
+     "inlineSiblingPairs": 1146,
+     "rowParents": 12,
+     "maxRowMembers": 96,
+     "navInlinePairs": 10
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      48,
+      486
+     ],
+     [
+      "get started",
+      48,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      236,
+      345
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      48,
+      704
+     ],
+     [
+      "it’s a love letter to web development.",
+      274,
+      291
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      48,
+      704
+     ],
+     [
+      "used by companies you’ve heard of",
+      130,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      48,
+      305
+     ],
+     [
+      "join our friendly community",
+      48,
+      704
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      148,
+      504
+     ],
+     [
+      "svelte society",
+      341,
+      109
+     ],
+     [
+      "our discord server",
+      494,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      704
+     ],
+     [
+      "marcel cutts",
+      393,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      157,
+      486
+     ],
+     [
+      "vercel",
+      329,
+      50
+     ],
+     [
+      "rich-harris",
+      370,
+      25
+     ],
+     [
+      "conduitry",
+      405,
+      25
+     ],
+     [
+      "dummdidumm",
+      336,
+      25
+     ],
+     [
+      "trueadm",
+      440,
+      25
+     ],
+     [
+      "tanhauhau",
+      301,
+      25
+     ],
+     [
+      "paoloricciuti",
+      474,
+      25
+     ],
+     [
+      "benmccann",
+      267,
+      25
+     ],
+     [
+      "puruvj",
+      509,
+      25
+     ],
+     [
+      "baseballyama",
+      232,
+      25
+     ],
+     [
+      "gtm-nayan",
+      543,
+      25
+     ],
+     [
+      "ocean-os",
+      198,
+      25
+     ],
+     [
+      "7nik",
+      578,
+      25
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      163,
+      25
+     ],
+     [
+      "swatinem",
+      613,
+      25
+     ],
+     [
+      "jacwright",
+      128,
+      25
+     ],
+     [
+      "lukeed",
+      647,
+      25
+     ],
+     [
+      "mrkishi",
+      94,
+      25
+     ],
+     [
+      "dreamindani",
+      682,
+      25
+     ],
+     [
+      "adiguba",
+      59,
+      25
+     ],
+     [
+      "mindrones",
+      716,
+      25
+     ],
+     [
+      "pngwn",
+      25,
+      25
+     ],
+     [
+      "ngtr6788",
+      751,
+      25
+     ],
+     [
+      "navorite",
+      -10,
+      25
+     ],
+     [
+      "geoffrich",
+      785,
+      25
+     ],
+     [
+      "ekhaled",
+      370,
+      25
+     ],
+     [
+      "ignatiusmb",
+      405,
+      25
+     ],
+     [
+      "emiltholin",
+      336,
+      25
+     ],
+     [
+      "antony",
+      440,
+      25
+     ],
+     [
+      "dominikg",
+      301,
+      25
+     ],
+     [
+      "mathiaswp",
+      474,
+      25
+     ],
+     [
+      "tivac",
+      267,
+      25
+     ],
+     [
+      "jches",
+      509,
+      25
+     ],
+     [
+      "zxbodya",
+      232,
+      25
+     ],
+     [
+      "btk5h",
+      543,
+      25
+     ],
+     [
+      "paulbgd",
+      198,
+      25
+     ],
+     [
+      "halfnelson",
+      578,
+      25
+     ],
+     [
+      "pushkine",
+      163,
+      25
+     ],
+     [
+      "garrettgeorge",
+      613,
+      25
+     ],
+     [
+      "btakita",
+      128,
+      25
+     ],
+     [
+      "brunnerh",
+      647,
+      25
+     ],
+     [
+      "fweinb",
+      94,
+      25
+     ],
+     [
+      "tehshrike",
+      682,
+      25
+     ],
+     [
+      "evs-chris",
+      59,
+      25
+     ],
+     [
+      "colincasey",
+      716,
+      25
+     ],
+     [
+      "jamesbirtles",
+      25,
+      25
+     ],
+     [
+      "bluwy",
+      751,
+      25
+     ],
+     [
+      "jacobmischka",
+      -10,
+      25
+     ],
+     [
+      "fcrozatier",
+      785,
+      25
+     ],
+     [
+      "drips",
+      370,
+      25
+     ],
+     [
+      "datawrapper",
+      405,
+      25
+     ],
+     [
+      "vercel",
+      336,
+      25
+     ],
+     [
+      "github sponsors",
+      440,
+      25
+     ],
+     [
+      "cohere",
+      301,
+      25
+     ],
+     [
+      "dabble",
+      474,
+      25
+     ],
+     [
+      "monogram",
+      267,
+      25
+     ],
+     [
+      "frontend masters",
+      509,
+      25
+     ],
+     [
+      "hugging face",
+      232,
+      25
+     ],
+     [
+      "threema open source fund",
+      543,
+      25
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      198,
+      25
+     ],
+     [
+      "pintura",
+      578,
+      25
+     ],
+     [
+      "codesmith",
+      163,
+      25
+     ],
+     [
+      "raster",
+      613,
+      25
+     ],
+     [
+      "avast",
+      128,
+      25
+     ],
+     [
+      "wondertax labs",
+      647,
+      25
+     ],
+     [
+      "jeff moe",
+      94,
+      25
+     ],
+     [
+      "invisr",
+      682,
+      25
+     ],
+     [
+      "matt",
+      59,
+      25
+     ],
+     [
+      "sanity",
+      716,
+      25
+     ],
+     [
+      "metafy",
+      25,
+      25
+     ],
+     [
+      "changelog",
+      751,
+      25
+     ],
+     [
+      "kohei yoshino",
+      -10,
+      25
+     ],
+     [
+      "clancy digital",
+      785,
+      25
+     ],
+     [
+      "kenoxa gmbh",
+      370,
+      25
+     ],
+     [
+      "level up tutorials",
+      405,
+      25
+     ],
+     [
+      "the pudding",
+      336,
+      25
+     ],
+     [
+      "jason hetherington",
+      440,
+      25
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      301,
+      25
+     ],
+     [
+      "zev averbach",
+      474,
+      25
+     ],
+     [
+      "donovan dikaio",
+      267,
+      25
+     ],
+     [
+      "bun",
+      509,
+      25
+     ],
+     [
+      "hyunbin",
+      232,
+      25
+     ],
+     [
+      "multi",
+      543,
+      25
+     ],
+     [
+      "evidence",
+      198,
+      25
+     ],
+     [
+      "scott spence",
+      578,
+      25
+     ],
+     [
+      "david stevens",
+      163,
+      25
+     ],
+     [
+      "0+x",
+      613,
+      25
+     ],
+     [
+      "handsontable - javascript data grid",
+      128,
+      25
+     ],
+     [
+      "dong-won jeffrey lee",
+      647,
+      25
+     ],
+     [
+      "cain voong",
+      94,
+      25
+     ],
+     [
+      "nicky hajal",
+      682,
+      25
+     ],
+     [
+      "dean papastrat",
+      59,
+      25
+     ],
+     [
+      "robert balfre",
+      716,
+      25
+     ],
+     [
+      "sentry",
+      25,
+      25
+     ],
+     [
+      "cliff johnson",
+      751,
+      25
+     ],
+     [
+      "sourcegraph",
+      -10,
+      25
+     ],
+     [
+      "emma agering",
+      785,
+      25
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      48,
+      704
+     ],
+     [
+      "free and open source software",
+      354,
+      237
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "docs",
+      227,
+      72
+     ],
+     [
+      "svelte",
+      219,
+      85
+     ],
+     [
+      "sveltekit",
+      219,
+      85
+     ],
+     [
+      "cli",
+      219,
+      85
+     ],
+     [
+      "ai",
+      219,
+      85
+     ],
+     [
+      "tutorial",
+      300,
+      69
+     ],
+     [
+      "packages",
+      368,
+      86
+     ],
+     [
+      "playground",
+      455,
+      97
+     ],
+     [
+      "blog",
+      552,
+      48
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      77,
+      486
+     ],
+     [
+      "get started",
+      77,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      381,
+      347
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      168,
+      584
+     ],
+     [
+      "it’s a love letter to web development.",
+      168,
+      559
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      168,
+      584
+     ],
+     [
+      "used by companies you’ve heard of",
+      130,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      48,
+      297
+     ],
+     [
+      "join our friendly community",
+      48,
+      704
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      148,
+      504
+     ],
+     [
+      "svelte society",
+      341,
+      109
+     ],
+     [
+      "our discord server",
+      494,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      704
+     ],
+     [
+      "marcel cutts",
+      393,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      157,
+      486
+     ],
+     [
+      "vercel",
+      329,
+      50
+     ],
+     [
+      "rich-harris",
+      903,
+      51
+     ],
+     [
+      "conduitry",
+      964,
+      51
+     ],
+     [
+      "dummdidumm",
+      842,
+      51
+     ],
+     [
+      "trueadm",
+      1025,
+      51
+     ],
+     [
+      "tanhauhau",
+      780,
+      51
+     ],
+     [
+      "paoloricciuti",
+      1087,
+      51
+     ],
+     [
+      "benmccann",
+      719,
+      51
+     ],
+     [
+      "puruvj",
+      1148,
+      51
+     ],
+     [
+      "baseballyama",
+      658,
+      51
+     ],
+     [
+      "gtm-nayan",
+      1209,
+      51
+     ],
+     [
+      "ocean-os",
+      597,
+      51
+     ],
+     [
+      "7nik",
+      1270,
+      51
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      535,
+      51
+     ],
+     [
+      "swatinem",
+      1332,
+      51
+     ],
+     [
+      "jacwright",
+      474,
+      51
+     ],
+     [
+      "lukeed",
+      1393,
+      51
+     ],
+     [
+      "mrkishi",
+      413,
+      51
+     ],
+     [
+      "dreamindani",
+      -16,
+      51
+     ],
+     [
+      "adiguba",
+      352,
+      51
+     ],
+     [
+      "mindrones",
+      45,
+      51
+     ],
+     [
+      "pngwn",
+      290,
+      51
+     ],
+     [
+      "ngtr6788",
+      107,
+      51
+     ],
+     [
+      "navorite",
+      229,
+      51
+     ],
+     [
+      "geoffrich",
+      168,
+      51
+     ],
+     [
+      "ekhaled",
+      168,
+      51
+     ],
+     [
+      "ignatiusmb",
+      229,
+      51
+     ],
+     [
+      "emiltholin",
+      107,
+      51
+     ],
+     [
+      "antony",
+      290,
+      51
+     ],
+     [
+      "dominikg",
+      45,
+      51
+     ],
+     [
+      "mathiaswp",
+      352,
+      51
+     ],
+     [
+      "tivac",
+      -16,
+      51
+     ],
+     [
+      "jches",
+      474,
+      51
+     ],
+     [
+      "zxbodya",
+      535,
+      51
+     ],
+     [
+      "btk5h",
+      964,
+      51
+     ],
+     [
+      "paulbgd",
+      413,
+      51
+     ],
+     [
+      "halfnelson",
+      1087,
+      51
+     ],
+     [
+      "pushkine",
+      1393,
+      51
+     ],
+     [
+      "garrettgeorge",
+      -16,
+      51
+     ],
+     [
+      "btakita",
+      1332,
+      51
+     ],
+     [
+      "brunnerh",
+      45,
+      51
+     ],
+     [
+      "fweinb",
+      1270,
+      51
+     ],
+     [
+      "tehshrike",
+      107,
+      51
+     ],
+     [
+      "evs-chris",
+      1209,
+      51
+     ],
+     [
+      "colincasey",
+      168,
+      51
+     ],
+     [
+      "jamesbirtles",
+      1148,
+      51
+     ],
+     [
+      "bluwy",
+      229,
+      51
+     ],
+     [
+      "jacobmischka",
+      1087,
+      51
+     ],
+     [
+      "fcrozatier",
+      290,
+      51
+     ],
+     [
+      "drips",
+      1025,
+      51
+     ],
+     [
+      "datawrapper",
+      352,
+      51
+     ],
+     [
+      "vercel",
+      964,
+      51
+     ],
+     [
+      "github sponsors",
+      413,
+      51
+     ],
+     [
+      "cohere",
+      903,
+      51
+     ],
+     [
+      "dabble",
+      474,
+      51
+     ],
+     [
+      "monogram",
+      842,
+      51
+     ],
+     [
+      "frontend masters",
+      535,
+      51
+     ],
+     [
+      "hugging face",
+      780,
+      51
+     ],
+     [
+      "threema open source fund",
+      597,
+      51
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      719,
+      51
+     ],
+     [
+      "pintura",
+      658,
+      51
+     ],
+     [
+      "codesmith",
+      658,
+      51
+     ],
+     [
+      "raster",
+      719,
+      51
+     ],
+     [
+      "avast",
+      597,
+      51
+     ],
+     [
+      "wondertax labs",
+      780,
+      51
+     ],
+     [
+      "jeff moe",
+      1148,
+      51
+     ],
+     [
+      "invisr",
+      1209,
+      51
+     ],
+     [
+      "matt",
+      1025,
+      51
+     ],
+     [
+      "sanity",
+      1270,
+      51
+     ],
+     [
+      "metafy",
+      903,
+      51
+     ],
+     [
+      "changelog",
+      1332,
+      51
+     ],
+     [
+      "kohei yoshino",
+      842,
+      51
+     ],
+     [
+      "clancy digital",
+      1393,
+      51
+     ],
+     [
+      "kenoxa gmbh",
+      413,
+      51
+     ],
+     [
+      "level up tutorials",
+      474,
+      51
+     ],
+     [
+      "the pudding",
+      352,
+      51
+     ],
+     [
+      "jason hetherington",
+      535,
+      51
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      290,
+      51
+     ],
+     [
+      "zev averbach",
+      597,
+      51
+     ],
+     [
+      "donovan dikaio",
+      229,
+      51
+     ],
+     [
+      "bun",
+      658,
+      51
+     ],
+     [
+      "hyunbin",
+      168,
+      51
+     ],
+     [
+      "multi",
+      719,
+      51
+     ],
+     [
+      "evidence",
+      107,
+      51
+     ],
+     [
+      "scott spence",
+      780,
+      51
+     ],
+     [
+      "david stevens",
+      45,
+      51
+     ],
+     [
+      "0+x",
+      842,
+      51
+     ],
+     [
+      "handsontable - javascript data grid",
+      -16,
+      51
+     ],
+     [
+      "dong-won jeffrey lee",
+      903,
+      51
+     ],
+     [
+      "cain voong",
+      1393,
+      51
+     ],
+     [
+      "nicky hajal",
+      964,
+      51
+     ],
+     [
+      "dean papastrat",
+      1332,
+      51
+     ],
+     [
+      "robert balfre",
+      1025,
+      51
+     ],
+     [
+      "sentry",
+      1270,
+      51
+     ],
+     [
+      "cliff johnson",
+      1087,
+      51
+     ],
+     [
+      "sourcegraph",
+      1209,
+      51
+     ],
+     [
+      "emma agering",
+      1148,
+      51
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      48,
+      704
+     ],
+     [
+      "free and open source software",
+      354,
+      237
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 3,
+    "candidates": 127,
+    "protruding": 3,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 127,
+    "protruding": 62,
+    "scrollWidth": 1440,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 1,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [
+    "docs ||| svelte"
+   ],
+   "sharedTextKeys": 120,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 1554,
+     "rowParents": 23,
+     "maxRowMembers": 96,
+     "navInlinePairs": 22
+    },
+    "recreation": {
+     "inlineSiblingPairs": 1534,
+     "rowParents": 15,
+     "maxRowMembers": 96,
+     "navInlinePairs": 16
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "docs",
+      180,
+      71
+     ],
+     [
+      "svelte",
+      175,
+      84
+     ],
+     [
+      "sveltekit",
+      175,
+      84
+     ],
+     [
+      "cli",
+      175,
+      84
+     ],
+     [
+      "ai",
+      175,
+      84
+     ],
+     [
+      "tutorial",
+      251,
+      72
+     ],
+     [
+      "packages",
+      323,
+      82
+     ],
+     [
+      "playground",
+      404,
+      98
+     ],
+     [
+      "blog",
+      502,
+      48
+     ],
+     [
+      "ctrl",
+      793,
+      26
+     ],
+     [
+      "k",
+      822,
+      7
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      48,
+      486
+     ],
+     [
+      "get started",
+      48,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      236,
+      345
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      48,
+      470
+     ],
+     [
+      "it’s a love letter to web development.",
+      48,
+      436
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      48,
+      470
+     ],
+     [
+      "used by companies you’ve heard of",
+      268,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      48,
+      305
+     ],
+     [
+      "join our friendly community",
+      48,
+      980
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      286,
+      504
+     ],
+     [
+      "svelte society",
+      479,
+      109
+     ],
+     [
+      "our discord server",
+      632,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      980
+     ],
+     [
+      "marcel cutts",
+      531,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      295,
+      486
+     ],
+     [
+      "vercel",
+      467,
+      50
+     ],
+     [
+      "rich-harris",
+      508,
+      25
+     ],
+     [
+      "conduitry",
+      543,
+      25
+     ],
+     [
+      "dummdidumm",
+      474,
+      25
+     ],
+     [
+      "trueadm",
+      578,
+      25
+     ],
+     [
+      "tanhauhau",
+      439,
+      25
+     ],
+     [
+      "paoloricciuti",
+      612,
+      25
+     ],
+     [
+      "benmccann",
+      405,
+      25
+     ],
+     [
+      "puruvj",
+      647,
+      25
+     ],
+     [
+      "baseballyama",
+      370,
+      25
+     ],
+     [
+      "gtm-nayan",
+      681,
+      25
+     ],
+     [
+      "ocean-os",
+      336,
+      25
+     ],
+     [
+      "7nik",
+      716,
+      25
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      301,
+      25
+     ],
+     [
+      "swatinem",
+      750,
+      25
+     ],
+     [
+      "jacwright",
+      267,
+      25
+     ],
+     [
+      "lukeed",
+      785,
+      25
+     ],
+     [
+      "mrkishi",
+      232,
+      25
+     ],
+     [
+      "dreamindani",
+      820,
+      25
+     ],
+     [
+      "adiguba",
+      197,
+      25
+     ],
+     [
+      "mindrones",
+      854,
+      25
+     ],
+     [
+      "pngwn",
+      163,
+      25
+     ],
+     [
+      "ngtr6788",
+      889,
+      25
+     ],
+     [
+      "navorite",
+      128,
+      25
+     ],
+     [
+      "geoffrich",
+      923,
+      25
+     ],
+     [
+      "ekhaled",
+      94,
+      25
+     ],
+     [
+      "ignatiusmb",
+      958,
+      25
+     ],
+     [
+      "emiltholin",
+      59,
+      25
+     ],
+     [
+      "antony",
+      992,
+      25
+     ],
+     [
+      "dominikg",
+      25,
+      25
+     ],
+     [
+      "mathiaswp",
+      1027,
+      25
+     ],
+     [
+      "tivac",
+      -10,
+      25
+     ],
+     [
+      "jches",
+      -10,
+      25
+     ],
+     [
+      "zxbodya",
+      25,
+      25
+     ],
+     [
+      "btk5h",
+      -10,
+      25
+     ],
+     [
+      "paulbgd",
+      1061,
+      25
+     ],
+     [
+      "halfnelson",
+      59,
+      25
+     ],
+     [
+      "pushkine",
+      508,
+      25
+     ],
+     [
+      "garrettgeorge",
+      543,
+      25
+     ],
+     [
+      "btakita",
+      474,
+      25
+     ],
+     [
+      "brunnerh",
+      578,
+      25
+     ],
+     [
+      "fweinb",
+      439,
+      25
+     ],
+     [
+      "tehshrike",
+      612,
+      25
+     ],
+     [
+      "evs-chris",
+      405,
+      25
+     ],
+     [
+      "colincasey",
+      647,
+      25
+     ],
+     [
+      "jamesbirtles",
+      370,
+      25
+     ],
+     [
+      "bluwy",
+      681,
+      25
+     ],
+     [
+      "jacobmischka",
+      336,
+      25
+     ],
+     [
+      "fcrozatier",
+      716,
+      25
+     ],
+     [
+      "drips",
+      301,
+      25
+     ],
+     [
+      "datawrapper",
+      750,
+      25
+     ],
+     [
+      "vercel",
+      267,
+      25
+     ],
+     [
+      "github sponsors",
+      785,
+      25
+     ],
+     [
+      "cohere",
+      232,
+      25
+     ],
+     [
+      "dabble",
+      820,
+      25
+     ],
+     [
+      "monogram",
+      197,
+      25
+     ],
+     [
+      "frontend masters",
+      854,
+      25
+     ],
+     [
+      "hugging face",
+      163,
+      25
+     ],
+     [
+      "threema open source fund",
+      889,
+      25
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      128,
+      25
+     ],
+     [
+      "pintura",
+      923,
+      25
+     ],
+     [
+      "codesmith",
+      94,
+      25
+     ],
+     [
+      "raster",
+      958,
+      25
+     ],
+     [
+      "avast",
+      59,
+      25
+     ],
+     [
+      "wondertax labs",
+      992,
+      25
+     ],
+     [
+      "jeff moe",
+      94,
+      25
+     ],
+     [
+      "invisr",
+      958,
+      25
+     ],
+     [
+      "matt",
+      25,
+      25
+     ],
+     [
+      "sanity",
+      992,
+      25
+     ],
+     [
+      "metafy",
+      1061,
+      25
+     ],
+     [
+      "changelog",
+      1027,
+      25
+     ],
+     [
+      "kohei yoshino",
+      1027,
+      25
+     ],
+     [
+      "clancy digital",
+      1061,
+      25
+     ],
+     [
+      "kenoxa gmbh",
+      508,
+      25
+     ],
+     [
+      "level up tutorials",
+      543,
+      25
+     ],
+     [
+      "the pudding",
+      474,
+      25
+     ],
+     [
+      "jason hetherington",
+      578,
+      25
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      439,
+      25
+     ],
+     [
+      "zev averbach",
+      612,
+      25
+     ],
+     [
+      "donovan dikaio",
+      405,
+      25
+     ],
+     [
+      "bun",
+      647,
+      25
+     ],
+     [
+      "hyunbin",
+      370,
+      25
+     ],
+     [
+      "multi",
+      681,
+      25
+     ],
+     [
+      "evidence",
+      336,
+      25
+     ],
+     [
+      "scott spence",
+      716,
+      25
+     ],
+     [
+      "david stevens",
+      301,
+      25
+     ],
+     [
+      "0+x",
+      750,
+      25
+     ],
+     [
+      "handsontable - javascript data grid",
+      267,
+      25
+     ],
+     [
+      "dong-won jeffrey lee",
+      785,
+      25
+     ],
+     [
+      "cain voong",
+      232,
+      25
+     ],
+     [
+      "nicky hajal",
+      820,
+      25
+     ],
+     [
+      "dean papastrat",
+      197,
+      25
+     ],
+     [
+      "robert balfre",
+      854,
+      25
+     ],
+     [
+      "sentry",
+      163,
+      25
+     ],
+     [
+      "cliff johnson",
+      889,
+      25
+     ],
+     [
+      "sourcegraph",
+      128,
+      25
+     ],
+     [
+      "emma agering",
+      923,
+      25
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      48,
+      980
+     ],
+     [
+      "free and open source software",
+      440,
+      237
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      32
+     ],
+     [
+      "docs",
+      259,
+      72
+     ],
+     [
+      "svelte",
+      251,
+      85
+     ],
+     [
+      "sveltekit",
+      251,
+      85
+     ],
+     [
+      "cli",
+      251,
+      85
+     ],
+     [
+      "ai",
+      251,
+      85
+     ],
+     [
+      "tutorial",
+      332,
+      69
+     ],
+     [
+      "packages",
+      400,
+      86
+     ],
+     [
+      "playground",
+      487,
+      97
+     ],
+     [
+      "blog",
+      584,
+      48
+     ],
+     [
+      "ctrl",
+      912,
+      31
+     ],
+     [
+      "k",
+      943,
+      8
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      77,
+      486
+     ],
+     [
+      "get started",
+      77,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      459,
+      347
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      48,
+      458
+     ],
+     [
+      "it’s a love letter to web development.",
+      48,
+      432
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      48,
+      458
+     ],
+     [
+      "used by companies you’ve heard of",
+      268,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      48,
+      297
+     ],
+     [
+      "join our friendly community",
+      48,
+      980
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      286,
+      504
+     ],
+     [
+      "svelte society",
+      479,
+      109
+     ],
+     [
+      "our discord server",
+      632,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      980
+     ],
+     [
+      "marcel cutts",
+      531,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      295,
+      486
+     ],
+     [
+      "vercel",
+      467,
+      50
+     ],
+     [
+      "rich-harris",
+      673,
+      36
+     ],
+     [
+      "conduitry",
+      719,
+      36
+     ],
+     [
+      "dummdidumm",
+      627,
+      36
+     ],
+     [
+      "trueadm",
+      765,
+      36
+     ],
+     [
+      "tanhauhau",
+      581,
+      36
+     ],
+     [
+      "paoloricciuti",
+      811,
+      36
+     ],
+     [
+      "benmccann",
+      535,
+      36
+     ],
+     [
+      "puruvj",
+      857,
+      36
+     ],
+     [
+      "baseballyama",
+      489,
+      36
+     ],
+     [
+      "gtm-nayan",
+      903,
+      36
+     ],
+     [
+      "ocean-os",
+      443,
+      36
+     ],
+     [
+      "7nik",
+      949,
+      36
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      397,
+      36
+     ],
+     [
+      "swatinem",
+      995,
+      36
+     ],
+     [
+      "jacwright",
+      352,
+      36
+     ],
+     [
+      "lukeed",
+      1041,
+      36
+     ],
+     [
+      "mrkishi",
+      306,
+      36
+     ],
+     [
+      "dreamindani",
+      1087,
+      36
+     ],
+     [
+      "adiguba",
+      260,
+      36
+     ],
+     [
+      "mindrones",
+      1132,
+      36
+     ],
+     [
+      "pngwn",
+      214,
+      36
+     ],
+     [
+      "ngtr6788",
+      1178,
+      36
+     ],
+     [
+      "navorite",
+      168,
+      36
+     ],
+     [
+      "geoffrich",
+      1224,
+      36
+     ],
+     [
+      "ekhaled",
+      122,
+      36
+     ],
+     [
+      "ignatiusmb",
+      1270,
+      36
+     ],
+     [
+      "emiltholin",
+      76,
+      36
+     ],
+     [
+      "antony",
+      1316,
+      36
+     ],
+     [
+      "dominikg",
+      30,
+      36
+     ],
+     [
+      "mathiaswp",
+      1362,
+      36
+     ],
+     [
+      "tivac",
+      -16,
+      36
+     ],
+     [
+      "jches",
+      -16,
+      36
+     ],
+     [
+      "zxbodya",
+      30,
+      36
+     ],
+     [
+      "btk5h",
+      -16,
+      36
+     ],
+     [
+      "paulbgd",
+      1408,
+      36
+     ],
+     [
+      "halfnelson",
+      76,
+      36
+     ],
+     [
+      "pushkine",
+      673,
+      36
+     ],
+     [
+      "garrettgeorge",
+      719,
+      36
+     ],
+     [
+      "btakita",
+      627,
+      36
+     ],
+     [
+      "brunnerh",
+      765,
+      36
+     ],
+     [
+      "fweinb",
+      581,
+      36
+     ],
+     [
+      "tehshrike",
+      811,
+      36
+     ],
+     [
+      "evs-chris",
+      535,
+      36
+     ],
+     [
+      "colincasey",
+      857,
+      36
+     ],
+     [
+      "jamesbirtles",
+      489,
+      36
+     ],
+     [
+      "bluwy",
+      903,
+      36
+     ],
+     [
+      "jacobmischka",
+      443,
+      36
+     ],
+     [
+      "fcrozatier",
+      949,
+      36
+     ],
+     [
+      "drips",
+      397,
+      36
+     ],
+     [
+      "datawrapper",
+      995,
+      36
+     ],
+     [
+      "vercel",
+      352,
+      36
+     ],
+     [
+      "github sponsors",
+      1041,
+      36
+     ],
+     [
+      "cohere",
+      306,
+      36
+     ],
+     [
+      "dabble",
+      1087,
+      36
+     ],
+     [
+      "monogram",
+      260,
+      36
+     ],
+     [
+      "frontend masters",
+      1132,
+      36
+     ],
+     [
+      "hugging face",
+      214,
+      36
+     ],
+     [
+      "threema open source fund",
+      1178,
+      36
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      168,
+      36
+     ],
+     [
+      "pintura",
+      1224,
+      36
+     ],
+     [
+      "codesmith",
+      122,
+      36
+     ],
+     [
+      "raster",
+      1270,
+      36
+     ],
+     [
+      "avast",
+      76,
+      36
+     ],
+     [
+      "wondertax labs",
+      1316,
+      36
+     ],
+     [
+      "jeff moe",
+      122,
+      36
+     ],
+     [
+      "invisr",
+      1270,
+      36
+     ],
+     [
+      "matt",
+      30,
+      36
+     ],
+     [
+      "sanity",
+      1316,
+      36
+     ],
+     [
+      "metafy",
+      1408,
+      36
+     ],
+     [
+      "changelog",
+      1362,
+      36
+     ],
+     [
+      "kohei yoshino",
+      1362,
+      36
+     ],
+     [
+      "clancy digital",
+      1408,
+      36
+     ],
+     [
+      "kenoxa gmbh",
+      673,
+      36
+     ],
+     [
+      "level up tutorials",
+      719,
+      36
+     ],
+     [
+      "the pudding",
+      627,
+      36
+     ],
+     [
+      "jason hetherington",
+      765,
+      36
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      581,
+      36
+     ],
+     [
+      "zev averbach",
+      811,
+      36
+     ],
+     [
+      "donovan dikaio",
+      535,
+      36
+     ],
+     [
+      "bun",
+      857,
+      36
+     ],
+     [
+      "hyunbin",
+      489,
+      36
+     ],
+     [
+      "multi",
+      903,
+      36
+     ],
+     [
+      "evidence",
+      443,
+      36
+     ],
+     [
+      "scott spence",
+      949,
+      36
+     ],
+     [
+      "david stevens",
+      397,
+      36
+     ],
+     [
+      "0+x",
+      995,
+      36
+     ],
+     [
+      "handsontable - javascript data grid",
+      352,
+      36
+     ],
+     [
+      "dong-won jeffrey lee",
+      1041,
+      36
+     ],
+     [
+      "cain voong",
+      306,
+      36
+     ],
+     [
+      "nicky hajal",
+      1087,
+      36
+     ],
+     [
+      "dean papastrat",
+      260,
+      36
+     ],
+     [
+      "robert balfre",
+      1132,
+      36
+     ],
+     [
+      "sentry",
+      214,
+      36
+     ],
+     [
+      "cliff johnson",
+      1178,
+      36
+     ],
+     [
+      "sourcegraph",
+      168,
+      36
+     ],
+     [
+      "emma agering",
+      1224,
+      36
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      48,
+      980
+     ],
+     [
+      "free and open source software",
+      440,
+      237
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 2,
+    "candidates": 127,
+    "protruding": 3,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 127,
+    "protruding": 51,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 1,
+   "sourceOnly": 1,
+   "recreationOnlyExamples": [
+    "cli ||| web development for the rest of us"
+   ],
+   "sourceOnlyExamples": [
+    "docs ||| svelte"
+   ],
+   "sharedTextKeys": 120,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 1554,
+     "rowParents": 23,
+     "maxRowMembers": 96,
+     "navInlinePairs": 22
+    },
+    "recreation": {
+     "inlineSiblingPairs": 1542,
+     "rowParents": 18,
+     "maxRowMembers": 96,
+     "navInlinePairs": 16
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "docs",
+      180,
+      71
+     ],
+     [
+      "svelte",
+      175,
+      84
+     ],
+     [
+      "sveltekit",
+      175,
+      84
+     ],
+     [
+      "cli",
+      175,
+      84
+     ],
+     [
+      "ai",
+      175,
+      84
+     ],
+     [
+      "tutorial",
+      251,
+      72
+     ],
+     [
+      "packages",
+      323,
+      82
+     ],
+     [
+      "playground",
+      404,
+      98
+     ],
+     [
+      "blog",
+      502,
+      48
+     ],
+     [
+      "ctrl",
+      1157,
+      26
+     ],
+     [
+      "k",
+      1186,
+      7
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      168,
+      486
+     ],
+     [
+      "get started",
+      168,
+      141
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      356,
+      345
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise\n\t\t\tcomponents that do minimal work in the browser, using languages you already know — html, css\n\t\t\tand javascript.",
+      168,
+      532
+     ],
+     [
+      "it’s a love letter to web development.",
+      261,
+      291
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re\n\t\t\tmost excited about using.",
+      168,
+      532
+     ],
+     [
+      "used by companies you’ve heard of",
+      450,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      168,
+      305
+     ],
+     [
+      "join our friendly community",
+      48,
+      1344
+     ],
+     [
+      "our sister organisation, , organises\n\t\tevents around the globe. find your chapter and join us in .",
+      468,
+      504
+     ],
+     [
+      "svelte society",
+      661,
+      109
+     ],
+     [
+      "our discord server",
+      814,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      1344
+     ],
+     [
+      "marcel cutts",
+      713,
+      89
+     ],
+     [
+      "backed by  and countless donors,\n\tdeveloped by full-time and part-time maintainers, svelte is here to stay.",
+      477,
+      486
+     ],
+     [
+      "vercel",
+      649,
+      50
+     ],
+     [
+      "rich-harris",
+      679,
+      36
+     ],
+     [
+      "conduitry",
+      725,
+      36
+     ],
+     [
+      "dummdidumm",
+      633,
+      36
+     ],
+     [
+      "trueadm",
+      771,
+      36
+     ],
+     [
+      "tanhauhau",
+      587,
+      36
+     ],
+     [
+      "paoloricciuti",
+      817,
+      36
+     ],
+     [
+      "benmccann",
+      541,
+      36
+     ],
+     [
+      "puruvj",
+      863,
+      36
+     ],
+     [
+      "baseballyama",
+      495,
+      36
+     ],
+     [
+      "gtm-nayan",
+      909,
+      36
+     ],
+     [
+      "ocean-os",
+      449,
+      36
+     ],
+     [
+      "7nik",
+      955,
+      36
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      403,
+      36
+     ],
+     [
+      "swatinem",
+      1001,
+      36
+     ],
+     [
+      "jacwright",
+      358,
+      36
+     ],
+     [
+      "lukeed",
+      1047,
+      36
+     ],
+     [
+      "mrkishi",
+      312,
+      36
+     ],
+     [
+      "dreamindani",
+      1093,
+      36
+     ],
+     [
+      "adiguba",
+      266,
+      36
+     ],
+     [
+      "mindrones",
+      1138,
+      36
+     ],
+     [
+      "pngwn",
+      220,
+      36
+     ],
+     [
+      "ngtr6788",
+      1184,
+      36
+     ],
+     [
+      "navorite",
+      174,
+      36
+     ],
+     [
+      "geoffrich",
+      1230,
+      36
+     ],
+     [
+      "ekhaled",
+      128,
+      36
+     ],
+     [
+      "ignatiusmb",
+      1276,
+      36
+     ],
+     [
+      "emiltholin",
+      82,
+      36
+     ],
+     [
+      "antony",
+      1322,
+      36
+     ],
+     [
+      "dominikg",
+      36,
+      36
+     ],
+     [
+      "mathiaswp",
+      1368,
+      36
+     ],
+     [
+      "tivac",
+      -10,
+      36
+     ],
+     [
+      "jches",
+      -10,
+      36
+     ],
+     [
+      "zxbodya",
+      36,
+      36
+     ],
+     [
+      "btk5h",
+      -10,
+      36
+     ],
+     [
+      "paulbgd",
+      1414,
+      36
+     ],
+     [
+      "halfnelson",
+      82,
+      36
+     ],
+     [
+      "pushkine",
+      679,
+      36
+     ],
+     [
+      "garrettgeorge",
+      725,
+      36
+     ],
+     [
+      "btakita",
+      633,
+      36
+     ],
+     [
+      "brunnerh",
+      771,
+      36
+     ],
+     [
+      "fweinb",
+      587,
+      36
+     ],
+     [
+      "tehshrike",
+      817,
+      36
+     ],
+     [
+      "evs-chris",
+      541,
+      36
+     ],
+     [
+      "colincasey",
+      863,
+      36
+     ],
+     [
+      "jamesbirtles",
+      495,
+      36
+     ],
+     [
+      "bluwy",
+      909,
+      36
+     ],
+     [
+      "jacobmischka",
+      449,
+      36
+     ],
+     [
+      "fcrozatier",
+      955,
+      36
+     ],
+     [
+      "drips",
+      403,
+      36
+     ],
+     [
+      "datawrapper",
+      1001,
+      36
+     ],
+     [
+      "vercel",
+      358,
+      36
+     ],
+     [
+      "github sponsors",
+      1047,
+      36
+     ],
+     [
+      "cohere",
+      312,
+      36
+     ],
+     [
+      "dabble",
+      1093,
+      36
+     ],
+     [
+      "monogram",
+      266,
+      36
+     ],
+     [
+      "frontend masters",
+      1138,
+      36
+     ],
+     [
+      "hugging face",
+      220,
+      36
+     ],
+     [
+      "threema open source fund",
+      1184,
+      36
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      174,
+      36
+     ],
+     [
+      "pintura",
+      1230,
+      36
+     ],
+     [
+      "codesmith",
+      128,
+      36
+     ],
+     [
+      "raster",
+      1276,
+      36
+     ],
+     [
+      "avast",
+      82,
+      36
+     ],
+     [
+      "wondertax labs",
+      1322,
+      36
+     ],
+     [
+      "jeff moe",
+      128,
+      36
+     ],
+     [
+      "invisr",
+      1276,
+      36
+     ],
+     [
+      "matt",
+      36,
+      36
+     ],
+     [
+      "sanity",
+      1322,
+      36
+     ],
+     [
+      "metafy",
+      1414,
+      36
+     ],
+     [
+      "changelog",
+      1368,
+      36
+     ],
+     [
+      "kohei yoshino",
+      1368,
+      36
+     ],
+     [
+      "clancy digital",
+      1414,
+      36
+     ],
+     [
+      "kenoxa gmbh",
+      679,
+      36
+     ],
+     [
+      "level up tutorials",
+      725,
+      36
+     ],
+     [
+      "the pudding",
+      633,
+      36
+     ],
+     [
+      "jason hetherington",
+      771,
+      36
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      587,
+      36
+     ],
+     [
+      "zev averbach",
+      817,
+      36
+     ],
+     [
+      "donovan dikaio",
+      541,
+      36
+     ],
+     [
+      "bun",
+      863,
+      36
+     ],
+     [
+      "hyunbin",
+      495,
+      36
+     ],
+     [
+      "multi",
+      909,
+      36
+     ],
+     [
+      "evidence",
+      449,
+      36
+     ],
+     [
+      "scott spence",
+      955,
+      36
+     ],
+     [
+      "david stevens",
+      403,
+      36
+     ],
+     [
+      "0+x",
+      1001,
+      36
+     ],
+     [
+      "handsontable - javascript data grid",
+      358,
+      36
+     ],
+     [
+      "dong-won jeffrey lee",
+      1047,
+      36
+     ],
+     [
+      "cain voong",
+      312,
+      36
+     ],
+     [
+      "nicky hajal",
+      1093,
+      36
+     ],
+     [
+      "dean papastrat",
+      266,
+      36
+     ],
+     [
+      "robert balfre",
+      1138,
+      36
+     ],
+     [
+      "sentry",
+      220,
+      36
+     ],
+     [
+      "cliff johnson",
+      1184,
+      36
+     ],
+     [
+      "sourcegraph",
+      174,
+      36
+     ],
+     [
+      "emma agering",
+      1230,
+      36
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the\n\t\tmit license.",
+      168,
+      1104
+     ],
+     [
+      "free and open source software",
+      622,
+      237
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      10,
+      170
+     ],
+     [
+      "docs",
+      259,
+      72
+     ],
+     [
+      "svelte",
+      251,
+      85
+     ],
+     [
+      "sveltekit",
+      251,
+      85
+     ],
+     [
+      "cli",
+      251,
+      85
+     ],
+     [
+      "ai",
+      251,
+      85
+     ],
+     [
+      "tutorial",
+      332,
+      69
+     ],
+     [
+      "packages",
+      400,
+      86
+     ],
+     [
+      "playground",
+      487,
+      97
+     ],
+     [
+      "blog",
+      584,
+      48
+     ],
+     [
+      "ctrl",
+      1276,
+      31
+     ],
+     [
+      "k",
+      1307,
+      8
+     ],
+     [
+      "svelte",
+      0,
+      1
+     ],
+     [
+      "web development for the rest of us",
+      77,
+      486
+     ],
+     [
+      "get started",
+      77,
+      163
+     ],
+     [
+      "attractively thin, graceful and stylish",
+      641,
+      347
+     ],
+     [
+      "svelte is a ui framework that uses a compiler to let you write breathtakingly concise components that do minimal work in the browser, using languages you already know — html, css and javascript.",
+      48,
+      640
+     ],
+     [
+      "it’s a love letter to web development.",
+      48,
+      535
+     ],
+     [
+      "but don’t take our word for it. developers consistently rank svelte as the framework they’re most excited about using.",
+      48,
+      640
+     ],
+     [
+      "used by companies you’ve heard of",
+      450,
+      540
+     ],
+     [
+      "watch the full svelte origins documentary",
+      48,
+      297
+     ],
+     [
+      "join our friendly community",
+      48,
+      1344
+     ],
+     [
+      "our sister organisation, , organises events around the globe. find your chapter and join us in .",
+      468,
+      504
+     ],
+     [
+      "svelte society",
+      661,
+      109
+     ],
+     [
+      "our discord server",
+      814,
+      147
+     ],
+     [
+      "photos by",
+      48,
+      1344
+     ],
+     [
+      "marcel cutts",
+      713,
+      90
+     ],
+     [
+      "backed by  and countless donors, developed by full-time and part-time maintainers, svelte is here to stay.",
+      477,
+      486
+     ],
+     [
+      "vercel",
+      649,
+      50
+     ],
+     [
+      "rich-harris",
+      673,
+      36
+     ],
+     [
+      "conduitry",
+      719,
+      36
+     ],
+     [
+      "dummdidumm",
+      627,
+      36
+     ],
+     [
+      "trueadm",
+      765,
+      36
+     ],
+     [
+      "tanhauhau",
+      581,
+      36
+     ],
+     [
+      "paoloricciuti",
+      811,
+      36
+     ],
+     [
+      "benmccann",
+      535,
+      36
+     ],
+     [
+      "puruvj",
+      857,
+      36
+     ],
+     [
+      "baseballyama",
+      489,
+      36
+     ],
+     [
+      "gtm-nayan",
+      903,
+      36
+     ],
+     [
+      "ocean-os",
+      443,
+      36
+     ],
+     [
+      "7nik",
+      949,
+      36
+     ],
+     [
+      "elliott-with-the-longest-name-on-github",
+      397,
+      36
+     ],
+     [
+      "swatinem",
+      995,
+      36
+     ],
+     [
+      "jacwright",
+      352,
+      36
+     ],
+     [
+      "lukeed",
+      1041,
+      36
+     ],
+     [
+      "mrkishi",
+      306,
+      36
+     ],
+     [
+      "dreamindani",
+      1087,
+      36
+     ],
+     [
+      "adiguba",
+      260,
+      36
+     ],
+     [
+      "mindrones",
+      1132,
+      36
+     ],
+     [
+      "pngwn",
+      214,
+      36
+     ],
+     [
+      "ngtr6788",
+      1178,
+      36
+     ],
+     [
+      "navorite",
+      168,
+      36
+     ],
+     [
+      "geoffrich",
+      1224,
+      36
+     ],
+     [
+      "ekhaled",
+      122,
+      36
+     ],
+     [
+      "ignatiusmb",
+      1270,
+      36
+     ],
+     [
+      "emiltholin",
+      76,
+      36
+     ],
+     [
+      "antony",
+      1316,
+      36
+     ],
+     [
+      "dominikg",
+      30,
+      36
+     ],
+     [
+      "mathiaswp",
+      1362,
+      36
+     ],
+     [
+      "tivac",
+      -16,
+      36
+     ],
+     [
+      "jches",
+      -16,
+      36
+     ],
+     [
+      "zxbodya",
+      30,
+      36
+     ],
+     [
+      "btk5h",
+      -16,
+      36
+     ],
+     [
+      "paulbgd",
+      1408,
+      36
+     ],
+     [
+      "halfnelson",
+      76,
+      36
+     ],
+     [
+      "pushkine",
+      673,
+      36
+     ],
+     [
+      "garrettgeorge",
+      719,
+      36
+     ],
+     [
+      "btakita",
+      627,
+      36
+     ],
+     [
+      "brunnerh",
+      765,
+      36
+     ],
+     [
+      "fweinb",
+      581,
+      36
+     ],
+     [
+      "tehshrike",
+      811,
+      36
+     ],
+     [
+      "evs-chris",
+      535,
+      36
+     ],
+     [
+      "colincasey",
+      857,
+      36
+     ],
+     [
+      "jamesbirtles",
+      489,
+      36
+     ],
+     [
+      "bluwy",
+      903,
+      36
+     ],
+     [
+      "jacobmischka",
+      443,
+      36
+     ],
+     [
+      "fcrozatier",
+      949,
+      36
+     ],
+     [
+      "drips",
+      397,
+      36
+     ],
+     [
+      "datawrapper",
+      995,
+      36
+     ],
+     [
+      "vercel",
+      352,
+      36
+     ],
+     [
+      "github sponsors",
+      1041,
+      36
+     ],
+     [
+      "cohere",
+      306,
+      36
+     ],
+     [
+      "dabble",
+      1087,
+      36
+     ],
+     [
+      "monogram",
+      260,
+      36
+     ],
+     [
+      "frontend masters",
+      1132,
+      36
+     ],
+     [
+      "hugging face",
+      214,
+      36
+     ],
+     [
+      "threema open source fund",
+      1178,
+      36
+     ],
+     [
+      "xyflow - react flow | svelte flow",
+      168,
+      36
+     ],
+     [
+      "pintura",
+      1224,
+      36
+     ],
+     [
+      "codesmith",
+      122,
+      36
+     ],
+     [
+      "raster",
+      1270,
+      36
+     ],
+     [
+      "avast",
+      76,
+      36
+     ],
+     [
+      "wondertax labs",
+      1316,
+      36
+     ],
+     [
+      "jeff moe",
+      122,
+      36
+     ],
+     [
+      "invisr",
+      1270,
+      36
+     ],
+     [
+      "matt",
+      30,
+      36
+     ],
+     [
+      "sanity",
+      1316,
+      36
+     ],
+     [
+      "metafy",
+      1408,
+      36
+     ],
+     [
+      "changelog",
+      1362,
+      36
+     ],
+     [
+      "kohei yoshino",
+      1362,
+      36
+     ],
+     [
+      "clancy digital",
+      1408,
+      36
+     ],
+     [
+      "kenoxa gmbh",
+      673,
+      36
+     ],
+     [
+      "level up tutorials",
+      719,
+      36
+     ],
+     [
+      "the pudding",
+      627,
+      36
+     ],
+     [
+      "jason hetherington",
+      765,
+      36
+     ],
+     [
+      "n8n.io - n8n gmbh",
+      581,
+      36
+     ],
+     [
+      "zev averbach",
+      811,
+      36
+     ],
+     [
+      "donovan dikaio",
+      535,
+      36
+     ],
+     [
+      "bun",
+      857,
+      36
+     ],
+     [
+      "hyunbin",
+      489,
+      36
+     ],
+     [
+      "multi",
+      903,
+      36
+     ],
+     [
+      "evidence",
+      443,
+      36
+     ],
+     [
+      "scott spence",
+      949,
+      36
+     ],
+     [
+      "david stevens",
+      397,
+      36
+     ],
+     [
+      "0+x",
+      995,
+      36
+     ],
+     [
+      "handsontable - javascript data grid",
+      352,
+      36
+     ],
+     [
+      "dong-won jeffrey lee",
+      1041,
+      36
+     ],
+     [
+      "cain voong",
+      306,
+      36
+     ],
+     [
+      "nicky hajal",
+      1087,
+      36
+     ],
+     [
+      "dean papastrat",
+      260,
+      36
+     ],
+     [
+      "robert balfre",
+      1132,
+      36
+     ],
+     [
+      "sentry",
+      214,
+      36
+     ],
+     [
+      "cliff johnson",
+      1178,
+      36
+     ],
+     [
+      "sourcegraph",
+      168,
+      36
+     ],
+     [
+      "emma agering",
+      1224,
+      36
+     ],
+     [
+      "© 2026 svelte contributors. svelte is  released under the mit license.",
+      48,
+      1344
+     ],
+     [
+      "free and open source software",
+      622,
+      237
+     ]
+    ]
+   }
+  }
+ }
+}

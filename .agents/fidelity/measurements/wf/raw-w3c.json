@@ -1,0 +1,6343 @@
+{
+ "site": {
+  "key": "w3c",
+  "recreationUrl": "http://127.0.0.1:8849/",
+  "sourceUrl": "https://www.w3.org/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 22,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 8,
+    "candidates": 67,
+    "protruding": 6,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreationOnly": 4,
+   "sourceOnly": 6,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web",
+    "media & entertainment ||| publishing",
+    "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee). ||| w3c on mastodon",
+    "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee). ||| w3c on github"
+   ],
+   "sourceOnlyExamples": [
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "support us ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "accessibility ||| support us",
+    "internationalization ||| support us",
+    "privacy ||| support us"
+   ],
+   "sharedTextKeys": 60,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 35,
+     "rowParents": 15,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 32,
+     "rowParents": 12,
+     "maxRowMembers": 7,
+     "navInlinePairs": 2
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      143,
+      129
+     ],
+     [
+      "japanese website",
+      270,
+      1
+     ],
+     [
+      "简体中文首页",
+      292,
+      88
+     ],
+     [
+      "chinese website",
+      378,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      20,
+      1
+     ],
+     [
+      "standards & groups",
+      20,
+      360
+     ],
+     [
+      "get involved",
+      20,
+      360
+     ],
+     [
+      "resources",
+      20,
+      360
+     ],
+     [
+      "news & events",
+      20,
+      360
+     ],
+     [
+      "support us",
+      20,
+      360
+     ],
+     [
+      "about",
+      20,
+      360
+     ],
+     [
+      "search",
+      46,
+      54
+     ],
+     [
+      "sign in",
+      20,
+      360
+     ],
+     [
+      "making the web work",
+      20,
+      360
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      20,
+      360
+     ],
+     [
+      "standards and guidelines",
+      20,
+      328
+     ],
+     [
+      "accessibility",
+      200,
+      132
+     ],
+     [
+      "internationalization",
+      20,
+      215
+     ],
+     [
+      "privacy",
+      247,
+      81
+     ],
+     [
+      "security",
+      20,
+      89
+     ],
+     [
+      "read more about w3c",
+      20,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      20,
+      360
+     ],
+     [
+      "play",
+      56,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      20,
+      360
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      20,
+      360
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      20,
+      360
+     ],
+     [
+      "e-commerce",
+      20,
+      246
+     ],
+     [
+      "media & entertainment",
+      110,
+      179
+     ],
+     [
+      "publishing",
+      20,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      20,
+      360
+     ],
+     [
+      "tpac 2026",
+      20,
+      360
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      20,
+      360
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      20,
+      360
+     ],
+     [
+      "visit the tpac 2026 website",
+      20,
+      242
+     ],
+     [
+      "web standards",
+      20,
+      360
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      20,
+      360
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      20,
+      360
+     ],
+     [
+      "members",
+      20,
+      76
+     ],
+     [
+      "staff",
+      171,
+      37
+     ],
+     [
+      "learn more about web standards",
+      20,
+      284
+     ],
+     [
+      "get involved",
+      20,
+      360
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      20,
+      360
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      20,
+      360
+     ],
+     [
+      "ways to get involved",
+      20,
+      197
+     ],
+     [
+      "latest news",
+      20,
+      360
+     ],
+     [
+      "latest entries from across our ,  or .",
+      20,
+      360
+     ],
+     [
+      "news",
+      249,
+      45
+     ],
+     [
+      "press releases",
+      20,
+      325
+     ],
+     [
+      "blog",
+      112,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      40,
+      315
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      40,
+      320
+     ],
+     [
+      "news",
+      40,
+      320
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      40,
+      319
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      40,
+      320
+     ],
+     [
+      "news",
+      40,
+      320
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      40,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      40,
+      320
+     ],
+     [
+      "news",
+      40,
+      320
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      40,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      40,
+      320
+     ],
+     [
+      "news",
+      40,
+      320
+     ],
+     [
+      "home",
+      22,
+      40
+     ],
+     [
+      "contact",
+      86,
+      51
+     ],
+     [
+      "help",
+      161,
+      31
+     ],
+     [
+      "support us",
+      215,
+      72
+     ],
+     [
+      "legal & policies",
+      22,
+      102
+     ],
+     [
+      "corporation",
+      148,
+      79
+     ],
+     [
+      "system status",
+      251,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      32,
+      121
+     ],
+     [
+      "w3c on github",
+      76,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      20,
+      330
+     ],
+     [
+      "world wide web consortium",
+      139,
+      194
+     ],
+     [
+      "w3c",
+      20,
+      30
+     ],
+     [
+      "®",
+      50,
+      9
+     ],
+     [
+      "liability",
+      62,
+      51
+     ],
+     [
+      "trademark",
+      120,
+      73
+     ],
+     [
+      "permissive license",
+      226,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      484,
+      129
+     ],
+     [
+      "简体中文首页",
+      633,
+      88
+     ],
+     [
+      "menu",
+      300,
+      80
+     ],
+     [
+      "making the web work",
+      20,
+      320
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      20,
+      320
+     ],
+     [
+      "standards and guidelines",
+      20,
+      276
+     ],
+     [
+      "accessibility",
+      159,
+      132
+     ],
+     [
+      "internationalization",
+      20,
+      215
+     ],
+     [
+      "privacy",
+      247,
+      81
+     ],
+     [
+      "security",
+      67,
+      89
+     ],
+     [
+      "read more about w3c",
+      20,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      116,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      20,
+      320
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      20,
+      320
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      20,
+      320
+     ],
+     [
+      "e-commerce",
+      94,
+      97
+     ],
+     [
+      "media & entertainment",
+      20,
+      244
+     ],
+     [
+      "publishing",
+      139,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      20,
+      320
+     ],
+     [
+      "tpac 2026",
+      84,
+      69
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      84,
+      69
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      84,
+      69
+     ],
+     [
+      "visit the tpac 2026 website",
+      84,
+      107
+     ],
+     [
+      "web standards",
+      84,
+      69
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      84,
+      69
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      84,
+      69
+     ],
+     [
+      "members",
+      84,
+      66
+     ],
+     [
+      "staff",
+      84,
+      37
+     ],
+     [
+      "learn more about web standards",
+      84,
+      122
+     ],
+     [
+      "get involved",
+      84,
+      69
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      84,
+      69
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      84,
+      69
+     ],
+     [
+      "ways to get involved",
+      84,
+      111
+     ],
+     [
+      "latest news",
+      20,
+      360
+     ],
+     [
+      "latest entries from across our ,  or .",
+      20,
+      360
+     ],
+     [
+      "news",
+      249,
+      45
+     ],
+     [
+      "press releases",
+      20,
+      325
+     ],
+     [
+      "blog",
+      112,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      51,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      51,
+      295
+     ],
+     [
+      "news",
+      51,
+      295
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      407,
+      262
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      407,
+      295
+     ],
+     [
+      "news",
+      407,
+      295
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      51,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      51,
+      295
+     ],
+     [
+      "news",
+      51,
+      295
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      407,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      407,
+      295
+     ],
+     [
+      "news",
+      407,
+      295
+     ],
+     [
+      "home",
+      22,
+      40
+     ],
+     [
+      "contact",
+      86,
+      51
+     ],
+     [
+      "help",
+      161,
+      31
+     ],
+     [
+      "support us",
+      215,
+      72
+     ],
+     [
+      "legal & policies",
+      22,
+      102
+     ],
+     [
+      "corporation",
+      148,
+      79
+     ],
+     [
+      "system status",
+      251,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      50,
+      121
+     ],
+     [
+      "w3c on github",
+      94,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      20,
+      326
+     ],
+     [
+      "world wide web consortium",
+      139,
+      194
+     ],
+     [
+      "w3c",
+      20,
+      30
+     ],
+     [
+      "®",
+      50,
+      9
+     ],
+     [
+      "liability",
+      59,
+      51
+     ],
+     [
+      "trademark",
+      117,
+      73
+     ],
+     [
+      "permissive license",
+      222,
+      124
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 21,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 4,
+    "candidates": 67,
+    "protruding": 6,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreationOnly": 3,
+   "sourceOnly": 8,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web",
+    "w3c on mastodon ||| web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+    "w3c on github ||| web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web."
+   ],
+   "sourceOnlyExamples": [
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "support us ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "accessibility ||| support us",
+    "internationalization ||| support us",
+    "privacy ||| support us",
+    "e-commerce ||| media & entertainment",
+    "media & entertainment ||| publishing"
+   ],
+   "sharedTextKeys": 60,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 36,
+     "rowParents": 14,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 35,
+     "rowParents": 13,
+     "maxRowMembers": 7,
+     "navInlinePairs": 2
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      190,
+      129
+     ],
+     [
+      "japanese website",
+      318,
+      1
+     ],
+     [
+      "简体中文首页",
+      340,
+      88
+     ],
+     [
+      "chinese website",
+      426,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      23,
+      1
+     ],
+     [
+      "standards & groups",
+      23,
+      405
+     ],
+     [
+      "get involved",
+      23,
+      405
+     ],
+     [
+      "resources",
+      23,
+      405
+     ],
+     [
+      "news & events",
+      23,
+      405
+     ],
+     [
+      "support us",
+      23,
+      405
+     ],
+     [
+      "about",
+      23,
+      405
+     ],
+     [
+      "search",
+      49,
+      54
+     ],
+     [
+      "sign in",
+      23,
+      405
+     ],
+     [
+      "making the web work",
+      23,
+      405
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      23,
+      405
+     ],
+     [
+      "standards and guidelines",
+      23,
+      328
+     ],
+     [
+      "accessibility",
+      161,
+      132
+     ],
+     [
+      "internationalization",
+      23,
+      215
+     ],
+     [
+      "privacy",
+      250,
+      81
+     ],
+     [
+      "security",
+      23,
+      89
+     ],
+     [
+      "read more about w3c",
+      23,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      23,
+      405
+     ],
+     [
+      "play",
+      58,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      23,
+      405
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      23,
+      405
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      23,
+      405
+     ],
+     [
+      "e-commerce",
+      188,
+      97
+     ],
+     [
+      "media & entertainment",
+      23,
+      335
+     ],
+     [
+      "publishing",
+      142,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      23,
+      387
+     ],
+     [
+      "tpac 2026",
+      23,
+      405
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      23,
+      405
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      23,
+      405
+     ],
+     [
+      "visit the tpac 2026 website",
+      23,
+      242
+     ],
+     [
+      "web standards",
+      23,
+      405
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      23,
+      405
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      23,
+      405
+     ],
+     [
+      "members",
+      341,
+      76
+     ],
+     [
+      "staff",
+      89,
+      37
+     ],
+     [
+      "learn more about web standards",
+      23,
+      284
+     ],
+     [
+      "get involved",
+      23,
+      405
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      23,
+      405
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      23,
+      405
+     ],
+     [
+      "ways to get involved",
+      23,
+      197
+     ],
+     [
+      "latest news",
+      23,
+      405
+     ],
+     [
+      "latest entries from across our ,  or .",
+      23,
+      405
+     ],
+     [
+      "news",
+      252,
+      45
+     ],
+     [
+      "press releases",
+      305,
+      114
+     ],
+     [
+      "blog",
+      43,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      43,
+      359
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      43,
+      365
+     ],
+     [
+      "news",
+      43,
+      365
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      43,
+      357
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      43,
+      365
+     ],
+     [
+      "news",
+      43,
+      365
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      43,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      43,
+      365
+     ],
+     [
+      "news",
+      43,
+      365
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      43,
+      359
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      43,
+      365
+     ],
+     [
+      "news",
+      43,
+      365
+     ],
+     [
+      "home",
+      25,
+      40
+     ],
+     [
+      "contact",
+      88,
+      51
+     ],
+     [
+      "help",
+      163,
+      31
+     ],
+     [
+      "support us",
+      218,
+      72
+     ],
+     [
+      "legal & policies",
+      313,
+      102
+     ],
+     [
+      "corporation",
+      25,
+      79
+     ],
+     [
+      "system status",
+      128,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      35,
+      121
+     ],
+     [
+      "w3c on github",
+      79,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      23,
+      366
+     ],
+     [
+      "world wide web consortium",
+      142,
+      194
+     ],
+     [
+      "w3c",
+      23,
+      30
+     ],
+     [
+      "®",
+      52,
+      9
+     ],
+     [
+      "liability",
+      65,
+      51
+     ],
+     [
+      "trademark",
+      123,
+      73
+     ],
+     [
+      "permissive license",
+      228,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      486,
+      129
+     ],
+     [
+      "简体中文首页",
+      636,
+      88
+     ],
+     [
+      "menu",
+      348,
+      80
+     ],
+     [
+      "making the web work",
+      23,
+      360
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      23,
+      360
+     ],
+     [
+      "standards and guidelines",
+      23,
+      328
+     ],
+     [
+      "accessibility",
+      203,
+      132
+     ],
+     [
+      "internationalization",
+      23,
+      215
+     ],
+     [
+      "privacy",
+      250,
+      81
+     ],
+     [
+      "security",
+      23,
+      89
+     ],
+     [
+      "read more about w3c",
+      23,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      118,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      23,
+      360
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      23,
+      360
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      23,
+      360
+     ],
+     [
+      "e-commerce",
+      252,
+      97
+     ],
+     [
+      "media & entertainment",
+      23,
+      179
+     ],
+     [
+      "publishing",
+      210,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      23,
+      360
+     ],
+     [
+      "tpac 2026",
+      108,
+      93
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      108,
+      93
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      108,
+      93
+     ],
+     [
+      "visit the tpac 2026 website",
+      108,
+      107
+     ],
+     [
+      "web standards",
+      108,
+      93
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      108,
+      93
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      108,
+      93
+     ],
+     [
+      "members",
+      108,
+      76
+     ],
+     [
+      "staff",
+      108,
+      37
+     ],
+     [
+      "learn more about web standards",
+      108,
+      122
+     ],
+     [
+      "get involved",
+      108,
+      93
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      108,
+      93
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      108,
+      93
+     ],
+     [
+      "ways to get involved",
+      108,
+      111
+     ],
+     [
+      "latest news",
+      23,
+      405
+     ],
+     [
+      "latest entries from across our ,  or .",
+      23,
+      405
+     ],
+     [
+      "news",
+      252,
+      45
+     ],
+     [
+      "press releases",
+      305,
+      114
+     ],
+     [
+      "blog",
+      43,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      53,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      53,
+      295
+     ],
+     [
+      "news",
+      53,
+      295
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      409,
+      262
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      409,
+      295
+     ],
+     [
+      "news",
+      409,
+      295
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      53,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      53,
+      295
+     ],
+     [
+      "news",
+      53,
+      295
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      409,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      409,
+      295
+     ],
+     [
+      "news",
+      409,
+      295
+     ],
+     [
+      "home",
+      25,
+      40
+     ],
+     [
+      "contact",
+      88,
+      51
+     ],
+     [
+      "help",
+      163,
+      31
+     ],
+     [
+      "support us",
+      218,
+      72
+     ],
+     [
+      "legal & policies",
+      313,
+      102
+     ],
+     [
+      "corporation",
+      25,
+      79
+     ],
+     [
+      "system status",
+      128,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      50,
+      121
+     ],
+     [
+      "w3c on github",
+      94,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      23,
+      405
+     ],
+     [
+      "world wide web consortium",
+      142,
+      194
+     ],
+     [
+      "w3c",
+      23,
+      30
+     ],
+     [
+      "®",
+      52,
+      9
+     ],
+     [
+      "liability",
+      61,
+      51
+     ],
+     [
+      "trademark",
+      119,
+      73
+     ],
+     [
+      "permissive license",
+      225,
+      124
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 17,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 6,
+    "candidates": 67,
+    "protruding": 4,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreationOnly": 5,
+   "sourceOnly": 6,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web",
+    "e-commerce ||| media & entertainment",
+    "media & entertainment ||| publishing",
+    "w3c is an international community where , full-time , and the public work together to develop web standards. ||| w3c on mastodon",
+    "w3c is an international community where , full-time , and the public work together to develop web standards. ||| w3c on github"
+   ],
+   "sourceOnlyExamples": [
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "support us ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "internationalization ||| support us",
+    "privacy ||| support us",
+    "security ||| support us"
+   ],
+   "sharedTextKeys": 60,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 35,
+     "rowParents": 14,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 36,
+     "rowParents": 13,
+     "maxRowMembers": 7,
+     "navInlinePairs": 2
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      219,
+      129
+     ],
+     [
+      "japanese website",
+      346,
+      1
+     ],
+     [
+      "简体中文首页",
+      368,
+      88
+     ],
+     [
+      "chinese website",
+      454,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      24,
+      1
+     ],
+     [
+      "standards & groups",
+      24,
+      432
+     ],
+     [
+      "get involved",
+      24,
+      432
+     ],
+     [
+      "resources",
+      24,
+      432
+     ],
+     [
+      "news & events",
+      24,
+      432
+     ],
+     [
+      "support us",
+      24,
+      432
+     ],
+     [
+      "about",
+      24,
+      432
+     ],
+     [
+      "search",
+      50,
+      54
+     ],
+     [
+      "sign in",
+      24,
+      432
+     ],
+     [
+      "making the web work",
+      24,
+      432
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      24,
+      432
+     ],
+     [
+      "standards and guidelines",
+      126,
+      276
+     ],
+     [
+      "accessibility",
+      309,
+      132
+     ],
+     [
+      "internationalization",
+      24,
+      215
+     ],
+     [
+      "privacy",
+      251,
+      81
+     ],
+     [
+      "security",
+      24,
+      89
+     ],
+     [
+      "read more about w3c",
+      24,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      24,
+      432
+     ],
+     [
+      "play",
+      60,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      24,
+      432
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      24,
+      432
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      24,
+      432
+     ],
+     [
+      "e-commerce",
+      98,
+      97
+     ],
+     [
+      "media & entertainment",
+      203,
+      179
+     ],
+     [
+      "publishing",
+      24,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      24,
+      387
+     ],
+     [
+      "tpac 2026",
+      24,
+      432
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      24,
+      432
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      24,
+      432
+     ],
+     [
+      "visit the tpac 2026 website",
+      24,
+      242
+     ],
+     [
+      "web standards",
+      24,
+      432
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      24,
+      432
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      24,
+      432
+     ],
+     [
+      "members",
+      343,
+      76
+     ],
+     [
+      "staff",
+      62,
+      37
+     ],
+     [
+      "learn more about web standards",
+      24,
+      284
+     ],
+     [
+      "get involved",
+      24,
+      432
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      24,
+      432
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      24,
+      432
+     ],
+     [
+      "ways to get involved",
+      24,
+      197
+     ],
+     [
+      "latest news",
+      24,
+      432
+     ],
+     [
+      "latest entries from across our ,  or .",
+      24,
+      432
+     ],
+     [
+      "news",
+      253,
+      45
+     ],
+     [
+      "press releases",
+      307,
+      114
+     ],
+     [
+      "blog",
+      24,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      44,
+      359
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      44,
+      392
+     ],
+     [
+      "news",
+      44,
+      392
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      44,
+      357
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      44,
+      392
+     ],
+     [
+      "news",
+      44,
+      392
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      44,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      44,
+      392
+     ],
+     [
+      "news",
+      44,
+      392
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      44,
+      359
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      44,
+      392
+     ],
+     [
+      "news",
+      44,
+      392
+     ],
+     [
+      "home",
+      26,
+      40
+     ],
+     [
+      "contact",
+      90,
+      51
+     ],
+     [
+      "help",
+      165,
+      31
+     ],
+     [
+      "support us",
+      219,
+      72
+     ],
+     [
+      "legal & policies",
+      315,
+      102
+     ],
+     [
+      "corporation",
+      26,
+      79
+     ],
+     [
+      "system status",
+      129,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      36,
+      121
+     ],
+     [
+      "w3c on github",
+      80,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      24,
+      409
+     ],
+     [
+      "world wide web consortium",
+      143,
+      194
+     ],
+     [
+      "w3c",
+      24,
+      30
+     ],
+     [
+      "®",
+      54,
+      9
+     ],
+     [
+      "liability",
+      66,
+      51
+     ],
+     [
+      "trademark",
+      124,
+      73
+     ],
+     [
+      "permissive license",
+      230,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      488,
+      129
+     ],
+     [
+      "简体中文首页",
+      637,
+      88
+     ],
+     [
+      "menu",
+      376,
+      80
+     ],
+     [
+      "making the web work",
+      24,
+      384
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      24,
+      384
+     ],
+     [
+      "standards and guidelines",
+      24,
+      328
+     ],
+     [
+      "accessibility",
+      163,
+      132
+     ],
+     [
+      "internationalization",
+      24,
+      215
+     ],
+     [
+      "privacy",
+      251,
+      81
+     ],
+     [
+      "security",
+      24,
+      89
+     ],
+     [
+      "read more about w3c",
+      24,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      120,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      24,
+      384
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      24,
+      384
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      24,
+      384
+     ],
+     [
+      "e-commerce",
+      189,
+      97
+     ],
+     [
+      "media & entertainment",
+      24,
+      335
+     ],
+     [
+      "publishing",
+      143,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      24,
+      384
+     ],
+     [
+      "tpac 2026",
+      123,
+      107
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      123,
+      107
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      123,
+      107
+     ],
+     [
+      "visit the tpac 2026 website",
+      123,
+      107
+     ],
+     [
+      "web standards",
+      123,
+      107
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      123,
+      107
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      123,
+      107
+     ],
+     [
+      "members",
+      123,
+      76
+     ],
+     [
+      "staff",
+      123,
+      37
+     ],
+     [
+      "learn more about web standards",
+      123,
+      122
+     ],
+     [
+      "get involved",
+      123,
+      107
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      123,
+      107
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      123,
+      107
+     ],
+     [
+      "ways to get involved",
+      123,
+      111
+     ],
+     [
+      "latest news",
+      24,
+      432
+     ],
+     [
+      "latest entries from across our ,  or .",
+      24,
+      432
+     ],
+     [
+      "news",
+      253,
+      45
+     ],
+     [
+      "press releases",
+      307,
+      114
+     ],
+     [
+      "blog",
+      24,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      55,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      55,
+      295
+     ],
+     [
+      "news",
+      55,
+      295
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      411,
+      262
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      411,
+      295
+     ],
+     [
+      "news",
+      411,
+      295
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      55,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      55,
+      295
+     ],
+     [
+      "news",
+      55,
+      295
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      411,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      411,
+      295
+     ],
+     [
+      "news",
+      411,
+      295
+     ],
+     [
+      "home",
+      26,
+      40
+     ],
+     [
+      "contact",
+      90,
+      51
+     ],
+     [
+      "help",
+      165,
+      31
+     ],
+     [
+      "support us",
+      219,
+      72
+     ],
+     [
+      "legal & policies",
+      315,
+      102
+     ],
+     [
+      "corporation",
+      26,
+      79
+     ],
+     [
+      "system status",
+      129,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      50,
+      121
+     ],
+     [
+      "w3c on github",
+      94,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      24,
+      405
+     ],
+     [
+      "world wide web consortium",
+      143,
+      194
+     ],
+     [
+      "w3c",
+      24,
+      30
+     ],
+     [
+      "®",
+      54,
+      9
+     ],
+     [
+      "liability",
+      63,
+      51
+     ],
+     [
+      "trademark",
+      121,
+      73
+     ],
+     [
+      "permissive license",
+      226,
+      124
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 15,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 67,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreationOnly": 1,
+   "sourceOnly": 4,
+   "recreationOnlyExamples": [
+    "get involved ||| w3c on github"
+   ],
+   "sourceOnlyExamples": [
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "support us ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "security ||| support us"
+   ],
+   "sharedTextKeys": 60,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 44,
+     "rowParents": 15,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 43,
+     "rowParents": 13,
+     "maxRowMembers": 7,
+     "navInlinePairs": 2
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      333,
+      129
+     ],
+     [
+      "japanese website",
+      460,
+      1
+     ],
+     [
+      "简体中文首页",
+      482,
+      88
+     ],
+     [
+      "chinese website",
+      568,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      30,
+      1
+     ],
+     [
+      "standards & groups",
+      30,
+      540
+     ],
+     [
+      "get involved",
+      30,
+      540
+     ],
+     [
+      "resources",
+      30,
+      540
+     ],
+     [
+      "news & events",
+      30,
+      540
+     ],
+     [
+      "support us",
+      30,
+      540
+     ],
+     [
+      "about",
+      30,
+      540
+     ],
+     [
+      "search",
+      56,
+      54
+     ],
+     [
+      "sign in",
+      30,
+      540
+     ],
+     [
+      "making the web work",
+      30,
+      540
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      30,
+      540
+     ],
+     [
+      "standards and guidelines",
+      30,
+      276
+     ],
+     [
+      "accessibility",
+      30,
+      132
+     ],
+     [
+      "internationalization",
+      174,
+      215
+     ],
+     [
+      "privacy",
+      401,
+      81
+     ],
+     [
+      "security",
+      30,
+      89
+     ],
+     [
+      "read more about w3c",
+      30,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      50,
+      500
+     ],
+     [
+      "play",
+      86,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      30,
+      540
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      30,
+      540
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      30,
+      540
+     ],
+     [
+      "e-commerce",
+      231,
+      97
+     ],
+     [
+      "media & entertainment",
+      336,
+      179
+     ],
+     [
+      "publishing",
+      30,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      30,
+      387
+     ],
+     [
+      "tpac 2026",
+      30,
+      540
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      30,
+      540
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      30,
+      540
+     ],
+     [
+      "visit the tpac 2026 website",
+      30,
+      242
+     ],
+     [
+      "web standards",
+      30,
+      540
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      30,
+      540
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      30,
+      540
+     ],
+     [
+      "members",
+      349,
+      76
+     ],
+     [
+      "staff",
+      499,
+      37
+     ],
+     [
+      "learn more about web standards",
+      30,
+      284
+     ],
+     [
+      "get involved",
+      30,
+      540
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      30,
+      540
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      30,
+      540
+     ],
+     [
+      "ways to get involved",
+      30,
+      197
+     ],
+     [
+      "latest news",
+      30,
+      540
+     ],
+     [
+      "latest entries from across our ,  or .",
+      30,
+      540
+     ],
+     [
+      "news",
+      259,
+      45
+     ],
+     [
+      "press releases",
+      313,
+      114
+     ],
+     [
+      "blog",
+      451,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      50,
+      415
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      50,
+      500
+     ],
+     [
+      "news",
+      50,
+      500
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      50,
+      425
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      50,
+      500
+     ],
+     [
+      "news",
+      50,
+      500
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      50,
+      421
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      50,
+      500
+     ],
+     [
+      "news",
+      50,
+      500
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      50,
+      489
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      50,
+      500
+     ],
+     [
+      "news",
+      50,
+      500
+     ],
+     [
+      "home",
+      32,
+      40
+     ],
+     [
+      "contact",
+      96,
+      51
+     ],
+     [
+      "help",
+      171,
+      31
+     ],
+     [
+      "support us",
+      225,
+      72
+     ],
+     [
+      "legal & policies",
+      321,
+      102
+     ],
+     [
+      "corporation",
+      447,
+      79
+     ],
+     [
+      "system status",
+      32,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      42,
+      121
+     ],
+     [
+      "w3c on github",
+      86,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      30,
+      409
+     ],
+     [
+      "world wide web consortium",
+      149,
+      194
+     ],
+     [
+      "w3c",
+      30,
+      30
+     ],
+     [
+      "®",
+      60,
+      9
+     ],
+     [
+      "liability",
+      72,
+      51
+     ],
+     [
+      "trademark",
+      130,
+      73
+     ],
+     [
+      "permissive license",
+      236,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      494,
+      129
+     ],
+     [
+      "简体中文首页",
+      643,
+      88
+     ],
+     [
+      "menu",
+      490,
+      80
+     ],
+     [
+      "making the web work",
+      30,
+      480
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      30,
+      480
+     ],
+     [
+      "standards and guidelines",
+      132,
+      276
+     ],
+     [
+      "accessibility",
+      210,
+      132
+     ],
+     [
+      "internationalization",
+      30,
+      215
+     ],
+     [
+      "privacy",
+      257,
+      81
+     ],
+     [
+      "security",
+      392,
+      89
+     ],
+     [
+      "read more about w3c",
+      30,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      126,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      30,
+      480
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      30,
+      480
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      30,
+      480
+     ],
+     [
+      "e-commerce",
+      386,
+      97
+     ],
+     [
+      "media & entertainment",
+      30,
+      179
+     ],
+     [
+      "publishing",
+      218,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      30,
+      387
+     ],
+     [
+      "tpac 2026",
+      180,
+      163
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      180,
+      163
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      180,
+      163
+     ],
+     [
+      "visit the tpac 2026 website",
+      180,
+      163
+     ],
+     [
+      "web standards",
+      180,
+      163
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      180,
+      163
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      180,
+      163
+     ],
+     [
+      "members",
+      180,
+      76
+     ],
+     [
+      "staff",
+      180,
+      37
+     ],
+     [
+      "learn more about web standards",
+      180,
+      163
+     ],
+     [
+      "get involved",
+      180,
+      163
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      180,
+      163
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      180,
+      163
+     ],
+     [
+      "ways to get involved",
+      180,
+      163
+     ],
+     [
+      "latest news",
+      30,
+      540
+     ],
+     [
+      "latest entries from across our ,  or .",
+      30,
+      540
+     ],
+     [
+      "news",
+      259,
+      45
+     ],
+     [
+      "press releases",
+      313,
+      114
+     ],
+     [
+      "blog",
+      451,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      61,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      61,
+      295
+     ],
+     [
+      "news",
+      61,
+      295
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      417,
+      262
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      417,
+      295
+     ],
+     [
+      "news",
+      417,
+      295
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      61,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      61,
+      295
+     ],
+     [
+      "news",
+      61,
+      295
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      417,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      417,
+      295
+     ],
+     [
+      "news",
+      417,
+      295
+     ],
+     [
+      "home",
+      32,
+      40
+     ],
+     [
+      "contact",
+      96,
+      51
+     ],
+     [
+      "help",
+      171,
+      31
+     ],
+     [
+      "support us",
+      225,
+      72
+     ],
+     [
+      "legal & policies",
+      321,
+      102
+     ],
+     [
+      "corporation",
+      447,
+      79
+     ],
+     [
+      "system status",
+      32,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      50,
+      121
+     ],
+     [
+      "w3c on github",
+      94,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      30,
+      405
+     ],
+     [
+      "world wide web consortium",
+      149,
+      194
+     ],
+     [
+      "w3c",
+      30,
+      30
+     ],
+     [
+      "®",
+      60,
+      9
+     ],
+     [
+      "liability",
+      69,
+      51
+     ],
+     [
+      "trademark",
+      127,
+      73
+     ],
+     [
+      "permissive license",
+      232,
+      124
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 17,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 67,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 3,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "read more about w3c ||| support us"
+   ],
+   "sharedTextKeys": 60,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 49,
+     "rowParents": 15,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 42,
+     "rowParents": 13,
+     "maxRowMembers": 7,
+     "navInlinePairs": 2
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      391,
+      129
+     ],
+     [
+      "japanese website",
+      518,
+      1
+     ],
+     [
+      "简体中文首页",
+      540,
+      88
+     ],
+     [
+      "chinese website",
+      626,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      33,
+      1
+     ],
+     [
+      "standards & groups",
+      33,
+      595
+     ],
+     [
+      "get involved",
+      33,
+      595
+     ],
+     [
+      "resources",
+      33,
+      595
+     ],
+     [
+      "news & events",
+      33,
+      595
+     ],
+     [
+      "support us",
+      33,
+      595
+     ],
+     [
+      "about",
+      33,
+      595
+     ],
+     [
+      "search",
+      59,
+      54
+     ],
+     [
+      "sign in",
+      33,
+      595
+     ],
+     [
+      "making the web work",
+      33,
+      595
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      33,
+      595
+     ],
+     [
+      "standards and guidelines",
+      33,
+      276
+     ],
+     [
+      "accessibility",
+      453,
+      132
+     ],
+     [
+      "internationalization",
+      33,
+      215
+     ],
+     [
+      "privacy",
+      260,
+      81
+     ],
+     [
+      "security",
+      395,
+      89
+     ],
+     [
+      "read more about w3c",
+      33,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      81,
+      500
+     ],
+     [
+      "play",
+      116,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      33,
+      595
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      33,
+      595
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      33,
+      595
+     ],
+     [
+      "e-commerce",
+      107,
+      97
+     ],
+     [
+      "media & entertainment",
+      212,
+      179
+     ],
+     [
+      "publishing",
+      400,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      33,
+      387
+     ],
+     [
+      "tpac 2026",
+      33,
+      595
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      33,
+      595
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      33,
+      595
+     ],
+     [
+      "visit the tpac 2026 website",
+      33,
+      242
+     ],
+     [
+      "web standards",
+      33,
+      595
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      33,
+      595
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      33,
+      595
+     ],
+     [
+      "members",
+      352,
+      76
+     ],
+     [
+      "staff",
+      503,
+      37
+     ],
+     [
+      "learn more about web standards",
+      33,
+      284
+     ],
+     [
+      "get involved",
+      33,
+      595
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      33,
+      595
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      33,
+      595
+     ],
+     [
+      "ways to get involved",
+      33,
+      197
+     ],
+     [
+      "latest news",
+      33,
+      595
+     ],
+     [
+      "latest entries from across our ,  or .",
+      33,
+      595
+     ],
+     [
+      "news",
+      262,
+      45
+     ],
+     [
+      "press releases",
+      316,
+      114
+     ],
+     [
+      "blog",
+      454,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      53,
+      505
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      53,
+      555
+     ],
+     [
+      "news",
+      53,
+      555
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      53,
+      513
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      53,
+      555
+     ],
+     [
+      "news",
+      53,
+      555
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      53,
+      421
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      53,
+      555
+     ],
+     [
+      "news",
+      53,
+      555
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      53,
+      489
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      53,
+      555
+     ],
+     [
+      "news",
+      53,
+      555
+     ],
+     [
+      "home",
+      35,
+      40
+     ],
+     [
+      "contact",
+      99,
+      51
+     ],
+     [
+      "help",
+      174,
+      31
+     ],
+     [
+      "support us",
+      228,
+      72
+     ],
+     [
+      "legal & policies",
+      324,
+      102
+     ],
+     [
+      "corporation",
+      450,
+      79
+     ],
+     [
+      "system status",
+      35,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      45,
+      121
+     ],
+     [
+      "w3c on github",
+      89,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      33,
+      409
+     ],
+     [
+      "world wide web consortium",
+      152,
+      194
+     ],
+     [
+      "w3c",
+      33,
+      30
+     ],
+     [
+      "®",
+      63,
+      9
+     ],
+     [
+      "liability",
+      75,
+      51
+     ],
+     [
+      "trademark",
+      133,
+      73
+     ],
+     [
+      "permissive license",
+      239,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      497,
+      129
+     ],
+     [
+      "简体中文首页",
+      646,
+      88
+     ],
+     [
+      "menu",
+      548,
+      80
+     ],
+     [
+      "making the web work",
+      33,
+      529
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      33,
+      529
+     ],
+     [
+      "standards and guidelines",
+      135,
+      276
+     ],
+     [
+      "accessibility",
+      172,
+      132
+     ],
+     [
+      "internationalization",
+      316,
+      215
+     ],
+     [
+      "privacy",
+      33,
+      81
+     ],
+     [
+      "security",
+      167,
+      89
+     ],
+     [
+      "read more about w3c",
+      33,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      129,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      33,
+      529
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      33,
+      529
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      33,
+      529
+     ],
+     [
+      "e-commerce",
+      234,
+      97
+     ],
+     [
+      "media & entertainment",
+      339,
+      179
+     ],
+     [
+      "publishing",
+      33,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      33,
+      387
+     ],
+     [
+      "tpac 2026",
+      210,
+      191
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      210,
+      191
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      210,
+      191
+     ],
+     [
+      "visit the tpac 2026 website",
+      210,
+      191
+     ],
+     [
+      "web standards",
+      210,
+      191
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      210,
+      191
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      210,
+      191
+     ],
+     [
+      "members",
+      210,
+      76
+     ],
+     [
+      "staff",
+      210,
+      37
+     ],
+     [
+      "learn more about web standards",
+      210,
+      191
+     ],
+     [
+      "get involved",
+      210,
+      191
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      210,
+      191
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      210,
+      191
+     ],
+     [
+      "ways to get involved",
+      210,
+      191
+     ],
+     [
+      "latest news",
+      33,
+      595
+     ],
+     [
+      "latest entries from across our ,  or .",
+      33,
+      595
+     ],
+     [
+      "news",
+      262,
+      45
+     ],
+     [
+      "press releases",
+      316,
+      114
+     ],
+     [
+      "blog",
+      454,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      64,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      64,
+      295
+     ],
+     [
+      "news",
+      64,
+      295
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      420,
+      262
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      420,
+      295
+     ],
+     [
+      "news",
+      420,
+      295
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      64,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      64,
+      295
+     ],
+     [
+      "news",
+      64,
+      295
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      420,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      420,
+      295
+     ],
+     [
+      "news",
+      420,
+      295
+     ],
+     [
+      "home",
+      35,
+      40
+     ],
+     [
+      "contact",
+      99,
+      51
+     ],
+     [
+      "help",
+      174,
+      31
+     ],
+     [
+      "support us",
+      228,
+      72
+     ],
+     [
+      "legal & policies",
+      324,
+      102
+     ],
+     [
+      "corporation",
+      450,
+      79
+     ],
+     [
+      "system status",
+      35,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      50,
+      121
+     ],
+     [
+      "w3c on github",
+      94,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      33,
+      405
+     ],
+     [
+      "world wide web consortium",
+      152,
+      194
+     ],
+     [
+      "w3c",
+      33,
+      30
+     ],
+     [
+      "®",
+      63,
+      9
+     ],
+     [
+      "liability",
+      72,
+      51
+     ],
+     [
+      "trademark",
+      130,
+      73
+     ],
+     [
+      "permissive license",
+      235,
+      124
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 18,
+    "candidates": 78,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 75,
+    "protruding": 9,
+    "scrollWidth": 1124,
+    "clientWidth": 800
+   },
+   "recreationOnly": 1,
+   "sourceOnly": 17,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web"
+   ],
+   "sourceOnlyExamples": [
+    "making the web work ||| standards & groups",
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "get involved ||| standards and guidelines",
+    "resources ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "resources ||| standards and guidelines",
+    "news & events ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "news & events ||| standards and guidelines"
+   ],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 61,
+     "rowParents": 20,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 84,
+     "rowParents": 15,
+     "maxRowMembers": 8,
+     "navInlinePairs": 31
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      523,
+      129
+     ],
+     [
+      "japanese website",
+      650,
+      1
+     ],
+     [
+      "简体中文首页",
+      672,
+      88
+     ],
+     [
+      "chinese website",
+      758,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      40,
+      1
+     ],
+     [
+      "standards & groups",
+      40,
+      720
+     ],
+     [
+      "get involved",
+      40,
+      720
+     ],
+     [
+      "resources",
+      40,
+      720
+     ],
+     [
+      "news & events",
+      40,
+      720
+     ],
+     [
+      "support us",
+      40,
+      720
+     ],
+     [
+      "about",
+      40,
+      720
+     ],
+     [
+      "search",
+      66,
+      54
+     ],
+     [
+      "sign in",
+      40,
+      720
+     ],
+     [
+      "making the web work",
+      40,
+      720
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      40,
+      720
+     ],
+     [
+      "standards and guidelines",
+      40,
+      692
+     ],
+     [
+      "accessibility",
+      179,
+      132
+     ],
+     [
+      "internationalization",
+      323,
+      215
+     ],
+     [
+      "privacy",
+      550,
+      81
+     ],
+     [
+      "security",
+      40,
+      89
+     ],
+     [
+      "read more about w3c",
+      40,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      150,
+      500
+     ],
+     [
+      "play",
+      186,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      40,
+      660
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      40,
+      660
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      40,
+      660
+     ],
+     [
+      "e-commerce",
+      114,
+      97
+     ],
+     [
+      "media & entertainment",
+      219,
+      179
+     ],
+     [
+      "publishing",
+      407,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      40,
+      387
+     ],
+     [
+      "tpac 2026",
+      386,
+      374
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      386,
+      374
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      386,
+      374
+     ],
+     [
+      "visit the tpac 2026 website",
+      386,
+      242
+     ],
+     [
+      "web standards",
+      386,
+      374
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      386,
+      374
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      386,
+      374
+     ],
+     [
+      "members",
+      386,
+      76
+     ],
+     [
+      "staff",
+      537,
+      37
+     ],
+     [
+      "learn more about web standards",
+      386,
+      284
+     ],
+     [
+      "get involved",
+      386,
+      374
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      386,
+      374
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      386,
+      374
+     ],
+     [
+      "ways to get involved",
+      386,
+      197
+     ],
+     [
+      "latest news",
+      40,
+      720
+     ],
+     [
+      "latest entries from across our ,  or .",
+      40,
+      720
+     ],
+     [
+      "news",
+      269,
+      45
+     ],
+     [
+      "press releases",
+      323,
+      114
+     ],
+     [
+      "blog",
+      461,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      60,
+      287
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      60,
+      309
+     ],
+     [
+      "news",
+      60,
+      309
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      431,
+      299
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      431,
+      309
+     ],
+     [
+      "news",
+      431,
+      309
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      60,
+      290
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      60,
+      309
+     ],
+     [
+      "news",
+      60,
+      309
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      431,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      431,
+      309
+     ],
+     [
+      "news",
+      431,
+      309
+     ],
+     [
+      "home",
+      42,
+      40
+     ],
+     [
+      "contact",
+      106,
+      51
+     ],
+     [
+      "help",
+      181,
+      31
+     ],
+     [
+      "support us",
+      235,
+      72
+     ],
+     [
+      "legal & policies",
+      331,
+      102
+     ],
+     [
+      "corporation",
+      457,
+      79
+     ],
+     [
+      "system status",
+      560,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      666,
+      121
+     ],
+     [
+      "w3c on github",
+      710,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      40,
+      409
+     ],
+     [
+      "world wide web consortium",
+      159,
+      194
+     ],
+     [
+      "w3c",
+      40,
+      30
+     ],
+     [
+      "®",
+      70,
+      9
+     ],
+     [
+      "liability",
+      82,
+      51
+     ],
+     [
+      "trademark",
+      140,
+      73
+     ],
+     [
+      "permissive license",
+      246,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      513,
+      129
+     ],
+     [
+      "简体中文首页",
+      662,
+      88
+     ],
+     [
+      "visit the w3c homepage",
+      40,
+      184
+     ],
+     [
+      "standards & groups",
+      164,
+      176
+     ],
+     [
+      "get involved",
+      347,
+      119
+     ],
+     [
+      "resources",
+      474,
+      100
+     ],
+     [
+      "news & events",
+      582,
+      136
+     ],
+     [
+      "support us",
+      727,
+      105
+     ],
+     [
+      "about",
+      840,
+      68
+     ],
+     [
+      "search",
+      937,
+      1
+     ],
+     [
+      "sign in",
+      961,
+      162
+     ],
+     [
+      "making the web work",
+      40,
+      640
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      40,
+      640
+     ],
+     [
+      "standards and guidelines",
+      40,
+      276
+     ],
+     [
+      "accessibility",
+      395,
+      132
+     ],
+     [
+      "internationalization",
+      40,
+      215
+     ],
+     [
+      "privacy",
+      267,
+      81
+     ],
+     [
+      "security",
+      402,
+      89
+     ],
+     [
+      "read more about w3c",
+      40,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      40,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      40,
+      640
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      40,
+      640
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      40,
+      640
+     ],
+     [
+      "e-commerce",
+      114,
+      97
+     ],
+     [
+      "media & entertainment",
+      219,
+      179
+     ],
+     [
+      "publishing",
+      407,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      40,
+      387
+     ],
+     [
+      "tpac 2026",
+      277,
+      256
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      277,
+      256
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      277,
+      256
+     ],
+     [
+      "visit the tpac 2026 website",
+      277,
+      242
+     ],
+     [
+      "web standards",
+      277,
+      256
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      277,
+      256
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      277,
+      256
+     ],
+     [
+      "members",
+      417,
+      76
+     ],
+     [
+      "staff",
+      315,
+      37
+     ],
+     [
+      "learn more about web standards",
+      277,
+      256
+     ],
+     [
+      "get involved",
+      277,
+      256
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      277,
+      256
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      277,
+      256
+     ],
+     [
+      "ways to get involved",
+      277,
+      197
+     ],
+     [
+      "latest news",
+      40,
+      720
+     ],
+     [
+      "latest entries from across our ,  or .",
+      40,
+      720
+     ],
+     [
+      "news",
+      269,
+      45
+     ],
+     [
+      "press releases",
+      323,
+      114
+     ],
+     [
+      "blog",
+      461,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      77,
+      155
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      77,
+      165
+     ],
+     [
+      "news",
+      77,
+      165
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      317,
+      158
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      317,
+      165
+     ],
+     [
+      "news",
+      317,
+      165
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      557,
+      156
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      557,
+      165
+     ],
+     [
+      "news",
+      557,
+      165
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      77,
+      252
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      77,
+      285
+     ],
+     [
+      "news",
+      77,
+      285
+     ],
+     [
+      "home",
+      42,
+      40
+     ],
+     [
+      "contact",
+      106,
+      51
+     ],
+     [
+      "help",
+      181,
+      31
+     ],
+     [
+      "support us",
+      235,
+      72
+     ],
+     [
+      "legal & policies",
+      331,
+      102
+     ],
+     [
+      "corporation",
+      457,
+      79
+     ],
+     [
+      "system status",
+      560,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      1204,
+      121
+     ],
+     [
+      "w3c on github",
+      1248,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      40,
+      405
+     ],
+     [
+      "world wide web consortium",
+      159,
+      194
+     ],
+     [
+      "w3c",
+      40,
+      30
+     ],
+     [
+      "®",
+      70,
+      9
+     ],
+     [
+      "liability",
+      79,
+      51
+     ],
+     [
+      "trademark",
+      137,
+      73
+     ],
+     [
+      "permissive license",
+      242,
+      124
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 16,
+    "candidates": 78,
+    "protruding": 6,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 3,
+    "candidates": 75,
+    "protruding": 9,
+    "scrollWidth": 1137,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 2,
+   "sourceOnly": 15,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web",
+    "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath. ||| sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead."
+   ],
+   "sourceOnlyExamples": [
+    "making the web work ||| standards & groups",
+    "get involved ||| making the web work",
+    "get involved ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "get involved ||| standards and guidelines",
+    "resources ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+    "resources ||| standards and guidelines",
+    "accessibility ||| resources",
+    "news & events ||| the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and ."
+   ],
+   "sharedTextKeys": 67,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 68,
+     "rowParents": 19,
+     "maxRowMembers": 7,
+     "navInlinePairs": 3
+    },
+    "recreation": {
+     "inlineSiblingPairs": 89,
+     "rowParents": 16,
+     "maxRowMembers": 8,
+     "navInlinePairs": 31
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      785,
+      129
+     ],
+     [
+      "japanese website",
+      912,
+      1
+     ],
+     [
+      "简体中文首页",
+      934,
+      88
+     ],
+     [
+      "chinese website",
+      1020,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      54,
+      1
+     ],
+     [
+      "standards & groups",
+      54,
+      968
+     ],
+     [
+      "get involved",
+      54,
+      968
+     ],
+     [
+      "resources",
+      54,
+      968
+     ],
+     [
+      "news & events",
+      54,
+      968
+     ],
+     [
+      "support us",
+      54,
+      968
+     ],
+     [
+      "about",
+      54,
+      968
+     ],
+     [
+      "search",
+      80,
+      54
+     ],
+     [
+      "sign in",
+      54,
+      968
+     ],
+     [
+      "making the web work",
+      54,
+      968
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      54,
+      968
+     ],
+     [
+      "standards and guidelines",
+      589,
+      276
+     ],
+     [
+      "accessibility",
+      687,
+      132
+     ],
+     [
+      "internationalization",
+      54,
+      215
+     ],
+     [
+      "privacy",
+      281,
+      81
+     ],
+     [
+      "security",
+      415,
+      89
+     ],
+     [
+      "read more about w3c",
+      54,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      288,
+      500
+     ],
+     [
+      "play",
+      324,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      54,
+      660
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      54,
+      660
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      54,
+      660
+     ],
+     [
+      "e-commerce",
+      127,
+      97
+     ],
+     [
+      "media & entertainment",
+      233,
+      179
+     ],
+     [
+      "publishing",
+      421,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      54,
+      387
+     ],
+     [
+      "tpac 2026",
+      586,
+      436
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      586,
+      436
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      586,
+      436
+     ],
+     [
+      "visit the tpac 2026 website",
+      586,
+      242
+     ],
+     [
+      "web standards",
+      586,
+      436
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      586,
+      436
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      586,
+      436
+     ],
+     [
+      "members",
+      905,
+      76
+     ],
+     [
+      "staff",
+      624,
+      37
+     ],
+     [
+      "learn more about web standards",
+      586,
+      284
+     ],
+     [
+      "get involved",
+      586,
+      436
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      586,
+      436
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      586,
+      436
+     ],
+     [
+      "ways to get involved",
+      586,
+      197
+     ],
+     [
+      "latest news",
+      54,
+      968
+     ],
+     [
+      "latest entries from across our ,  or .",
+      54,
+      968
+     ],
+     [
+      "news",
+      283,
+      45
+     ],
+     [
+      "press releases",
+      336,
+      114
+     ],
+     [
+      "blog",
+      475,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      74,
+      178
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      74,
+      179
+     ],
+     [
+      "news",
+      74,
+      179
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      324,
+      173
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      324,
+      179
+     ],
+     [
+      "news",
+      324,
+      179
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      573,
+      179
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      573,
+      179
+     ],
+     [
+      "news",
+      573,
+      179
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      822,
+      161
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      822,
+      179
+     ],
+     [
+      "news",
+      822,
+      179
+     ],
+     [
+      "home",
+      56,
+      40
+     ],
+     [
+      "contact",
+      120,
+      51
+     ],
+     [
+      "help",
+      194,
+      31
+     ],
+     [
+      "support us",
+      249,
+      72
+     ],
+     [
+      "legal & policies",
+      345,
+      102
+     ],
+     [
+      "corporation",
+      471,
+      79
+     ],
+     [
+      "system status",
+      574,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      946,
+      121
+     ],
+     [
+      "w3c on github",
+      990,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      54,
+      409
+     ],
+     [
+      "world wide web consortium",
+      173,
+      194
+     ],
+     [
+      "w3c",
+      54,
+      30
+     ],
+     [
+      "®",
+      84,
+      9
+     ],
+     [
+      "liability",
+      96,
+      51
+     ],
+     [
+      "trademark",
+      154,
+      73
+     ],
+     [
+      "permissive license",
+      260,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      775,
+      129
+     ],
+     [
+      "简体中文首页",
+      924,
+      88
+     ],
+     [
+      "visit the w3c homepage",
+      54,
+      184
+     ],
+     [
+      "standards & groups",
+      177,
+      176
+     ],
+     [
+      "get involved",
+      361,
+      119
+     ],
+     [
+      "resources",
+      488,
+      100
+     ],
+     [
+      "news & events",
+      596,
+      136
+     ],
+     [
+      "support us",
+      740,
+      105
+     ],
+     [
+      "about",
+      854,
+      68
+     ],
+     [
+      "search",
+      951,
+      1
+     ],
+     [
+      "sign in",
+      975,
+      162
+     ],
+     [
+      "making the web work",
+      54,
+      861
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      54,
+      861
+     ],
+     [
+      "standards and guidelines",
+      589,
+      276
+     ],
+     [
+      "accessibility",
+      740,
+      132
+     ],
+     [
+      "internationalization",
+      54,
+      215
+     ],
+     [
+      "privacy",
+      281,
+      81
+     ],
+     [
+      "security",
+      415,
+      89
+     ],
+     [
+      "read more about w3c",
+      54,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      54,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      54,
+      861
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      54,
+      861
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      54,
+      861
+     ],
+     [
+      "e-commerce",
+      479,
+      97
+     ],
+     [
+      "media & entertainment",
+      585,
+      179
+     ],
+     [
+      "publishing",
+      773,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      54,
+      387
+     ],
+     [
+      "tpac 2026",
+      462,
+      334
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      462,
+      334
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      462,
+      334
+     ],
+     [
+      "visit the tpac 2026 website",
+      462,
+      242
+     ],
+     [
+      "web standards",
+      462,
+      334
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      462,
+      334
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      462,
+      334
+     ],
+     [
+      "members",
+      462,
+      76
+     ],
+     [
+      "staff",
+      613,
+      37
+     ],
+     [
+      "learn more about web standards",
+      462,
+      284
+     ],
+     [
+      "get involved",
+      462,
+      334
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      462,
+      334
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      462,
+      334
+     ],
+     [
+      "ways to get involved",
+      462,
+      197
+     ],
+     [
+      "latest news",
+      54,
+      968
+     ],
+     [
+      "latest entries from across our ,  or .",
+      54,
+      968
+     ],
+     [
+      "news",
+      283,
+      45
+     ],
+     [
+      "press releases",
+      336,
+      114
+     ],
+     [
+      "blog",
+      475,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      91,
+      155
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      91,
+      168
+     ],
+     [
+      "news",
+      91,
+      168
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      333,
+      158
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      333,
+      168
+     ],
+     [
+      "news",
+      333,
+      168
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      575,
+      156
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      575,
+      168
+     ],
+     [
+      "news",
+      575,
+      168
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      817,
+      161
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      817,
+      168
+     ],
+     [
+      "news",
+      817,
+      168
+     ],
+     [
+      "home",
+      56,
+      40
+     ],
+     [
+      "contact",
+      120,
+      51
+     ],
+     [
+      "help",
+      194,
+      31
+     ],
+     [
+      "support us",
+      249,
+      72
+     ],
+     [
+      "legal & policies",
+      345,
+      102
+     ],
+     [
+      "corporation",
+      471,
+      79
+     ],
+     [
+      "system status",
+      574,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      1204,
+      121
+     ],
+     [
+      "w3c on github",
+      1248,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      54,
+      405
+     ],
+     [
+      "world wide web consortium",
+      173,
+      194
+     ],
+     [
+      "w3c",
+      54,
+      30
+     ],
+     [
+      "®",
+      84,
+      9
+     ],
+     [
+      "liability",
+      92,
+      51
+     ],
+     [
+      "trademark",
+      151,
+      73
+     ],
+     [
+      "permissive license",
+      256,
+      124
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 1,
+    "candidates": 78,
+    "protruding": 1,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 4,
+    "candidates": 77,
+    "protruding": 1,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 3,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead. ||| working with stakeholders of the web",
+    "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath. ||| sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+    "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable. ||| w3c on mastodon"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 69,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 103,
+     "rowParents": 22,
+     "maxRowMembers": 8,
+     "navInlinePairs": 32
+    },
+    "recreation": {
+     "inlineSiblingPairs": 94,
+     "rowParents": 18,
+     "maxRowMembers": 8,
+     "navInlinePairs": 33
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to content",
+      0,
+      1
+     ],
+     [
+      "日本語ホームページ",
+      1043,
+      129
+     ],
+     [
+      "japanese website",
+      1170,
+      1
+     ],
+     [
+      "简体中文首页",
+      1192,
+      88
+     ],
+     [
+      "chinese website",
+      1278,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      160,
+      1
+     ],
+     [
+      "standards & groups",
+      328,
+      186
+     ],
+     [
+      "get involved",
+      522,
+      129
+     ],
+     [
+      "resources",
+      659,
+      110
+     ],
+     [
+      "news & events",
+      777,
+      146
+     ],
+     [
+      "support us",
+      931,
+      115
+     ],
+     [
+      "about",
+      1054,
+      78
+     ],
+     [
+      "search",
+      1161,
+      1
+     ],
+     [
+      "sign in",
+      1186,
+      94
+     ],
+     [
+      "making the web work",
+      160,
+      504
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      160,
+      504
+     ],
+     [
+      "standards and guidelines",
+      262,
+      276
+     ],
+     [
+      "accessibility",
+      299,
+      132
+     ],
+     [
+      "internationalization",
+      160,
+      215
+     ],
+     [
+      "privacy",
+      387,
+      81
+     ],
+     [
+      "security",
+      522,
+      89
+     ],
+     [
+      "read more about w3c",
+      160,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      780,
+      500
+     ],
+     [
+      "play",
+      815,
+      1
+     ],
+     [
+      "working with stakeholders of the web",
+      160,
+      660
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      160,
+      660
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      160,
+      660
+     ],
+     [
+      "e-commerce",
+      234,
+      97
+     ],
+     [
+      "media & entertainment",
+      339,
+      179
+     ],
+     [
+      "publishing",
+      527,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      160,
+      387
+     ],
+     [
+      "tpac 2026",
+      776,
+      504
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      776,
+      504
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      776,
+      504
+     ],
+     [
+      "visit the tpac 2026 website",
+      776,
+      242
+     ],
+     [
+      "web standards",
+      776,
+      504
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      776,
+      504
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      776,
+      504
+     ],
+     [
+      "members",
+      1095,
+      76
+     ],
+     [
+      "staff",
+      776,
+      37
+     ],
+     [
+      "learn more about web standards",
+      776,
+      284
+     ],
+     [
+      "get involved",
+      776,
+      504
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      776,
+      504
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      776,
+      504
+     ],
+     [
+      "ways to get involved",
+      776,
+      197
+     ],
+     [
+      "latest news",
+      160,
+      1120
+     ],
+     [
+      "latest entries from across our ,  or .",
+      160,
+      1120
+     ],
+     [
+      "news",
+      389,
+      45
+     ],
+     [
+      "press releases",
+      443,
+      114
+     ],
+     [
+      "blog",
+      581,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      181,
+      186
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      181,
+      214
+     ],
+     [
+      "news",
+      181,
+      214
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      469,
+      189
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      469,
+      214
+     ],
+     [
+      "news",
+      469,
+      214
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      757,
+      179
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      757,
+      214
+     ],
+     [
+      "news",
+      757,
+      214
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      1046,
+      194
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      1046,
+      214
+     ],
+     [
+      "news",
+      1046,
+      214
+     ],
+     [
+      "home",
+      162,
+      40
+     ],
+     [
+      "contact",
+      226,
+      51
+     ],
+     [
+      "help",
+      301,
+      31
+     ],
+     [
+      "support us",
+      355,
+      72
+     ],
+     [
+      "legal & policies",
+      451,
+      102
+     ],
+     [
+      "corporation",
+      577,
+      79
+     ],
+     [
+      "system status",
+      680,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      1204,
+      121
+     ],
+     [
+      "w3c on github",
+      1248,
+      101
+     ],
+     [
+      "copyright © 2026 .  ,  and  rules apply.",
+      160,
+      409
+     ],
+     [
+      "world wide web consortium",
+      279,
+      194
+     ],
+     [
+      "w3c",
+      160,
+      30
+     ],
+     [
+      "®",
+      190,
+      9
+     ],
+     [
+      "liability",
+      202,
+      51
+     ],
+     [
+      "trademark",
+      260,
+      73
+     ],
+     [
+      "permissive license",
+      366,
+      124
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to content",
+      0,
+      30
+     ],
+     [
+      "日本語ホームページ",
+      1033,
+      129
+     ],
+     [
+      "japanese website",
+      1170,
+      1
+     ],
+     [
+      "简体中文首页",
+      1182,
+      88
+     ],
+     [
+      "chinese website",
+      1278,
+      1
+     ],
+     [
+      "visit the w3c homepage",
+      160,
+      184
+     ],
+     [
+      "standards & groups",
+      284,
+      161
+     ],
+     [
+      "get involved",
+      452,
+      104
+     ],
+     [
+      "resources",
+      564,
+      85
+     ],
+     [
+      "news & events",
+      657,
+      121
+     ],
+     [
+      "support us",
+      787,
+      90
+     ],
+     [
+      "about",
+      885,
+      53
+     ],
+     [
+      "search",
+      967,
+      127
+     ],
+     [
+      "sign in",
+      1118,
+      162
+     ],
+     [
+      "making the web work",
+      72,
+      976
+     ],
+     [
+      "the world wide web consortium (w3c) develops  to help everyone build and enjoy a web based on the principles of , ,  and .",
+      72,
+      976
+     ],
+     [
+      "standards and guidelines",
+      607,
+      276
+     ],
+     [
+      "accessibility",
+      705,
+      132
+     ],
+     [
+      "internationalization",
+      72,
+      215
+     ],
+     [
+      "privacy",
+      299,
+      81
+     ],
+     [
+      "security",
+      434,
+      89
+     ],
+     [
+      "read more about w3c",
+      72,
+      206
+     ],
+     [
+      "sorry, your browser does not support embedded videos. here is a <a href=\"https://www.w3.org/cms-uploads/animation.mp4\">link to the video</a> instead.",
+      72,
+      500
+     ],
+     [
+      "working with stakeholders of the web",
+      72,
+      976
+     ],
+     [
+      "a range of organizations join the world wide web consortium as members to work with us to drive the direction of core web technologies and exchange ideas with industry and research leaders. we rotate randomly a few of our member organizations' logos underneath.",
+      72,
+      976
+     ],
+     [
+      "the web consortium and its members, with help from the public and the web community, focus on a range of business ecosystems that the web transforms, including , ,  and several other areas.",
+      72,
+      976
+     ],
+     [
+      "e-commerce",
+      428,
+      97
+     ],
+     [
+      "media & entertainment",
+      533,
+      179
+     ],
+     [
+      "publishing",
+      721,
+      83
+     ],
+     [
+      "discover how w3c supports these organizations",
+      72,
+      387
+     ],
+     [
+      "tpac 2026",
+      651,
+      402
+     ],
+     [
+      "tpac 2026, our major hybrid event of the year, gathers our community on 26-30 october, in dublin, ireland.",
+      651,
+      402
+     ],
+     [
+      "during this exciting week, w3c work groups meet to coordinate work that advances web standardization. tpac also brings together the w3c governing bodies (board of directors, advisory board, technical architecture group and the w3c advisory committee).",
+      651,
+      402
+     ],
+     [
+      "visit the tpac 2026 website",
+      651,
+      242
+     ],
+     [
+      "web standards",
+      651,
+      402
+     ],
+     [
+      "web standards are the building blocks of a consistent digitally connected world. they are implemented in browsers, blogs, search engines, and other software that power our experience on the web.",
+      651,
+      402
+     ],
+     [
+      "w3c is an international community where , full-time , and the public work together to develop web standards.",
+      651,
+      402
+     ],
+     [
+      "members",
+      970,
+      76
+     ],
+     [
+      "staff",
+      718,
+      37
+     ],
+     [
+      "learn more about web standards",
+      651,
+      284
+     ],
+     [
+      "get involved",
+      651,
+      402
+     ],
+     [
+      "w3c works at the nexus of core technology, industry needs, and societal needs. everyone can get involved with the work we do.",
+      651,
+      402
+     ],
+     [
+      "there are many ways individuals and organizations can participate in the web consortium to advance web standardization.",
+      651,
+      402
+     ],
+     [
+      "ways to get involved",
+      651,
+      197
+     ],
+     [
+      "latest news",
+      160,
+      1120
+     ],
+     [
+      "latest entries from across our ,  or .",
+      160,
+      1120
+     ],
+     [
+      "news",
+      389,
+      45
+     ],
+     [
+      "press releases",
+      443,
+      114
+     ],
+     [
+      "blog",
+      581,
+      38
+     ],
+     [
+      "w3c invites implementations of decentralized identifier resolution (did resolution) v1",
+      197,
+      186
+     ],
+     [
+      "this document describes the process of obtaining a did document and accompanying metadata for a specific did.",
+      197,
+      205
+     ],
+     [
+      "news",
+      197,
+      205
+     ],
+     [
+      "group note: further aligning w3c's program of technical work with human rights",
+      477,
+      189
+     ],
+     [
+      "in this document, the advisory board lists examples of how human rights and technical standards setting map to each other, points to existing w3c work in this area, and provides concrete proposals to further the alignment between the w3c’s technical work and human rights.",
+      477,
+      205
+     ],
+     [
+      "news",
+      477,
+      205
+     ],
+     [
+      "w3c invites implementations of webtransport",
+      757,
+      179
+     ],
+     [
+      "this document defines a set of ecmascript apis in webidl to allow data to be sent and received between a browser and server.",
+      757,
+      205
+     ],
+     [
+      "news",
+      757,
+      205
+     ],
+     [
+      "group note draft: verifiable credentials overview v1.1",
+      1037,
+      194
+     ],
+     [
+      "the family of w3c recommendations for verifiable credentials, described in this overview document, provides a mechanism to express these sorts of credentials on the web in a way that is cryptographically secure, privacy respecting, and machine-verifiable.",
+      1037,
+      205
+     ],
+     [
+      "news",
+      1037,
+      205
+     ],
+     [
+      "home",
+      162,
+      40
+     ],
+     [
+      "contact",
+      226,
+      51
+     ],
+     [
+      "help",
+      301,
+      31
+     ],
+     [
+      "support us",
+      355,
+      72
+     ],
+     [
+      "legal & policies",
+      451,
+      102
+     ],
+     [
+      "corporation",
+      577,
+      79
+     ],
+     [
+      "system status",
+      680,
+      92
+     ],
+     [
+      "w3c on mastodon",
+      1204,
+      121
+     ],
+     [
+      "w3c on github",
+      1248,
+      101
+     ],
+     [
+      "copyright © 2026 .,  and  rules apply.",
+      160,
+      405
+     ],
+     [
+      "world wide web consortium",
+      279,
+      194
+     ],
+     [
+      "w3c",
+      160,
+      30
+     ],
+     [
+      "®",
+      190,
+      9
+     ],
+     [
+      "liability",
+      199,
+      51
+     ],
+     [
+      "trademark",
+      257,
+      73
+     ],
+     [
+      "permissive license",
+      362,
+      124
+     ]
+    ]
+   }
+  }
+ }
+}
