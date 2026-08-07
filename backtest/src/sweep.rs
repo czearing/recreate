@@ -79,6 +79,54 @@ pub fn probe_widths(bands: &[String], session_width: u32) -> Vec<u32> {
     thin(widths, clamp(session_width as i64))
 }
 
+/// What a probe is assumed to cost before one has been timed on this page.
+///
+/// Only the first probe uses it; every later admission check uses the worst
+/// probe actually measured, so a page that is slower than this is discovered
+/// after one probe rather than after the deadline.
+pub const NOMINAL_PROBE_MS: u64 = 60;
+
+/// The share of a comparison's remaining time the width sweep may spend.
+///
+/// The sweep is evidence a comparison can be truncated without losing its
+/// verdict, so it takes a slice of the existing budget and leaves the rest for
+/// the states and the report. It is a share rather than a duration so it stays
+/// correct if the caller's own remaining time is already short.
+pub const SWEEP_TIME_SHARE: f64 = 0.5;
+
+/// The widths of [`probe_widths`], ordered so the highest-yield probes run
+/// first.
+///
+/// A time-boxed sweep is truncated to a prefix, so the prefix must be the
+/// valuable part. A media query is a conditional, so its declared boundary is
+/// where an inclusive/exclusive mistake lives, and the widths inside one band
+/// all exercise the same rule and mostly repeat each other. Probing in
+/// ascending width order — the order the sample set is naturally built in —
+/// would instead spend the budget on whichever end of the axis happens to be
+/// numerically smaller.
+pub fn probe_order(bands: &[String], session_width: u32) -> Vec<u32> {
+    let boundaries = boundaries(bands);
+    let mut widths = probe_widths(bands, session_width);
+    let session = clamp(session_width as i64);
+    widths.sort_by_key(|width| (value_rank(*width, &boundaries, session), *width));
+    widths
+}
+
+/// Lower ranks are probed first.
+fn value_rank(width: u32, boundaries: &[u32], session_width: u32) -> u8 {
+    if width == session_width {
+        // Without it the swept evidence and the recorded states describe
+        // different pages, so it is worth more than any other single width.
+        0
+    } else if boundaries.contains(&width) {
+        1
+    } else if boundaries.iter().any(|value| width.abs_diff(*value) == 1) {
+        2
+    } else {
+        3
+    }
+}
+
 fn clamp(value: i64) -> u32 {
     value.clamp(MINIMUM_WIDTH as i64, MAXIMUM_WIDTH as i64) as u32
 }
@@ -371,6 +419,31 @@ mod tests {
     fn a_page_without_width_conditional_css_is_never_swept() {
         assert!(probe_widths(&[], 1440).is_empty());
         assert!(probe_widths(&bands(&["(min-width:37.5em)"]), 1440).is_empty());
+        assert!(probe_order(&[], 1440).is_empty());
+    }
+
+    /// Under a time box the sweep is truncated to a prefix, so the prefix has
+    /// to be the part worth keeping.
+    #[test]
+    fn probes_are_ordered_by_defect_yield_not_by_width() {
+        let order = probe_order(&bands(&["(min-width:600px)", "(min-width:900px)"]), 1440);
+        assert_eq!(order[0], 1440, "the session width outranks every probe");
+        assert_eq!(&order[1..3], &[600, 900], "boundaries come next");
+        assert_eq!(
+            &order[3..7],
+            &[599, 601, 899, 901],
+            "then the pixels either side of each boundary"
+        );
+        assert_eq!(order[7], 750, "band midpoints come last");
+    }
+
+    /// Ordering must not quietly drop or invent a width; it is the same set.
+    #[test]
+    fn ordering_probes_by_value_preserves_the_sampled_set() {
+        let bands = bands(&["(min-width:600px)", "(max-width:1200px)"]);
+        let mut ordered = probe_order(&bands, 1440);
+        ordered.sort_unstable();
+        assert_eq!(ordered, probe_widths(&bands, 1440));
     }
 
     #[test]

@@ -15,7 +15,7 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, HashMap},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 const EVIDENCE_SCRIPT: &str = r##"
@@ -409,37 +409,76 @@ pub enum Sweep<'a> {
 ///
 /// Returns nothing for a page that declares no width-conditional CSS, so such a
 /// page costs exactly what it cost before this existed.
+///
+/// The sweep runs inside a slice of the comparison deadline and stops when that
+/// slice is spent. A cap on the probe count cannot bound the time, because the
+/// cost of a probe is a document-wide reflow whose price depends on the page,
+/// so any fixed count silently asserts a per-probe cost that some page will
+/// exceed. The count remains a ceiling; time is what ends the loop in practice.
+/// Widths the slice did not reach are returned rather than dropped, because a
+/// width that was never measured must not read as a width that matched.
 async fn sweep_widths(
     cdp: &mut Cdp,
     base: &State,
     viewport: &Viewport,
     mode: &Sweep<'_>,
     deadline: Deadline,
-) -> anyhow::Result<Vec<SweepProbe>> {
+) -> anyhow::Result<SweptAxis> {
     let widths = match mode {
-        Sweep::Derive => sweep::probe_widths(&base.stylesheet.viewport_bands, viewport.width),
+        Sweep::Derive => sweep::probe_order(&base.stylesheet.viewport_bands, viewport.width),
         Sweep::Replay(source) => source.sweep.iter().map(|probe| probe.width).collect(),
     };
     if widths.is_empty() {
-        return Ok(Vec::new());
+        return Ok(SweptAxis::default());
     }
-    let mut probes = Vec::with_capacity(widths.len());
+    let budget = deadline.slice(sweep::SWEEP_TIME_SHARE);
+    let mut axis = SweptAxis::default();
+    // The first probe has no measured predecessor, so it is admitted on a
+    // nominal estimate and the estimate is then the worst probe actually seen:
+    // a page whose reflows are expensive stops early instead of discovering the
+    // cost by blowing the deadline.
+    let mut estimate = Duration::from_millis(sweep::NOMINAL_PROBE_MS);
     for width in widths {
-        probes.push(probe_width(cdp, width, viewport, deadline).await?);
+        if !budget.admits(estimate) {
+            axis.uncovered.push(width);
+            continue;
+        }
+        let started = Instant::now();
+        axis.probes.push(probe_width(cdp, width, viewport, deadline).await?);
+        estimate = estimate.max(started.elapsed());
     }
     if let Sweep::Replay(source) = mode {
-        let mut refiner = sweep::Refiner::plan(&source.sweep, &probes);
+        let mut refiner = sweep::Refiner::plan(&source.sweep, &axis.probes);
         while let Some(width) = refiner.next_width() {
+            // Refinement narrows an interval that is already reported, so it is
+            // the first thing to give up when the slice runs low.
+            if !budget.admits(estimate) {
+                axis.uncovered.push(width);
+                break;
+            }
+            let started = Instant::now();
             let probe = probe_width(cdp, width, viewport, deadline).await?;
+            estimate = estimate.max(started.elapsed());
             refiner.accept(&source.sweep, &probe);
-            probes.push(probe);
-            probes.sort_by_key(|probe| probe.width);
+            axis.probes.push(probe);
         }
     }
+    // Evidence is recorded in probe order but reported by width, so a truncated
+    // sweep and a complete one produce the same interval arithmetic.
+    axis.probes.sort_by_key(|probe| probe.width);
+    axis.uncovered.sort_unstable();
+    axis.uncovered.dedup();
     // The recorded states were captured before the sweep, but leave the tab at
     // the width the session declares so nothing downstream inherits a probe.
     set_width(cdp, viewport.width, viewport, deadline).await?;
-    Ok(probes)
+    Ok(axis)
+}
+
+/// What a sweep measured, and what it ran out of time to measure.
+#[derive(Default)]
+struct SweptAxis {
+    probes: Vec<SweepProbe>,
+    uncovered: Vec<u32>,
 }
 
 async fn probe_width(
@@ -647,7 +686,8 @@ pub async fn record_source(session: &Session, baseline_only: bool) -> anyhow::Re
         },
         actions,
         states,
-        sweep,
+        sweep: sweep.probes,
+        uncovered: sweep.uncovered,
         digest: String::new(),
     };
     artifact.seal()?;
@@ -724,7 +764,7 @@ async fn snapshot_states(
     viewport: &Viewport,
     mode: &Sweep<'_>,
     deadline: Deadline,
-) -> anyhow::Result<(Vec<State>, Vec<SweepProbe>)> {
+) -> anyhow::Result<(Vec<State>, SweptAxis)> {
     cdp.call("Page.enable", json!({}), deadline).await?;
     cdp.call("Runtime.enable", json!({}), deadline).await?;
     focus_page(cdp, deadline).await?;
@@ -778,7 +818,8 @@ pub async fn record_source_snapshot(session: &Session) -> anyhow::Result<Artifac
         },
         actions: Vec::new(),
         states,
-        sweep,
+        sweep: sweep.probes,
+        uncovered: sweep.uncovered,
         digest: String::new(),
     };
     artifact.seal()?;
@@ -825,7 +866,8 @@ pub async fn compare_candidate_snapshot(
         },
         actions: Vec::new(),
         states,
-        sweep,
+        sweep: sweep.probes,
+        uncovered: sweep.uncovered,
         digest: String::new(),
     };
     candidate.seal()?;
@@ -880,7 +922,8 @@ pub async fn compare_candidate(
         },
         actions: artifact.actions.clone(),
         states,
-        sweep,
+        sweep: sweep.probes,
+        uncovered: sweep.uncovered,
         digest: String::new(),
     };
     candidate.seal()?;
@@ -976,7 +1019,7 @@ async fn capture_states(
     actions: &[Action],
     mode: &Sweep<'_>,
     deadline: Deadline,
-) -> anyhow::Result<(Vec<State>, Vec<SweepProbe>)> {
+) -> anyhow::Result<(Vec<State>, SweptAxis)> {
     let mut states = Vec::new();
     navigate(cdp, url, viewport, deadline).await?;
     let base = capture_state(cdp, viewport, "base", false, deadline).await?;

@@ -274,6 +274,11 @@ pub struct Artifact {
     /// artifact bytes and the comparison cost of such a page unchanged.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub sweep: Vec<SweepProbe>,
+    /// Widths the sweep planned but ran out of time to measure. Empty for every
+    /// sweep that completed, so an artifact only carries this when there is
+    /// genuinely coverage it cannot vouch for.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub uncovered: Vec<u32>,
     pub digest: String,
 }
 
@@ -383,6 +388,7 @@ mod compatibility_tests {
             actions: Vec::new(),
             states: vec![state],
             sweep: Vec::new(),
+            uncovered: Vec::new(),
             digest: String::new(),
         };
         artifact.seal().unwrap();

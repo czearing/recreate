@@ -2341,7 +2341,9 @@ fn scenario_rank(value: &str) -> u8 {
 /// as `transform`.
 fn compare_sweep(source: &Artifact, candidate: &Artifact) -> Vec<Finding> {
     if source.sweep.is_empty() || candidate.sweep.is_empty() {
-        return Vec::new();
+        // A sweep with no probes still has to declare what it skipped: a page
+        // whose every probe was cut is the case least entitled to silence.
+        return uncovered_findings(source, candidate);
     }
     let mut findings = Vec::new();
     for target in sweep::diverging_targets(&source.sweep, &candidate.sweep) {
@@ -2369,7 +2371,36 @@ fn compare_sweep(source: &Artifact, candidate: &Artifact) -> Vec<Finding> {
     // when a node appears or resizes, every ancestor it made taller is a
     // consequence, not a second defect.
     collapse_consequences(&mut findings);
+    findings.extend(uncovered_findings(source, candidate));
     findings
+}
+
+/// Widths the sweep ran out of time to measure, on either side.
+///
+/// Truncating a measurement is legitimate; staying quiet about it is not. A
+/// width that was never probed is indistinguishable, in a report that omits it,
+/// from a width that was probed and matched — which turns a time limit into a
+/// claim of coverage that was never made. Reporting it keeps the comparison
+/// honestly incomplete instead of wrongly clean.
+fn uncovered_findings(source: &Artifact, candidate: &Artifact) -> Vec<Finding> {
+    let mut widths = source
+        .uncovered
+        .iter()
+        .chain(candidate.uncovered.iter())
+        .copied()
+        .collect::<Vec<_>>();
+    widths.sort_unstable();
+    widths.dedup();
+    widths
+        .into_iter()
+        .map(|width| {
+            let span = Span {
+                lo: width,
+                hi: width,
+            };
+            finding(&span, "viewport", "coverage", "measured", "UNCOVERED", None)
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -3010,6 +3041,7 @@ mod tests {
             actions: Vec::new(),
             states,
             sweep: Vec::new(),
+            uncovered: Vec::new(),
             digest: String::new(),
         };
         artifact.seal().unwrap();
@@ -3283,6 +3315,48 @@ mod tests {
     }
 
     /// A `V540 base` line must keep sorting ahead of a later interval line.
+    /// A sweep that ran out of time must not read as a sweep that matched.
+    #[test]
+    fn a_width_the_sweep_never_reached_is_reported_as_uncovered() {
+        let probes = vec![sweep_probe(600, sweep_node(24.0, 0.0, 200.0, true))];
+        let mut left = artifact(vec![state("base", NodeEvidence::default())]);
+        left.sweep = probes.clone();
+        left.uncovered = vec![900, 901];
+        left.seal().unwrap();
+        let mut right = artifact(vec![state("base", NodeEvidence::default())]);
+        right.sweep = probes;
+        right.seal().unwrap();
+        let findings = compare_sweep(&left, &right);
+        assert_eq!(
+            findings.iter().map(|f| f.line.as_str()).collect::<Vec<_>>(),
+            vec![
+                "V900 sweep viewport coverage measured->UNCOVERED",
+                "V901 sweep viewport coverage measured->UNCOVERED"
+            ]
+        );
+    }
+
+    /// A page whose every probe was cut is the case least entitled to silence.
+    #[test]
+    fn an_entirely_unswept_page_still_declares_the_widths_it_skipped() {
+        let mut left = artifact(vec![state("base", NodeEvidence::default())]);
+        left.uncovered = vec![600];
+        left.seal().unwrap();
+        let mut right = artifact(vec![state("base", NodeEvidence::default())]);
+        right.seal().unwrap();
+        assert_eq!(compare_sweep(&left, &right).len(), 1);
+    }
+
+    /// A completed sweep is silent, so nothing that already passes changes.
+    #[test]
+    fn a_sweep_that_reached_every_width_reports_no_coverage_gap() {
+        let probes = vec![
+            sweep_probe(599, sweep_node(24.0, 0.0, 200.0, true)),
+            sweep_probe(600, sweep_node(24.0, 0.0, 200.0, true)),
+        ];
+        assert!(swept(probes.clone(), probes).is_empty());
+    }
+
     #[test]
     fn a_recorded_width_sorts_ahead_of_a_later_interval() {
         assert!(scenario_rank("base") < scenario_rank("sweep"));
