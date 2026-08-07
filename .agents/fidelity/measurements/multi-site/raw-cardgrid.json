@@ -1,0 +1,4705 @@
+{
+ "site": {
+  "key": "cardgrid",
+  "sourceUrl": "https://getbootstrap.com/docs/5.3/examples/album/",
+  "recreationUrl": "http://127.0.0.1:8801/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 4,
+    "scrollWidth": 732,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      342,
+      1
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      12,
+      376
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      12,
+      376
+     ],
+     [
+      "main call to action",
+      46,
+      156
+     ],
+     [
+      "secondary action",
+      207,
+      147
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "thumbnail",
+      158,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      342
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      330,
+      41
+     ],
+     [
+      "back to top",
+      308,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      376
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      376
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      326,
+      2
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      144,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      144,
+      456
+     ],
+     [
+      "main call to action",
+      220,
+      156
+     ],
+     [
+      "secondary action",
+      376,
+      147
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      368,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      662
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      658,
+      41
+     ],
+     [
+      "back to top",
+      308,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      376
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      376
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      149
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 2,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 56,
+    "protruding": 4,
+    "scrollWidth": 732,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      392,
+      1
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      12,
+      426
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      12,
+      426
+     ],
+     [
+      "main call to action",
+      71,
+      156
+     ],
+     [
+      "secondary action",
+      232,
+      147
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "thumbnail",
+      183,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      392
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      380,
+      41
+     ],
+     [
+      "back to top",
+      358,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      426
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      426
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      412
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      376,
+      2
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      144,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      144,
+      456
+     ],
+     [
+      "main call to action",
+      220,
+      156
+     ],
+     [
+      "secondary action",
+      376,
+      147
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      368,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      662
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      658,
+      41
+     ],
+     [
+      "back to top",
+      358,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      426
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      426
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      412
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 2,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 2,
+    "candidates": 56,
+    "protruding": 4,
+    "scrollWidth": 732,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      422,
+      1
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      12,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      12,
+      456
+     ],
+     [
+      "main call to action",
+      86,
+      156
+     ],
+     [
+      "secondary action",
+      247,
+      147
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "thumbnail",
+      198,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      29,
+      422
+     ],
+     [
+      "view",
+      29,
+      48
+     ],
+     [
+      "edit",
+      76,
+      41
+     ],
+     [
+      "9 mins",
+      410,
+      41
+     ],
+     [
+      "back to top",
+      388,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      456
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      456
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      412
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      406,
+      2
+     ],
+     [
+      "album",
+      40,
+      63
+     ],
+     [
+      "album example",
+      144,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      144,
+      456
+     ],
+     [
+      "main call to action",
+      220,
+      156
+     ],
+     [
+      "secondary action",
+      376,
+      147
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      101,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      128
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      125,
+      40
+     ],
+     [
+      "thumbnail",
+      279,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      215,
+      128
+     ],
+     [
+      "view",
+      215,
+      48
+     ],
+     [
+      "edit",
+      262,
+      41
+     ],
+     [
+      "9 mins",
+      303,
+      40
+     ],
+     [
+      "thumbnail",
+      457,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      393,
+      128
+     ],
+     [
+      "view",
+      393,
+      48
+     ],
+     [
+      "edit",
+      440,
+      41
+     ],
+     [
+      "9 mins",
+      481,
+      40
+     ],
+     [
+      "thumbnail",
+      635,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      571,
+      128
+     ],
+     [
+      "view",
+      571,
+      48
+     ],
+     [
+      "edit",
+      618,
+      41
+     ],
+     [
+      "9 mins",
+      659,
+      40
+     ],
+     [
+      "thumbnail",
+      368,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      37,
+      662
+     ],
+     [
+      "view",
+      37,
+      48
+     ],
+     [
+      "edit",
+      84,
+      41
+     ],
+     [
+      "9 mins",
+      658,
+      41
+     ],
+     [
+      "back to top",
+      388,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      12,
+      456
+     ],
+     [
+      "new to bootstrap? or read our .",
+      12,
+      456
+     ],
+     [
+      "visit the homepage",
+      148,
+      137
+     ],
+     [
+      "getting started guide",
+      12,
+      412
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 4,
+    "scrollWidth": 762,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      542,
+      1
+     ],
+     [
+      "album",
+      70,
+      63
+     ],
+     [
+      "album example",
+      42,
+      516
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      42,
+      516
+     ],
+     [
+      "main call to action",
+      146,
+      156
+     ],
+     [
+      "secondary action",
+      307,
+      147
+     ],
+     [
+      "thumbnail",
+      125,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      59,
+      216
+     ],
+     [
+      "view",
+      59,
+      48
+     ],
+     [
+      "edit",
+      106,
+      41
+     ],
+     [
+      "9 mins",
+      234,
+      41
+     ],
+     [
+      "thumbnail",
+      391,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      325,
+      216
+     ],
+     [
+      "view",
+      325,
+      48
+     ],
+     [
+      "edit",
+      372,
+      41
+     ],
+     [
+      "9 mins",
+      500,
+      41
+     ],
+     [
+      "thumbnail",
+      125,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      59,
+      216
+     ],
+     [
+      "view",
+      59,
+      48
+     ],
+     [
+      "edit",
+      106,
+      41
+     ],
+     [
+      "9 mins",
+      234,
+      41
+     ],
+     [
+      "thumbnail",
+      391,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      325,
+      216
+     ],
+     [
+      "view",
+      325,
+      48
+     ],
+     [
+      "edit",
+      372,
+      41
+     ],
+     [
+      "9 mins",
+      500,
+      41
+     ],
+     [
+      "thumbnail",
+      125,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      59,
+      216
+     ],
+     [
+      "view",
+      59,
+      48
+     ],
+     [
+      "edit",
+      106,
+      41
+     ],
+     [
+      "9 mins",
+      234,
+      41
+     ],
+     [
+      "thumbnail",
+      391,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      325,
+      216
+     ],
+     [
+      "view",
+      325,
+      48
+     ],
+     [
+      "edit",
+      372,
+      41
+     ],
+     [
+      "9 mins",
+      500,
+      41
+     ],
+     [
+      "thumbnail",
+      125,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      59,
+      216
+     ],
+     [
+      "view",
+      59,
+      48
+     ],
+     [
+      "edit",
+      106,
+      41
+     ],
+     [
+      "9 mins",
+      234,
+      41
+     ],
+     [
+      "thumbnail",
+      391,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      325,
+      216
+     ],
+     [
+      "view",
+      325,
+      48
+     ],
+     [
+      "edit",
+      372,
+      41
+     ],
+     [
+      "9 mins",
+      500,
+      41
+     ],
+     [
+      "thumbnail",
+      125,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      59,
+      216
+     ],
+     [
+      "view",
+      59,
+      48
+     ],
+     [
+      "edit",
+      106,
+      41
+     ],
+     [
+      "9 mins",
+      234,
+      41
+     ],
+     [
+      "back to top",
+      478,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      42,
+      516
+     ],
+     [
+      "new to bootstrap? or read our .",
+      42,
+      516
+     ],
+     [
+      "visit the homepage",
+      178,
+      137
+     ],
+     [
+      "getting started guide",
+      403,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      526,
+      2
+     ],
+     [
+      "album",
+      70,
+      63
+     ],
+     [
+      "album example",
+      174,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      174,
+      456
+     ],
+     [
+      "main call to action",
+      250,
+      156
+     ],
+     [
+      "secondary action",
+      406,
+      147
+     ],
+     [
+      "thumbnail",
+      131,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      67,
+      128
+     ],
+     [
+      "view",
+      67,
+      48
+     ],
+     [
+      "edit",
+      114,
+      41
+     ],
+     [
+      "9 mins",
+      155,
+      40
+     ],
+     [
+      "thumbnail",
+      309,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      245,
+      128
+     ],
+     [
+      "view",
+      245,
+      48
+     ],
+     [
+      "edit",
+      292,
+      41
+     ],
+     [
+      "9 mins",
+      333,
+      40
+     ],
+     [
+      "thumbnail",
+      487,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      423,
+      128
+     ],
+     [
+      "view",
+      423,
+      48
+     ],
+     [
+      "edit",
+      470,
+      41
+     ],
+     [
+      "9 mins",
+      511,
+      40
+     ],
+     [
+      "thumbnail",
+      665,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      601,
+      128
+     ],
+     [
+      "view",
+      601,
+      48
+     ],
+     [
+      "edit",
+      648,
+      41
+     ],
+     [
+      "9 mins",
+      689,
+      40
+     ],
+     [
+      "thumbnail",
+      131,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      67,
+      128
+     ],
+     [
+      "view",
+      67,
+      48
+     ],
+     [
+      "edit",
+      114,
+      41
+     ],
+     [
+      "9 mins",
+      155,
+      40
+     ],
+     [
+      "thumbnail",
+      309,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      245,
+      128
+     ],
+     [
+      "view",
+      245,
+      48
+     ],
+     [
+      "edit",
+      292,
+      41
+     ],
+     [
+      "9 mins",
+      333,
+      40
+     ],
+     [
+      "thumbnail",
+      487,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      423,
+      128
+     ],
+     [
+      "view",
+      423,
+      48
+     ],
+     [
+      "edit",
+      470,
+      41
+     ],
+     [
+      "9 mins",
+      511,
+      40
+     ],
+     [
+      "thumbnail",
+      665,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      601,
+      128
+     ],
+     [
+      "view",
+      601,
+      48
+     ],
+     [
+      "edit",
+      648,
+      41
+     ],
+     [
+      "9 mins",
+      689,
+      40
+     ],
+     [
+      "thumbnail",
+      398,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      67,
+      662
+     ],
+     [
+      "view",
+      67,
+      48
+     ],
+     [
+      "edit",
+      114,
+      41
+     ],
+     [
+      "9 mins",
+      688,
+      41
+     ],
+     [
+      "back to top",
+      478,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      42,
+      516
+     ],
+     [
+      "new to bootstrap? or read our .",
+      42,
+      516
+     ],
+     [
+      "visit the homepage",
+      178,
+      137
+     ],
+     [
+      "getting started guide",
+      403,
+      149
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 4,
+    "scrollWidth": 793,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      603,
+      1
+     ],
+     [
+      "album",
+      101,
+      63
+     ],
+     [
+      "album example",
+      73,
+      516
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      73,
+      516
+     ],
+     [
+      "main call to action",
+      177,
+      156
+     ],
+     [
+      "secondary action",
+      337,
+      147
+     ],
+     [
+      "thumbnail",
+      156,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      90,
+      216
+     ],
+     [
+      "view",
+      90,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      265,
+      41
+     ],
+     [
+      "thumbnail",
+      422,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      356,
+      216
+     ],
+     [
+      "view",
+      356,
+      48
+     ],
+     [
+      "edit",
+      402,
+      41
+     ],
+     [
+      "9 mins",
+      531,
+      41
+     ],
+     [
+      "thumbnail",
+      156,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      90,
+      216
+     ],
+     [
+      "view",
+      90,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      265,
+      41
+     ],
+     [
+      "thumbnail",
+      422,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      356,
+      216
+     ],
+     [
+      "view",
+      356,
+      48
+     ],
+     [
+      "edit",
+      402,
+      41
+     ],
+     [
+      "9 mins",
+      531,
+      41
+     ],
+     [
+      "thumbnail",
+      156,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      90,
+      216
+     ],
+     [
+      "view",
+      90,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      265,
+      41
+     ],
+     [
+      "thumbnail",
+      422,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      356,
+      216
+     ],
+     [
+      "view",
+      356,
+      48
+     ],
+     [
+      "edit",
+      402,
+      41
+     ],
+     [
+      "9 mins",
+      531,
+      41
+     ],
+     [
+      "thumbnail",
+      156,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      90,
+      216
+     ],
+     [
+      "view",
+      90,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      265,
+      41
+     ],
+     [
+      "thumbnail",
+      422,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      356,
+      216
+     ],
+     [
+      "view",
+      356,
+      48
+     ],
+     [
+      "edit",
+      402,
+      41
+     ],
+     [
+      "9 mins",
+      531,
+      41
+     ],
+     [
+      "thumbnail",
+      156,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      90,
+      216
+     ],
+     [
+      "view",
+      90,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      265,
+      41
+     ],
+     [
+      "back to top",
+      508,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      73,
+      516
+     ],
+     [
+      "new to bootstrap? or read our .",
+      73,
+      516
+     ],
+     [
+      "visit the homepage",
+      208,
+      137
+     ],
+     [
+      "getting started guide",
+      434,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      587,
+      2
+     ],
+     [
+      "album",
+      101,
+      63
+     ],
+     [
+      "album example",
+      205,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      205,
+      456
+     ],
+     [
+      "main call to action",
+      281,
+      156
+     ],
+     [
+      "secondary action",
+      437,
+      147
+     ],
+     [
+      "thumbnail",
+      162,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      98,
+      128
+     ],
+     [
+      "view",
+      98,
+      48
+     ],
+     [
+      "edit",
+      144,
+      41
+     ],
+     [
+      "9 mins",
+      186,
+      40
+     ],
+     [
+      "thumbnail",
+      340,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      276,
+      128
+     ],
+     [
+      "view",
+      276,
+      48
+     ],
+     [
+      "edit",
+      322,
+      41
+     ],
+     [
+      "9 mins",
+      364,
+      40
+     ],
+     [
+      "thumbnail",
+      518,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      454,
+      128
+     ],
+     [
+      "view",
+      454,
+      48
+     ],
+     [
+      "edit",
+      500,
+      41
+     ],
+     [
+      "9 mins",
+      542,
+      40
+     ],
+     [
+      "thumbnail",
+      696,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      632,
+      128
+     ],
+     [
+      "view",
+      632,
+      48
+     ],
+     [
+      "edit",
+      678,
+      41
+     ],
+     [
+      "9 mins",
+      720,
+      40
+     ],
+     [
+      "thumbnail",
+      162,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      98,
+      128
+     ],
+     [
+      "view",
+      98,
+      48
+     ],
+     [
+      "edit",
+      144,
+      41
+     ],
+     [
+      "9 mins",
+      186,
+      40
+     ],
+     [
+      "thumbnail",
+      340,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      276,
+      128
+     ],
+     [
+      "view",
+      276,
+      48
+     ],
+     [
+      "edit",
+      322,
+      41
+     ],
+     [
+      "9 mins",
+      364,
+      40
+     ],
+     [
+      "thumbnail",
+      518,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      454,
+      128
+     ],
+     [
+      "view",
+      454,
+      48
+     ],
+     [
+      "edit",
+      500,
+      41
+     ],
+     [
+      "9 mins",
+      542,
+      40
+     ],
+     [
+      "thumbnail",
+      696,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      632,
+      128
+     ],
+     [
+      "view",
+      632,
+      48
+     ],
+     [
+      "edit",
+      678,
+      41
+     ],
+     [
+      "9 mins",
+      720,
+      40
+     ],
+     [
+      "thumbnail",
+      429,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      98,
+      662
+     ],
+     [
+      "view",
+      98,
+      48
+     ],
+     [
+      "edit",
+      144,
+      41
+     ],
+     [
+      "9 mins",
+      719,
+      41
+     ],
+     [
+      "back to top",
+      508,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      73,
+      516
+     ],
+     [
+      "new to bootstrap? or read our .",
+      73,
+      516
+     ],
+     [
+      "visit the homepage",
+      208,
+      137
+     ],
+     [
+      "getting started guide",
+      434,
+      149
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      742,
+      1
+     ],
+     [
+      "album",
+      80,
+      63
+     ],
+     [
+      "album example",
+      172,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      172,
+      456
+     ],
+     [
+      "main call to action",
+      246,
+      156
+     ],
+     [
+      "secondary action",
+      407,
+      147
+     ],
+     [
+      "thumbnail",
+      121,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      69,
+      187
+     ],
+     [
+      "view",
+      69,
+      48
+     ],
+     [
+      "edit",
+      116,
+      41
+     ],
+     [
+      "9 mins",
+      216,
+      41
+     ],
+     [
+      "thumbnail",
+      358,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      306,
+      187
+     ],
+     [
+      "view",
+      306,
+      48
+     ],
+     [
+      "edit",
+      353,
+      41
+     ],
+     [
+      "9 mins",
+      453,
+      41
+     ],
+     [
+      "thumbnail",
+      595,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      544,
+      187
+     ],
+     [
+      "view",
+      544,
+      48
+     ],
+     [
+      "edit",
+      590,
+      41
+     ],
+     [
+      "9 mins",
+      690,
+      41
+     ],
+     [
+      "thumbnail",
+      121,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      69,
+      187
+     ],
+     [
+      "view",
+      69,
+      48
+     ],
+     [
+      "edit",
+      116,
+      41
+     ],
+     [
+      "9 mins",
+      216,
+      41
+     ],
+     [
+      "thumbnail",
+      358,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      306,
+      187
+     ],
+     [
+      "view",
+      306,
+      48
+     ],
+     [
+      "edit",
+      353,
+      41
+     ],
+     [
+      "9 mins",
+      453,
+      41
+     ],
+     [
+      "thumbnail",
+      595,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      544,
+      187
+     ],
+     [
+      "view",
+      544,
+      48
+     ],
+     [
+      "edit",
+      590,
+      41
+     ],
+     [
+      "9 mins",
+      690,
+      41
+     ],
+     [
+      "thumbnail",
+      121,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      69,
+      187
+     ],
+     [
+      "view",
+      69,
+      48
+     ],
+     [
+      "edit",
+      116,
+      41
+     ],
+     [
+      "9 mins",
+      216,
+      41
+     ],
+     [
+      "thumbnail",
+      358,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      306,
+      187
+     ],
+     [
+      "view",
+      306,
+      48
+     ],
+     [
+      "edit",
+      353,
+      41
+     ],
+     [
+      "9 mins",
+      453,
+      41
+     ],
+     [
+      "thumbnail",
+      595,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      544,
+      187
+     ],
+     [
+      "view",
+      544,
+      48
+     ],
+     [
+      "edit",
+      590,
+      41
+     ],
+     [
+      "9 mins",
+      690,
+      41
+     ],
+     [
+      "back to top",
+      668,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      52,
+      696
+     ],
+     [
+      "new to bootstrap? or read our .",
+      52,
+      696
+     ],
+     [
+      "visit the homepage",
+      188,
+      137
+     ],
+     [
+      "getting started guide",
+      413,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      726,
+      2
+     ],
+     [
+      "album",
+      80,
+      63
+     ],
+     [
+      "album example",
+      180,
+      440
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      180,
+      440
+     ],
+     [
+      "main call to action",
+      248,
+      156
+     ],
+     [
+      "secondary action",
+      404,
+      147
+     ],
+     [
+      "thumbnail",
+      139,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      77,
+      124
+     ],
+     [
+      "view",
+      77,
+      48
+     ],
+     [
+      "edit",
+      124,
+      41
+     ],
+     [
+      "9 mins",
+      165,
+      36
+     ],
+     [
+      "thumbnail",
+      313,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      251,
+      124
+     ],
+     [
+      "view",
+      251,
+      48
+     ],
+     [
+      "edit",
+      298,
+      41
+     ],
+     [
+      "9 mins",
+      339,
+      36
+     ],
+     [
+      "thumbnail",
+      487,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      425,
+      124
+     ],
+     [
+      "view",
+      425,
+      48
+     ],
+     [
+      "edit",
+      472,
+      41
+     ],
+     [
+      "9 mins",
+      513,
+      36
+     ],
+     [
+      "thumbnail",
+      661,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      599,
+      124
+     ],
+     [
+      "view",
+      599,
+      48
+     ],
+     [
+      "edit",
+      646,
+      41
+     ],
+     [
+      "9 mins",
+      687,
+      36
+     ],
+     [
+      "thumbnail",
+      139,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      77,
+      124
+     ],
+     [
+      "view",
+      77,
+      48
+     ],
+     [
+      "edit",
+      124,
+      41
+     ],
+     [
+      "9 mins",
+      165,
+      36
+     ],
+     [
+      "thumbnail",
+      313,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      251,
+      124
+     ],
+     [
+      "view",
+      251,
+      48
+     ],
+     [
+      "edit",
+      298,
+      41
+     ],
+     [
+      "9 mins",
+      339,
+      36
+     ],
+     [
+      "thumbnail",
+      487,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      425,
+      124
+     ],
+     [
+      "view",
+      425,
+      48
+     ],
+     [
+      "edit",
+      472,
+      41
+     ],
+     [
+      "9 mins",
+      513,
+      36
+     ],
+     [
+      "thumbnail",
+      661,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      599,
+      124
+     ],
+     [
+      "view",
+      599,
+      48
+     ],
+     [
+      "edit",
+      646,
+      41
+     ],
+     [
+      "9 mins",
+      687,
+      36
+     ],
+     [
+      "thumbnail",
+      400,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      77,
+      646
+     ],
+     [
+      "view",
+      77,
+      48
+     ],
+     [
+      "edit",
+      124,
+      41
+     ],
+     [
+      "9 mins",
+      682,
+      41
+     ],
+     [
+      "back to top",
+      668,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      52,
+      696
+     ],
+     [
+      "new to bootstrap? or read our .",
+      52,
+      696
+     ],
+     [
+      "visit the homepage",
+      188,
+      137
+     ],
+     [
+      "getting started guide",
+      413,
+      149
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      1018,
+      1
+     ],
+     [
+      "album",
+      98,
+      63
+     ],
+     [
+      "album example",
+      310,
+      456
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      310,
+      456
+     ],
+     [
+      "main call to action",
+      384,
+      156
+     ],
+     [
+      "secondary action",
+      545,
+      147
+     ],
+     [
+      "thumbnail",
+      179,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      87,
+      267
+     ],
+     [
+      "view",
+      87,
+      48
+     ],
+     [
+      "edit",
+      134,
+      41
+     ],
+     [
+      "9 mins",
+      314,
+      41
+     ],
+     [
+      "thumbnail",
+      496,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      404,
+      267
+     ],
+     [
+      "view",
+      404,
+      48
+     ],
+     [
+      "edit",
+      451,
+      41
+     ],
+     [
+      "9 mins",
+      631,
+      41
+     ],
+     [
+      "thumbnail",
+      813,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      722,
+      267
+     ],
+     [
+      "view",
+      722,
+      48
+     ],
+     [
+      "edit",
+      768,
+      41
+     ],
+     [
+      "9 mins",
+      948,
+      41
+     ],
+     [
+      "thumbnail",
+      179,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      87,
+      267
+     ],
+     [
+      "view",
+      87,
+      48
+     ],
+     [
+      "edit",
+      134,
+      41
+     ],
+     [
+      "9 mins",
+      314,
+      41
+     ],
+     [
+      "thumbnail",
+      496,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      404,
+      267
+     ],
+     [
+      "view",
+      404,
+      48
+     ],
+     [
+      "edit",
+      451,
+      41
+     ],
+     [
+      "9 mins",
+      631,
+      41
+     ],
+     [
+      "thumbnail",
+      813,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      722,
+      267
+     ],
+     [
+      "view",
+      722,
+      48
+     ],
+     [
+      "edit",
+      768,
+      41
+     ],
+     [
+      "9 mins",
+      948,
+      41
+     ],
+     [
+      "thumbnail",
+      179,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      87,
+      267
+     ],
+     [
+      "view",
+      87,
+      48
+     ],
+     [
+      "edit",
+      134,
+      41
+     ],
+     [
+      "9 mins",
+      314,
+      41
+     ],
+     [
+      "thumbnail",
+      496,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      404,
+      267
+     ],
+     [
+      "view",
+      404,
+      48
+     ],
+     [
+      "edit",
+      451,
+      41
+     ],
+     [
+      "9 mins",
+      631,
+      41
+     ],
+     [
+      "thumbnail",
+      813,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      722,
+      267
+     ],
+     [
+      "view",
+      722,
+      48
+     ],
+     [
+      "edit",
+      768,
+      41
+     ],
+     [
+      "9 mins",
+      948,
+      41
+     ],
+     [
+      "back to top",
+      926,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      70,
+      936
+     ],
+     [
+      "new to bootstrap? or read our .",
+      70,
+      936
+     ],
+     [
+      "visit the homepage",
+      206,
+      137
+     ],
+     [
+      "getting started guide",
+      431,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      1002,
+      2
+     ],
+     [
+      "album",
+      98,
+      63
+     ],
+     [
+      "album example",
+      316,
+      444
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      316,
+      444
+     ],
+     [
+      "main call to action",
+      386,
+      156
+     ],
+     [
+      "secondary action",
+      542,
+      147
+     ],
+     [
+      "thumbnail",
+      164,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      95,
+      137
+     ],
+     [
+      "view",
+      95,
+      48
+     ],
+     [
+      "edit",
+      142,
+      41
+     ],
+     [
+      "9 mins",
+      191,
+      41
+     ],
+     [
+      "thumbnail",
+      351,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      282,
+      137
+     ],
+     [
+      "view",
+      282,
+      48
+     ],
+     [
+      "edit",
+      329,
+      41
+     ],
+     [
+      "9 mins",
+      379,
+      41
+     ],
+     [
+      "thumbnail",
+      538,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      469,
+      137
+     ],
+     [
+      "view",
+      469,
+      48
+     ],
+     [
+      "edit",
+      516,
+      41
+     ],
+     [
+      "9 mins",
+      566,
+      41
+     ],
+     [
+      "thumbnail",
+      725,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      657,
+      137
+     ],
+     [
+      "view",
+      657,
+      48
+     ],
+     [
+      "edit",
+      703,
+      41
+     ],
+     [
+      "9 mins",
+      753,
+      41
+     ],
+     [
+      "thumbnail",
+      912,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      844,
+      137
+     ],
+     [
+      "view",
+      844,
+      48
+     ],
+     [
+      "edit",
+      890,
+      41
+     ],
+     [
+      "9 mins",
+      940,
+      41
+     ],
+     [
+      "thumbnail",
+      187,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      95,
+      184
+     ],
+     [
+      "view",
+      95,
+      48
+     ],
+     [
+      "edit",
+      142,
+      41
+     ],
+     [
+      "9 mins",
+      238,
+      41
+     ],
+     [
+      "thumbnail",
+      421,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      329,
+      184
+     ],
+     [
+      "view",
+      329,
+      48
+     ],
+     [
+      "edit",
+      376,
+      41
+     ],
+     [
+      "9 mins",
+      472,
+      41
+     ],
+     [
+      "thumbnail",
+      655,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      563,
+      184
+     ],
+     [
+      "view",
+      563,
+      48
+     ],
+     [
+      "edit",
+      610,
+      41
+     ],
+     [
+      "9 mins",
+      706,
+      41
+     ],
+     [
+      "thumbnail",
+      889,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      797,
+      184
+     ],
+     [
+      "view",
+      797,
+      48
+     ],
+     [
+      "edit",
+      844,
+      41
+     ],
+     [
+      "9 mins",
+      940,
+      41
+     ],
+     [
+      "back to top",
+      926,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      70,
+      936
+     ],
+     [
+      "new to bootstrap? or read our .",
+      70,
+      936
+     ],
+     [
+      "visit the homepage",
+      206,
+      137
+     ],
+     [
+      "getting started guide",
+      431,
+      149
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 1,
+    "candidates": 56,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 16,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      1382,
+      1
+     ],
+     [
+      "album",
+      100,
+      63
+     ],
+     [
+      "album example",
+      402,
+      636
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      402,
+      636
+     ],
+     [
+      "main call to action",
+      566,
+      156
+     ],
+     [
+      "secondary action",
+      727,
+      147
+     ],
+     [
+      "thumbnail",
+      241,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      89,
+      387
+     ],
+     [
+      "view",
+      89,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      436,
+      41
+     ],
+     [
+      "thumbnail",
+      678,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      526,
+      387
+     ],
+     [
+      "view",
+      526,
+      48
+     ],
+     [
+      "edit",
+      573,
+      41
+     ],
+     [
+      "9 mins",
+      873,
+      41
+     ],
+     [
+      "thumbnail",
+      1115,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      964,
+      387
+     ],
+     [
+      "view",
+      964,
+      48
+     ],
+     [
+      "edit",
+      1010,
+      41
+     ],
+     [
+      "9 mins",
+      1310,
+      41
+     ],
+     [
+      "thumbnail",
+      241,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      89,
+      387
+     ],
+     [
+      "view",
+      89,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      436,
+      41
+     ],
+     [
+      "thumbnail",
+      678,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      526,
+      387
+     ],
+     [
+      "view",
+      526,
+      48
+     ],
+     [
+      "edit",
+      573,
+      41
+     ],
+     [
+      "9 mins",
+      873,
+      41
+     ],
+     [
+      "thumbnail",
+      1115,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      964,
+      387
+     ],
+     [
+      "view",
+      964,
+      48
+     ],
+     [
+      "edit",
+      1010,
+      41
+     ],
+     [
+      "9 mins",
+      1310,
+      41
+     ],
+     [
+      "thumbnail",
+      241,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      89,
+      387
+     ],
+     [
+      "view",
+      89,
+      48
+     ],
+     [
+      "edit",
+      136,
+      41
+     ],
+     [
+      "9 mins",
+      436,
+      41
+     ],
+     [
+      "thumbnail",
+      678,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      526,
+      387
+     ],
+     [
+      "view",
+      526,
+      48
+     ],
+     [
+      "edit",
+      573,
+      41
+     ],
+     [
+      "9 mins",
+      873,
+      41
+     ],
+     [
+      "thumbnail",
+      1115,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      964,
+      387
+     ],
+     [
+      "view",
+      964,
+      48
+     ],
+     [
+      "edit",
+      1010,
+      41
+     ],
+     [
+      "9 mins",
+      1310,
+      41
+     ],
+     [
+      "back to top",
+      1288,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      72,
+      1296
+     ],
+     [
+      "new to bootstrap? or read our .",
+      72,
+      1296
+     ],
+     [
+      "visit the homepage",
+      208,
+      137
+     ],
+     [
+      "getting started guide",
+      433,
+      149
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      1366,
+      2
+     ],
+     [
+      "album",
+      100,
+      63
+     ],
+     [
+      "album example",
+      408,
+      624
+     ],
+     [
+      "something short and leading about the collection below—its contents, the creator, etc. make it short and sweet, but not too short so folks don’t simply skip over it entirely.",
+      408,
+      624
+     ],
+     [
+      "main call to action",
+      568,
+      156
+     ],
+     [
+      "secondary action",
+      724,
+      147
+     ],
+     [
+      "thumbnail",
+      165,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      97,
+      135
+     ],
+     [
+      "view",
+      97,
+      48
+     ],
+     [
+      "edit",
+      144,
+      41
+     ],
+     [
+      "9 mins",
+      191,
+      41
+     ],
+     [
+      "thumbnail",
+      350,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      282,
+      135
+     ],
+     [
+      "view",
+      282,
+      48
+     ],
+     [
+      "edit",
+      329,
+      41
+     ],
+     [
+      "9 mins",
+      377,
+      41
+     ],
+     [
+      "thumbnail",
+      535,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      467,
+      135
+     ],
+     [
+      "view",
+      467,
+      48
+     ],
+     [
+      "edit",
+      514,
+      41
+     ],
+     [
+      "9 mins",
+      562,
+      41
+     ],
+     [
+      "thumbnail",
+      720,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      652,
+      135
+     ],
+     [
+      "view",
+      652,
+      48
+     ],
+     [
+      "edit",
+      699,
+      41
+     ],
+     [
+      "9 mins",
+      747,
+      41
+     ],
+     [
+      "thumbnail",
+      905,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      838,
+      135
+     ],
+     [
+      "view",
+      838,
+      48
+     ],
+     [
+      "edit",
+      884,
+      41
+     ],
+     [
+      "9 mins",
+      932,
+      41
+     ],
+     [
+      "thumbnail",
+      1090,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      1023,
+      135
+     ],
+     [
+      "view",
+      1023,
+      48
+     ],
+     [
+      "edit",
+      1069,
+      41
+     ],
+     [
+      "9 mins",
+      1117,
+      41
+     ],
+     [
+      "thumbnail",
+      1275,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      1208,
+      135
+     ],
+     [
+      "view",
+      1208,
+      48
+     ],
+     [
+      "edit",
+      1254,
+      41
+     ],
+     [
+      "9 mins",
+      1302,
+      41
+     ],
+     [
+      "thumbnail",
+      396,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      97,
+      598
+     ],
+     [
+      "view",
+      97,
+      48
+     ],
+     [
+      "edit",
+      144,
+      41
+     ],
+     [
+      "9 mins",
+      654,
+      41
+     ],
+     [
+      "thumbnail",
+      1044,
+      84
+     ],
+     [
+      "this is a wider card with supporting text below as a natural lead-in to additional content. this content is a little bit longer.",
+      745,
+      598
+     ],
+     [
+      "view",
+      745,
+      48
+     ],
+     [
+      "edit",
+      792,
+      41
+     ],
+     [
+      "9 mins",
+      1302,
+      41
+     ],
+     [
+      "back to top",
+      1288,
+      80
+     ],
+     [
+      "album example is © bootstrap, but please download and customize it for yourself!",
+      72,
+      1296
+     ],
+     [
+      "new to bootstrap? or read our .",
+      72,
+      1296
+     ],
+     [
+      "visit the homepage",
+      208,
+      137
+     ],
+     [
+      "getting started guide",
+      433,
+      149
+     ]
+    ]
+   }
+  }
+ }
+}

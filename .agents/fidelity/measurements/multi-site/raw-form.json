@@ -1,0 +1,4145 @@
+{
+ "site": {
+  "sourceUrl": "https://getbootstrap.com/docs/5.3/examples/checkout/",
+  "recreationUrl": "http://127.0.0.1:8804/",
+  "key": "form"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 412,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 789,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      342,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      376
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      376
+     ],
+     [
+      "your cart",
+      12,
+      88
+     ],
+     [
+      "3",
+      358,
+      30
+     ],
+     [
+      "product name",
+      29,
+      102
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$12",
+      345,
+      26
+     ],
+     [
+      "second product",
+      29,
+      115
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$8",
+      354,
+      17
+     ],
+     [
+      "third item",
+      29,
+      101
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$5",
+      354,
+      17
+     ],
+     [
+      "promo code",
+      29,
+      94
+     ],
+     [
+      "examplecode",
+      29,
+      94
+     ],
+     [
+      "−$5",
+      343,
+      28
+     ],
+     [
+      "total (usd)",
+      29,
+      78
+     ],
+     [
+      "$20",
+      343,
+      28
+     ],
+     [
+      "redeem",
+      296,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      376
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      12,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      12,
+      35
+     ],
+     [
+      "zip",
+      12,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      352
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      376
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      12,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      12,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      376
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      376
+     ],
+     [
+      "privacy",
+      114,
+      49
+     ],
+     [
+      "terms",
+      176,
+      41
+     ],
+     [
+      "support",
+      229,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      311,
+      2
+     ],
+     [
+      "checkout form",
+      12,
+      729
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      729
+     ],
+     [
+      "your cart",
+      36,
+      92
+     ],
+     [
+      "3",
+      280,
+      32
+     ],
+     [
+      "product name",
+      53,
+      102
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$12",
+      269,
+      26
+     ],
+     [
+      "second product",
+      53,
+      115
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$8",
+      278,
+      17
+     ],
+     [
+      "third item",
+      53,
+      101
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$5",
+      278,
+      17
+     ],
+     [
+      "promo code",
+      53,
+      94
+     ],
+     [
+      "examplecode",
+      53,
+      94
+     ],
+     [
+      "−$5",
+      267,
+      28
+     ],
+     [
+      "total (usd)",
+      53,
+      78
+     ],
+     [
+      "$20",
+      267,
+      28
+     ],
+     [
+      "redeem",
+      44,
+      83
+     ],
+     [
+      "billing address",
+      360,
+      405
+     ],
+     [
+      "first name",
+      360,
+      73
+     ],
+     [
+      "last name",
+      570,
+      72
+     ],
+     [
+      "username",
+      360,
+      71
+     ],
+     [
+      "@",
+      360,
+      41
+     ],
+     [
+      "email",
+      360,
+      113
+     ],
+     [
+      "(optional)",
+      402,
+      71
+     ],
+     [
+      "address",
+      360,
+      57
+     ],
+     [
+      "address 2",
+      360,
+      145
+     ],
+     [
+      "(optional)",
+      434,
+      71
+     ],
+     [
+      "country",
+      360,
+      56
+     ],
+     [
+      "state",
+      535,
+      35
+     ],
+     [
+      "zip",
+      676,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      384,
+      357
+     ],
+     [
+      "save this information for next time",
+      384,
+      244
+     ],
+     [
+      "payment",
+      360,
+      405
+     ],
+     [
+      "credit card",
+      384,
+      77
+     ],
+     [
+      "debit card",
+      384,
+      73
+     ],
+     [
+      "paypal",
+      384,
+      45
+     ],
+     [
+      "name on card",
+      360,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      360,
+      190
+     ],
+     [
+      "credit card number",
+      574,
+      137
+     ],
+     [
+      "expiration",
+      360,
+      70
+     ],
+     [
+      "cvv",
+      467,
+      30
+     ],
+     [
+      "continue to checkout",
+      360,
+      405
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      729
+     ],
+     [
+      "privacy",
+      295,
+      49
+     ],
+     [
+      "terms",
+      352,
+      41
+     ],
+     [
+      "support",
+      401,
+      57
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 462,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 789,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      392,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      426
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      426
+     ],
+     [
+      "your cart",
+      12,
+      88
+     ],
+     [
+      "3",
+      407,
+      31
+     ],
+     [
+      "product name",
+      29,
+      102
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$12",
+      395,
+      26
+     ],
+     [
+      "second product",
+      29,
+      115
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$8",
+      404,
+      17
+     ],
+     [
+      "third item",
+      29,
+      101
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$5",
+      404,
+      17
+     ],
+     [
+      "promo code",
+      29,
+      94
+     ],
+     [
+      "examplecode",
+      29,
+      94
+     ],
+     [
+      "−$5",
+      393,
+      28
+     ],
+     [
+      "total (usd)",
+      29,
+      78
+     ],
+     [
+      "$20",
+      393,
+      28
+     ],
+     [
+      "redeem",
+      346,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      426
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      12,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      12,
+      35
+     ],
+     [
+      "zip",
+      12,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      357
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      426
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      12,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      12,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      426
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      426
+     ],
+     [
+      "privacy",
+      139,
+      49
+     ],
+     [
+      "terms",
+      201,
+      41
+     ],
+     [
+      "support",
+      254,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      361,
+      2
+     ],
+     [
+      "checkout form",
+      12,
+      729
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      729
+     ],
+     [
+      "your cart",
+      36,
+      92
+     ],
+     [
+      "3",
+      280,
+      32
+     ],
+     [
+      "product name",
+      53,
+      102
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$12",
+      269,
+      26
+     ],
+     [
+      "second product",
+      53,
+      115
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$8",
+      278,
+      17
+     ],
+     [
+      "third item",
+      53,
+      101
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$5",
+      278,
+      17
+     ],
+     [
+      "promo code",
+      53,
+      94
+     ],
+     [
+      "examplecode",
+      53,
+      94
+     ],
+     [
+      "−$5",
+      267,
+      28
+     ],
+     [
+      "total (usd)",
+      53,
+      78
+     ],
+     [
+      "$20",
+      267,
+      28
+     ],
+     [
+      "redeem",
+      44,
+      83
+     ],
+     [
+      "billing address",
+      360,
+      405
+     ],
+     [
+      "first name",
+      360,
+      73
+     ],
+     [
+      "last name",
+      570,
+      72
+     ],
+     [
+      "username",
+      360,
+      71
+     ],
+     [
+      "@",
+      360,
+      41
+     ],
+     [
+      "email",
+      360,
+      113
+     ],
+     [
+      "(optional)",
+      402,
+      71
+     ],
+     [
+      "address",
+      360,
+      57
+     ],
+     [
+      "address 2",
+      360,
+      145
+     ],
+     [
+      "(optional)",
+      434,
+      71
+     ],
+     [
+      "country",
+      360,
+      56
+     ],
+     [
+      "state",
+      535,
+      35
+     ],
+     [
+      "zip",
+      676,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      384,
+      357
+     ],
+     [
+      "save this information for next time",
+      384,
+      244
+     ],
+     [
+      "payment",
+      360,
+      405
+     ],
+     [
+      "credit card",
+      384,
+      77
+     ],
+     [
+      "debit card",
+      384,
+      73
+     ],
+     [
+      "paypal",
+      384,
+      45
+     ],
+     [
+      "name on card",
+      360,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      360,
+      190
+     ],
+     [
+      "credit card number",
+      574,
+      137
+     ],
+     [
+      "expiration",
+      360,
+      70
+     ],
+     [
+      "cvv",
+      467,
+      30
+     ],
+     [
+      "continue to checkout",
+      360,
+      405
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      729
+     ],
+     [
+      "privacy",
+      295,
+      49
+     ],
+     [
+      "terms",
+      352,
+      41
+     ],
+     [
+      "support",
+      401,
+      57
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 492,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 789,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      422,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      456
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      456
+     ],
+     [
+      "your cart",
+      12,
+      89
+     ],
+     [
+      "3",
+      437,
+      31
+     ],
+     [
+      "product name",
+      29,
+      102
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$12",
+      425,
+      26
+     ],
+     [
+      "second product",
+      29,
+      115
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$8",
+      434,
+      17
+     ],
+     [
+      "third item",
+      29,
+      101
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$5",
+      434,
+      17
+     ],
+     [
+      "promo code",
+      29,
+      94
+     ],
+     [
+      "examplecode",
+      29,
+      94
+     ],
+     [
+      "−$5",
+      423,
+      28
+     ],
+     [
+      "total (usd)",
+      29,
+      78
+     ],
+     [
+      "$20",
+      423,
+      28
+     ],
+     [
+      "redeem",
+      376,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      456
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      12,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      12,
+      35
+     ],
+     [
+      "zip",
+      12,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      357
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      456
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      12,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      12,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      456
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      456
+     ],
+     [
+      "privacy",
+      154,
+      49
+     ],
+     [
+      "terms",
+      216,
+      41
+     ],
+     [
+      "support",
+      269,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      391,
+      2
+     ],
+     [
+      "checkout form",
+      12,
+      729
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      729
+     ],
+     [
+      "your cart",
+      36,
+      92
+     ],
+     [
+      "3",
+      280,
+      32
+     ],
+     [
+      "product name",
+      53,
+      102
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$12",
+      269,
+      26
+     ],
+     [
+      "second product",
+      53,
+      115
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$8",
+      278,
+      17
+     ],
+     [
+      "third item",
+      53,
+      101
+     ],
+     [
+      "brief description",
+      53,
+      101
+     ],
+     [
+      "$5",
+      278,
+      17
+     ],
+     [
+      "promo code",
+      53,
+      94
+     ],
+     [
+      "examplecode",
+      53,
+      94
+     ],
+     [
+      "−$5",
+      267,
+      28
+     ],
+     [
+      "total (usd)",
+      53,
+      78
+     ],
+     [
+      "$20",
+      267,
+      28
+     ],
+     [
+      "redeem",
+      44,
+      83
+     ],
+     [
+      "billing address",
+      360,
+      405
+     ],
+     [
+      "first name",
+      360,
+      73
+     ],
+     [
+      "last name",
+      570,
+      72
+     ],
+     [
+      "username",
+      360,
+      71
+     ],
+     [
+      "@",
+      360,
+      41
+     ],
+     [
+      "email",
+      360,
+      113
+     ],
+     [
+      "(optional)",
+      402,
+      71
+     ],
+     [
+      "address",
+      360,
+      57
+     ],
+     [
+      "address 2",
+      360,
+      145
+     ],
+     [
+      "(optional)",
+      434,
+      71
+     ],
+     [
+      "country",
+      360,
+      56
+     ],
+     [
+      "state",
+      535,
+      35
+     ],
+     [
+      "zip",
+      676,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      384,
+      357
+     ],
+     [
+      "save this information for next time",
+      384,
+      244
+     ],
+     [
+      "payment",
+      360,
+      405
+     ],
+     [
+      "credit card",
+      384,
+      77
+     ],
+     [
+      "debit card",
+      384,
+      73
+     ],
+     [
+      "paypal",
+      384,
+      45
+     ],
+     [
+      "name on card",
+      360,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      360,
+      190
+     ],
+     [
+      "credit card number",
+      574,
+      137
+     ],
+     [
+      "expiration",
+      360,
+      70
+     ],
+     [
+      "cvv",
+      467,
+      30
+     ],
+     [
+      "continue to checkout",
+      360,
+      405
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      729
+     ],
+     [
+      "privacy",
+      295,
+      49
+     ],
+     [
+      "terms",
+      352,
+      41
+     ],
+     [
+      "support",
+      401,
+      57
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 612,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 896,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      542,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      576
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      576
+     ],
+     [
+      "your cart",
+      12,
+      90
+     ],
+     [
+      "3",
+      557,
+      31
+     ],
+     [
+      "product name",
+      29,
+      102
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$12",
+      545,
+      26
+     ],
+     [
+      "second product",
+      29,
+      115
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$8",
+      554,
+      17
+     ],
+     [
+      "third item",
+      29,
+      101
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$5",
+      554,
+      17
+     ],
+     [
+      "promo code",
+      29,
+      94
+     ],
+     [
+      "examplecode",
+      29,
+      94
+     ],
+     [
+      "−$5",
+      543,
+      28
+     ],
+     [
+      "total (usd)",
+      29,
+      78
+     ],
+     [
+      "$20",
+      543,
+      28
+     ],
+     [
+      "redeem",
+      496,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      576
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      308,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      12,
+      35
+     ],
+     [
+      "zip",
+      12,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      357
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      576
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      12,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      12,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      576
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      576
+     ],
+     [
+      "privacy",
+      214,
+      49
+     ],
+     [
+      "terms",
+      276,
+      41
+     ],
+     [
+      "support",
+      329,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      511,
+      2
+     ],
+     [
+      "checkout form",
+      119,
+      516
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      119,
+      516
+     ],
+     [
+      "your cart",
+      143,
+      92
+     ],
+     [
+      "3",
+      386,
+      32
+     ],
+     [
+      "product name",
+      160,
+      102
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$12",
+      375,
+      26
+     ],
+     [
+      "second product",
+      160,
+      115
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$8",
+      384,
+      17
+     ],
+     [
+      "third item",
+      160,
+      101
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$5",
+      384,
+      17
+     ],
+     [
+      "promo code",
+      160,
+      94
+     ],
+     [
+      "examplecode",
+      160,
+      94
+     ],
+     [
+      "−$5",
+      373,
+      28
+     ],
+     [
+      "total (usd)",
+      160,
+      78
+     ],
+     [
+      "$20",
+      374,
+      28
+     ],
+     [
+      "redeem",
+      151,
+      83
+     ],
+     [
+      "billing address",
+      466,
+      405
+     ],
+     [
+      "first name",
+      466,
+      73
+     ],
+     [
+      "last name",
+      677,
+      72
+     ],
+     [
+      "username",
+      466,
+      71
+     ],
+     [
+      "@",
+      466,
+      41
+     ],
+     [
+      "email",
+      466,
+      113
+     ],
+     [
+      "(optional)",
+      508,
+      71
+     ],
+     [
+      "address",
+      466,
+      57
+     ],
+     [
+      "address 2",
+      466,
+      145
+     ],
+     [
+      "(optional)",
+      540,
+      71
+     ],
+     [
+      "country",
+      466,
+      56
+     ],
+     [
+      "state",
+      642,
+      35
+     ],
+     [
+      "zip",
+      782,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      490,
+      357
+     ],
+     [
+      "save this information for next time",
+      490,
+      244
+     ],
+     [
+      "payment",
+      466,
+      405
+     ],
+     [
+      "credit card",
+      490,
+      77
+     ],
+     [
+      "debit card",
+      490,
+      73
+     ],
+     [
+      "paypal",
+      490,
+      45
+     ],
+     [
+      "name on card",
+      466,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      466,
+      190
+     ],
+     [
+      "credit card number",
+      681,
+      137
+     ],
+     [
+      "expiration",
+      466,
+      70
+     ],
+     [
+      "cvv",
+      574,
+      30
+     ],
+     [
+      "continue to checkout",
+      466,
+      405
+     ],
+     [
+      "© 2017–2025 company name",
+      119,
+      516
+     ],
+     [
+      "privacy",
+      295,
+      49
+     ],
+     [
+      "terms",
+      352,
+      41
+     ],
+     [
+      "support",
+      401,
+      57
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 673,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 896,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      603,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      637
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      637
+     ],
+     [
+      "your cart",
+      12,
+      91
+     ],
+     [
+      "3",
+      618,
+      31
+     ],
+     [
+      "product name",
+      29,
+      102
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$12",
+      606,
+      26
+     ],
+     [
+      "second product",
+      29,
+      115
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$8",
+      615,
+      17
+     ],
+     [
+      "third item",
+      29,
+      101
+     ],
+     [
+      "brief description",
+      29,
+      101
+     ],
+     [
+      "$5",
+      615,
+      17
+     ],
+     [
+      "promo code",
+      29,
+      94
+     ],
+     [
+      "examplecode",
+      29,
+      94
+     ],
+     [
+      "−$5",
+      604,
+      28
+     ],
+     [
+      "total (usd)",
+      29,
+      78
+     ],
+     [
+      "$20",
+      604,
+      28
+     ],
+     [
+      "redeem",
+      557,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      637
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      339,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      12,
+      35
+     ],
+     [
+      "zip",
+      12,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      357
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      637
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      12,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      12,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      637
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      637
+     ],
+     [
+      "privacy",
+      244,
+      49
+     ],
+     [
+      "terms",
+      306,
+      41
+     ],
+     [
+      "support",
+      360,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      572,
+      2
+     ],
+     [
+      "checkout form",
+      119,
+      516
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      119,
+      516
+     ],
+     [
+      "your cart",
+      143,
+      92
+     ],
+     [
+      "3",
+      386,
+      32
+     ],
+     [
+      "product name",
+      160,
+      102
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$12",
+      375,
+      26
+     ],
+     [
+      "second product",
+      160,
+      115
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$8",
+      384,
+      17
+     ],
+     [
+      "third item",
+      160,
+      101
+     ],
+     [
+      "brief description",
+      160,
+      101
+     ],
+     [
+      "$5",
+      384,
+      17
+     ],
+     [
+      "promo code",
+      160,
+      94
+     ],
+     [
+      "examplecode",
+      160,
+      94
+     ],
+     [
+      "−$5",
+      373,
+      28
+     ],
+     [
+      "total (usd)",
+      160,
+      78
+     ],
+     [
+      "$20",
+      374,
+      28
+     ],
+     [
+      "redeem",
+      151,
+      83
+     ],
+     [
+      "billing address",
+      466,
+      405
+     ],
+     [
+      "first name",
+      466,
+      73
+     ],
+     [
+      "last name",
+      677,
+      72
+     ],
+     [
+      "username",
+      466,
+      71
+     ],
+     [
+      "@",
+      466,
+      41
+     ],
+     [
+      "email",
+      466,
+      113
+     ],
+     [
+      "(optional)",
+      508,
+      71
+     ],
+     [
+      "address",
+      466,
+      57
+     ],
+     [
+      "address 2",
+      466,
+      145
+     ],
+     [
+      "(optional)",
+      540,
+      71
+     ],
+     [
+      "country",
+      466,
+      56
+     ],
+     [
+      "state",
+      642,
+      35
+     ],
+     [
+      "zip",
+      782,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      490,
+      357
+     ],
+     [
+      "save this information for next time",
+      490,
+      244
+     ],
+     [
+      "payment",
+      466,
+      405
+     ],
+     [
+      "credit card",
+      490,
+      77
+     ],
+     [
+      "debit card",
+      490,
+      73
+     ],
+     [
+      "paypal",
+      490,
+      45
+     ],
+     [
+      "name on card",
+      466,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      466,
+      190
+     ],
+     [
+      "credit card number",
+      681,
+      137
+     ],
+     [
+      "expiration",
+      466,
+      70
+     ],
+     [
+      "cvv",
+      574,
+      30
+     ],
+     [
+      "continue to checkout",
+      466,
+      405
+     ],
+     [
+      "© 2017–2025 company name",
+      119,
+      516
+     ],
+     [
+      "privacy",
+      295,
+      49
+     ],
+     [
+      "terms",
+      352,
+      41
+     ],
+     [
+      "support",
+      401,
+      57
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 812,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 1,
+    "scrollWidth": 1425,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      742,
+      1
+     ],
+     [
+      "checkout form",
+      12,
+      776
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      12,
+      776
+     ],
+     [
+      "your cart",
+      493,
+      93
+     ],
+     [
+      "3",
+      756,
+      32
+     ],
+     [
+      "product name",
+      510,
+      102
+     ],
+     [
+      "brief description",
+      510,
+      101
+     ],
+     [
+      "$12",
+      745,
+      26
+     ],
+     [
+      "second product",
+      510,
+      115
+     ],
+     [
+      "brief description",
+      510,
+      101
+     ],
+     [
+      "$8",
+      754,
+      17
+     ],
+     [
+      "third item",
+      510,
+      101
+     ],
+     [
+      "brief description",
+      510,
+      101
+     ],
+     [
+      "$5",
+      754,
+      17
+     ],
+     [
+      "promo code",
+      510,
+      94
+     ],
+     [
+      "examplecode",
+      510,
+      94
+     ],
+     [
+      "−$5",
+      743,
+      28
+     ],
+     [
+      "total (usd)",
+      510,
+      78
+     ],
+     [
+      "$20",
+      743,
+      28
+     ],
+     [
+      "redeem",
+      696,
+      83
+     ],
+     [
+      "billing address",
+      12,
+      433
+     ],
+     [
+      "first name",
+      12,
+      73
+     ],
+     [
+      "last name",
+      236,
+      72
+     ],
+     [
+      "username",
+      12,
+      71
+     ],
+     [
+      "@",
+      12,
+      41
+     ],
+     [
+      "email",
+      12,
+      113
+     ],
+     [
+      "(optional)",
+      54,
+      71
+     ],
+     [
+      "address",
+      12,
+      57
+     ],
+     [
+      "address 2",
+      12,
+      145
+     ],
+     [
+      "(optional)",
+      86,
+      71
+     ],
+     [
+      "country",
+      12,
+      56
+     ],
+     [
+      "state",
+      199,
+      35
+     ],
+     [
+      "zip",
+      348,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      36,
+      357
+     ],
+     [
+      "save this information for next time",
+      36,
+      244
+     ],
+     [
+      "payment",
+      12,
+      433
+     ],
+     [
+      "credit card",
+      36,
+      77
+     ],
+     [
+      "debit card",
+      36,
+      73
+     ],
+     [
+      "paypal",
+      36,
+      45
+     ],
+     [
+      "name on card",
+      12,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      12,
+      190
+     ],
+     [
+      "credit card number",
+      240,
+      137
+     ],
+     [
+      "expiration",
+      12,
+      70
+     ],
+     [
+      "cvv",
+      126,
+      30
+     ],
+     [
+      "continue to checkout",
+      12,
+      433
+     ],
+     [
+      "© 2017–2025 company name",
+      12,
+      776
+     ],
+     [
+      "privacy",
+      314,
+      49
+     ],
+     [
+      "terms",
+      376,
+      41
+     ],
+     [
+      "support",
+      429,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      711,
+      2
+     ],
+     [
+      "checkout form",
+      365,
+      696
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      365,
+      696
+     ],
+     [
+      "your cart",
+      389,
+      98
+     ],
+     [
+      "3",
+      597,
+      34
+     ],
+     [
+      "product name",
+      406,
+      102
+     ],
+     [
+      "brief description",
+      406,
+      101
+     ],
+     [
+      "$12",
+      588,
+      26
+     ],
+     [
+      "second product",
+      406,
+      115
+     ],
+     [
+      "brief description",
+      406,
+      101
+     ],
+     [
+      "$8",
+      596,
+      17
+     ],
+     [
+      "third item",
+      406,
+      101
+     ],
+     [
+      "brief description",
+      406,
+      101
+     ],
+     [
+      "$5",
+      596,
+      17
+     ],
+     [
+      "promo code",
+      406,
+      94
+     ],
+     [
+      "examplecode",
+      406,
+      94
+     ],
+     [
+      "−$5",
+      585,
+      28
+     ],
+     [
+      "total (usd)",
+      406,
+      78
+     ],
+     [
+      "$20",
+      586,
+      28
+     ],
+     [
+      "redeem",
+      397,
+      83
+     ],
+     [
+      "billing address",
+      679,
+      358
+     ],
+     [
+      "first name",
+      679,
+      73
+     ],
+     [
+      "last name",
+      866,
+      72
+     ],
+     [
+      "username",
+      679,
+      71
+     ],
+     [
+      "@",
+      679,
+      41
+     ],
+     [
+      "email",
+      679,
+      113
+     ],
+     [
+      "(optional)",
+      721,
+      71
+     ],
+     [
+      "address",
+      679,
+      57
+     ],
+     [
+      "address 2",
+      679,
+      145
+     ],
+     [
+      "(optional)",
+      753,
+      71
+     ],
+     [
+      "country",
+      679,
+      56
+     ],
+     [
+      "state",
+      834,
+      35
+     ],
+     [
+      "zip",
+      959,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      703,
+      334
+     ],
+     [
+      "save this information for next time",
+      703,
+      244
+     ],
+     [
+      "payment",
+      679,
+      358
+     ],
+     [
+      "credit card",
+      703,
+      77
+     ],
+     [
+      "debit card",
+      703,
+      73
+     ],
+     [
+      "paypal",
+      703,
+      45
+     ],
+     [
+      "name on card",
+      679,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      679,
+      159
+     ],
+     [
+      "credit card number",
+      870,
+      137
+     ],
+     [
+      "expiration",
+      679,
+      70
+     ],
+     [
+      "cvv",
+      774,
+      30
+     ],
+     [
+      "continue to checkout",
+      679,
+      358
+     ],
+     [
+      "© 2017–2025 company name",
+      365,
+      696
+     ],
+     [
+      "privacy",
+      631,
+      49
+     ],
+     [
+      "terms",
+      688,
+      41
+     ],
+     [
+      "support",
+      737,
+      57
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 1,
+    "scrollWidth": 1425,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      1018,
+      1
+     ],
+     [
+      "checkout form",
+      70,
+      936
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      70,
+      936
+     ],
+     [
+      "your cart",
+      726,
+      96
+     ],
+     [
+      "3",
+      973,
+      33
+     ],
+     [
+      "product name",
+      743,
+      102
+     ],
+     [
+      "brief description",
+      743,
+      101
+     ],
+     [
+      "$12",
+      963,
+      26
+     ],
+     [
+      "second product",
+      743,
+      115
+     ],
+     [
+      "brief description",
+      743,
+      101
+     ],
+     [
+      "$8",
+      972,
+      17
+     ],
+     [
+      "third item",
+      743,
+      101
+     ],
+     [
+      "brief description",
+      743,
+      101
+     ],
+     [
+      "$5",
+      972,
+      17
+     ],
+     [
+      "promo code",
+      743,
+      94
+     ],
+     [
+      "examplecode",
+      743,
+      94
+     ],
+     [
+      "−$5",
+      961,
+      28
+     ],
+     [
+      "total (usd)",
+      743,
+      78
+     ],
+     [
+      "$20",
+      961,
+      28
+     ],
+     [
+      "redeem",
+      914,
+      83
+     ],
+     [
+      "billing address",
+      70,
+      608
+     ],
+     [
+      "first name",
+      70,
+      73
+     ],
+     [
+      "last name",
+      382,
+      72
+     ],
+     [
+      "username",
+      70,
+      71
+     ],
+     [
+      "@",
+      70,
+      41
+     ],
+     [
+      "email",
+      70,
+      113
+     ],
+     [
+      "(optional)",
+      112,
+      71
+     ],
+     [
+      "address",
+      70,
+      57
+     ],
+     [
+      "address 2",
+      70,
+      145
+     ],
+     [
+      "(optional)",
+      144,
+      71
+     ],
+     [
+      "country",
+      70,
+      56
+     ],
+     [
+      "state",
+      330,
+      35
+     ],
+     [
+      "zip",
+      538,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      94,
+      357
+     ],
+     [
+      "save this information for next time",
+      94,
+      244
+     ],
+     [
+      "payment",
+      70,
+      608
+     ],
+     [
+      "credit card",
+      94,
+      77
+     ],
+     [
+      "debit card",
+      94,
+      73
+     ],
+     [
+      "paypal",
+      94,
+      45
+     ],
+     [
+      "name on card",
+      70,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      70,
+      190
+     ],
+     [
+      "credit card number",
+      386,
+      137
+     ],
+     [
+      "expiration",
+      70,
+      70
+     ],
+     [
+      "cvv",
+      228,
+      30
+     ],
+     [
+      "continue to checkout",
+      70,
+      608
+     ],
+     [
+      "© 2017–2025 company name",
+      70,
+      936
+     ],
+     [
+      "privacy",
+      452,
+      49
+     ],
+     [
+      "terms",
+      514,
+      41
+     ],
+     [
+      "support",
+      567,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      987,
+      2
+     ],
+     [
+      "checkout form",
+      245,
+      936
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      245,
+      936
+     ],
+     [
+      "your cart",
+      269,
+      98
+     ],
+     [
+      "3",
+      499,
+      34
+     ],
+     [
+      "product name",
+      286,
+      102
+     ],
+     [
+      "brief description",
+      286,
+      101
+     ],
+     [
+      "$12",
+      490,
+      26
+     ],
+     [
+      "second product",
+      286,
+      115
+     ],
+     [
+      "brief description",
+      286,
+      101
+     ],
+     [
+      "$8",
+      498,
+      17
+     ],
+     [
+      "third item",
+      286,
+      101
+     ],
+     [
+      "brief description",
+      286,
+      101
+     ],
+     [
+      "$5",
+      498,
+      17
+     ],
+     [
+      "promo code",
+      286,
+      94
+     ],
+     [
+      "examplecode",
+      286,
+      94
+     ],
+     [
+      "−$5",
+      487,
+      28
+     ],
+     [
+      "total (usd)",
+      286,
+      78
+     ],
+     [
+      "$20",
+      488,
+      28
+     ],
+     [
+      "redeem",
+      277,
+      83
+     ],
+     [
+      "billing address",
+      581,
+      576
+     ],
+     [
+      "first name",
+      581,
+      73
+     ],
+     [
+      "last name",
+      877,
+      72
+     ],
+     [
+      "username",
+      581,
+      71
+     ],
+     [
+      "@",
+      581,
+      41
+     ],
+     [
+      "email",
+      581,
+      113
+     ],
+     [
+      "(optional)",
+      623,
+      71
+     ],
+     [
+      "address",
+      581,
+      57
+     ],
+     [
+      "address 2",
+      581,
+      145
+     ],
+     [
+      "(optional)",
+      655,
+      71
+     ],
+     [
+      "country",
+      581,
+      56
+     ],
+     [
+      "state",
+      827,
+      35
+     ],
+     [
+      "zip",
+      1024,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      605,
+      357
+     ],
+     [
+      "save this information for next time",
+      605,
+      244
+     ],
+     [
+      "payment",
+      581,
+      576
+     ],
+     [
+      "credit card",
+      605,
+      77
+     ],
+     [
+      "debit card",
+      605,
+      73
+     ],
+     [
+      "paypal",
+      605,
+      45
+     ],
+     [
+      "name on card",
+      581,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      581,
+      190
+     ],
+     [
+      "credit card number",
+      881,
+      137
+     ],
+     [
+      "expiration",
+      581,
+      70
+     ],
+     [
+      "cvv",
+      731,
+      30
+     ],
+     [
+      "continue to checkout",
+      581,
+      576
+     ],
+     [
+      "© 2017–2025 company name",
+      245,
+      936
+     ],
+     [
+      "privacy",
+      631,
+      49
+     ],
+     [
+      "terms",
+      688,
+      41
+     ],
+     [
+      "support",
+      737,
+      57
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 3,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 49,
+    "protruding": 1,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 46,
+   "boxes": {
+    "source": [
+     [
+      "toggle theme",
+      1382,
+      1
+     ],
+     [
+      "checkout form",
+      252,
+      936
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      252,
+      936
+     ],
+     [
+      "your cart",
+      908,
+      98
+     ],
+     [
+      "3",
+      1154,
+      34
+     ],
+     [
+      "product name",
+      925,
+      102
+     ],
+     [
+      "brief description",
+      925,
+      101
+     ],
+     [
+      "$12",
+      1145,
+      26
+     ],
+     [
+      "second product",
+      925,
+      115
+     ],
+     [
+      "brief description",
+      925,
+      101
+     ],
+     [
+      "$8",
+      1154,
+      17
+     ],
+     [
+      "third item",
+      925,
+      101
+     ],
+     [
+      "brief description",
+      925,
+      101
+     ],
+     [
+      "$5",
+      1154,
+      17
+     ],
+     [
+      "promo code",
+      925,
+      94
+     ],
+     [
+      "examplecode",
+      925,
+      94
+     ],
+     [
+      "−$5",
+      1143,
+      28
+     ],
+     [
+      "total (usd)",
+      925,
+      78
+     ],
+     [
+      "$20",
+      1143,
+      28
+     ],
+     [
+      "redeem",
+      1096,
+      83
+     ],
+     [
+      "billing address",
+      252,
+      608
+     ],
+     [
+      "first name",
+      252,
+      73
+     ],
+     [
+      "last name",
+      564,
+      72
+     ],
+     [
+      "username",
+      252,
+      71
+     ],
+     [
+      "@",
+      252,
+      41
+     ],
+     [
+      "email",
+      252,
+      113
+     ],
+     [
+      "(optional)",
+      294,
+      71
+     ],
+     [
+      "address",
+      252,
+      57
+     ],
+     [
+      "address 2",
+      252,
+      145
+     ],
+     [
+      "(optional)",
+      326,
+      71
+     ],
+     [
+      "country",
+      252,
+      56
+     ],
+     [
+      "state",
+      512,
+      35
+     ],
+     [
+      "zip",
+      720,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      276,
+      357
+     ],
+     [
+      "save this information for next time",
+      276,
+      244
+     ],
+     [
+      "payment",
+      252,
+      608
+     ],
+     [
+      "credit card",
+      276,
+      77
+     ],
+     [
+      "debit card",
+      276,
+      73
+     ],
+     [
+      "paypal",
+      276,
+      45
+     ],
+     [
+      "name on card",
+      252,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      252,
+      190
+     ],
+     [
+      "credit card number",
+      568,
+      137
+     ],
+     [
+      "expiration",
+      252,
+      70
+     ],
+     [
+      "cvv",
+      410,
+      30
+     ],
+     [
+      "continue to checkout",
+      252,
+      608
+     ],
+     [
+      "© 2017–2025 company name",
+      252,
+      936
+     ],
+     [
+      "privacy",
+      634,
+      49
+     ],
+     [
+      "terms",
+      696,
+      41
+     ],
+     [
+      "support",
+      749,
+      57
+     ]
+    ],
+    "recreation": [
+     [
+      "toggle theme",
+      1351,
+      2
+     ],
+     [
+      "checkout form",
+      65,
+      1296
+     ],
+     [
+      "below is an example form built entirely with bootstrap’s form controls. each required form group has a validation state that can be triggered by attempting to submit the form without completing it.",
+      65,
+      1296
+     ],
+     [
+      "your cart",
+      89,
+      98
+     ],
+     [
+      "3",
+      439,
+      34
+     ],
+     [
+      "product name",
+      106,
+      102
+     ],
+     [
+      "brief description",
+      106,
+      101
+     ],
+     [
+      "$12",
+      430,
+      26
+     ],
+     [
+      "second product",
+      106,
+      115
+     ],
+     [
+      "brief description",
+      106,
+      101
+     ],
+     [
+      "$8",
+      438,
+      17
+     ],
+     [
+      "third item",
+      106,
+      101
+     ],
+     [
+      "brief description",
+      106,
+      101
+     ],
+     [
+      "$5",
+      438,
+      17
+     ],
+     [
+      "promo code",
+      106,
+      94
+     ],
+     [
+      "examplecode",
+      106,
+      94
+     ],
+     [
+      "−$5",
+      427,
+      28
+     ],
+     [
+      "total (usd)",
+      106,
+      78
+     ],
+     [
+      "$20",
+      428,
+      28
+     ],
+     [
+      "redeem",
+      97,
+      83
+     ],
+     [
+      "billing address",
+      521,
+      816
+     ],
+     [
+      "first name",
+      521,
+      73
+     ],
+     [
+      "last name",
+      937,
+      72
+     ],
+     [
+      "username",
+      521,
+      71
+     ],
+     [
+      "@",
+      521,
+      41
+     ],
+     [
+      "email",
+      521,
+      113
+     ],
+     [
+      "(optional)",
+      563,
+      71
+     ],
+     [
+      "address",
+      521,
+      57
+     ],
+     [
+      "address 2",
+      521,
+      145
+     ],
+     [
+      "(optional)",
+      595,
+      71
+     ],
+     [
+      "country",
+      521,
+      56
+     ],
+     [
+      "state",
+      867,
+      35
+     ],
+     [
+      "zip",
+      1144,
+      22
+     ],
+     [
+      "shipping address is the same as my billing address",
+      545,
+      357
+     ],
+     [
+      "save this information for next time",
+      545,
+      244
+     ],
+     [
+      "payment",
+      521,
+      816
+     ],
+     [
+      "credit card",
+      545,
+      77
+     ],
+     [
+      "debit card",
+      545,
+      73
+     ],
+     [
+      "paypal",
+      545,
+      45
+     ],
+     [
+      "name on card",
+      521,
+      100
+     ],
+     [
+      "full name as displayed on card",
+      521,
+      190
+     ],
+     [
+      "credit card number",
+      941,
+      137
+     ],
+     [
+      "expiration",
+      521,
+      70
+     ],
+     [
+      "cvv",
+      731,
+      30
+     ],
+     [
+      "continue to checkout",
+      521,
+      816
+     ],
+     [
+      "© 2017–2025 company name",
+      65,
+      1296
+     ],
+     [
+      "privacy",
+      631,
+      49
+     ],
+     [
+      "terms",
+      688,
+      41
+     ],
+     [
+      "support",
+      737,
+      57
+     ]
+    ]
+   }
+  }
+ }
+}

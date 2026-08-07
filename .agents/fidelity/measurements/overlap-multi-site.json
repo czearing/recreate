@@ -1,0 +1,1288 @@
+{
+ "schemaVersion": 1,
+ "measurement": "overlap-multi-site",
+ "commit": "4c8ae61c88d5666dff4783ad1ad950c15c9f2a80",
+ "measuredAt": "2026-08-07T13:13:29.591Z",
+ "question": "Does the shipped generator produce element overlap that the source does not have, across structurally different real pages rather than one?",
+ "verdict": "reproduces",
+ "verdictDetail": "3 of 7 pages show at least one pair that overlaps on the recreation and not on the source. 4 pages show none. The defect is page-dependent, which is why a single-page measurement could return a clean zero and still leave the complaint open.",
+ "priorMeasurement": {
+  "file": ".agents/fidelity/measurements/overlap-real-site.json",
+  "verdict": "does-not-reproduce",
+  "reconciliation": "That run measured one auth-gated page whose source side had to be replayed from a capture. It is not contradicted here: it remains a correct negative for that page. This run shows the negative did not generalise."
+ },
+ "method": {
+  "inheritedFrom": ".agents/fidelity/measurements/overlap-real-site.json",
+  "instrument": "One headless Edge over CDP. Source and recreation opened as separate targets, Emulation.setDeviceMetricsOverride per width, identical predicate evaluated on each side.",
+  "overlapPredicate": "Rect-rejection intersection between visible elements carrying their OWN non-empty text; ancestor/descendant pairs excluded; intersection area >= 16px2 and area/min(areaA,areaB) >= 0.08. Same thresholds as the single-site run.",
+  "pairIdentity": "Each pair keyed by the sorted, whitespace-collapsed, lowercased visible text of its two elements, never by selector, because the recreation is a structural rewrite whose DOM paths legitimately differ. This also makes overlap-by-design cancel between the two sides.",
+  "differenceFromPriorRun": "The source side is the LIVE page, not a replay, because every page here is public. That removes replay fidelity as a source of error entirely. In its place a content-drift guard scores a pair only when both of its texts are present on both sides, so content that changed between capture and measurement cannot manufacture a difference.",
+  "widths": [
+   1440,
+   1076,
+   800,
+   661,
+   600,
+   480,
+   450,
+   400
+  ],
+  "generation": "recreate capture <url> --out <dir> (default viewports 1920x1080,1440x900,768x1024,390x844,320x568), then vite build, served from dist at the filesystem root so the emitted absolute /assets paths resolve."
+ },
+ "crossSiteFinding": {
+  "whereTheDefectConcentrates": "Every named recreation-only pair on all three reproducing pages falls into one of two shapes: a horizontal row of short inline items (a breadcrumb trail, a top navigation bar), or a table cell against its table caption. Both are cases where elements share a horizontal line, which is the only situation in which a frozen over-wide length can become overlap rather than overflow.",
+  "whyFourPagesShowNothing": "The four clean pages resolve their narrow layouts into single-column block flow. In block flow an over-wide box overflows its parent instead of colliding with a sibling, so those pages cannot express this defect as overlap however wrong their widths are. Their zeros are a property of the page structure, not a clearance of the generator.",
+  "correspondingOverflowEvidence": "The card grid and dashboard pages, both of which score zero on overlap, show recreation-only horizontal protrusion at narrow widths (4 and 2 elements respectively at <=480px) that the source does not have. Measured on overlap alone they read as clean; they are not.",
+  "implicationForSampling": "A one-page study of this defect is decided by whether that page happens to contain a horizontal inline row. Three of seven structurally distinct pages reproduce; picking any one of the other four would have returned a confident negative."
+ },
+ "instrumentGaps": [
+  "Serving each recreation under a subpath returned a page that rendered zero elements, because the build emits absolute /assets/ URLs. That silent-zero was caught only by the per-site candidate-count control; without it the first run would have reported a clean zero for every site. Each site is now served at its own root.",
+  "The capture command could not capture any MediaWiki page: en.wikipedia.org and simple.wikipedia.org both failed with \"Space limit exceeded: Message too long\" (78.3 MB and 119.4 MB against a 67.1 MB CDP cap). The data-table slot was filled with a DataTables page instead. This is a real capture-side limit on large pages, not a measurement choice.",
+  "The headless browser exited on its own several times mid-run; runs were retried with a fresh profile until each produced a record. No partial record was used.",
+  "Overlap is measured only between elements carrying their own text. A purely graphical overlap (an image over an image) is not observable to this instrument and is reported as undetected, not absent."
+ ],
+ "sites": [
+  {
+   "key": "docs",
+   "structure": "documentation page",
+   "sourceUrl": "https://docs.python.org/3/library/json.html",
+   "stack": "Sphinx, no SPA framework",
+   "why": "Documentation: long prose with a sidebar and many inline code spans; the highest element count in the sample.",
+   "recreationUrl": "http://127.0.0.1:8807/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 11,
+    "sumRecreationOnlyPairsAcrossWidths": 47,
+    "widthsWithRecreationOnlyOverlap": [
+     1076,
+     800,
+     661,
+     600,
+     480,
+     450,
+     400
+    ],
+    "distinctRecreationOnlyPairsNamed": [
+     "» ||| — json encoder and decoder",
+     "python ||| — json encoder and decoder",
+     "3.14.7 documentation ||| — json encoder and decoder",
+     "the python standard library ||| — json encoder and decoder",
+     "internet data handling ||| — json encoder and decoder",
+     "| ||| — json encoder and decoder",
+     "as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not. ||| © 2001 python software foundation. this page is licensed under the python software foundation license version 2. examples, recipes, and other code in the documentation are additionally licensed under the zero clause bsd license. see for more information. the python software foundation is a non-profit corporation. last updated on aug 07, 2026 (09:08 utc). ? created using 8.2.3.",
+     "as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not. ||| copyright",
+     "obj ||| python-to-json conversion table",
+     "fp ||| python-to-json conversion table",
+     ".write() ||| python-to-json conversion table",
+     "file-like object ||| python-to-json conversion table"
+    ],
+    "reproduces": true
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [
+     661,
+     600,
+     480,
+     450,
+     400
+    ],
+    "maxRecreationOnlyProtrudingElements": 3
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 1396,
+    "minRecreationCandidates": 1395,
+    "minSharedTextKeys": 458,
+    "sourceReflow400to1440": {
+     "common": 139,
+     "moved": 139,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 138,
+     "moved": 138,
+     "pct": 100
+    },
+    "instrumentFoundOverlapOnSourceSide": true,
+    "instrumentFoundOverlapOnRecreationSide": true,
+    "verdict": "valid: instrument demonstrably sensitive on both sides of this page"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 1395,
+    "recreationCandidatesAt1440": 1436
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 12,
+     "recreationPairs": 13,
+     "recreationOnlyPairs": 7,
+     "sourceOnlyPairs": 6,
+     "recreationOnlyExamples": [
+      "obj ||| python-to-json conversion table",
+      "fp ||| python-to-json conversion table",
+      ".write() ||| python-to-json conversion table",
+      "file-like object ||| python-to-json conversion table",
+      "[ ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "1 ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not."
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1395,
+     "sharedTextKeys": 458,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 3
+    },
+    "450": {
+     "sourcePairs": 20,
+     "recreationPairs": 13,
+     "recreationOnlyPairs": 6,
+     "sourceOnlyPairs": 13,
+     "recreationOnlyExamples": [
+      "obj ||| python-to-json conversion table",
+      "fp ||| python-to-json conversion table",
+      ".write() ||| python-to-json conversion table",
+      "[ ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "1 ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "] ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not."
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1395,
+     "sharedTextKeys": 458,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 3
+    },
+    "480": {
+     "sourcePairs": 16,
+     "recreationPairs": 13,
+     "recreationOnlyPairs": 7,
+     "sourceOnlyPairs": 10,
+     "recreationOnlyExamples": [
+      "obj ||| python-to-json conversion table",
+      "fp ||| python-to-json conversion table",
+      ".write() ||| python-to-json conversion table",
+      "file-like object ||| python-to-json conversion table",
+      "[ ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "1 ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not."
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1395,
+     "sharedTextKeys": 458,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 3
+    },
+    "600": {
+     "sourcePairs": 13,
+     "recreationPairs": 13,
+     "recreationOnlyPairs": 7,
+     "sourceOnlyPairs": 7,
+     "recreationOnlyExamples": [
+      "obj ||| python-to-json conversion table",
+      "fp ||| python-to-json conversion table",
+      ".write() ||| python-to-json conversion table",
+      "file-like object ||| python-to-json conversion table",
+      "[ ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "1 ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not."
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1395,
+     "sharedTextKeys": 458,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 3
+    },
+    "661": {
+     "sourcePairs": 13,
+     "recreationPairs": 13,
+     "recreationOnlyPairs": 7,
+     "sourceOnlyPairs": 7,
+     "recreationOnlyExamples": [
+      "obj ||| python-to-json conversion table",
+      "fp ||| python-to-json conversion table",
+      ".write() ||| python-to-json conversion table",
+      "file-like object ||| python-to-json conversion table",
+      "[ ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not.",
+      "1 ||| as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not."
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1395,
+     "sharedTextKeys": 458,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 3
+    },
+    "800": {
+     "sourcePairs": 16,
+     "recreationPairs": 6,
+     "recreationOnlyPairs": 2,
+     "sourceOnlyPairs": 12,
+     "recreationOnlyExamples": [
+      "as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not. ||| © 2001 python software foundation. this page is licensed under the python software foundation license version 2. examples, recipes, and other code in the documentation are additionally licensed under the zero clause bsd license. see for more information. the python software foundation is a non-profit corporation. last updated on aug 07, 2026 (09:08 utc). ? created using 8.2.3.",
+      "as noted in , json permits literal u+2028 (line separator) and u+2029 (paragraph separator) characters in strings, whereas javascript (as of ecmascript edition 5.1) does not. ||| copyright"
+     ],
+     "sourceCandidates": 1396,
+     "recreationCandidates": 1396,
+     "sharedTextKeys": 459,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1076": {
+     "sourcePairs": 16,
+     "recreationPairs": 17,
+     "recreationOnlyPairs": 11,
+     "sourceOnlyPairs": 10,
+     "recreationOnlyExamples": [
+      "» ||| — json encoder and decoder",
+      "python ||| — json encoder and decoder",
+      "3.14.7 documentation ||| — json encoder and decoder",
+      "the python standard library ||| — json encoder and decoder",
+      "internet data handling ||| — json encoder and decoder",
+      "| ||| — json encoder and decoder"
+     ],
+     "sourceCandidates": 1436,
+     "recreationCandidates": 1436,
+     "sharedTextKeys": 468,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1440": {
+     "sourcePairs": 17,
+     "recreationPairs": 17,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 1436,
+     "recreationCandidates": 1436,
+     "sharedTextKeys": 468,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 2,
+    "identicalAtEveryWidth": true,
+    "run2RecreationOnlyByWidth": {
+     "400": 7,
+     "450": 6,
+     "480": 7,
+     "600": 7,
+     "661": 7,
+     "800": 2,
+     "1076": 11,
+     "1440": 0
+    }
+   }
+  },
+  {
+   "key": "table",
+   "structure": "data table",
+   "sourceUrl": "https://datatables.net/examples/styling/bootstrap5.html",
+   "stack": "jQuery / DataTables",
+   "why": "Data table: a wide fixed-column grid that cannot reflow, plus a JS widget that rewrites the DOM after load.",
+   "recreationUrl": "http://127.0.0.1:8806/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 5,
+    "sumRecreationOnlyPairsAcrossWidths": 15,
+    "widthsWithRecreationOnlyOverlap": [
+     1440,
+     1076,
+     800
+    ],
+    "distinctRecreationOnlyPairsNamed": [
+     "blog ||| |",
+     "blog ||| register",
+     "blog ||| datatables",
+     "community ||| datatables",
+     "datatables ||| support"
+    ],
+    "reproduces": true
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [
+     1440,
+     1076,
+     800,
+     661,
+     600,
+     480
+    ],
+    "maxRecreationOnlyProtrudingElements": 13
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 247,
+    "minRecreationCandidates": 286,
+    "minSharedTextKeys": 229,
+    "sourceReflow400to1440": {
+     "common": 229,
+     "moved": 229,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 256,
+     "moved": 254,
+     "pct": 99.2
+    },
+    "instrumentFoundOverlapOnSourceSide": false,
+    "instrumentFoundOverlapOnRecreationSide": true,
+    "verdict": "valid: instrument demonstrably sensitive on both sides of this page"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 286,
+    "recreationCandidatesAt1440": 286
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 0,
+     "recreationPairs": 7,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 247,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 229,
+     "sourceProtrudingElements": 18,
+     "recreationProtrudingElements": 17,
+     "recreationOnlyProtrusion": 0
+    },
+    "450": {
+     "sourcePairs": 0,
+     "recreationPairs": 7,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 247,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 229,
+     "sourceProtrudingElements": 18,
+     "recreationProtrudingElements": 17,
+     "recreationOnlyProtrusion": 0
+    },
+    "480": {
+     "sourcePairs": 0,
+     "recreationPairs": 7,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 247,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 229,
+     "sourceProtrudingElements": 16,
+     "recreationProtrudingElements": 17,
+     "recreationOnlyProtrusion": 1
+    },
+    "600": {
+     "sourcePairs": 0,
+     "recreationPairs": 7,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 247,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 229,
+     "sourceProtrudingElements": 5,
+     "recreationProtrudingElements": 17,
+     "recreationOnlyProtrusion": 12
+    },
+    "661": {
+     "sourcePairs": 0,
+     "recreationPairs": 7,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 247,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 229,
+     "sourceProtrudingElements": 4,
+     "recreationProtrudingElements": 17,
+     "recreationOnlyProtrusion": 13
+    },
+    "800": {
+     "sourcePairs": 0,
+     "recreationPairs": 5,
+     "recreationOnlyPairs": 5,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [
+      "blog ||| |",
+      "blog ||| register",
+      "blog ||| datatables",
+      "community ||| datatables",
+      "datatables ||| support"
+     ],
+     "sourceCandidates": 286,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 256,
+     "sourceProtrudingElements": 7,
+     "recreationProtrudingElements": 13,
+     "recreationOnlyProtrusion": 6
+    },
+    "1076": {
+     "sourcePairs": 0,
+     "recreationPairs": 5,
+     "recreationOnlyPairs": 5,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [
+      "blog ||| |",
+      "blog ||| register",
+      "blog ||| datatables",
+      "community ||| datatables",
+      "datatables ||| support"
+     ],
+     "sourceCandidates": 286,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 256,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 13,
+     "recreationOnlyProtrusion": 10
+    },
+    "1440": {
+     "sourcePairs": 0,
+     "recreationPairs": 5,
+     "recreationOnlyPairs": 5,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [
+      "blog ||| |",
+      "blog ||| register",
+      "blog ||| datatables",
+      "community ||| datatables",
+      "datatables ||| support"
+     ],
+     "sourceCandidates": 286,
+     "recreationCandidates": 286,
+     "sharedTextKeys": 256,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 13,
+     "recreationOnlyProtrusion": 10
+    }
+   },
+   "stability": {
+    "repeats": 2,
+    "identicalAtEveryWidth": true,
+    "run2RecreationOnlyByWidth": {
+     "400": 0,
+     "450": 0,
+     "480": 0,
+     "600": 0,
+     "661": 0,
+     "800": 5,
+     "1076": 5,
+     "1440": 5
+    }
+   }
+  },
+  {
+   "key": "hero",
+   "structure": "marketing page with hero",
+   "sourceUrl": "https://vuejs.org/",
+   "stack": "Vue 3 / VitePress",
+   "why": "Marketing hero: large absolutely-positioned decorative art layered over headline text, the structure most able to turn a frozen length into overlap.",
+   "recreationUrl": "http://127.0.0.1:8803/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 3,
+    "sumRecreationOnlyPairsAcrossWidths": 3,
+    "widthsWithRecreationOnlyOverlap": [
+     800
+    ],
+    "distinctRecreationOnlyPairsNamed": [
+     "docs ||| vue.js",
+     "ctrl ||| playground",
+     "k ||| playground"
+    ],
+    "reproduces": true
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [
+     1076,
+     800
+    ],
+    "maxRecreationOnlyProtrudingElements": 7
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 68,
+    "minRecreationCandidates": 74,
+    "minSharedTextKeys": 67,
+    "sourceReflow400to1440": {
+     "common": 67,
+     "moved": 65,
+     "pct": 97
+    },
+    "recreationReflow400to1440": {
+     "common": 70,
+     "moved": 67,
+     "pct": 95.7
+    },
+    "instrumentFoundOverlapOnSourceSide": false,
+    "instrumentFoundOverlapOnRecreationSide": true,
+    "verdict": "valid: instrument demonstrably sensitive on both sides of this page"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 74,
+    "recreationCandidatesAt1440": 80
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 68,
+     "recreationCandidates": 74,
+     "sharedTextKeys": 67,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "450": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 68,
+     "recreationCandidates": 74,
+     "sharedTextKeys": 67,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "480": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 68,
+     "recreationCandidates": 74,
+     "sharedTextKeys": 67,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "600": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 68,
+     "recreationCandidates": 74,
+     "sharedTextKeys": 67,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "661": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 68,
+     "recreationCandidates": 74,
+     "sharedTextKeys": 67,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "800": {
+     "sourcePairs": 0,
+     "recreationPairs": 6,
+     "recreationOnlyPairs": 3,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [
+      "docs ||| vue.js",
+      "ctrl ||| playground",
+      "k ||| playground"
+     ],
+     "sourceCandidates": 76,
+     "recreationCandidates": 77,
+     "sharedTextKeys": 72,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 7,
+     "recreationOnlyProtrusion": 7
+    },
+    "1076": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 77,
+     "recreationCandidates": 77,
+     "sharedTextKeys": 73,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 6,
+     "recreationOnlyProtrusion": 6
+    },
+    "1440": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 80,
+     "recreationCandidates": 80,
+     "sharedTextKeys": 75,
+     "sourceProtrudingElements": 2,
+     "recreationProtrudingElements": 2,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 2,
+    "identicalAtEveryWidth": true,
+    "run2RecreationOnlyByWidth": {
+     "400": 0,
+     "450": 0,
+     "480": 0,
+     "600": 0,
+     "661": 0,
+     "800": 3,
+     "1076": 0,
+     "1440": 0
+    }
+   }
+  },
+  {
+   "key": "cardgrid",
+   "structure": "card grid",
+   "sourceUrl": "https://getbootstrap.com/docs/5.3/examples/album/",
+   "stack": "Bootstrap 5",
+   "why": "Card grid: a wrapping flex/grid of equal cards, the shape the original complaint described.",
+   "recreationUrl": "http://127.0.0.1:8801/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 0,
+    "sumRecreationOnlyPairsAcrossWidths": 0,
+    "widthsWithRecreationOnlyOverlap": [],
+    "distinctRecreationOnlyPairsNamed": [],
+    "reproduces": false
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [
+     661,
+     600,
+     480,
+     450,
+     400
+    ],
+    "maxRecreationOnlyProtrudingElements": 4
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 56,
+    "minRecreationCandidates": 56,
+    "minSharedTextKeys": 16,
+    "sourceReflow400to1440": {
+     "common": 16,
+     "moved": 16,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 16,
+     "moved": 16,
+     "pct": 100
+    },
+    "instrumentFoundOverlapOnSourceSide": true,
+    "instrumentFoundOverlapOnRecreationSide": true,
+    "verdict": "valid: instrument demonstrably sensitive on both sides of this page"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 56,
+    "recreationCandidatesAt1440": 56
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 4,
+     "recreationOnlyProtrusion": 4
+    },
+    "450": {
+     "sourcePairs": 2,
+     "recreationPairs": 2,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 4,
+     "recreationOnlyProtrusion": 4
+    },
+    "480": {
+     "sourcePairs": 2,
+     "recreationPairs": 2,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 4,
+     "recreationOnlyProtrusion": 4
+    },
+    "600": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 4,
+     "recreationOnlyProtrusion": 4
+    },
+    "661": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 4,
+     "recreationOnlyProtrusion": 4
+    },
+    "800": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1076": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1440": {
+     "sourcePairs": 1,
+     "recreationPairs": 1,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 56,
+     "recreationCandidates": 56,
+     "sharedTextKeys": 16,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 1,
+    "identicalAtEveryWidth": null,
+    "note": "Repeated only for the reproducing pages; a zero page repeated would still be a zero."
+   }
+  },
+  {
+   "key": "dashboard",
+   "structure": "dashboard with sidebar",
+   "sourceUrl": "https://getbootstrap.com/docs/5.3/examples/dashboard/",
+   "stack": "Bootstrap 5",
+   "why": "Dashboard with a persistent sidebar: a fixed-position rail beside a fluid main column, so a frozen rail width can collide with content.",
+   "recreationUrl": "http://127.0.0.1:8802/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 0,
+    "sumRecreationOnlyPairsAcrossWidths": 0,
+    "widthsWithRecreationOnlyOverlap": [],
+    "distinctRecreationOnlyPairsNamed": [],
+    "reproduces": false
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [
+     480,
+     450,
+     400
+    ],
+    "maxRecreationOnlyProtrudingElements": 2
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 92,
+    "minRecreationCandidates": 92,
+    "minSharedTextKeys": 35,
+    "sourceReflow400to1440": {
+     "common": 35,
+     "moved": 35,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 35,
+     "moved": 35,
+     "pct": 100
+    },
+    "instrumentFoundOverlapOnSourceSide": false,
+    "instrumentFoundOverlapOnRecreationSide": false,
+    "verdict": "weak: this page produced no overlap on either side at any width, so its zero shows the page is not structurally able to overlap rather than that the recreation is correct"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 92,
+    "recreationCandidatesAt1440": 105
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 92,
+     "recreationCandidates": 92,
+     "sharedTextKeys": 35,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 2,
+     "recreationOnlyProtrusion": 2
+    },
+    "450": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 92,
+     "recreationCandidates": 92,
+     "sharedTextKeys": 35,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 2,
+     "recreationOnlyProtrusion": 2
+    },
+    "480": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 92,
+     "recreationCandidates": 92,
+     "sharedTextKeys": 35,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 2,
+     "recreationOnlyProtrusion": 2
+    },
+    "600": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 92,
+     "recreationCandidates": 92,
+     "sharedTextKeys": 35,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "661": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 92,
+     "recreationCandidates": 92,
+     "sharedTextKeys": 35,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "800": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 105,
+     "recreationCandidates": 105,
+     "sharedTextKeys": 47,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1076": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 105,
+     "recreationCandidates": 105,
+     "sharedTextKeys": 47,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1440": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 105,
+     "recreationCandidates": 105,
+     "sharedTextKeys": 47,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 1,
+    "identicalAtEveryWidth": null,
+    "note": "Repeated only for the reproducing pages; a zero page repeated would still be a zero."
+   }
+  },
+  {
+   "key": "form",
+   "structure": "form-heavy page",
+   "sourceUrl": "https://getbootstrap.com/docs/5.3/examples/checkout/",
+   "stack": "Bootstrap 5",
+   "why": "Form-heavy: dense label/input/validation rows in a two-column grid that must collapse to one column.",
+   "recreationUrl": "http://127.0.0.1:8804/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 0,
+    "sumRecreationOnlyPairsAcrossWidths": 0,
+    "widthsWithRecreationOnlyOverlap": [],
+    "distinctRecreationOnlyPairsNamed": [],
+    "reproduces": false
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [],
+    "maxRecreationOnlyProtrudingElements": 0
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 49,
+    "minRecreationCandidates": 49,
+    "minSharedTextKeys": 46,
+    "sourceReflow400to1440": {
+     "common": 46,
+     "moved": 46,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 46,
+     "moved": 46,
+     "pct": 100
+    },
+    "instrumentFoundOverlapOnSourceSide": false,
+    "instrumentFoundOverlapOnRecreationSide": false,
+    "verdict": "weak: this page produced no overlap on either side at any width, so its zero shows the page is not structurally able to overlap rather than that the recreation is correct"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 49,
+    "recreationCandidatesAt1440": 49
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 0
+    },
+    "450": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 0
+    },
+    "480": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 0
+    },
+    "600": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 0
+    },
+    "661": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 3,
+     "recreationOnlyProtrusion": 0
+    },
+    "800": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 1,
+     "recreationOnlyProtrusion": 0
+    },
+    "1076": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 1,
+     "recreationOnlyProtrusion": 0
+    },
+    "1440": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 49,
+     "recreationCandidates": 49,
+     "sharedTextKeys": 46,
+     "sourceProtrudingElements": 3,
+     "recreationProtrudingElements": 1,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 1,
+    "identicalAtEveryWidth": null,
+    "note": "Repeated only for the reproducing pages; a zero page repeated would still be a zero."
+   }
+  },
+  {
+   "key": "legacy",
+   "structure": "legacy table/float layout",
+   "sourceUrl": "https://news.ycombinator.com/",
+   "stack": "no framework, table layout",
+   "why": "No-framework control built from nested tables and floats, the technique the research names as able to overlap when a parent collapses.",
+   "recreationUrl": "http://127.0.0.1:8805/",
+   "defect": {
+    "maxRecreationOnlyPairsAtAnyWidth": 0,
+    "sumRecreationOnlyPairsAcrossWidths": 0,
+    "widthsWithRecreationOnlyOverlap": [],
+    "distinctRecreationOnlyPairsNamed": [],
+    "reproduces": false
+   },
+   "secondarySignal": {
+    "note": "Horizontal protrusion (scrollWidth > clientWidth with overflow-x visible). A frozen over-wide length becomes overflow, not overlap, in ordinary block/flex/grid flow, so overlap alone can read a real break as clean.",
+    "widthsWithRecreationOnlyProtrusion": [],
+    "maxRecreationOnlyProtrudingElements": 0
+   },
+   "positiveControl": {
+    "bothSidesRendered": true,
+    "minSourceCandidates": 323,
+    "minRecreationCandidates": 323,
+    "minSharedTextKeys": 165,
+    "sourceReflow400to1440": {
+     "common": 221,
+     "moved": 221,
+     "pct": 100
+    },
+    "recreationReflow400to1440": {
+     "common": 220,
+     "moved": 220,
+     "pct": 100
+    },
+    "instrumentFoundOverlapOnSourceSide": true,
+    "instrumentFoundOverlapOnRecreationSide": false,
+    "verdict": "valid with caveat: instrument found overlaps on this page (source side) but the recreation produced none at any width, so a recreation-side zero here is a real negative"
+   },
+   "exposure": {
+    "note": "Raw counts rank by page size as much as by defect. Candidate elements is the opportunity each count was drawn from.",
+    "recreationCandidatesAt400": 323,
+    "recreationCandidatesAt1440": 323
+   },
+   "perWidth": {
+    "400": {
+     "sourcePairs": 32,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 28,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "450": {
+     "sourcePairs": 40,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 36,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "480": {
+     "sourcePairs": 40,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 36,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "600": {
+     "sourcePairs": 18,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 18,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "661": {
+     "sourcePairs": 6,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 6,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "800": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 1,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1076": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    },
+    "1440": {
+     "sourcePairs": 0,
+     "recreationPairs": 0,
+     "recreationOnlyPairs": 0,
+     "sourceOnlyPairs": 0,
+     "recreationOnlyExamples": [],
+     "sourceCandidates": 323,
+     "recreationCandidates": 323,
+     "sharedTextKeys": 165,
+     "sourceProtrudingElements": 0,
+     "recreationProtrudingElements": 0,
+     "recreationOnlyProtrusion": 0
+    }
+   },
+   "stability": {
+    "repeats": 1,
+    "identicalAtEveryWidth": null,
+    "note": "Repeated only for the reproducing pages; a zero page repeated would still be a zero."
+   }
+  }
+ ]
+}
