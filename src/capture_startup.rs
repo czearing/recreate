@@ -1,11 +1,19 @@
 use crate::{
+    blocking_overlay::{is_blocking_overlay, js_predicate},
     capture::read_state,
-    capture_settle::{POLL_INTERVAL_MS, capture_ready, next_stable},
+    capture_settle,
     cdp::Cdp,
     model::{PageState, Viewport},
 };
 use anyhow::Result;
 use std::time::Duration;
+
+/// How often the page is asked whether a startup curtain has appeared yet.
+const STARTUP_POLL_MS: u64 = 100;
+/// How long a page is given to raise a startup curtain before capture concludes it has none.
+const STARTUP_ATTEMPTS: u32 = 60;
+/// How long a curtain's own images are given to decode before it is judged still present.
+const CURTAIN_IMAGE_MS: u64 = 2_000;
 
 pub async fn wait_ready(cdp: &mut Cdp, wait_for_startup: bool) -> Result<()> {
     wait_ready_mode(cdp, wait_for_startup, true).await
@@ -15,147 +23,84 @@ pub async fn wait_ready_without_lifecycle(cdp: &mut Cdp, wait_for_startup: bool)
     wait_ready_mode(cdp, wait_for_startup, false).await
 }
 
+/// Asks the page once when it has settled, rather than interrogating it on a timer.
+///
+/// The page observes its own changes, so it can answer the moment it is still. Driving the
+/// same question from Rust meant every answer was rounded up to the next poll interval, and
+/// the cost of asking — a full style scan of every element — was paid on every tick instead
+/// of only at the moments the answer could have changed.
 async fn wait_ready_mode(
     cdp: &mut Cdp,
     wait_for_startup: bool,
     wait_for_lifecycle: bool,
 ) -> Result<()> {
-    let started = std::time::Instant::now();
-    let mut previous = String::new();
-    let mut stable = 0;
-    for _ in 0..120 {
-        let lifecycle = if wait_for_lifecycle {
-            "window.__recreateLifecycleDone === true &&"
-        } else {
-            ""
-        };
-        let source = format!(
-            r#"(() => {{
-              let shownCount = 0;
-              let digest = 0;
-              let blocking = false;
-              for (const element of document.querySelectorAll('*')) {{
-                const rect = element.getBoundingClientRect();
-                const style = getComputedStyle(element);
-                const shown = rect.width > 0 && rect.height > 0 &&
-                  style.display !== 'none' && style.visibility !== 'hidden' &&
-                  Number(style.opacity || 1) > 0;
-                if (shown) {{
-                  const part = [
-                    element.tagName, Math.round(rect.x), Math.round(rect.y),
-                    Math.round(rect.width), Math.round(rect.height),
-                    style.display
-                  ].join(':');
-                  for (let index = 0; index < part.length; index++) {{
-                    digest = (Math.imul(digest, 31) + part.charCodeAt(index)) | 0;
-                  }}
-                  shownCount++;
-                }}
-                const area = rect.width * rect.height;
-                const z = Number(style.zIndex);
-                blocking ||= area >= innerWidth * innerHeight * 0.9 &&
-                  ['absolute','fixed'].includes(style.position) &&
-                  Number.isFinite(z) && z >= 50 &&
-                  style.pointerEvents !== 'none' && shown;
-              }}
-              return {{
-              ready: document.readyState === 'complete' &&
-                document.fonts.status === 'loaded' &&
-                {lifecycle}
-                (window.__recreatePendingRequests || 0) === 0,
-              signature: shownCount ? `${{shownCount}}:${{digest}}` : '',
-              blocking
-            }};
-            }})()"#
-        );
-        let value = cdp.evaluate(&source).await?;
-        let signature = value["signature"].as_str().unwrap_or_default();
-        let startup_complete = !wait_for_startup || value["blocking"].as_bool() != Some(true);
-        let ready = value["ready"].as_bool() == Some(true) && !signature.is_empty();
-        stable = next_stable(&previous, signature, stable);
-        if ready && startup_complete && capture_ready(started.elapsed(), stable) {
-            return Ok(());
-        }
-        previous = signature.to_string();
-        tokio::time::sleep(Duration::from_millis(POLL_INTERVAL_MS)).await;
-    }
-    anyhow::bail!("page did not become stable")
+    let settled = cdp
+        .evaluate(&capture_settle::source(
+            wait_for_lifecycle,
+            wait_for_startup,
+        ))
+        .await?;
+    anyhow::ensure!(
+        settled.as_bool() == Some(true),
+        "page did not become stable"
+    );
+    Ok(())
 }
 
+/// A settled capture that still holds a curtain recorded the splash screen, not the page.
 pub fn ensure_settled(state: &PageState) -> Result<()> {
-    let area = f64::from(state.viewport.width) * f64::from(state.viewport.height);
-    if state.nodes.iter().any(|node| {
-        let z = node
-            .style
-            .get("z-index")
-            .and_then(|value| value.parse::<i32>().ok());
-        node.rect.width * node.rect.height >= area * 0.9
-            && matches!(
-                node.style.get("position").map(String::as_str),
-                Some("absolute" | "fixed")
-            )
-            && z.is_some_and(|value| value >= 50)
-            && node.style.get("pointer-events").map(String::as_str) != Some("none")
-            && node.style.get("display").map(String::as_str) != Some("none")
-            && node.style.get("visibility").map(String::as_str) != Some("hidden")
-    }) {
+    if state
+        .nodes
+        .iter()
+        .any(|node| is_blocking_overlay(node, &state.viewport))
+    {
         anyhow::bail!("settled capture still contains a blocking overlay");
     }
     Ok(())
 }
 
+/// Waits for a startup curtain to appear and finish drawing, so the layer a page shows
+/// first can be recorded before it is replaced.
 pub async fn wait_startup(
     cdp: &mut Cdp,
     viewport: &Viewport,
     started: std::time::Instant,
 ) -> Result<Option<(PageState, u64)>> {
-    for _ in 0..60 {
-        if cdp
-            .evaluate(
-                "(async()=>{const blocking=element=>{const rect=element.getBoundingClientRect(),\
-                 style=getComputedStyle(element),z=Number(style.zIndex);return \
-                 rect.width*rect.height>=innerWidth*innerHeight*.9&&\
-                 ['absolute','fixed'].includes(style.position)&&Number.isFinite(z)&&z>=50&&\
-                 style.pointerEvents!=='none'&&style.display!=='none'&&style.visibility!=='hidden'};\
-                 const overlay=Array.from(document.querySelectorAll('*')).find(blocking);\
-                 if(!overlay)return false;const images=[...(overlay.matches('img')?[overlay]:[]),\
-                 ...overlay.querySelectorAll('img')];await Promise.race([Promise.all(\
-                 images.map(image=>image.complete?\
-                 (image.decode?image.decode().catch(()=>{}):Promise.resolve()):new Promise(resolve=>{\
-                 image.addEventListener('load',resolve,{once:true});\
-                 image.addEventListener('error',resolve,{once:true})}))),\
-                 new Promise(resolve=>setTimeout(resolve,2000))]);return blocking(overlay)})()",
-            )
-            .await?
-            .as_bool()
-            == Some(true)
-        {
+    let source = format!(
+        "(async () => {{\
+         const blocking = {predicate};\
+         const overlay = Array.from(document.querySelectorAll('*')).find(blocking);\
+         if (!overlay) return false;\
+         const images = [...(overlay.matches('img') ? [overlay] : []), \
+         ...overlay.querySelectorAll('img')];\
+         await Promise.race([\
+         Promise.all(images.map(image => image.complete\
+         ? (image.decode ? image.decode().catch(() => {{}}) : Promise.resolve())\
+         : new Promise(resolve => {{\
+         image.addEventListener('load', resolve, {{ once: true }});\
+         image.addEventListener('error', resolve, {{ once: true }});\
+         }}))),\
+         new Promise(resolve => setTimeout(resolve, {CURTAIN_IMAGE_MS}))]);\
+         return blocking(overlay);\
+         }})()",
+        predicate = js_predicate(),
+    );
+    for _ in 0..STARTUP_ATTEMPTS {
+        if cdp.evaluate(&source).await?.as_bool() == Some(true) {
             let state = read_state(cdp, viewport.clone()).await?;
             return Ok(Some((state, started.elapsed().as_millis() as u64)));
         }
-        tokio::time::sleep(Duration::from_millis(100)).await;
+        tokio::time::sleep(Duration::from_millis(STARTUP_POLL_MS)).await;
     }
     Ok(None)
 }
 
+/// Selects the subtree a startup curtain owns, so it can be recorded as its own layer.
 pub fn startup_nodes(state: &PageState, animation_targets: &[String]) -> Vec<crate::model::Node> {
-    let area = f64::from(state.viewport.width) * f64::from(state.viewport.height);
     let mut roots: Vec<_> = state
         .nodes
         .iter()
-        .filter(|node| {
-            let z = node
-                .style
-                .get("z-index")
-                .and_then(|value| value.parse::<i32>().ok())
-                .unwrap_or_default();
-            node.rect.width * node.rect.height >= area * 0.9
-                && matches!(
-                    node.style.get("position").map(String::as_str),
-                    Some("absolute" | "fixed")
-                )
-                && z >= 50
-        })
+        .filter(|node| is_blocking_overlay(node, &state.viewport))
         .map(|node| node.path.clone())
         .collect();
     for target in animation_targets {

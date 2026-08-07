@@ -2,6 +2,7 @@ mod asset_script;
 mod attribute_sequence_script;
 mod backtest;
 mod behavior;
+mod blocking_overlay;
 mod browser;
 mod capture;
 mod capture_settle;

@@ -6,7 +6,6 @@ use crate::{
     probe, serve, validate,
 };
 use anyhow::Result;
-use base64::Engine;
 use serde_json::json;
 use std::fs;
 
@@ -63,16 +62,6 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
         } else {
             capture_state(&mut cdp, viewport.clone(), reload && states.is_empty()).await?
         };
-        let screenshot = cdp
-            .send("Page.captureScreenshot", json!({ "format": "png" }))
-            .await?;
-        if let Some(data) = screenshot["data"].as_str() {
-            fs::write(
-                args.out
-                    .join(format!("source-{}x{}.png", viewport.width, viewport.height)),
-                base64::engine::general_purpose::STANDARD.decode(data)?,
-            )?;
-        }
         let mut state = state;
         let paths = state
             .nodes

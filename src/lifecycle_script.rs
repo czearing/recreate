@@ -38,14 +38,19 @@ mod tests {
         }
     }
 
-    /// The recorder must carry a settle decision rather than run to a constant, and its
-    /// keyframe offsets must be resolved against however long it actually ran.
+    /// The recorder must carry a settle decision rather than run to a constant, and it must
+    /// hand that decision the page's own longest observed gap in motion rather than let a
+    /// quiet period be chosen for it.
     #[test]
     fn the_recording_window_is_measured_and_only_ceilinged() {
         let source = super::source();
         assert!(!source.contains("__LIFECYCLE_SETTLE__"));
-        assert!(source.contains("lifecycleSettled(now - start, now - lastChange, busy)"));
+        assert!(
+            source.contains("lifecycleSettled(now - start, now - lastChange, busy, longestGap)")
+        );
+        assert!(source.contains("longestGap = Math.max(longestGap, now - lastChange)"));
         assert!(source.contains("const LIFECYCLE_CEILING_MS = 12000"));
+        assert!(!source.contains("LIFECYCLE_QUIET_MS"));
         assert!(!source.contains("(now - start) / 12000"));
         assert!(!source.contains("now - start < 12000"));
     }

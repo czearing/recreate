@@ -30,6 +30,7 @@ __LIFECYCLE_SETTLE__
   const record = () => {
     const start = performance.now();
     let lastChange = start;
+    let longestGap = 0;
     const previous = new WeakMap();
     const tracks = new Map();
     const safe = new Set([
@@ -191,11 +192,12 @@ __LIFECYCLE_SETTLE__
         const frames = tracks.get(path) || [before];
         frames.push(value);
         tracks.set(path, frames);
+        longestGap = Math.max(longestGap, now - lastChange);
         lastChange = now;
       }
       fullSample = false;
       const busy = animations.length > 0 || loading;
-      if (!lifecycleSettled(now - start, now - lastChange, busy)) {
+      if (!lifecycleSettled(now - start, now - lastChange, busy, longestGap)) {
         requestAnimationFrame(sample);
       } else {
         // Offsets are resolved against the duration the recorder actually ran for, so a
