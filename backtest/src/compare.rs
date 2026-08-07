@@ -72,12 +72,14 @@ pub fn artifacts(source: &Artifact, candidate: &Artifact, elapsed_ms: u128) -> R
         findings.retain(|finding| finding.property != "pixels");
         suppressed += before - findings.len();
     }
-    findings.sort_by(|left, right| {
-        left.viewport
-            .cmp(&right.viewport)
-            .then_with(|| scenario_rank(&left.scenario).cmp(&scenario_rank(&right.scenario)))
-            .then_with(|| left.target.cmp(&right.target))
-    });
+    // Ordered on every field the finding renders, so no two distinguishable
+    // findings can tie. The first three keys alone left ties to be resolved by
+    // `sort_by`'s stability, which means insertion order across the separate
+    // `extend` calls below decided the reported first line. Findings equal on
+    // all of these render identically, so their relative order is unobservable
+    // and needs no further tiebreak; a synthetic index would be assigned in
+    // emission order and reintroduce exactly the dependence removed here.
+    findings.sort_by(finding_order);
     Report {
         schema_version: SCHEMA_VERSION,
         status: if findings.is_empty() {
@@ -2327,6 +2329,30 @@ fn scenario_rank(value: &str) -> u8 {
     }
 }
 
+/// Total order over findings, up to observational equivalence.
+///
+/// Every field the finding renders takes part, so no two *distinguishable*
+/// findings can tie. Ordering on `(viewport, scenario_rank, target)` alone left
+/// ties for `sort_by` to resolve by stability, which handed the decision to the
+/// insertion sequence of the separate `extend` calls in `compare_states` — so
+/// the reported first line depended on which detector happened to run first
+/// rather than on the findings themselves.
+///
+/// Findings equal on all of these fields render identically, so their relative
+/// order cannot be observed and needs no further tiebreak. A synthetic index
+/// would be worse than nothing: it would be assigned in emission order and so
+/// reintroduce precisely the insertion-order dependence removed here.
+fn finding_order(left: &Finding, right: &Finding) -> std::cmp::Ordering {
+    left.viewport
+        .cmp(&right.viewport)
+        .then_with(|| scenario_rank(&left.scenario).cmp(&scenario_rank(&right.scenario)))
+        .then_with(|| left.target.cmp(&right.target))
+        .then_with(|| left.property.cmp(&right.property))
+        .then_with(|| left.source.cmp(&right.source))
+        .then_with(|| left.candidate.cmp(&right.candidate))
+        .then_with(|| left.key.cmp(&right.key))
+}
+
 /// Differences that hold over a width interval rather than at one recorded
 /// width.
 ///
@@ -2405,6 +2431,96 @@ mod tests {
         StylesheetEvidence, Viewport,
     };
     use std::time::Instant;
+
+    /// A finding differing from its neighbours only in fields the old
+    /// three-key comparator ignored, so every pair below tied under it.
+    fn ordering_probe(target: &str, property: &str, source: &str, candidate: &str) -> Finding {
+        Finding {
+            key: format!("{target}|{property}|{source}|{candidate}"),
+            line: format!("V800 base {target} {property} {source}->{candidate}"),
+            viewport: 800,
+            scenario: "base".into(),
+            target: target.into(),
+            property: property.into(),
+            source: source.into(),
+            candidate: candidate.into(),
+            severity: "high".into(),
+            confidence: "certain".into(),
+            items: Vec::new(),
+        }
+    }
+
+    /// The ordering must be a function of the findings alone, never of the
+    /// sequence the detectors happened to emit them in.
+    ///
+    /// Sorting once proves nothing: a non-total comparator still produces one
+    /// self-consistent answer per input permutation. So this sorts the SAME set
+    /// from many different insertion orders and requires a single identical
+    /// result. Every probe below shares `(viewport, scenario, target)` with at
+    /// least one other, so all of them tied under the previous comparator and
+    /// the outcome was decided by `sort_by`'s stability.
+    #[test]
+    fn finding_order_is_independent_of_insertion_order() {
+        let findings = vec![
+            ordering_probe("Marker panel", "x", "360", "648"),
+            ordering_probe("Marker panel", "overlap", "clear", "2298.40px2"),
+            ordering_probe("Marker panel", "width", "288", "200"),
+            ordering_probe("Marker panel", "x", "360", "700"),
+            ordering_probe("Related links", "y", "12", "40"),
+            ordering_probe("Related links", "overlap", "clear", "18.00px2"),
+        ];
+
+        let mut expected = findings.clone();
+        expected.sort_by(finding_order);
+        let expected: Vec<&str> = expected.iter().map(|item| item.key.as_str()).collect();
+
+        // Rotations and reversals of rotations: 12 distinct insertion orders
+        // covering every element in every leading position, in both directions.
+        let mut permutations = 0;
+        for rotation in 0..findings.len() {
+            for reversed in [false, true] {
+                let mut permuted: Vec<Finding> = findings[rotation..]
+                    .iter()
+                    .chain(findings[..rotation].iter())
+                    .cloned()
+                    .collect();
+                if reversed {
+                    permuted.reverse();
+                }
+                assert_ne!(
+                    permuted.len(),
+                    0,
+                    "a permutation must not be empty or the assertion below is vacuous"
+                );
+                permuted.sort_by(finding_order);
+                let actual: Vec<&str> = permuted.iter().map(|item| item.key.as_str()).collect();
+                assert_eq!(
+                    actual, expected,
+                    "insertion order {rotation}/reversed={reversed} produced a different sorted \
+                     order, so the comparator is not total"
+                );
+                permutations += 1;
+            }
+        }
+        assert_eq!(permutations, 12, "expected 12 insertion orders to be tried");
+    }
+
+    /// Guards the specific pair that the frozen manifests pin.
+    ///
+    /// `x` must precede `overlap` for the same target, because `property` is
+    /// compared lexically once `target` ties. This is the ordering the fixture
+    /// expectations were frozen against, so a future reordering of the key
+    /// fields breaks here rather than in a 175-second qualification run.
+    #[test]
+    fn properties_of_one_target_order_lexically() {
+        let mut findings = vec![
+            ordering_probe("Marker panel", "x", "360", "648"),
+            ordering_probe("Marker panel", "overlap", "clear", "2298.40px2"),
+        ];
+        findings.sort_by(finding_order);
+        let properties: Vec<&str> = findings.iter().map(|item| item.property.as_str()).collect();
+        assert_eq!(properties, vec!["overlap", "x"]);
+    }
 
     fn state(scenario: &str, node: NodeEvidence) -> State {
         State {

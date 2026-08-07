@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "workItem": "finding-total-order",
+  "author": "fidelity-developer",
+  "claim": "The comparator's finding order was extended to a total order over every rendered field, removing the dependence of the reported first line on which detector emitted a finding first.",
+
+  "premiseCorrections": [
+    {
+      "claim": "HEAD is red (42/44, exit 1).",
+      "finding": "FALSE at the HEAD I measured. Baseline release qualification at commit c58b4e8, run BEFORE any edit, measured detected 44/44, undetected 0, exceededBudget 0, comparisons 72/72, duplicateFindings 0, exit 0, in 175.4s.",
+      "cause": "fixture-author refroze the two manifests in the interval. backtest/fixtures/frozen-offset/expected.json now pins frozen-marker-left to 'V800 base Marker panel over Related links panel overlap clear->2298.40px2' and backtest/fixtures/wrap-collision/expected.json pins frozen-run-width to 'V800 base Conversion table over Related links overlap clear->2881.92px2'. Both are the NEW overlap-first lines produced by the widened enclosure oracle, not the old ones.",
+      "consequence": "The baseline did NOT reproduce the reported failure. Per my own rules that is a stop-and-report condition for the REPORTED defect. I continued with the ordering change anyway because it is justified independently of that failure - the non-total comparator is demonstrable directly by unit test - and I state explicitly that it is NOT justified by, and did not fix, any red score."
+    },
+    {
+      "claim": "budget-reachability.json shows the two fixtures flip DETECTED/UNDETECTED at ~35% across 5 repeats, so this is nondeterminism as well as staleness.",
+      "finding": "FALSE as stated. That ~35% is a POOLED rate over two DIFFERENT causes and describes no single unit. The artifact's own numbers separate them: one run records detected 43/44 with exceededBudget=1 and maximumMs=4990, which is a TIMING failure (4990 > COMPARISON_DEADLINE_MS 4400); another records detected 42/44 with undetected=2 whose cause string is 'content mismatch', which is deterministic. Its line 599 states the deterministic mechanism outright: 'An additional overlap finding sorts ahead of it and displaces it.'",
+      "confound": "Those runs used the DEV profile at 100 percent ambient CPU, where per-comparison cost straddles the 4400ms deadline. Under the release profile the same corpus peaks at 1415ms (baseline) and 3068ms (after), so the timing component cannot fire at all.",
+      "correctMethod": "Compute flake rates PER UNIT and classify by cause string. A failure that occurs on 100 percent of its own unit's repeats is deterministic; pooling it with healthy units divides by the wrong denominator and disguises it as partial.",
+      "measuredRefutation": "5 repeats of exactly the two named fixtures produced detected 6/6, comparisons 40/40, exceededBudget 0, exit 0. Flip rate 0 percent, not 35 percent."
+    },
+    {
+      "claim": "The findings vector is built by three extend() calls at lines 474-476.",
+      "finding": "Understated. compare.rs has EIGHT extend() sites into a findings vector: 352, 438, 474, 475, 476, 482, 2362, 2368. The fragility surface was larger than described, which strengthens rather than weakens the case for a total order."
+    }
+  ],
+
+  "mechanism": {
+    "oneSentence": "Rust's sort_by is stable, so a comparator keyed only on (viewport, scenario_rank, target) left every finding pair agreeing on those three fields to be ordered by insertion sequence across eight separate extend() calls, making the reported first line a function of which detector ran first rather than of the findings themselves.",
+    "fragileNotRandom": "This is FRAGILITY, not randomness. A stable sort on identical input always yields identical output, so a non-total comparator can never by itself produce run-to-run variation. Confirmed by construction: compare.rs imports only BTreeMap/BTreeSet, contains no HashMap/HashSet and no rayon, so no randomized-hash iteration and no unordered parallelism exists to perturb the insertion sequence.",
+    "consequence": "Any manifest pinning an exact FIRST line is pinned to an artifact of detector emission order, so adding a detector reorders unrelated expectations."
+  },
+
+  "comparatorDiff": {
+    "file": "backtest/src/compare.rs",
+    "before": "findings.sort_by(|left, right| left.viewport.cmp(&right.viewport).then_with(|| scenario_rank(&left.scenario).cmp(&scenario_rank(&right.scenario))).then_with(|| left.target.cmp(&right.target)));",
+    "after": "findings.sort_by(finding_order);",
+    "newFunction": "fn finding_order(left: &Finding, right: &Finding) -> std::cmp::Ordering",
+    "keyOrder": ["viewport", "scenario_rank(scenario)", "target", "property", "source", "candidate", "key"],
+    "fieldsAdded": ["property", "source", "candidate", "key"],
+    "whyExtractedToNamedFn": "So the permutation test exercises the REAL comparator rather than a copy of it. A test asserting against a duplicated closure proves nothing about production ordering.",
+    "whyThoseFieldsAndNoMore": "Totality is required only up to OBSERVATIONAL equivalence. Finding (model.rs:320-335) renders key, line, viewport, scenario, target, property, source, candidate, severity, confidence, items; findings equal on the seven ordered keys render identically, so their relative order is unobservable. severity and confidence are functionally determined by property and add no discrimination. line is derived from the ordered fields.",
+    "whyNoSyntheticTiebreaker": "A synthetic unique index would be assigned in EMISSION order, so using it as a final tiebreak would reintroduce exactly the insertion-order dependence this change removes. It would make the sort look total while restoring the defect.",
+    "behaviourUnchanged": "Ordering only. No finding is added, removed, or altered; only the sequence changed. Lines 1-74 and every detector are untouched."
+  },
+
+  "permutationProof": {
+    "test": "compare::tests::finding_order_is_independent_of_insertion_order",
+    "method": "Sorts the SAME 6-finding vector from 12 distinct insertion orders (6 rotations x forward/reversed, so every element occupies the leading position in both directions) and asserts one identical sorted result. Sorting once cannot distinguish a total order from a lucky one.",
+    "probeDesign": "Every probe shares (viewport, scenario, target) with at least one other, so ALL of them tied under the previous comparator. Four share target 'Marker panel' and differ only in property/source/candidate.",
+    "permutationsChecked": 12,
+    "result": "PASS",
+    "instrumentValidated": true,
+    "validation": {
+      "method": "Disabled the four added keys, restoring the original three-key comparator, and re-ran.",
+      "result": "FAILED as required, on insertion order 0/reversed=true.",
+      "printedFailure": "left: [\"Marker panel|x|360|700\", \"Marker panel|width|288|200\", \"Marker panel|overlap|clear|2298.40px2\", \"Marker panel|x|360|648\", ...] right: [\"Marker panel|x|360|648\", \"Marker panel|overlap|clear|2298.40px2\", ...]",
+      "significance": "Reversing insertion order alone changes the FIRST element - precisely the displacement that breaks a manifest pinned to an exact first line. The probe was reverted immediately after."
+    },
+    "secondTest": {
+      "name": "compare::tests::properties_of_one_target_order_lexically",
+      "purpose": "Pins that 'overlap' precedes 'x' for one target, the ordering the current fixture expectations were frozen against, so a future reordering of the key fields fails in 0.00s instead of in a 130s qualification run.",
+      "result": "PASS"
+    }
+  },
+
+  "setStabilityAcrossRepeats": {
+    "question": "Was ordering the ONLY cause? The tie-break theory predicts an identical finding SET across repeats with only the order moving; a varying set SIZE would mean it is not the whole story.",
+    "command": "recreate-backtest.exe qualify --fixtures <scratch copy of frozen-offset + wrap-collision> --repeat 5",
+    "fixturesCopiedNotEdited": ["frozen-offset", "wrap-collision"],
+    "repeats": 5,
+    "result": { "detected": 6, "total": 6, "undetected": 0, "comparisons": 40, "passedComparisons": 40, "exceededBudget": 0, "exitCode": 0, "elapsedSeconds": 102.6 },
+    "whyThisProvesSetStability": "fixture.rs:389-392 requires every repeat's full report text AND normalized JSON to equal repeat 1's (stable_text / stable_json, seeded by get_or_insert at 422-423). Any variation at all - even a pure permutation with an identical set - fails the comparison. So 40/40 passing is machine proof that all 5 repeats produced BYTE-IDENTICAL reports: identical set, identical cardinality, identical sequence.",
+    "conclusion": "Set size did not vary. The finding set is stable. There was no nondeterminism to explain, so ordering was not 'the only cause' of a flake - there was no flake. The failures were deterministic first-line displacement and have since been resolved by fixture-author's refreeze."
+  },
+
+  "fallbackCheck": {
+    "question": "Could an ordering change alter whether the three findings.is_empty() fallbacks trigger?",
+    "answer": "No, and this is structural rather than empirical.",
+    "reasons": [
+      "All three fallbacks gate on findings.is_empty(). Emptiness is PERMUTATION-INVARIANT: reordering a vector cannot change whether it has zero elements, so no ordering change can flip any of these conditions.",
+      "All three run strictly BEFORE the sort. The fallbacks are at compare.rs:348 and 478 (inside the per-state helpers) and 532 (inside the layout helper); the sort is at line 75 in artifacts(), operating on the already-assembled vector. The sort is downstream of every fallback and cannot influence them."
+    ],
+    "crossedInTheseCases": false,
+    "evidence": "Neither named case can reach a fallback regardless, because both produce a non-empty finding set: frozen-offset/frozen-marker-left declares primaryFindings 2 and wrap-collision/frozen-run-width declares primaryFindings 5, and both were measured as detected with those counts across all 5 repeats.",
+    "fallbackSites": [
+      { "line": 348, "guard": "findings.is_empty() && !source.screenshot_sha256.is_empty() && source.screenshot_sha256 != candidate.screenshot_sha256", "emits": "compare_raster_tiles(.., true)" },
+      { "line": 478, "guard": "findings.is_empty() && !source.screenshot_sha256.is_empty() && source.screenshot_sha256 != candidate.screenshot_sha256", "emits": "compare_raster_tiles(.., false)" },
+      { "line": 532, "guard": "findings.is_empty() && has_unowned_change && fallback_to_viewport", "emits": "viewport_pixel_finding" }
+    ]
+  },
+
+  "qualification": {
+    "profile": "release",
+    "command": "cargo run --release -- qualify --output <scratch>/after.json",
+    "denominatorFirst": { "fixtures": 28, "mutants": 44, "floorFixtures": 28, "floorMutants": 44, "denominatorMoved": false },
+    "denominatorMethod": "Counted from backtest/fixtures/*/expected.json immediately before each run, because peers land fixtures continuously and a stale denominator permits a silent shrink.",
+    "before": {
+      "commit": "c58b4e8",
+      "detected": 44, "total": 44, "undetected": 0, "exceededBudget": 0,
+      "comparisons": 72, "passedComparisons": 72, "duplicateFindings": 0,
+      "p95Ms": 1051, "maximumMs": 1415, "exitCode": 0, "elapsedSeconds": 175.4
+    },
+    "after": {
+      "detected": 44, "total": 44, "undetected": 0, "exceededBudget": 0,
+      "comparisons": 72, "passedComparisons": 72, "duplicateFindings": 0,
+      "p95Ms": 1412, "p99Ms": 3068, "maximumMs": 3068, "exitCode": 0, "elapsedSeconds": 130.5
+    },
+    "scoreWithDenominator": "44/44 detected across 28/28 fixtures, before and after",
+    "interpretation": "UNCHANGED is the correct and required outcome. An ordering-only change must not alter WHICH findings are produced; had the score moved, that would have been evidence of a second unexplained effect rather than of success. The kill rate did not drop.",
+    "budget": "maximumMs 3068 < COMPARISON_DEADLINE_MS 4400, so every comparison stayed within budget with 1332ms of headroom; exceededBudgetMutations 0."
+  },
+
+  "regressionChecks": {
+    "unitSuite": { "command": "cargo test --bins", "result": "83 passed, 0 failed", "note": "81 before, plus my 2 new tests." },
+    "clippy": "The one sort_by_key warning is pre-existing at fixture.rs:474 (cost_lines.sort_by), not in changed code.",
+    "fmt": "cargo fmt --check reports pre-existing diffs across 9 files from peer churn (capture.rs, deadline.rs, fixture.rs, report.rs, sweep.rs, tests/stage_budget.rs, and compare.rs:2235/2378/2771). I fixed only the one diff I introduced (compare.rs:2518) and left every pre-existing diff untouched, since reformatting peers' in-flight files would corrupt their diffs.",
+    "deadlineConstants": { "COMPARISON_DEADLINE_MS": 4400, "WATCHDOG_MS": 4800, "changed": false }
+  },
+
+  "fixtureRecommendation": {
+    "site": "backtest/src/fixture.rs:384-392",
+    "agreeWithPeers": true,
+    "currentConditions": [
+      "report.findings.len() == mutation.primary_findings",
+      "finding == mutation.finding  (compares only the FIRST line)"
+    ],
+    "diagnosis": "Both assert a CEILING where the case intends only a FLOOR, turning the gate into a change-detector that reports 'something changed' without saying whether it improved or regressed. A mutation test's real claim is 'the declared fault is caught', which is satisfied by the expected finding being PRESENT. The exact-count condition forbids catching anything additional, so a strictly more sensitive detector fails; the first-line condition means any new finding sorting ahead displaces a still-correct detection into 'content mismatch'. The two interact multiplicatively: one bans new findings, the other bans their position.",
+    "evidence": "This is measured, not hypothetical. It is the mechanism recorded in budget-reachability.json:599, whose own failure text confirms the expected line REMAINED PRESENT in the lines array on every failing run.",
+    "recommendation": [
+      "Replace 'findings.len() == primary_findings' with 'findings.len() >= primary_findings', reinterpreting the manifest field from an exact count to a floor.",
+      "Replace 'finding == mutation.finding' with membership: require mutation.finding to appear among the emitted lines.",
+      "Keep unexpected_primary_findings as the bound on genuine noise - it already exists to govern exactly the extra findings the count condition was crudely suppressing.",
+      "KEEP exact everywhere it is cheap and meaningful: status, duplicates, budget, and especially the cross-repeat stable_text/stable_json equality at 389-392, which is the reproducibility proof and must not be relaxed."
+    ],
+    "cost": "Small and local: fixture.rs:384-392 plus the failure message at 401-421. No manifest schema change, since primary_findings is reinterpreted rather than renamed. Every currently-passing case still passes, because equality implies the floor and first-position implies membership.",
+    "safetyLost": "The ability to notice extra findings automatically. That is already delegated to unexpected_primary_findings, so the loss is nominal.",
+    "notImplemented": "Deliberately not implemented in this work item, as instructed. Stated as a recommendation with its cost only."
+  },
+
+  "notesForPeers": {
+    "toFixtureAuthor": "Your refreeze of frozen-offset and wrap-collision has landed and both now pin the overlap-first lines; the corpus is green at 44/44. Note your fixture tree is still UNCOMMITTED in the shared working tree (28 modified/deleted paths plus 20 untracked fixture directories, including the comprehensive -> per-feature split). I left every one of them untouched.",
+    "toFidelityLead": "The queued item was premised on a red HEAD and on nondeterminism. Neither held when measured. The ordering fix was still worth landing as a fragility fix, but it moved no number and was never going to; the real remaining defect is the over-specified gate at fixture.rs:384-392 described above."
+  }
+}
