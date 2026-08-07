@@ -1,0 +1,144 @@
+{
+  "recordedBy": "verification-gate",
+  "recordedAtUtc": "2026-08-07T14:05:00Z",
+  "purpose": "Attribute the generation stage's 6204ms median to its individual phases, so optimisation is directed by measurement rather than by guess. This record produces a profile and a finding only. No behaviour was changed and nothing was optimised.",
+  "profile": "release",
+  "profileNote": "All timings from a --release binary built in a detached worktree. A debug build inflates timings by roughly 2.5-3x and no debug number appears here.",
+  "gitCommitSha": "4c8ae61c88d5666dff4783ad1ad950c15c9f2a80",
+  "gitCommitShaShort": "4c8ae61",
+  "host": "Contended shared machine, CPU saturated throughout. Every timing is an upper bound. Host instability is itself a central finding of this record - see spreadClassification.",
+
+  "premiseCorrections": [
+    {
+      "claim": "Instruction 2: 'Instrument the generation pipeline so each major phase reports its own elapsed milliseconds.'",
+      "finding": "The pipeline was ALREADY instrumented at HEAD and the instrumentation was unused. An env-gated timer keyed on RECREATE_TIMING exists at four sites: src/generate/mod.rs:105, src/generate/project.rs:10, src/generate/css.rs:44 and src/generate/css_base.rs:59, emitting twelve cumulative phase markers to stderr. Zero lines of code were added or changed to produce this profile. The detached worktree at 4c8ae61 reports 'git status --porcelain' with 0 entries after the entire measurement series.",
+      "consequence": "The gap was never missing instrumentation, it was that nothing ever ran the instrumentation and no durable file recorded its output. This file closes that gap."
+    },
+    {
+      "claim": "Instruction 2 names seven phases: spec parsing, capture decode, style resolution, component recovery, JSX emission, CSS emission, file writing.",
+      "finding": "Three of the seven do not exist as separable boundaries in the code. (a) 'capture decode' is not a distinct phase: simd_json::serde::from_slice deserializes the captured spec directly into the Specification struct inside the parse step, so there is no decode stage to time. (b) 'JSX emission', 'CSS emission' and 'file writing' are not separable: src/generate/project.rs interleaves jsx::component() with fs::write() inside a single loop over components, and source_style_split/source_split write CSS in the same region, so all three share one boundary reported here as sources_emit_write. Splitting them would require editing generation code, which this task forbids.",
+      "consequence": "The real phase boundaries are reported instead of forcing measurements into an assumed decomposition. Where the assumed name maps cleanly it is given in namedPhaseMapping below."
+    },
+    {
+      "claim": "Methodology: 'the dominant cost may be parsing or writing rather than any generation logic'.",
+      "finding": "REFUTED by measurement. Parsing is 353ms (5.2%) and the entire emit-plus-write region is 1007ms (14.8%). Generation logic dominates: css_base alone is 4582ms, 67.2% of the total.",
+      "consequence": "The 25.6MB input size is a red herring for latency. Optimising I/O or the JSON reader cannot reach the target."
+    }
+  ],
+
+  "premiseConfirmations": {
+    "source": ".agents/fidelity/measurements/end-to-end.json",
+    "generationMedianMs": { "stated": 6204, "found": 6204, "confirmed": true },
+    "generationRunsMs": { "stated": [5670, 6204, 7551], "found": [5670, 6204, 7551], "confirmed": true },
+    "generationSpreadMs": { "stated": 1881, "found": 1881, "confirmed": true },
+    "note": "All three figures confirmed verbatim from the artifact. The assignment's premise is accurate."
+  },
+
+  "method": {
+    "command": "recreate generate --spec live-r15/spec.json --out <dir>  with RECREATE_TIMING=1",
+    "builtIn": "detached git worktree at 4c8ae61, private CARGO_TARGET_DIR, so the shared tree was never touched and another agent's uncommitted edit to src/generate/jsx_render.rs could not contaminate the profile",
+    "specBytes": 25657399,
+    "outputFiles": 148,
+    "outputJsx": 47,
+    "instrumentedRuns": 11,
+    "uninstrumentedControlRuns": 10,
+    "selfTimeNotStackTime": "Markers are cumulative from each scope's start. Phase self-time is the successive difference, and the nested css_* clock is rebased onto the project clock, so no phase double-counts another. css_base, css_responsive and css_states are children of the style-resolution region and are listed individually rather than nested."
+  },
+
+  "phaseTable": {
+    "unit": "milliseconds of self time",
+    "statistic": "median and worst observed over 11 instrumented runs. No percentile is reported: at this sample size a p95 degenerates toward the maximum, so median plus min plus worst is the honest summary, as the task requires.",
+    "rows": [
+      { "phase": "file_read",          "median": 21,   "min": 17,   "worst": 54,   "slowFastRatio": 3.18, "shareOfMedianTotal": "0.3%" },
+      { "phase": "spec_parse",         "median": 353,  "min": 325,  "worst": 408,  "slowFastRatio": 1.26, "shareOfMedianTotal": "5.2%" },
+      { "phase": "assets",             "median": 121,  "min": 106,  "worst": 242,  "slowFastRatio": 2.28, "shareOfMedianTotal": "1.8%" },
+      { "phase": "css_base",           "median": 4582, "min": 4145, "worst": 5464, "slowFastRatio": 1.32, "shareOfMedianTotal": "67.2%" },
+      { "phase": "css_responsive",     "median": 371,  "min": 272,  "worst": 770,  "slowFastRatio": 2.83, "shareOfMedianTotal": "5.4%" },
+      { "phase": "css_states",         "median": 60,   "min": 45,   "worst": 122,  "slowFastRatio": 2.71, "shareOfMedianTotal": "0.9%" },
+      { "phase": "css_tail",           "median": 11,   "min": 7,    "worst": 23,   "slowFastRatio": 3.29, "shareOfMedianTotal": "0.2%" },
+      { "phase": "components",         "median": 44,   "min": 30,   "worst": 108,  "slowFastRatio": 3.60, "shareOfMedianTotal": "0.6%" },
+      { "phase": "classes",            "median": 54,   "min": 42,   "worst": 104,  "slowFastRatio": 2.48, "shareOfMedianTotal": "0.8%" },
+      { "phase": "state_styles",       "median": 19,   "min": 14,   "worst": 31,   "slowFastRatio": 2.21, "shareOfMedianTotal": "0.3%" },
+      { "phase": "sources_emit_write", "median": 1007, "min": 654,  "worst": 2083, "slowFastRatio": 3.19, "shareOfMedianTotal": "14.8%" },
+      { "phase": "final_writes",       "median": 34,   "min": 27,   "worst": 59,   "slowFastRatio": 2.19, "shareOfMedianTotal": "0.5%" }
+    ],
+    "totalInstrumentedMs": { "median": 6821, "min": 6006, "worst": 9150, "slowFastRatio": 1.52 },
+    "accounting": {
+      "sumOfPhaseMedians": 6677,
+      "medianTotal": 6821,
+      "residualMs": 144,
+      "residualPercent": "2.1%",
+      "residualExplanation": "Medians of parts do not sum to the median of the whole, plus small unlabelled gaps between markers. At 2.1% no dominant cost is hiding in the unattributed remainder, which is what licenses the attribution above."
+    }
+  },
+
+  "namedPhaseMapping": {
+    "specParsing": { "maps": "file_read + spec_parse", "medianMs": 374, "share": "5.5%" },
+    "captureDecode": { "maps": null, "note": "No such phase exists. Deserialization into Specification happens inside spec_parse." },
+    "styleResolution": { "maps": "css_base + css_responsive + css_states + css_tail", "medianMs": 5024, "share": "73.7%" },
+    "componentRecovery": { "maps": "components", "medianMs": 44, "share": "0.6%" },
+    "jsxEmission": { "maps": "fused into sources_emit_write", "medianMs": null },
+    "cssEmission": { "maps": "fused into sources_emit_write", "medianMs": null },
+    "fileWriting": { "maps": "fused into sources_emit_write", "medianMs": null },
+    "fusedRegion": { "name": "sources_emit_write", "medianMs": 1007, "share": "14.8%", "note": "JSX emission, CSS emission and file writing share one boundary because project.rs interleaves them in a single loop. Separating them requires a code change this task forbids." }
+  },
+
+  "dominantPhase": {
+    "name": "css_base",
+    "file": "src/generate/css_base.rs",
+    "medianMs": 4582,
+    "shareOfMedianTotal": "67.2%",
+    "shareOfMedianTotalNumeric": 67.2,
+    "broaderRegion": { "name": "style resolution", "medianMs": 5024, "share": "73.7%" },
+    "statement": "css_base is the single phase with the largest median share at 67.2 percent of the 6821ms median generation total. The style-resolution region containing it is 73.7 percent. The next largest phase, sources_emit_write, is 14.8 percent - css_base is 4.6x larger than it.",
+    "consequenceForTheBudget": "end-to-end.json requires generation to fall from 6204ms to 3896ms, a 37 percent reduction, for the 5000ms end-to-end budget to be met. css_base alone measures 4582ms, which already exceeds 3896ms by 686ms. Therefore the target is unreachable unless css_base itself is reduced: even if every other phase in the pipeline became instantaneous, generation would still miss the budget. This is the actionable finding of the profile."
+  },
+
+  "spreadClassification": {
+    "question": "Is the 1881ms spread concentrated in one phase or spread across all of them?",
+    "answer": "Spread across all of them, and it is not a property of any phase. It is host noise.",
+    "evidence": [
+      "Ratio test: every phase shows a slow/fast ratio between 1.26 and 3.60. There is no isolated outlier. Under a genuine per-phase instability one ratio would stand far above the rest; instead the whole table is uniformly elevated, which is the signature of a shared multiplicative factor stretching all work proportionally.",
+      "The two largest phases are the two most STABLE in ratio terms: css_base 1.32 and spec_parse 1.26, both below the total's own ratio of 1.52. The variance therefore does not live in the phase that owns the mean. Attributing the mean and attributing the variance give different answers here.",
+      "The highest ratios belong to the smallest phases - components 3.60, css_tail 3.29, file_read 3.18 - where a few tens of milliseconds of scheduler jitter dominates a sub-60ms measurement. These are noise-floor artifacts, not costs.",
+      "Decisive control: ten uninstrumented runs of the identical binary on the identical spec, with no code change whatsoever, spanned 5796ms to 6695ms - a spread of 899ms. Instrumented runs spanned 6006ms to 9150ms. The same unchanged work therefore varies by roughly 1000-3000ms purely from host conditions, which brackets the 1881ms figure being investigated. A spread that appears without any change cannot be attributed to a phase.",
+      "Absolute swings are comparable across the two big phases rather than concentrated: css_base 1319ms and sources_emit_write 1429ms, both needed to account for the total 3144ms swing."
+    ],
+    "implication": "The 1881ms spread recorded in end-to-end.json should not be treated as an optimisation target. It is measurement environment, not code. The median is the number worth acting on; the spread is the reason to serialise timing runs on a quiet host before trusting any future improvement claim."
+  },
+
+  "instrumentationOverhead": {
+    "question": "Does RECREATE_TIMING perturb what it measures?",
+    "design": "Counterbalanced interleaved A/B, 4 pairs ON-first and 4 pairs OFF-first, to separate instrumentation cost from ordering and drift. The first uncounterbalanced attempt showed deltas of 522, 415, 323, 186ms declining monotonically with ON always first - a positional confound I introduced and then corrected rather than reported.",
+    "onRunsMs": [6098, 6584, 6620, 6742, 6820, 7298, 7375, 9227],
+    "offRunsMs": [5796, 6098, 6169, 6264, 6464, 6497, 6556, 6695],
+    "medianDeltaMs": 417,
+    "verdict": "Not separable from host noise at this sample size. One of four counterbalanced pairs reversed sign, and the ON range (3129ms) and OFF range (899ms) both exceed the 417ms median delta. Treat 417ms (about 6 percent) as an upper bound on overhead, not a measurement of it.",
+    "whyItDoesNotAffectTheConclusion": "Twelve env-gated eprintln calls cannot plausibly cost hundreds of milliseconds, and more importantly the reported quantity is each phase's SHARE within a single run. A constant per-run additive cost cancels out of a ratio, so the 67.2 percent attribution to css_base is robust to any overhead of this magnitude."
+  },
+
+  "parseSanityCheck": {
+    "measuredMs": 353,
+    "specBytes": 25657399,
+    "throughputMBps": 72.7,
+    "reader": "simd_json::serde::from_slice",
+    "expectation": "Published serde_json release benchmarks run 300-420 MB/s and simd-json is faster still, so a 25.6MB document has a theoretical floor near 60-90ms.",
+    "finding": "Parsing runs roughly 4-6x slower than its floor. That is a real inefficiency, but it is worth at most ~280ms against a 2308ms deficit, so it is not the fix. Recorded so a future reader does not rediscover it and mistake it for the answer.",
+    "action": "None. This task does not optimise."
+  },
+
+  "consoleErrors": {
+    "count": 0,
+    "evidence": "All 10 uninstrumented control runs produced 0 bytes on stderr and exit code 0. All 11 instrumented runs produced only RECREATE_TIMING marker lines on stderr and exit code 0. Every run emitted 148 files and 47 JSX components, identical to the count recorded in end-to-end.json, confirming the runs did the same work."
+  },
+
+  "protectedInvariants": {
+    "COMPARISON_DEADLINE_MS": 4400,
+    "WATCHDOG_MS": 4800,
+    "unchanged": true,
+    "qualificationSweepRun": false,
+    "qualificationSweepNote": "Deliberately not run. verification-gate owns that machine and the task directs these timing runs not to overlap with it. No qualification executed during this series.",
+    "generationCodeModified": false,
+    "sharedTreeFilesTouched": "none - only .agents/fidelity/measurements/generation-profile.json was written"
+  }
+}
