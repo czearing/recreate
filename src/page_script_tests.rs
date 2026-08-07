@@ -31,11 +31,16 @@ fn captures_attribute_sequences() {
     assert!(script.contains("interval_ms"));
 }
 
+/// The activation primitive lives in its own module, so this asserts the composed script
+/// actually carries it and that emission consults it. The behaviour itself is proven by
+/// `rule_activation_tests`, which executes this logic against a scripted CSSOM.
 #[test]
-fn keeps_only_active_media_children_as_direct_authored_rules() {
+fn keeps_only_active_conditional_children_as_direct_authored_rules() {
     let script = source();
-    assert!(script.contains("const activeMedia = !media || matchMedia(media).matches"));
-    assert!(script.contains("activeMedia || rule.type === CSSRule.MEDIA_RULE"));
+    assert!(!script.contains("__RULE_ACTIVATION__"));
+    assert!(script.contains("for (const entry of probes) entry.active = probeMatches(entry)"));
+    assert!(script.contains("active || rule.type === CSSRule.MEDIA_RULE"));
+    assert!(!script.contains("matchMedia(media).matches"));
 }
 
 #[test]

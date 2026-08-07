@@ -43,11 +43,11 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
         .await?;
     cdp.send(
         "Page.addScriptToEvaluateOnNewDocument",
-        json!({ "source": lifecycle_script::SOURCE }),
+        json!({ "source": lifecycle_script::source() }),
     )
     .await?;
     if args.reuse {
-        cdp.evaluate(lifecycle_script::SOURCE).await?;
+        cdp.evaluate(&lifecycle_script::source()).await?;
     }
     set_focus(&mut cdp).await?;
     set_motion(&mut cdp).await?;

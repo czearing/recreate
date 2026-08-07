@@ -16,6 +16,11 @@ fn with_sheets(template: &str, sheets: &[String]) -> String {
 }
 
 fn source_template() -> String {
+    template_with_assets(asset_script::SOURCE)
+}
+
+/// One template, so a capture stage added here cannot be missing from the asset-free form.
+fn template_with_assets(assets: &str) -> String {
     CAPTURE
         .replace("__STYLE_PROPERTIES__", style_contract::PROPERTIES)
         .replace(
@@ -23,29 +28,16 @@ fn source_template() -> String {
             style_contract::DIRECTIONAL_BORDERS,
         )
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
+        .replace("__RULE_ACTIVATION__", crate::rule_activation_script::SOURCE)
         .replace(
             "__ATTRIBUTE_SEQUENCE_CAPTURE__",
             crate::attribute_sequence_script::SOURCE,
         )
-        .replace("__ASSET_CAPTURE__", asset_script::SOURCE)
+        .replace("__ASSET_CAPTURE__", assets)
 }
 
 pub fn source_without_assets() -> String {
-    with_sheets(
-        &CAPTURE
-            .replace("__STYLE_PROPERTIES__", style_contract::PROPERTIES)
-            .replace(
-                "__DIRECTIONAL_BORDERS__",
-                style_contract::DIRECTIONAL_BORDERS,
-            )
-            .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
-            .replace(
-                "__ATTRIBUTE_SEQUENCE_CAPTURE__",
-                crate::attribute_sequence_script::SOURCE,
-            )
-            .replace("__ASSET_CAPTURE__", "const assetData = {};"),
-        &[],
-    )
+    with_sheets(&template_with_assets("const assetData = {};"), &[])
 }
 
 #[cfg(test)]

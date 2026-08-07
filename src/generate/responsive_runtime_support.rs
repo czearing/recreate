@@ -33,7 +33,7 @@ pub async fn connect(url: &str, endpoint: &str) -> Result<crate::cdp::Cdp> {
         .await?;
     cdp.send(
         "Page.addScriptToEvaluateOnNewDocument",
-        json!({"source": lifecycle_script::SOURCE}),
+        json!({"source": lifecycle_script::source()}),
     )
     .await?;
     Ok(cdp)

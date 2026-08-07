@@ -1,6 +1,7 @@
 (() => {
   if (window.__recreateLifecycleInstalled) return;
   window.__recreateLifecycleInstalled = true;
+__LIFECYCLE_SETTLE__
   window.__recreateLifecycleAnimations = [];
   window.__recreateAttributeMutations = [];
   window.__recreateLifecycleDone = false;
@@ -28,6 +29,7 @@
   };
   const record = () => {
     const start = performance.now();
+    let lastChange = start;
     const previous = new WeakMap();
     const tracks = new Map();
     const safe = new Set([
@@ -156,7 +158,8 @@
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
         const value = {
-          offset: Math.min(1, (now - start) / 12000),
+          offset: 0,
+          time: now - start,
           x: rect.x,
           y: rect.y,
           width: rect.width,
@@ -188,15 +191,23 @@
         const frames = tracks.get(path) || [before];
         frames.push(value);
         tracks.set(path, frames);
+        lastChange = now;
       }
       fullSample = false;
-      if (now - start < 12000) {
+      const busy = animations.length > 0 || loading;
+      if (!lifecycleSettled(now - start, now - lastChange, busy)) {
         requestAnimationFrame(sample);
       } else {
+        // Offsets are resolved against the duration the recorder actually ran for, so a
+        // window that closes early still describes the same motion at the same fractions.
+        const duration = Math.max(1, now - start);
         window.__recreateLifecycleAnimations = Array.from(tracks, ([target, keyframes]) => ({
           target,
-          keyframes,
-          timing: { duration: now - start, delay: 0, iterations: 1, easing: 'linear' }
+          keyframes: keyframes.map(({ time, ...frame }) => ({
+            ...frame,
+            offset: Math.min(1, Math.max(0, time / duration))
+          })),
+          timing: { duration, delay: 0, iterations: 1, easing: 'linear' }
         }));
         window.__recreateLifecycleDone = true;
       }

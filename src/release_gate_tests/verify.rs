@@ -32,7 +32,7 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
         .await?;
     cdp.send(
         "Page.addScriptToEvaluateOnNewDocument",
-        json!({"source": lifecycle_script::SOURCE}),
+        json!({"source": lifecycle_script::source()}),
     )
     .await?;
     let mut parity_mismatches = 0;

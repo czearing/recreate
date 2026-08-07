@@ -150,7 +150,7 @@ async fn validate_fixture(
         .await?;
     cdp.send(
         "Page.addScriptToEvaluateOnNewDocument",
-        json!({"source": lifecycle_script::SOURCE}),
+        json!({"source": lifecycle_script::source()}),
     )
     .await?;
     let mut states = Vec::new();

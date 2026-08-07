@@ -4,6 +4,7 @@ mod backtest;
 mod behavior;
 mod browser;
 mod capture;
+mod capture_settle;
 mod capture_startup;
 #[cfg(test)]
 mod capture_startup_tests;
@@ -22,11 +23,13 @@ mod interaction_script;
 mod interaction_surface;
 mod interactions_input;
 mod lifecycle_script;
+mod lifecycle_settle_script;
 mod model;
 mod page_script;
 mod probe;
 #[cfg(test)]
 mod release_gate_tests;
+mod rule_activation_script;
 mod serve;
 mod skill;
 mod state_style_script;

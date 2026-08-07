@@ -1,6 +1,6 @@
 pub const SOURCE: &str = r#"
-  const cssRules = [], stateStyles = [], stateStyleKeys = new Set();
-  const dynamicState = /:(hover|focus-visible|focus-within|focus|active)\b/g;
+__RULE_ACTIVATION__
+  const cssRules = [], cssRuleKeys = new Set(), stateStyles = [], stateStyleKeys = new Set();
   const stateShorthands = [
     'animation','background','border','border-color','border-radius','border-style',
     'border-width','flex','font','gap','grid','inset','margin','mask','padding',
@@ -29,67 +29,71 @@ pub const SOURCE: &str = r#"
       return `${name}: ${value}${priority ? ` !${priority}` : ''};`;
     }).filter(Boolean).join(' ');
   };
-  const visitRules = (rules, media = null) => {
-    for (const rule of Array.from(rules || [])) {
-      const activeMedia = !media || matchMedia(media).matches;
-      // A grouping rule's cssText already contains every rule nested inside it,
-      // and those are pushed again as the walk recurses, so capturing both
-      // duplicates the entire stylesheet body of layers, supports and scopes.
+  const captureStateStyles = (rule, media) => {
+    const reduced = media?.includes('prefers-reduced-motion') || false;
+    for (const selector of rule.selectorText.split(',')) {
+      const states = Array.from(selector.matchAll(dynamicStatePattern), match => match[0]);
+      const tail = selector.trim().split(/[\s>+~]+/).pop() || '';
+      const tailStates = Array.from(tail.matchAll(dynamicStatePattern), match => match[0]);
+      if (!states.length && !reduced) continue;
+      const base = selector.replace(dynamicStatePattern, '').trim();
+      const pseudoElement = base.match(/::[\w-]+$/)?.[0] || '';
+      const query = base.slice(0, base.length - pseudoElement.length);
+      if (!query) continue;
+      try {
+        for (const element of document.querySelectorAll(query)) {
+          const stateIndex = selector.search(/:(hover|focus-visible|focus-within|focus|active)\b/);
+          const ownerQuery = stateIndex >= 0 ? selector.slice(0, stateIndex).trim() : '';
+          let owner = null;
+          if (ownerQuery) {
+            try { owner = element.closest(ownerQuery); } catch {}
+          }
+          const scoped = owner && owner !== element;
+          const captured = {
+            target: pathOf(element),
+            scope: scoped ? pathOf(owner) : null,
+            pseudo: states.length || pseudoElement
+              ? `${scoped ? states[0] : states.join('')}${scoped ? '' : pseudoElement}`
+              : null,
+            target_pseudo: scoped && (tailStates.length || pseudoElement)
+              ? `${tailStates.join('')}${pseudoElement}`
+              : null,
+            media,
+            declarations: resolveVariables(rule.style, element)
+          };
+          const key = JSON.stringify(captured);
+          if (!stateStyleKeys.has(key)) {
+            stateStyleKeys.add(key);
+            stateStyles.push(captured);
+          }
+        }
+      } catch {}
+    }
+  };
+  // Authored rules are a set, not a cascade log: the caller re-supplies sheet text for
+  // sheets the page could not read, and which ones failed cannot be matched back to that
+  // text, so the same sheet is walked twice. Two identical rule texts cannot disagree, so
+  // recording a text once is the whole of the information either copy carries.
+  const recordRule = text => {
+    if (cssRuleKeys.has(text)) return;
+    cssRuleKeys.add(text);
+    cssRules.push(text);
+  };
+  const emitEntries = entries => {
+    for (const { rule, media, active } of entries) {
+      // A grouping rule's cssText already contains every rule nested inside it, and those
+      // are emitted as entries of their own, so recording both duplicates the entire
+      // stylesheet body of layers, supports and scopes. A media block is the exception:
+      // its condition is authored responsive intent no flattened copy can carry.
       const grouping =
         !rule.selectorText &&
         rule.cssRules &&
         rule.cssRules.length &&
         rule.type !== CSSRule.MEDIA_RULE;
-      if (!grouping && (activeMedia || rule.type === CSSRule.MEDIA_RULE)) {
-        cssRules.push(rule.cssText);
-      }
-      const reduced = media?.includes('prefers-reduced-motion') || false;
-      if (rule.selectorText && rule.style) {
-        for (const selector of rule.selectorText.split(',')) {
-          const states = Array.from(selector.matchAll(dynamicState), match => match[0]);
-          const tail = selector.trim().split(/[\s>+~]+/).pop() || '';
-          const tailStates = Array.from(tail.matchAll(dynamicState), match => match[0]);
-          if (!states.length && !reduced) continue;
-          const base = selector.replace(dynamicState, '').trim();
-          const pseudoElement = base.match(/::[\w-]+$/)?.[0] || '';
-          const query = base.slice(0, base.length - pseudoElement.length);
-          if (!query) continue;
-          try {
-            for (const element of document.querySelectorAll(query)) {
-              const stateIndex = selector.search(/:(hover|focus-visible|focus-within|focus|active)\b/);
-              const ownerQuery = stateIndex >= 0 ? selector.slice(0, stateIndex).trim() : '';
-              let owner = null;
-              if (ownerQuery) {
-                try { owner = element.closest(ownerQuery); } catch {}
-              }
-              const scoped = owner && owner !== element;
-              const captured = {
-                target: pathOf(element),
-                scope: scoped ? pathOf(owner) : null,
-                pseudo: states.length || pseudoElement
-                  ? `${scoped ? states[0] : states.join('')}${scoped ? '' : pseudoElement}`
-                  : null,
-                target_pseudo: scoped && (tailStates.length || pseudoElement)
-                  ? `${tailStates.join('')}${pseudoElement}`
-                  : null,
-                media,
-                declarations: resolveVariables(rule.style, element)
-              };
-              const key = JSON.stringify(captured);
-              if (!stateStyleKeys.has(key)) {
-                stateStyleKeys.add(key);
-                stateStyles.push(captured);
-              }
-            }
-          } catch {}
-        }
-      }
-      if (rule.cssRules) {
-        const nestedMedia = rule.type === CSSRule.MEDIA_RULE
-          ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
-          : media;
-        visitRules(rule.cssRules, nestedMedia);
-      }
+      if (!grouping && (active || rule.type === CSSRule.MEDIA_RULE)) recordRule(rule.cssText);
+      // A state rule is recorded whatever its condition, because the state it describes is
+      // entered later, under conditions that need not be the ones in force now.
+      if (rule.selectorText && rule.style) captureStateStyles(rule, media);
     }
   };
   // `document.styleSheets` excludes constructed sheets adopted by the document or by a
@@ -112,6 +116,7 @@ pub const SOURCE: &str = r#"
   };
   try { collectShadowSheets(document); } catch {}
   let unreadableSheets = 0;
+  const ruleEntries = [];
   const allSheets = [
     ...Array.from(document.styleSheets),
     ...Array.from(document.adoptedStyleSheets || []),
@@ -120,16 +125,19 @@ pub const SOURCE: &str = r#"
   for (const sheet of allSheets) {
     let rules = null;
     try { rules = sheet.cssRules; } catch { unreadableSheets++; continue; }
-    try { visitRules(rules); } catch { unreadableSheets++; }
+    try { ruleEntries.push(...flattenRules(rules)); } catch { unreadableSheets++; }
   }
   for (const text of authoredSheetTexts) {
     try {
       const sheet = new CSSStyleSheet();
       sheet.replaceSync(text);
-      visitRules(sheet.cssRules);
+      ruleEntries.push(...flattenRules(sheet.cssRules));
       if (unreadableSheets > 0) unreadableSheets--;
     } catch {}
   }
+  // Activation is resolved for every collected rule at once, so the whole walk costs one
+  // style recalculation rather than one per conditional rule.
+  emitEntries(activateEntries(ruleEntries));
 "#;
 
 #[cfg(test)]

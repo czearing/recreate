@@ -55,7 +55,7 @@ pub async fn state(
     .await?;
     cdp.send(
         "Page.addScriptToEvaluateOnNewDocument",
-        serde_json::json!({ "source": lifecycle_script::SOURCE }),
+        serde_json::json!({ "source": lifecycle_script::source() }),
     )
     .await?;
     cdp.send(
