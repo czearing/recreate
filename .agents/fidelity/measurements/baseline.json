@@ -1,5 +1,5 @@
 {
-  "medianP95Ms": 998,
+  "medianP95Ms": 1104,
   "consoleErrors": 0,
   "protectedFilesModifiedByMe": [],
   "discardedRun": {
@@ -15,11 +15,11 @@
     "undetected": 1,
     "whyDiscarded": "The fixture corpus was being edited by another agent during the run: comprehensive was mid-deletion and overlap-preserved had been created minutes earlier. Run 4 re-measured the settled tree with a fixture-tree hash pinned identical before and after and returned 38/38."
   },
-  "marginToBudgetMs": 3402,
+  "marginToBudgetMs": 3296,
   "reason": "The assigned change does not exist. git status --porcelain -- src is empty and src/generate/source_item_dedupe.rs is untouched at HEAD 28140cb, so work item 003 has not been implemented and there is nothing to compare. A missing output is a reject, not a gap to fill; writing the refactor myself would destroy the independence that makes this gate worth anything. The gate itself was built and validated and is ready for the change when it lands.",
   "verdict": "REJECT / RETURN - no subject to gate",
   "recordedBy": "verification-gate",
-  "medianP99Ms": 1406,
+  "medianP99Ms": 1504,
   "medianOfRuns": 3,
   "profile": "release",
   "denominatorFixtures": 26,
@@ -28,13 +28,13 @@
     "fixtures": 25,
     "mutants": 37
   },
-  "recordedAtUtc": "2026-08-07T12:18:08.9450207Z",
-  "marginOverSpreadRatio": 10.6,
-  "p95SpreadMs": 321,
+  "recordedAtUtc": "2026-08-07T12:44:03.1943991Z",
+  "marginOverSpreadRatio": 8.5,
+  "p95SpreadMs": 390,
   "denominatorMutants": 38,
   "comparisons": 64,
-  "medianMaximumMs": 1406,
-  "gitCommitShaAtMeasurement": "28140cb",
+  "medianMaximumMs": 1504,
+  "gitCommitShaAtMeasurement": "e91b566",
   "gateConstants": {
     "unchanged": true,
     "budgetReDerived": false,
@@ -149,6 +149,61 @@
       "action": "Returned to fidelity-developer unmeasured. Per the rule that a missing output is a reject and not a gap to fill, the refactor was not written by this agent."
     },
     "runtimeSeconds": 151,
+    "consoleErrors": 0
+  },
+  "endToEndScope": {
+    "file": ".agents/fidelity/measurements/end-to-end.json",
+    "generationP50Ms": 6204,
+    "comparisonMedianP95Ms": 1104,
+    "sumMs": 7308,
+    "budgetMs": 5000,
+    "underBudget": false,
+    "dominatingStage": "generation (84.9% of the sum; alone exceeds 5000ms by 1204ms)"
+  },
+  "latestComparisonRuns": {
+    "profile": "release",
+    "runs": [
+      {
+        "id": "qual2",
+        "total": 38,
+        "detected": 38,
+        "undetected": 0,
+        "exceededBudget": 0,
+        "comparisons": 64,
+        "p95Ms": 1004,
+        "p99Ms": 1278,
+        "maximumMs": 1278,
+        "genMs": 6441,
+        "exit": 0
+      },
+      {
+        "id": "qual3",
+        "total": 38,
+        "detected": 38,
+        "undetected": 0,
+        "exceededBudget": 0,
+        "comparisons": 64,
+        "p95Ms": 1104,
+        "p99Ms": 1504,
+        "maximumMs": 1504,
+        "genMs": 7363,
+        "exit": 0
+      },
+      {
+        "id": "qual4",
+        "total": 38,
+        "detected": 38,
+        "undetected": 0,
+        "exceededBudget": 0,
+        "comparisons": 64,
+        "p95Ms": 1394,
+        "p99Ms": 2277,
+        "maximumMs": 2277,
+        "genMs": 7040,
+        "exit": 0
+      }
+    ],
+    "corpusHashStable": true,
     "consoleErrors": 0
   }
 }

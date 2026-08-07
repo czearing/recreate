@@ -1,0 +1,134 @@
+{
+  "recordedBy": "verification-gate",
+  "recordedAtUtc": "2026-08-07T12:43:47.1245818Z",
+  "purpose": "Publish the generation stage and the comparison stage side by side, so the latency budget covers the scope the user actually named (the recreate tool AND the tests) rather than the tests alone.",
+  "profile": "release",
+  "profileNote": "Both stages measured from --release binaries. A debug build inflates comparison timings by roughly 2.5x (per-case ratio 1.38-4.31, median ~3.0), so a debug number is not comparable and is never mixed in here.",
+  "gitCommitSha": "e91b566ccd4dade0f5a22098445420b23ac72a8d",
+  "gitCommitShaShort": "e91b566",
+  "host": "CPU 100 percent throughout; contended shared machine. All numbers are contaminated upper bounds, which strengthens rather than weakens the over-budget verdict.",
+  "verdict": {
+    "sumUnder5000ms": false,
+    "measuredSumMs": 7308,
+    "budgetMs": 5000,
+    "exceedsBudgetByMs": 2308,
+    "dominatingStage": "generation",
+    "dominatingStageShareOfSum": "84.9%",
+    "plainStatement": "No. The sum is 7308ms against a 5000ms budget, over by 2308ms. Generation dominates at 84.9% of the total. Generation alone is 6204ms, which exceeds the entire 5000ms budget by 1204ms before a single comparison runs, so the budget would still be missed even if the comparison stage were instantaneous.",
+    "whatWouldBeRequired": "For the sum to reach 5000ms with the comparison stage at its measured 1104ms, generation must fall to 3896ms or less, a reduction of 37 percent."
+  },
+  "stages": {
+    "generation": {
+      "unit": "milliseconds per whole-spec run",
+      "command": "recreate generate --spec live-r15/spec.json --out <dir>",
+      "specBytes": 25657399,
+      "specSha256Prefix": "DA1CF13983465A26",
+      "outputFiles": 148,
+      "outputJsx": 47,
+      "runs": 3,
+      "warmRunsMs": [
+        6204,
+        7551,
+        5670
+      ],
+      "p50Ms": 6204,
+      "minMs": 5670,
+      "maxMs": 7551,
+      "spreadMs": 1881,
+      "p95Ms": null,
+      "p95Withheld": "Deliberately not reported. At n=3 a 95th percentile degenerates to the maximum, so publishing one would lend the authority of a percentile to a single unrepeated observation. maxMs 7551 is the worst observed value and is the honest substitute.",
+      "coldRunMs": 6596,
+      "warmUpEffect": "None detectable. The cold run at 6596ms falls between the warm runs 5670 and 7551, so first-run cost is inside the run-to-run spread and there is nothing to discard.",
+      "deadline": "none - unbounded by design, and left unbounded",
+      "consoleErrors": 0,
+      "stderrBytesPerRun": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "comparison": {
+      "unit": "milliseconds per comparison",
+      "command": "recreate-backtest qualify",
+      "runs": 3,
+      "comparisonsPerRun": 64,
+      "totalComparisonSamples": 192,
+      "p95PerRunMs": [
+        1004,
+        1104,
+        1394
+      ],
+      "p99PerRunMs": [
+        1278,
+        1504,
+        2277
+      ],
+      "medianP95Ms": 1104,
+      "medianP99Ms": 1504,
+      "maximumMs": 2277,
+      "p95SpreadMs": 390,
+      "budgetMs": 4400,
+      "withinBudget": true,
+      "marginToBudgetMs": 3296,
+      "denominatorMutants": 38,
+      "denominatorFixtures": 26,
+      "detected": 38,
+      "undetected": 0,
+      "exceededBudget": 0,
+      "failures": 0,
+      "duplicateFindings": 0,
+      "consoleErrors": 0,
+      "unchangedFromPriorRecord": "Comparison methodology unchanged; these are fresh measurements of the same stage on the same corpus."
+    }
+  },
+  "sumCaveat": "The two stages count different units - generation is one duration per run, comparison is a percentile over 64 samples per run - so 6204 + 1104 is not a percentile of anything. It is published because the budget was stated as a single number, and it is an upper bound rather than an expected total: percentiles are not additive, since the slowest generation run and the slowest comparison are not the same event. The verdict does not depend on the sum, because generation alone already exceeds 5000ms.",
+  "worstObservedSumMs": 9828,
+  "crossCheck": {
+    "method": "Generation timed two independent ways: an external process stopwatch, and the repository's own blackbox::run ProcessEvidence.elapsedMs surfaced by qualify --recreate-bin.",
+    "externalStopwatchMs": [
+      6204,
+      7551,
+      5670
+    ],
+    "repoNativeTimerMs": [
+      6441,
+      7363,
+      7040
+    ],
+    "agreement": "Both series overlap and share a median near 6.2-7.0s. No second clock was invented; the repo already records this duration and simply never persisted it.",
+    "allEightMeasurementsMs": [
+      5670,
+      6204,
+      6441,
+      6596,
+      7040,
+      7275,
+      7363,
+      7551
+    ],
+    "medianOfAllEight": 6818
+  },
+  "corpusStability": {
+    "method": "SHA256 over per-file SHA256 of every file under backtest/fixtures, sorted by path",
+    "hashBefore": "DC8DB78BFBA816BC",
+    "hashAfter": "DC8DB78BFBA816BC",
+    "fileCount": 116,
+    "stable": true
+  },
+  "discardedRun": {
+    "which": "combined run 1",
+    "exit": 1,
+    "reason": "recreate-backtest: IO error: An existing connection was forcibly closed by the remote host (os error 10054) - a CDP socket died on the contended host before generation ran, so genMs was 0. An infrastructure fault, not a measurement. Replaced by a fourth run."
+  },
+  "gateConstants": {
+    "COMPARISON_DEADLINE_MS": 4400,
+    "WATCHDOG_MS": 4800,
+    "unchanged": true,
+    "generationPlacedUnderComparisonDeadline": false
+  },
+  "premiseCorrections": [
+    "The assignment cites 'the current p95 of 946ms'. That value is superseded: it came from baseline.json at commit 917dd8c. The live baseline at the time of this run reads medianP95Ms 998, and this run measures 1104. 946 no longer describes the system.",
+    "The assignment states 'no durable measurement file records a generation duration at all'. The durable-file part is correct - no such file existed - but the capability was already present and unused: backtest/src/blackbox.rs ProcessEvidence records elapsed_ms with no deadline, and qualify exposes it via --recreate-bin/--recreate-arg. This record uses that native timer rather than adding one."
+  ]
+}
