@@ -1,14 +1,21 @@
+use super::component_identity;
 use crate::model::Node;
 use std::collections::BTreeMap;
 
+/// Names a component from the strongest identity the page still carries.
+///
+/// The source application's own component name survives in scoped class names,
+/// so that is preferred. A developer-authored test id is next, then the ARIA
+/// role, then tag and structure. Accessible-name text is deliberately absent:
+/// it is page copy, so it produced names like `CreateWeeklyPlanningAssistant`
+/// that describe one sentence on one page and mean nothing on the next.
 pub fn for_node(node: &Node, index: usize, nodes: &BTreeMap<String, &Node>) -> String {
     let value = node
         .attributes
-        .get("data-testid")
-        .or_else(|| node.attributes.get("aria-label"))
-        .or_else(|| node.attributes.get("role"))
-        .map(String::as_str)
-        .map(str::to_string)
+        .get("class")
+        .and_then(|class| component_identity::from_class(class))
+        .or_else(|| node.attributes.get("data-testid").cloned())
+        .or_else(|| node.attributes.get("role").cloned())
         .unwrap_or_else(|| structural_name(node, nodes));
     let name = value
         .split(|character: char| !character.is_alphanumeric())

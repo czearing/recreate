@@ -32,15 +32,8 @@ pub fn class_maps(
 }
 
 fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>) -> String {
-    let mut signature = responsive::base_declarations(
-        node,
-        None,
-        &state.viewport,
-        assets,
-        &state.css_rules,
-        false,
-        false,
-    );
+    let mut signature =
+        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules, false);
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
         signature.push_str(&responsive::output_declarations(&before.style, assets));
@@ -65,15 +58,7 @@ fn append_rule(
     }
     css.push_str(&format!(
         ".{class}{{{}}}\n",
-        responsive::base_declarations(
-            node,
-            None,
-            &state.viewport,
-            assets,
-            &state.css_rules,
-            false,
-            false,
-        )
+        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules, false,)
     ));
     if let Some(before) = &node.before {
         css.push_str(&format!(

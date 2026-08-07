@@ -88,6 +88,8 @@ pub struct NodeEvidence {
     pub order: usize,
     pub text: String,
     pub visible: bool,
+    #[serde(default)]
+    pub clipped: bool,
     pub x: f64,
     pub y: f64,
     pub width: f64,
@@ -179,11 +181,38 @@ pub struct State {
     pub scenario: String,
     pub nodes: BTreeMap<String, NodeEvidence>,
     pub active_element: String,
+    #[serde(default, skip_serializing_if = "StylesheetEvidence::is_empty")]
+    pub stylesheet: StylesheetEvidence,
     pub runtime: RuntimeEvidence,
     pub screenshot_sha256: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub raster_tiles: Vec<RasterTileEvidence>,
     pub capture_complete: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StylesheetEvidence {
+    /// Every distinct width-constrained media condition the page's own stylesheets
+    /// declare, whitespace removed so `(max-width: 480px)` and `(max-width:480px)`
+    /// compare equal.
+    #[serde(default)]
+    pub viewport_bands: Vec<String>,
+    /// Declarations holding a fractional pixel length. A measured `getBoundingClientRect`
+    /// readout frozen into a stylesheet almost always carries a fraction; authored design
+    /// values almost never do.
+    #[serde(default)]
+    pub frozen_pixels: usize,
+    /// `grid-template-columns: repeat(4, ...)` pins a column count sampled at one width.
+    /// The source almost always uses `repeat(auto-fill, ...)`, which reflows.
+    #[serde(default)]
+    pub frozen_tracks: usize,
+}
+
+impl StylesheetEvidence {
+    pub fn is_empty(&self) -> bool {
+        self.viewport_bands.is_empty() && self.frozen_pixels == 0 && self.frozen_tracks == 0
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -294,6 +323,7 @@ mod compatibility_tests {
             scenario: "base".into(),
             nodes: BTreeMap::from([("target".into(), NodeEvidence::default())]),
             active_element: String::new(),
+            stylesheet: Default::default(),
             runtime: RuntimeEvidence::default(),
             screenshot_sha256: String::new(),
             raster_tiles: Vec::new(),

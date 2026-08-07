@@ -5,7 +5,7 @@ use crate::{
     digest, instrumentation,
     model::{
         Action, Artifact, LayoutShiftEvidence, NodeEvidence, RasterTileEvidence, RuntimeEvidence,
-        SCHEMA_VERSION, Session, SourceIdentity, State, Viewport,
+        SCHEMA_VERSION, Session, SourceIdentity, State, StylesheetEvidence, Viewport,
     },
 };
 use anyhow::Context;
@@ -69,6 +69,54 @@ const EVIDENCE_SCRIPT: &str = r##"
   if (allElements.length > 5000) {
     throw new Error(`capture node limit exceeded: ${allElements.length}`);
   }
+  const styleCache = new Map();
+  const styleOf = (element) => {
+    let cached = styleCache.get(element);
+    if (!cached) {
+      cached = getComputedStyle(element);
+      styleCache.set(element, cached);
+    }
+    return cached;
+  };
+  const rectCache = new Map();
+  const rectOf = (element) => {
+    let cached = rectCache.get(element);
+    if (!cached) {
+      cached = element.getBoundingClientRect();
+      rectCache.set(element, cached);
+    }
+    return cached;
+  };
+  // An element clipped to nothing by an ancestor still reports its own full rect, its own
+  // colours and visibility, so every property-level signal looks healthy while the pixels
+  // never reach the screen. Intersect against each clipping ancestor to see it.
+  const clippedAway = (element) => {
+    const rect = rectOf(element);
+    if (styleOf(element).position === "fixed") return false;
+    let left = rect.left;
+    let top = rect.top;
+    let right = rect.right;
+    let bottom = rect.bottom;
+    let escaping = styleOf(element).position === "absolute";
+    for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
+      const style = styleOf(ancestor);
+      const clips =
+        style.overflow !== "visible" ||
+        style.overflowX !== "visible" ||
+        style.overflowY !== "visible";
+      if (clips && !escaping) {
+        const bounds = rectOf(ancestor);
+        left = Math.max(left, bounds.left);
+        top = Math.max(top, bounds.top);
+        right = Math.min(right, bounds.right);
+        bottom = Math.min(bottom, bounds.bottom);
+        if (right - left <= 0.5 || bottom - top <= 0.5) return true;
+      }
+      if (escaping && style.position !== "static") escaping = false;
+      if (style.position === "fixed") break;
+    }
+    return false;
+  };
   const eligible = allElements
     .filter((element) => !element.closest("head"))
     .filter((element) => !["SCRIPT", "STYLE", "NOSCRIPT"].includes(element.tagName));
@@ -78,8 +126,8 @@ const EVIDENCE_SCRIPT: &str = r##"
     if (Object.prototype.hasOwnProperty.call(nodes, id)) {
       throw new Error(`duplicate capture target: ${id}`);
     }
-    const style = getComputedStyle(element);
-    const rect = element.getBoundingClientRect();
+    const style = styleOf(element);
+    const rect = rectOf(element);
     const duration = style.animationName !== "none"
       ? Math.round((parseFloat(style.animationDuration) || 0) * (style.animationDuration.includes("ms") ? 1 : 1000))
       : null;
@@ -111,6 +159,7 @@ const EVIDENCE_SCRIPT: &str = r##"
       order: Math.max(0, Array.from(element.parentElement?.children || []).indexOf(element)),
       text: directText(element),
       visible: style.display !== "none" && style.visibility !== "hidden",
+      clipped: clippedAway(element),
       x: Math.round(rect.x * 100) / 100,
       y: Math.round(rect.y * 100) / 100,
       width: Math.round(rect.width * 100) / 100,
@@ -225,9 +274,49 @@ const EVIDENCE_SCRIPT: &str = r##"
   }
   const active = document.activeElement && document.activeElement !== document.body
     ? pathOf(document.activeElement) : "";
+  const viewportBands = new Set();
+  let frozenPixels = 0;
+  let frozenTracks = 0;
+  let ruleBudget = 400000;
+  let declarationBudget = 60000;
+  const scanRules = (rules, depth) => {
+    if (!rules || depth > 8) return;
+    for (const rule of rules) {
+      if (ruleBudget-- <= 0) return;
+      const condition = rule.conditionText || rule.media?.mediaText || "";
+      if (condition && /m(in|ax)-width|width\s*[<>]=/.test(condition)) {
+        viewportBands.add(condition.replace(/\s+/g, ""));
+      }
+      const style = rule.style;
+      if (style && declarationBudget > 0) {
+        declarationBudget -= style.length;
+        for (let index = 0; index < style.length; index += 1) {
+          const name = style[index];
+          const value = style.getPropertyValue(name);
+          if (/\d\.\d+px/.test(value)) frozenPixels += 1;
+          if (/^grid-template-(columns|rows)$/.test(name) && /repeat\(\s*\d/.test(value)) {
+            frozenTracks += 1;
+          }
+        }
+      }
+      if (rule.cssRules) scanRules(rule.cssRules, depth + 1);
+    }
+  };
+  for (const sheet of [...document.styleSheets, ...(document.adoptedStyleSheets || [])]) {
+    try {
+      scanRules(sheet.cssRules, 0);
+    } catch {
+      // A cross-origin stylesheet cannot be read; it is not generator output.
+    }
+  }
   return {
     nodes,
     activeElement: active,
+    stylesheet: {
+      viewportBands: Array.from(viewportBands).sort(),
+      frozenPixels,
+      frozenTracks
+    },
     runtime: globalThis.__backtest?.snapshot?.() || {
       consoleErrors: [],
       requests: [],
@@ -244,6 +333,8 @@ const EVIDENCE_SCRIPT: &str = r##"
 struct RawEvidence {
     nodes: BTreeMap<String, NodeEvidence>,
     active_element: String,
+    #[serde(default)]
+    stylesheet: StylesheetEvidence,
     runtime: RawRuntime,
 }
 
@@ -931,6 +1022,7 @@ async fn capture_state(
         scenario: scenario.into(),
         nodes,
         active_element: raw.active_element,
+        stylesheet: raw.stylesheet,
         runtime: RuntimeEvidence {
             console_errors: raw.runtime.console_errors,
             requests: raw.runtime.requests,

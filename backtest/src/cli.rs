@@ -193,6 +193,18 @@ impl Cli {
 }
 
 async fn run(args: Run) -> anyhow::Result<()> {
+    let profiles = [
+        args.output.join(".recreate-backtest-source-profile"),
+        args.output.join(".recreate-backtest-candidate-profile"),
+    ];
+    let result = run_comparison(args).await;
+    for profile in &profiles {
+        browser::terminate_recorded(profile);
+    }
+    result
+}
+
+async fn run_comparison(args: Run) -> anyhow::Result<()> {
     fs::create_dir_all(&args.output)?;
     let source_session = args.output.join("source.session.json");
     let source_artifact = args.output.join("source.artifact.json");
@@ -289,10 +301,20 @@ async fn compare_snapshot(
     if comparison.exists() {
         fs::remove_dir_all(&comparison)?;
     }
+    // The recreation artifact is only written when the comparison produces one, so a
+    // file left by an earlier run would otherwise sit next to a fresh source artifact
+    // and be read as if it described this run.
+    let recreation_artifact = output.join("recreation.artifact.json");
+    if recreation_artifact.exists() {
+        fs::remove_file(&recreation_artifact)?;
+    }
     let artifact: Artifact = read_json(source)?;
     let session: Session = read_json(candidate)?;
-    let value = fixture::compare_snapshot(&artifact, &session, focus.as_deref()).await;
+    let (value, actual) = fixture::compare_snapshot(&artifact, &session, focus.as_deref()).await;
     let _ = cancel_watchdog.send(());
+    if let Some(actual) = actual {
+        write_json(&recreation_artifact, &actual)?;
+    }
     finish_compare(&comparison, &value, allowances)
 }
 

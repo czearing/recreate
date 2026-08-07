@@ -105,7 +105,11 @@ pub async fn write_project(
     let (mount_source, mount_markup) = mount(has_root, &root_class)?;
     fs::write(
         source.join("styles.css"),
-        source_css::dedupe_exact(&styles.css),
+        format!(
+            "{}{}",
+            root_reset(specification),
+            source_css::dedupe_exact(&styles.css)
+        ),
     )?;
     let mut app_source = jsx::app(specification, &components, &state_classes, &assets);
     let mut state_source = jsx_states::interaction_states(
@@ -124,8 +128,14 @@ pub async fn write_project(
     {
         source_generated_blocks::write(&source.join("components"), &block_source)?;
     }
-    let generated_items =
-        super::source_item_dedupe::extract(&mut [&mut app_source, &mut state_source]);
+    let generated_items = super::source_item_dedupe::extract(
+        &mut [&mut app_source, &mut state_source],
+        &components
+            .items
+            .iter()
+            .map(|component| component.name.clone())
+            .collect(),
+    );
     if !generated_items.is_empty() {
         let directory = source.join("components").join("CollectionItems");
         fs::create_dir_all(&directory)?;
@@ -196,4 +206,34 @@ pub async fn write_project(
         r#"{"private":true,"scripts":{"dev":"vite","build":"vite build"},"dependencies":{"vite":"^8.1.0","react":"^19.2.0","react-dom":"^19.2.0"}}"#,
     )?;
     Ok(())
+}
+
+/// The user agent gives `body` an 8px margin and the generator emits no rule
+/// for the document roots, so a source that reset that margin loses 16px of
+/// width in the recreation. Replay the captured root box explicitly.
+fn root_reset(specification: &Specification) -> String {
+    let Some(state) = specification.states.first() else {
+        return String::new();
+    };
+    let mut css = String::new();
+    for tag in ["html", "body"] {
+        let Some(node) = state.nodes.iter().find(|node| node.tag == tag) else {
+            continue;
+        };
+        let declarations = ["margin", "padding"]
+            .into_iter()
+            .flat_map(|box_property| {
+                ["top", "right", "bottom", "left"].map(move |side| format!("{box_property}-{side}"))
+            })
+            .filter_map(|property| {
+                node.style
+                    .get(&property)
+                    .map(|value| format!("{property}:{value};"))
+            })
+            .collect::<String>();
+        if !declarations.is_empty() {
+            css.push_str(&format!("{tag}{{{declarations}}}\n"));
+        }
+    }
+    css
 }

@@ -34,6 +34,7 @@ pub fn normalize(
     }
     position::normalize_centering(styles, node, parent, viewport);
     position::normalize_fixed_edge(styles, node, viewport);
+    position::normalize_overconstrained_inset(styles, parent, viewport);
 }
 
 pub(super) fn fills_viewport(node: &Node, viewport: &Viewport) -> bool {

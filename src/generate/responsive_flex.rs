@@ -24,19 +24,6 @@ pub(in crate::generate) fn constrained_by_flex_chain(
     false
 }
 
-pub(super) fn intrinsic_flex_text(node: &Node, parent: Option<&Node>, text_parent: bool) -> bool {
-    let Some(parent) = parent else {
-        return false;
-    };
-    text_parent
-        && matches!(node.tag.as_str(), "div" | "p" | "span")
-        && node.style.get("display").map(String::as_str) == Some("block")
-        && node.style.get("position").map(String::as_str) == Some("static")
-        && parent.style.get("display").map(String::as_str) == Some("flex")
-        && parent.style.get("flex-direction").map(String::as_str) == Some("column")
-        && node.rect.width < parent.rect.width - 12.0
-}
-
 pub(super) fn fluid_flex_item(node: &Node, parent: Option<&Node>) -> bool {
     parent.is_some_and(|parent| {
         let flexible_main_axis = ["flex-grow", "flex-shrink"].into_iter().any(|name| {

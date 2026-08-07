@@ -32,6 +32,48 @@ impl Drop for BrowserProcess {
     }
 }
 
+fn pid_file(profile: &Path) -> PathBuf {
+    profile.with_file_name(format!(
+        "{}.pid",
+        profile
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("browser")
+    ))
+}
+
+/// A browser left behind by an interrupted run keeps ownership of its profile,
+/// so every later launch hands off to it and exits without ever exposing CDP.
+/// Recording the process makes that leak recoverable instead of permanent.
+pub fn terminate_recorded(profile: &Path) {
+    let file = pid_file(profile);
+    let Ok(text) = std::fs::read_to_string(&file) else {
+        return;
+    };
+    if let Ok(pid) = text.trim().parse::<u32>() {
+        terminate(pid);
+    }
+    let _ = std::fs::remove_file(file);
+}
+
+#[cfg(windows)]
+fn terminate(pid: u32) {
+    let _ = Command::new("taskkill")
+        .args(["/PID", &pid.to_string(), "/T", "/F"])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+}
+
+#[cfg(not(windows))]
+fn terminate(pid: u32) {
+    let _ = Command::new("kill")
+        .args(["-9", &pid.to_string()])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+}
+
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Target {
@@ -118,6 +160,7 @@ pub async fn launch(
     headful: bool,
 ) -> anyhow::Result<BrowserProcess> {
     std::fs::create_dir_all(profile)?;
+    terminate_recorded(profile);
     let profile = profile.canonicalize()?;
     let port = free_port()?;
     let endpoint = format!("http://127.0.0.1:{port}");
@@ -136,6 +179,7 @@ pub async fn launch(
         .arg("--disable-features=Translate,OptimizationHints,MediaRouter")
         .arg("--disable-popup-blocking")
         .arg("--allow-insecure-localhost")
+        .arg("--ignore-certificate-errors")
         .arg("--host-resolver-rules=MAP localhost 127.0.0.1")
         .arg("--hide-scrollbars")
         .arg("--mute-audio")
@@ -147,11 +191,12 @@ pub async fn launch(
         command.arg("--headless=new").arg("--disable-gpu");
     }
     #[cfg(windows)]
-    command.creation_flags(0x0000_0008 | 0x0000_0200);
+    command.creation_flags(0x0800_0000 | 0x0000_0200);
     command.arg("about:blank");
     let child = command
         .spawn()
         .with_context(|| format!("failed to launch {}", executable.display()))?;
+    let _ = std::fs::write(pid_file(&profile), child.id().to_string());
     let mut process = BrowserProcess {
         child: Some(child),
         endpoint,
@@ -159,20 +204,30 @@ pub async fn launch(
         profile,
     };
     let deadline = Deadline::new(10_000);
+    let mut launcher_exit = None;
     loop {
         match version(&process.endpoint).await {
             Ok(_) => return Ok(process),
             Err(error) => {
-                if let Some(status) = process
-                    .child
-                    .as_mut()
-                    .context("browser process handle is missing")?
-                    .try_wait()?
+                // A Windows browser launcher hands off to a detached process and
+                // exits before CDP is listening, so its exit is only fatal once
+                // the deadline has also passed.
+                if launcher_exit.is_none()
+                    && let Some(status) = process
+                        .child
+                        .as_mut()
+                        .context("browser process handle is missing")?
+                        .try_wait()?
                 {
-                    anyhow::bail!("browser exited before exposing CDP ({status})");
+                    launcher_exit = Some(status);
                 }
                 if deadline.remaining().is_err() {
-                    anyhow::bail!("browser did not expose CDP: {error}");
+                    match launcher_exit {
+                        Some(status) => {
+                            anyhow::bail!("browser exited before exposing CDP ({status})")
+                        }
+                        None => anyhow::bail!("browser did not expose CDP: {error}"),
+                    }
                 }
             }
         }

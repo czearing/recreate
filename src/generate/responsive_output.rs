@@ -1,4 +1,3 @@
-use super::flex::{fluid_flex_item, intrinsic_flex_text};
 use crate::{
     generate::css::declarations,
     model::{Node, Styles, Viewport},
@@ -12,7 +11,6 @@ pub fn base_declarations(
     assets: &BTreeMap<String, String>,
     css_rules: &[String],
     fluid_height: bool,
-    text_parent: bool,
 ) -> String {
     base_declarations_indexed(
         node,
@@ -21,7 +19,6 @@ pub fn base_declarations(
         assets,
         &super::super::authored_css::Index::new(css_rules),
         fluid_height,
-        text_parent,
     )
 }
 
@@ -32,23 +29,73 @@ pub fn base_declarations_indexed(
     assets: &BTreeMap<String, String>,
     css_rules: &super::super::authored_css::Index<'_>,
     fluid_height: bool,
-    text_parent: bool,
 ) -> String {
     let mut styles = node.style.clone();
-    let authored_width = super::super::authored_css::has_property_indexed(node, css_rules, "width");
     super::super::authored_css::normalize_indexed(&mut styles, node, css_rules);
-    if !authored_width
-        && (intrinsic_flex_text(node, parent, text_parent) || fluid_flex_item(node, parent))
-    {
-        styles.remove("width");
-    }
     if fluid_height {
         styles.remove("height");
     }
     super::super::inherited_styles::normalize_indexed(&mut styles, node, parent, css_rules);
     super::super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
+    // Last, so that nothing downstream can put a sampled pixel back.
+    remove_sampled_sizes(&mut styles, node, css_rules);
     normalize(&mut styles);
     declarations(&styles, assets)
+}
+
+/// The size properties, in the two axes plus the shorthands that resolve to them.
+const SIZE_PROPERTIES: [&str; 9] = [
+    "width",
+    "height",
+    "min-width",
+    "min-height",
+    "max-width",
+    "max-height",
+    "flex-basis",
+    "grid-template-columns",
+    "grid-template-rows",
+];
+
+/// A captured style is a *used* value: `getComputedStyle` resolves `width: 50%`,
+/// `flex: 1`, `clamp()`, `var()`, and `grid-template-columns: 1fr 2fr` to the pixels they
+/// happened to occupy at the captured viewport. Emitting that pixel back out produces a
+/// page that is correct at exactly one width and wrong everywhere else, and no amount of
+/// per-tag guessing at "is this pixel real?" can recover the authored intent, because the
+/// intent was destroyed before the emitter ever saw the value.
+///
+/// So the emitter never invents a size. If the source authored a size, the authored value
+/// is used verbatim; otherwise nothing is emitted and the box is sized by the same flow
+/// that sized it in the source. Replaced elements are the one exception, and not a
+/// per-site one: they have no in-flow content to reflow, and their box must be reserved
+/// or the page shifts as they load.
+fn remove_sampled_sizes(
+    styles: &mut Styles,
+    node: &Node,
+    css_rules: &super::super::authored_css::Index<'_>,
+) {
+    if is_replaced(node) {
+        return;
+    }
+    for property in SIZE_PROPERTIES {
+        if !styles
+            .get(property)
+            .is_some_and(|value| value.ends_with("px"))
+        {
+            continue;
+        }
+        match css_rules.authored_value(node, property) {
+            Some(authored) => styles.insert(property.into(), authored),
+            None => styles.remove(property),
+        };
+    }
+}
+
+/// Replaced elements are sized by their own intrinsic content rather than by the flow.
+fn is_replaced(node: &Node) -> bool {
+    matches!(
+        node.tag.as_str(),
+        "img" | "svg" | "video" | "canvas" | "iframe" | "embed" | "object"
+    )
 }
 
 pub fn output_declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
@@ -78,7 +125,10 @@ fn normalize(styles: &mut Styles) {
 
 fn remove_defaults(styles: &mut Styles) {
     for (name, value) in [
+        ("align-content", "normal"),
+        ("align-items", "normal"),
         ("align-self", "auto"),
+        ("backdrop-filter", "none"),
         ("background-blend-mode", "normal"),
         ("background-clip", "border-box"),
         ("background-image", "none"),
@@ -91,26 +141,39 @@ fn remove_defaults(styles: &mut Styles) {
         ("box-shadow", "none"),
         ("box-sizing", "content-box"),
         ("clip-path", "none"),
+        ("column-gap", "normal"),
         ("cursor", "auto"),
         ("filter", "none"),
+        ("flex-basis", "auto"),
+        ("flex-direction", "row"),
+        ("flex-grow", "0"),
+        ("flex-shrink", "1"),
+        ("flex-wrap", "nowrap"),
         ("float", "none"),
         ("font-feature-settings", "normal"),
         ("font-kerning", "auto"),
         ("font-stretch", "100%"),
         ("font-style", "normal"),
         ("font-variation-settings", "normal"),
+        ("grid-auto-columns", "auto"),
         ("grid-auto-flow", "row"),
+        ("grid-auto-rows", "auto"),
         ("grid-column-end", "auto"),
         ("grid-column-start", "auto"),
         ("grid-row-end", "auto"),
         ("grid-row-start", "auto"),
+        ("grid-template-areas", "none"),
         ("grid-template-columns", "none"),
         ("grid-template-rows", "none"),
+        ("justify-content", "normal"),
+        ("justify-items", "normal"),
         ("justify-self", "auto"),
+        ("mask-image", "none"),
         ("max-height", "none"),
         ("max-width", "none"),
         ("min-height", "auto"),
         ("min-width", "auto"),
+        ("mix-blend-mode", "normal"),
         ("object-fit", "fill"),
         ("object-position", "50% 50%"),
         ("opacity", "1"),
@@ -119,6 +182,10 @@ fn remove_defaults(styles: &mut Styles) {
         ("overflow-y", "visible"),
         ("pointer-events", "auto"),
         ("position", "static"),
+        ("row-gap", "normal"),
+        ("scrollbar-color", "auto"),
+        ("scrollbar-gutter", "auto"),
+        ("scrollbar-width", "auto"),
         ("table-layout", "auto"),
         ("text-rendering", "auto"),
         ("text-transform", "none"),
@@ -131,6 +198,16 @@ fn remove_defaults(styles: &mut Styles) {
     ] {
         if styles.get(name).is_some_and(|current| current == value) {
             styles.remove(name);
+        }
+    }
+    // An inset only does something on a positioned box, so on a static one the sampled
+    // `auto` is noise. On a positioned box it is load-bearing: it is what stops an
+    // authored offset from applying on the other axis.
+    if styles.get("position").is_none_or(|value| value == "static") {
+        for side in ["top", "right", "bottom", "left"] {
+            if styles.get(side).is_some_and(|value| value == "auto") {
+                styles.remove(side);
+            }
         }
     }
 }
@@ -155,6 +232,7 @@ fn output_property(name: &str) -> bool {
         "overflow",
         "padding",
         "scroll-",
+        "scrollbar-",
         "text-",
         "transform",
         "transition",
@@ -208,4 +286,34 @@ fn output_property(name: &str) -> bool {
                 | "width"
                 | "z-index"
         )
+}
+
+#[cfg(test)]
+mod scrollbar_output_tests {
+    use super::output_declarations;
+    use crate::model::Styles;
+    use std::collections::BTreeMap;
+
+    fn render(name: &str, value: &str) -> String {
+        let mut styles = Styles::new();
+        styles.insert(name.into(), value.into());
+        output_declarations(&styles, &BTreeMap::new())
+    }
+
+    /// A thin scrollbar is 10px where the default is 15px, so dropping it
+    /// makes every scroll container 5px narrower than the source.
+    #[test]
+    fn a_thin_scrollbar_reaches_the_stylesheet() {
+        assert!(render("scrollbar-width", "thin").contains("scrollbar-width"));
+        assert!(render("scrollbar-gutter", "stable").contains("scrollbar-gutter"));
+    }
+
+    /// Emitting the default shadows an inherited authored value and widens
+    /// the containers it was supposed to leave alone.
+    #[test]
+    fn a_default_scrollbar_is_not_emitted() {
+        assert!(!render("scrollbar-width", "auto").contains("scrollbar-width"));
+        assert!(!render("scrollbar-gutter", "auto").contains("scrollbar-gutter"));
+        assert!(!render("scrollbar-color", "auto").contains("scrollbar-color"));
+    }
 }

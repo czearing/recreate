@@ -139,6 +139,58 @@ fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
     attributes
 }
 
+/// An authored value that references a custom property is normally dropped in favour of the
+/// sampled computed value, which is safe for a colour or a spacing but destroys layout that
+/// responds to the viewport: a track list like
+/// `repeat(auto-fit, minmax(min(var(--min-col), 100%), 1fr))` samples as `230px 230px 230px
+/// 230px`, freezing the column count at every width. Custom properties are re-emitted per
+/// element with their resolved values, so such a value still resolves in the recreation and
+/// is kept instead.
+pub(super) fn fluid_authored_value(value: &str) -> bool {
+    ["repeat(", "minmax(", "auto-fit", "auto-fill", "clamp(", "%"]
+        .into_iter()
+        .any(|token| value.contains(token))
+}
+
+/// Authored stylesheets commonly size boxes with logical properties, while the
+/// generator reasons in physical ones. Without this mapping the authored value
+/// is discarded and a sampled pixel width freezes the layout.
+pub(super) fn physical_property(node: &Node, name: &str) -> &'static str {
+    let horizontal = node
+        .style
+        .get("writing-mode")
+        .is_none_or(|mode| mode.starts_with("horizontal"));
+    if !horizontal {
+        return "";
+    }
+    match name {
+        "inline-size" => "width",
+        "min-inline-size" => "min-width",
+        "max-inline-size" => "max-width",
+        "block-size" => "height",
+        "min-block-size" => "min-height",
+        "max-block-size" => "max-height",
+        _ => "",
+    }
+}
+
+/// A CSS-wide keyword is a cascade instruction, not a value. `all: unset` says
+/// "resolve every property as if nothing declared it", so it names no geometry and
+/// cannot be the authored source of a computed pixel.
+///
+/// Emitting one is worse than emitting nothing. The generator writes an element's
+/// resolved longhands into a base rule and its per-viewport rules into `@media`
+/// bands, and those bands come last. A band that emits `padding: unset` therefore
+/// overrides the base rule's correct `padding-left: 10px`, resetting it to zero.
+/// Dropping the keyword leaves the property undeclared in the band, so the base
+/// rule keeps winning — which is the behaviour the keyword was asking for anyway.
+pub(super) fn cascade_keyword(value: &str) -> bool {
+    matches!(
+        value.trim().trim_end_matches('}').trim(),
+        "unset" | "initial" | "inherit" | "revert" | "revert-layer"
+    )
+}
+
 pub(super) fn retained(name: &str) -> bool {
     matches!(
         name,

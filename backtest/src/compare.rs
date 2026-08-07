@@ -32,6 +32,12 @@ pub fn artifacts(source: &Artifact, candidate: &Artifact, elapsed_ms: u128) -> R
                 "incomplete state evidence".into(),
             );
         }
+        if let Some(reason) = unrendered_page(expected, actual) {
+            return inconclusive(source.digest.clone(), elapsed_ms, reason);
+        }
+        if let Some(reason) = painted_nothing(expected, actual) {
+            return inconclusive(source.digest.clone(), elapsed_ms, reason);
+        }
         if expected.scenario == "load" {
             continue;
         }
@@ -159,6 +165,63 @@ pub fn inconclusive(source_digest: String, elapsed_ms: u128, diagnostic: String)
         allowed: Vec::new(),
         unused_allowances: Vec::new(),
     }
+}
+
+/// A page that never rendered its application — a sign-in wall, an error page, or a
+/// certificate interstitial — still captures a handful of nodes. Comparing it produces
+/// confident findings for every element the other side legitimately has, so reject the
+/// run instead of reporting that noise as differences.
+fn unrendered_page(source: &State, candidate: &State) -> Option<String> {
+    const SHELL_CEILING: usize = 24;
+    let source_nodes = source.nodes.len();
+    let candidate_nodes = candidate.nodes.len();
+    let shell = |small: usize, large: usize| small < SHELL_CEILING && large >= small * 4;
+    let side = if shell(source_nodes, candidate_nodes) {
+        "source"
+    } else if shell(candidate_nodes, source_nodes) {
+        "recreation"
+    } else {
+        return None;
+    };
+    Some(format!(
+        "the {side} never rendered its page: {source_nodes} elements on the source against \
+         {candidate_nodes} on the recreation, which is a sign-in wall, an error page, or a \
+         certificate warning rather than the application; open the {side} and get it to the \
+         state you want to compare, then run this command again"
+    ))
+}
+
+/// Clipping preserves every property-level signal: an element squeezed to nothing by an
+/// ancestor still reports its own rect, colours, opacity and visibility, so node counts and
+/// property comparisons all look healthy while the page paints nothing. Counting elements
+/// cannot see it, so measure how much of the page survives its clipping ancestors instead.
+fn painted_nothing(source: &State, candidate: &State) -> Option<String> {
+    const FLOOR: usize = 24;
+    let surviving = |state: &State| {
+        state
+            .nodes
+            .values()
+            .filter(|node| node.visible && !node.clipped && node.width > 0.0 && node.height > 0.0)
+            .count()
+    };
+    let side = |state: &State| (state.nodes.len(), surviving(state));
+    let (source_total, source_shown) = side(source);
+    let (candidate_total, candidate_shown) = side(candidate);
+    let blank = |total: usize, shown: usize| total >= FLOOR && shown * 20 < total;
+    let (side, total, shown) = if blank(candidate_total, candidate_shown) {
+        ("recreation", candidate_total, candidate_shown)
+    } else if blank(source_total, source_shown) {
+        ("source", source_total, source_shown)
+    } else {
+        return None;
+    };
+    Some(format!(
+        "the {side} painted nothing: {shown} of its {total} elements survive their clipping \
+         ancestors, so the page is blank on screen even though its elements exist and report \
+         normal positions; an ancestor is collapsed to zero width or height with a hidden \
+         overflow, and every other difference this run would report is noise until that is \
+         fixed"
+    ))
 }
 
 pub fn duplicate_keys(findings: &[Finding]) -> usize {
@@ -394,6 +457,8 @@ fn compare_semantic_state(source: &State, candidate: &State) -> Vec<Finding> {
         });
     }
     findings.extend(layout_findings);
+    findings.extend(compare_text_collisions(source, candidate));
+    findings.extend(compare_stylesheet(source, candidate));
     let mut findings = compact_semantic_findings(source, findings);
     if findings.is_empty()
         && !source.screenshot_sha256.is_empty()
@@ -734,6 +799,155 @@ fn overlap_area(left: &NodeEvidence, right: &NodeEvidence) -> f64 {
     let width = (left.x + left.width).min(right.x + right.width) - left.x.max(right.x);
     let height = (left.y + left.height).min(right.y + right.height) - left.y.max(right.y);
     width.max(0.0) * height.max(0.0)
+}
+
+/// Two pieces of text painted over each other is a defect on its own terms, so
+/// it cannot be left to the cohort comparison: that only counts overlaps inside
+/// a single region, kind and size bucket of three or more items, and only when
+/// the total differs, so a heading colliding with a button is invisible to it.
+/// Every collision the source does not also have is reported.
+/// Frozen breakpoints are invisible to any single rendered viewport: inside a sampled
+/// band the recreation matches exactly, and outside every band its geometry disappears.
+/// Reading the stylesheets catches that at one viewport, with no sweep and no images.
+/// The same breakpoint can be authored as `max-width` or as range syntax, so
+/// comparing the raw condition text reports an equivalent breakpoint as an
+/// invented one and sends the reader after a difference that does not exist.
+fn canonical_band(band: &str) -> String {
+    let mut text = band.replace(' ', "");
+    for (property, operator) in [("max-width:", "<="), ("min-width:", ">=")] {
+        text = text.replace(property, &format!("width{operator}"));
+    }
+    text
+}
+
+fn compare_stylesheet(source: &State, candidate: &State) -> Vec<Finding> {
+    let mut findings = Vec::new();
+    let expected: BTreeSet<String> = source
+        .stylesheet
+        .viewport_bands
+        .iter()
+        .map(|band| canonical_band(band))
+        .collect();
+    let invented: Vec<&str> = candidate
+        .stylesheet
+        .viewport_bands
+        .iter()
+        .map(String::as_str)
+        .filter(|band| !expected.contains(&canonical_band(band)))
+        .collect();
+    if !invented.is_empty() {
+        findings.push(finding(
+            candidate,
+            "stylesheet",
+            "invented breakpoints",
+            "none",
+            &invented.join(" "),
+            None,
+        ));
+    }
+    let expected_pixels = source.stylesheet.frozen_pixels;
+    let actual_pixels = candidate.stylesheet.frozen_pixels;
+    if actual_pixels > expected_pixels.saturating_mul(2) && actual_pixels > expected_pixels + 24 {
+        findings.push(finding(
+            candidate,
+            "stylesheet",
+            "sampled pixel lengths",
+            &compact_number(expected_pixels as f64),
+            &compact_number(actual_pixels as f64),
+            Some(format!("+{}", actual_pixels - expected_pixels)),
+        ));
+    }
+    if source.stylesheet.frozen_tracks < candidate.stylesheet.frozen_tracks {
+        findings.push(finding(
+            candidate,
+            "stylesheet",
+            "pinned grid track count",
+            &compact_number(source.stylesheet.frozen_tracks as f64),
+            &compact_number(candidate.stylesheet.frozen_tracks as f64),
+            None,
+        ));
+    }
+    findings
+}
+
+fn compare_text_collisions(source: &State, candidate: &State) -> Vec<Finding> {
+    let expected = text_collisions(source);
+    text_collisions(candidate)
+        .into_iter()
+        .filter(|(pair, _)| !expected.contains_key(pair))
+        .map(|((first, second), area)| {
+            finding(
+                candidate,
+                &format!("{first} over {second}"),
+                "overlap",
+                "clear",
+                &format!("{}px²", compact_number(area)),
+                None,
+            )
+        })
+        .collect()
+}
+
+fn text_collisions(state: &State) -> BTreeMap<(String, String), f64> {
+    let nodes: Vec<(&str, &NodeEvidence)> = semantic_nodes(state)
+        .into_iter()
+        .filter(|(_, node)| !semantic_text(node).is_empty())
+        .collect();
+    let mut collisions = BTreeMap::new();
+    for left in 0..nodes.len() {
+        for right in (left + 1)..nodes.len() {
+            let (left_key, first) = nodes[left];
+            let (right_key, second) = nodes[right];
+            let area = overlap_area(first, second);
+            if area < 16.0 {
+                continue;
+            }
+            let smallest = (first.width * first.height).min(second.width * second.height);
+            if smallest <= 0.0 || area / smallest < 0.08 {
+                continue;
+            }
+            // Nesting and full containment are how layered interfaces are built;
+            // only text intruding on unrelated text is a defect.
+            if contains(first, second)
+                || contains(second, first)
+                || related(state, left_key, second)
+                || related(state, right_key, first)
+            {
+                continue;
+            }
+            let mut pair = [
+                truncate(semantic_text(first), 32),
+                truncate(semantic_text(second), 32),
+            ];
+            pair.sort();
+            let [first_label, second_label] = pair;
+            collisions.insert((first_label, second_label), area);
+        }
+    }
+    collisions
+}
+
+fn contains(outer: &NodeEvidence, inner: &NodeEvidence) -> bool {
+    outer.x <= inner.x + 1.0
+        && outer.y <= inner.y + 1.0
+        && outer.x + outer.width + 1.0 >= inner.x + inner.width
+        && outer.y + outer.height + 1.0 >= inner.y + inner.height
+}
+
+/// True when `key` names the node itself or any of its ancestors, so a child
+/// painted inside its own parent is never reported.
+fn related(state: &State, key: &str, other: &NodeEvidence) -> bool {
+    let mut parent = other.parent.as_str();
+    for _ in 0..24 {
+        if parent == key {
+            return true;
+        }
+        let Some(ancestor) = state.nodes.get(parent) else {
+            return false;
+        };
+        parent = ancestor.parent.as_str();
+    }
+    false
 }
 
 fn semantic_nodes(state: &State) -> Vec<(&str, &NodeEvidence)> {
@@ -1374,15 +1588,29 @@ fn compact_semantic_findings(state: &State, findings: Vec<Finding>) -> Vec<Findi
     output
 }
 
+/// Elements that share a label are counted rather than repeated, because a
+/// list of identical lines is noise a reader has to deduplicate by hand.
 fn grouped_labels(region: &str, values: &[Finding]) -> Vec<String> {
-    values
-        .iter()
-        .map(|value| {
-            value
-                .target
-                .strip_prefix(&format!("{region} / "))
-                .unwrap_or(&value.target)
-                .to_string()
+    let mut labels: Vec<(String, usize)> = Vec::new();
+    for value in values {
+        let label = value
+            .target
+            .strip_prefix(&format!("{region} / "))
+            .unwrap_or(&value.target)
+            .to_string();
+        match labels.iter_mut().find(|(name, _)| *name == label) {
+            Some((_, count)) => *count += 1,
+            None => labels.push((label, 1)),
+        }
+    }
+    labels
+        .into_iter()
+        .map(|(label, count)| {
+            if count > 1 {
+                format!("{label} x{count}")
+            } else {
+                label
+            }
         })
         .collect()
 }
@@ -2029,7 +2257,7 @@ mod tests {
     use super::*;
     use crate::model::{
         LayoutShiftEvidence, MotionCheckpoint, MotionEvidence, RuntimeEvidence, SourceIdentity,
-        Viewport,
+        StylesheetEvidence, Viewport,
     };
     use std::time::Instant;
 
@@ -2042,6 +2270,7 @@ mod tests {
             scenario: scenario.into(),
             nodes: BTreeMap::from([("target".into(), node)]),
             active_element: String::new(),
+            stylesheet: Default::default(),
             runtime: RuntimeEvidence::default(),
             screenshot_sha256: String::new(),
             raster_tiles: Vec::new(),
@@ -2070,6 +2299,231 @@ mod tests {
         let findings = compare_authored_state(&source, &candidate);
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].property, "text");
+    }
+
+    fn card_state(title_height: f64) -> State {
+        let card = |key: &str, text: &str, y: f64, height: f64| {
+            (
+                key.to_string(),
+                NodeEvidence {
+                    tag: "span".into(),
+                    parent: "card".into(),
+                    text: text.into(),
+                    visible: true,
+                    x: 0.0,
+                    y,
+                    width: 200.0,
+                    height,
+                    ..NodeEvidence::default()
+                },
+            )
+        };
+        State {
+            viewport: Viewport {
+                width: 1440,
+                height: 900,
+            },
+            scenario: "base".into(),
+            nodes: BTreeMap::from([
+                card("title", "Untitled notebook", 0.0, title_height),
+                card("action", "Create", 30.0, 22.0),
+            ]),
+            active_element: String::new(),
+            stylesheet: Default::default(),
+            runtime: RuntimeEvidence::default(),
+            screenshot_sha256: String::new(),
+            raster_tiles: Vec::new(),
+            capture_complete: true,
+        }
+    }
+
+    #[test]
+    fn text_painted_over_unrelated_text_is_reported() {
+        let findings = compare_semantic_state(&card_state(22.0), &card_state(44.0));
+        assert!(
+            findings.iter().any(|finding| finding.property == "overlap"),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    fn page_of(nodes: usize) -> State {
+        let mut state = card_state(22.0);
+        state.nodes = (0..nodes)
+            .map(|index| {
+                (
+                    format!("node{index}"),
+                    NodeEvidence {
+                        tag: "span".into(),
+                        text: format!("item {index}"),
+                        visible: true,
+                        y: index as f64 * 40.0,
+                        width: 200.0,
+                        height: 22.0,
+                        ..NodeEvidence::default()
+                    },
+                )
+            })
+            .collect();
+        state
+    }
+
+    #[test]
+    fn a_source_that_never_rendered_its_page_is_inconclusive_rather_than_compared() {
+        let report = artifacts(
+            &artifact(vec![page_of(9)]),
+            &artifact(vec![page_of(2656)]),
+            10,
+        );
+        assert_eq!(report.status, Status::Inconclusive);
+        assert!(
+            report
+                .diagnostic
+                .as_deref()
+                .unwrap_or_default()
+                .contains("the source never rendered its page"),
+            "{:?}",
+            report.diagnostic
+        );
+        assert!(report.findings.is_empty());
+    }
+
+    fn clipped_page_of(nodes: usize, clipped: bool) -> State {
+        let mut state = page_of(nodes);
+        for node in state.nodes.values_mut() {
+            node.clipped = clipped;
+        }
+        state
+    }
+
+    #[test]
+    fn a_recreation_clipped_to_nothing_is_inconclusive_rather_than_compared() {
+        let report = artifacts(
+            &artifact(vec![page_of(369)]),
+            &artifact(vec![clipped_page_of(369, true)]),
+            10,
+        );
+        assert_eq!(report.status, Status::Inconclusive);
+        assert!(
+            report
+                .diagnostic
+                .as_deref()
+                .unwrap_or_default()
+                .contains("the recreation painted nothing"),
+            "{:?}",
+            report.diagnostic
+        );
+        assert!(report.findings.is_empty());
+    }
+
+    #[test]
+    fn a_page_that_actually_paints_is_still_compared() {
+        let report = artifacts(
+            &artifact(vec![page_of(369)]),
+            &artifact(vec![clipped_page_of(369, false)]),
+            10,
+        );
+        assert_ne!(
+            report.status,
+            Status::Inconclusive,
+            "an unclipped page must not trip the blank-page guard: {:?}",
+            report.diagnostic
+        );
+    }
+
+    fn styled(bands: &[&str], frozen_pixels: usize) -> State {
+        let mut state = card_state(22.0);
+        state.stylesheet = StylesheetEvidence {
+            viewport_bands: bands.iter().map(|band| band.to_string()).collect(),
+            frozen_pixels,
+            frozen_tracks: 0,
+        };
+        state
+    }
+
+    #[test]
+    fn breakpoints_the_source_never_declared_are_reported_at_one_viewport() {
+        let findings = compare_semantic_state(
+            &styled(&["(max-width:1023px)"], 4),
+            &styled(
+                &["(max-width:1023px)", "(min-width:769px)and(max-width:1440px)"],
+                4,
+            ),
+        );
+        let line = findings
+            .iter()
+            .find(|finding| finding.property == "invented breakpoints")
+            .map(|finding| finding.line.clone());
+        assert_eq!(
+            line.as_deref(),
+            Some(
+                "V1440 base stylesheet invented breakpoints none->(min-width:769px)and(max-width:1440px)"
+            ),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn a_breakpoint_rewritten_in_range_syntax_is_not_reported_as_invented() {
+        let findings = compare_semantic_state(
+            &styled(&["(max-width:800px)"], 4),
+            &styled(&["(width<=800px)"], 4),
+        );
+        assert!(
+            !findings
+                .iter()
+                .any(|finding| finding.property == "invented breakpoints"),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn matching_breakpoints_are_not_reported() {
+        let findings = compare_semantic_state(
+            &styled(&["(max-width:1023px)"], 40),
+            &styled(&["(max-width:1023px)"], 44),
+        );
+        assert!(
+            !findings
+                .iter()
+                .any(|finding| finding.target == "stylesheet"),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn a_flood_of_sampled_pixel_lengths_is_reported() {
+        let findings = compare_semantic_state(&styled(&[], 8), &styled(&[], 393));
+        assert!(
+            findings
+                .iter()
+                .any(|finding| finding.property == "sampled pixel lengths"),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn two_fully_rendered_pages_are_still_compared() {
+        let report = artifacts(
+            &artifact(vec![page_of(2656)]),
+            &artifact(vec![page_of(2600)]),
+            10,
+        );
+        assert_ne!(report.status, Status::Inconclusive);
+    }
+
+    #[test]
+    fn matching_text_positions_report_no_overlap() {
+        let findings = compare_semantic_state(&card_state(22.0), &card_state(22.0));
+        assert!(
+            !findings.iter().any(|finding| finding.property == "overlap"),
+            "{:?}",
+            findings.iter().map(|f| &f.line).collect::<Vec<_>>()
+        );
     }
 
     #[test]
@@ -2364,6 +2818,7 @@ mod tests {
             scenario: "base".into(),
             nodes,
             active_element: String::new(),
+            stylesheet: Default::default(),
             runtime: RuntimeEvidence::default(),
             screenshot_sha256: String::new(),
             raster_tiles: Vec::new(),

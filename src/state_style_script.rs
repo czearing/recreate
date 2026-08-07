@@ -32,7 +32,15 @@ pub const SOURCE: &str = r#"
   const visitRules = (rules, media = null) => {
     for (const rule of Array.from(rules || [])) {
       const activeMedia = !media || matchMedia(media).matches;
-      if (activeMedia || rule.type === CSSRule.MEDIA_RULE) {
+      // A grouping rule's cssText already contains every rule nested inside it,
+      // and those are pushed again as the walk recurses, so capturing both
+      // duplicates the entire stylesheet body of layers, supports and scopes.
+      const grouping =
+        !rule.selectorText &&
+        rule.cssRules &&
+        rule.cssRules.length &&
+        rule.type !== CSSRule.MEDIA_RULE;
+      if (!grouping && (activeMedia || rule.type === CSSRule.MEDIA_RULE)) {
         cssRules.push(rule.cssText);
       }
       const reduced = media?.includes('prefers-reduced-motion') || false;
@@ -84,8 +92,43 @@ pub const SOURCE: &str = r#"
       }
     }
   };
-  for (const sheet of Array.from(document.styleSheets)) {
-    try { visitRules(sheet.cssRules); } catch {}
+  // `document.styleSheets` excludes constructed sheets adopted by the document or by a
+  // shadow root, and `cssRules` throws SecurityError on any cross-origin sheet served
+  // without CORS headers. Both cases previously vanished into an empty catch, leaving no
+  // authored rules and a page rebuilt entirely from sampled pixels. Unreadable sheets are
+  // counted and their text is supplied by the caller, which reads it through the browser's
+  // own CSSOM where CORS does not apply.
+  const shadowSheets = [];
+  const collectShadowSheets = root => {
+    for (const element of root.querySelectorAll('*')) {
+      const shadow = element.shadowRoot;
+      if (!shadow) continue;
+      for (const sheet of shadow.adoptedStyleSheets || []) shadowSheets.push(sheet);
+      for (const style of shadow.querySelectorAll('style')) {
+        if (style.sheet) shadowSheets.push(style.sheet);
+      }
+      collectShadowSheets(shadow);
+    }
+  };
+  try { collectShadowSheets(document); } catch {}
+  let unreadableSheets = 0;
+  const allSheets = [
+    ...Array.from(document.styleSheets),
+    ...Array.from(document.adoptedStyleSheets || []),
+    ...shadowSheets
+  ];
+  for (const sheet of allSheets) {
+    let rules = null;
+    try { rules = sheet.cssRules; } catch { unreadableSheets++; continue; }
+    try { visitRules(rules); } catch { unreadableSheets++; }
+  }
+  for (const text of authoredSheetTexts) {
+    try {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(text);
+      visitRules(sheet.cssRules);
+      if (unreadableSheets > 0) unreadableSheets--;
+    } catch {}
   }
 "#;
 

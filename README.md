@@ -16,7 +16,7 @@
 </div>
 
 Recreate captures one rendered page and turns it into local assets, responsive
-evidence, animation data, interaction states, and clean React components.
+evidence, animation data, and clean React components.
 
 ## Install
 
@@ -88,7 +88,7 @@ Recreate writes:
 - `acceptance.json`
 - source screenshots for each viewport
 - local assets and fonts
-- `react/` with semantic component folders, JSX, CSS, and interaction states
+- `react/` with semantic component folders, JSX, and CSS
 
 ## Verify
 

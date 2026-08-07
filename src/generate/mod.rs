@@ -6,8 +6,6 @@ pub(crate) mod animations;
 mod assets;
 mod assets_remote;
 mod attribute_sequences;
-#[cfg(test)]
-mod authenticated_interaction_runtime_tests;
 mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
@@ -23,18 +21,13 @@ mod css_paths;
 mod css_state_helpers;
 mod css_values;
 mod css_visual;
+mod component_identity;
 mod custom_properties;
 mod custom_property_diff;
 mod document;
 mod inherited_styles;
 mod initial_scroll;
-#[cfg(test)]
-mod interaction_geometry_support;
 mod interaction_labels;
-#[cfg(test)]
-mod interaction_runtime_support;
-#[cfg(test)]
-mod interaction_runtime_tests;
 mod interaction_scroll;
 mod interactions;
 mod jsx;
@@ -96,10 +89,6 @@ mod state_style_maps;
 mod state_styles;
 mod structural_css;
 #[cfg(test)]
-mod structural_runtime_support;
-#[cfg(test)]
-mod structural_runtime_tests;
-#[cfg(test)]
 mod structural_tests;
 mod structural_tree;
 #[cfg(test)]
@@ -120,7 +109,6 @@ pub async fn from_file(spec: &Path, out: &Path) -> Result<()> {
     let mut bytes = fs::read(spec)?;
     timing("read");
     let mut specification: Specification = simd_json::serde::from_slice(&mut bytes)?;
-    crate::interactions::deduplicate(&mut specification.interactions);
     crate::interaction_surface::normalize(&mut specification);
     timing("parse");
     write_project(&specification, out, &[]).await?;

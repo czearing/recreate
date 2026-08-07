@@ -1,5 +1,5 @@
 pub const PROPERTIES: &str = concat!(
-    "'display','position','float','inset','top','right','bottom','left','box-sizing',",
+    "'display','visibility','position','float','inset','top','right','bottom','left','box-sizing',",
     "'width','height','min-width','max-width','min-height','max-height',",
     "'margin','margin-top','margin-right','margin-bottom','margin-left',",
     "'padding','padding-top','padding-right','padding-bottom','padding-left',",
@@ -21,7 +21,19 @@ pub const PROPERTIES: &str = concat!(
     "'white-space','word-break',",
     "'object-fit','object-position','cursor','pointer-events','transition',",
     "'animation','mask-image','mask-size','mask-position','mask-repeat',",
-    "'mask-composite','clip-path'"
+    "'mask-composite','clip-path',",
+    // A property whose user-agent default differs from its CSS initial value cannot be
+    // left uncaptured: the recreation renders the same tag, so the user-agent default
+    // paints instead of the source's authored value. `textarea` is `resize: both` in
+    // every UA stylesheet while the initial value is `none`, which draws a resize grip
+    // the source does not have; links carry `text-decoration: underline`; and form
+    // controls carry `appearance: auto`.
+    "'resize','appearance','text-decoration-line','text-decoration-color',",
+    "'text-decoration-style','text-decoration-thickness','text-overflow',",
+    // `writing-mode` decides whether an authored `inline-size` means `width` or
+    // `height`. It is read when mapping logical properties to physical ones, so
+    // leaving it uncaptured made that mapping assume horizontal for every page.
+    "'writing-mode'"
 );
 
 pub const DIRECTIONAL_BORDERS: &str = concat!(

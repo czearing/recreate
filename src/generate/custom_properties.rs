@@ -90,7 +90,10 @@ fn render(properties: &[String], dictionary: &[String], values: &[u32]) -> Strin
         .filter(|(property, _)| property.starts_with("--"))
         .filter_map(|(property, value)| {
             let value = dictionary.get(*value as usize)?;
-            Some(format!("{property}:{value};"))
+            // An empty custom property is not a value. Emitting it makes every
+            // `var()` that reads it invalid at computed-value time, so the property
+            // silently falls back to its initial value instead of the authored one.
+            (!value.trim().is_empty()).then(|| format!("{property}:{value};"))
         })
         .collect()
 }

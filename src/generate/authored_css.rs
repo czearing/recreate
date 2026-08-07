@@ -56,13 +56,24 @@ pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
     {
         styles.remove("grid-template-rows");
     }
-    if !authored.contains_key("height")
-        && authored.contains_key("min-height")
-        && matches!(
-            authored.get("display").map(String::as_str),
-            Some("flex" | "inline-flex" | "grid" | "inline-grid")
-        )
-    {
+    // A box the author never gave a height to is sized by its content. Keeping
+    // the sampled pixel height freezes the line and row count observed at the
+    // capture viewport, so text or a row that wraps at a narrower width
+    // overflows the frozen box instead of growing it, and everything below it
+    // moves up. Two shapes qualify: a flex or grid container, and any box with
+    // an authored minimum height, which is a floor the author expects content
+    // to grow past. The authored map drops custom-property values, so ask the
+    // rules directly: a size written as a variable is still one the author meant.
+    let authored_height = ["height", "block-size"]
+        .iter()
+        .any(|property| rules.has_property(node, property));
+    let content_sized = matches!(
+        authored.get("display").map(String::as_str),
+        Some("flex" | "inline-flex" | "grid" | "inline-grid")
+    ) || ["min-height", "min-block-size"]
+        .iter()
+        .any(|property| rules.has_property(node, property));
+    if !authored_height && content_sized {
         styles.remove("height");
     }
     styles.extend(authored);

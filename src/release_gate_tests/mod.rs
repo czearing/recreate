@@ -2,7 +2,7 @@ mod runtime;
 mod support;
 mod verify;
 
-use crate::{browser, capture, cli::CaptureArgs, interactions, lifecycle_script};
+use crate::{browser, capture, cli::CaptureArgs, lifecycle_script};
 use serde::Serialize;
 use serde_json::json;
 use std::{
@@ -132,7 +132,6 @@ async fn validate_fixture(
         url: Some(url::Url::from_file_path(fixture).unwrap().to_string()),
         reuse: false,
         reload: false,
-        baseline_only: false,
         spec_only: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
@@ -151,20 +150,11 @@ async fn validate_fixture(
     for (index, (width, height)) in selected_viewports(VIEWPORTS).into_iter().enumerate() {
         states.push(capture::capture_state(&mut cdp, viewport(width, height), index == 0).await?);
     }
-    let captured_graph = if name == "interaction" {
-        interactions::capture_graph(&mut cdp, &states).await?
-    } else {
-        interactions::CapturedGraph {
-            interactions: Vec::new(),
-            transitions: Vec::new(),
-        }
-    };
     let capture_ms = capture_started.elapsed().as_millis();
     let source_errors = collect_errors(&mut cdp);
     drop(cdp);
     browser::close(&args.cdp_url, &source_target.id).await?;
-    let mut specification = specification(states, captured_graph.interactions);
-    specification.transitions = captured_graph.transitions;
+    let specification = specification(states, Vec::new());
     let directory = workspace.join(name);
     crate::generate::write_project(&specification, &directory, &[]).await?;
     assert!(crate::validate::validate(&specification, &directory)?.passed);

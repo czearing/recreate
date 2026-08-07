@@ -42,6 +42,21 @@ fn rewrites_longer_protocol_relative_asset_urls_first() {
 }
 
 #[test]
+fn rewrites_a_font_the_stylesheet_wrote_as_a_root_relative_path() {
+    let assets = BTreeMap::from([(
+        "https://local.example:8080/assets/font/segoe-sans.711fd8a54c.woff2".to_string(),
+        "/assets/segoe-sans.woff2".to_string(),
+    )]);
+    assert_eq!(
+        rewrite_rule_assets(
+            r#"src:url("/assets/font/segoe-sans.711fd8a54c.woff2") format("woff2")"#,
+            &assets,
+        ),
+        r#"src:url("/assets/segoe-sans.woff2") format("woff2")"#
+    );
+}
+
+#[test]
 fn directional_border_contract_is_captured_and_generated() {
     let mut styles = Styles::new();
     for side in ["top", "right", "bottom", "left"] {

@@ -1,37 +1,11 @@
 use crate::style_contract;
 
-const VISUAL_PROPERTIES: &str = concat!(
-    "'display','visibility','position','width','height','overflow','overflow-x','overflow-y',",
-    "'color','background-color','background-image','border','border-radius','box-shadow',",
-    "'outline-color','outline-style','outline-width','outline-offset','opacity','transform',",
-    "'font-family','font-size','font-weight','line-height','text-decoration','cursor',",
-    "'pointer-events','fill','stroke'"
-);
 const FULL_SELECTION: &str = "const selected = new Set(document.querySelectorAll('*'));";
-const VISUAL_SELECTION: &str = r#"
-  const selected = new Set([
-    document.documentElement, document.body,
-    ...document.querySelectorAll(
-      'a[href],button,input:not([type="hidden"]),select,textarea,summary,'+
-      '[role],[aria-label],[aria-haspopup],[aria-expanded],[aria-pressed],'+
-      '[aria-selected],[tabindex]:not([tabindex="-1"]),img,svg,canvas,video,audio'
-    )
-  ]);
-  for (const element of [...selected]) {
-    for (let parent = element.parentElement; parent; parent = parent.parentElement) {
-      selected.add(parent);
-    }
-  }
-"#;
 
 const SOURCE: &str = concat!("\n", include_str!("interaction_script.js"));
 
 pub fn source() -> String {
     render(style_contract::PROPERTIES, FULL_SELECTION)
-}
-
-pub fn visual_source() -> String {
-    render(VISUAL_PROPERTIES, VISUAL_SELECTION)
 }
 
 fn render(properties: &str, selection: &str) -> String {
@@ -52,7 +26,6 @@ mod tests {
         assert!(super::source().contains("new Set(document.querySelectorAll('*'))"));
         assert!(!super::SOURCE.contains("pin|delete|duplicate"));
         assert!(super::SOURCE.contains("scroll_left: element.scrollLeft"));
-        assert!(super::visual_source().contains("'outline-style'"));
     }
 
     #[test]

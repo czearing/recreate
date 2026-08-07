@@ -57,6 +57,7 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             .then_with(|| left_roots.cmp(right_roots))
     });
     candidates.truncate(80);
+    let candidates = merge_identical_bodies(candidates, &nodes, classes);
     let mut names = HashMap::new();
     let items: Vec<Component> = candidates
         .into_iter()
@@ -99,6 +100,45 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             .map(|node| (node.path.clone(), node))
             .collect(),
     }
+}
+
+/// Collapses candidate groups that would emit byte-identical components.
+///
+/// A generated component is a styled wrapper — its body is only the tag and the
+/// class, because children are always rendered at the call site. So two groups
+/// sharing a tag and a class are the same component by construction, however
+/// their subtrees differ, and emitting both produces pure duplication.
+fn merge_identical_bodies(
+    candidates: Vec<(Vec<String>, usize)>,
+    nodes: &BTreeMap<String, &Node>,
+    classes: &BTreeMap<String, String>,
+) -> Vec<(Vec<String>, usize)> {
+    let mut order: Vec<String> = Vec::new();
+    let mut merged: HashMap<String, (Vec<String>, usize)> = HashMap::new();
+    for (roots, size) in candidates {
+        let Some(root) = roots.first() else {
+            continue;
+        };
+        let Some(node) = nodes.get(root) else {
+            continue;
+        };
+        let body = format!(
+            "{}|{}",
+            node.tag,
+            classes.get(root).map(String::as_str).unwrap_or_default()
+        );
+        match merged.get_mut(&body) {
+            Some((existing, _)) => existing.extend(roots),
+            None => {
+                order.push(body.clone());
+                merged.insert(body, (roots, size));
+            }
+        }
+    }
+    order
+        .into_iter()
+        .filter_map(|body| merged.remove(&body))
+        .collect()
 }
 
 fn fingerprint(

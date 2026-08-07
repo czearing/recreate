@@ -13,7 +13,7 @@ use serde_json::json;
 mod read;
 
 pub(in crate::capture) use read::browser_cookies;
-pub use read::{read_interaction_state, read_state, read_visual_interaction_state};
+pub use read::{read_interaction_state, read_state};
 
 pub async fn capture_state(
     cdp: &mut crate::cdp::Cdp,

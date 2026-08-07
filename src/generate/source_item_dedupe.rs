@@ -1,12 +1,12 @@
 use super::source_dedupe_support::{jsx_blocks, normalize, replace_ranges};
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 pub struct GeneratedItem {
     pub name: String,
     pub source: String,
 }
 
-pub fn extract(sources: &mut [&mut String]) -> Vec<GeneratedItem> {
+pub fn extract(sources: &mut [&mut String], reserved: &BTreeSet<String>) -> Vec<GeneratedItem> {
     let entity = super::source_item_names::collection_entity(sources);
     let mut groups = HashMap::<String, Vec<Occurrence>>::new();
     for (source_index, source) in sources.iter().enumerate() {
@@ -56,11 +56,15 @@ pub fn extract(sources: &mut [&mut String]) -> Vec<GeneratedItem> {
         );
         let variant = names.entry(base.clone()).or_default();
         *variant += 1;
-        let name = if *variant == 1 {
-            base
+        let mut name = if *variant == 1 {
+            base.clone()
         } else {
             format!("{base}Variant{variant}")
         };
+        while reserved.contains(&name) {
+            *variant += 1;
+            name = format!("{base}Variant{variant}");
+        }
         let fields =
             super::source_item_names::prop_fields(&signature, &available[0].values, &varying);
         let props = super::source_item_names::prop_names(&signature, &available[0].values, &fields);

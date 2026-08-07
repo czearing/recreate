@@ -188,6 +188,10 @@ fn launch(endpoint: &str) -> Result<()> {
             format!("--user-data-dir={}", profile.display()),
             "--no-first-run".into(),
             "--no-default-browser-check".into(),
+            // A development server usually serves an untrusted certificate. Rendering the
+            // browser's own privacy interstitial instead of the page under test compares
+            // nothing, so trust what the operator asked us to open.
+            "--ignore-certificate-errors".into(),
             "--force-device-scale-factor=1".into(),
             "--new-window".into(),
             "about:blank".into(),

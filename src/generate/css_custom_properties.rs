@@ -36,7 +36,13 @@ fn append_values(rules: &[String], references: BTreeSet<String>, css: &mut Strin
             .filter_map(|rule| value(rule, &name))
             .collect::<BTreeSet<_>>();
         if values.len() == 1 {
-            declarations.push_str(&format!("{name}:{};", values.into_iter().next().unwrap()));
+            let value = values.into_iter().next().unwrap();
+            // An empty custom property is not a value: `var()` reading it produces an
+            // empty substitution, making the declaration invalid at computed-value time
+            // so the property silently falls back to its initial value.
+            if !value.trim().is_empty() {
+                declarations.push_str(&format!("{name}:{value};"));
+            }
         }
     }
     if !declarations.is_empty() {

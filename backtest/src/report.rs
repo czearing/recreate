@@ -84,8 +84,14 @@ fn body(finding: &Finding) -> String {
         return line.to_string();
     }
     let joined = finding.items.join(", ");
+    let strip = |head: &str| {
+        head.trim_end()
+            .trim_end_matches(':')
+            .trim_end()
+            .to_string()
+    };
     line.strip_suffix(&format!("{joined})"))
-        .map(|head| format!("{head})"))
+        .map(|head| format!("{})", strip(head)))
         .or_else(|| line.strip_suffix(&joined).map(str::to_string))
         .unwrap_or_else(|| line.to_string())
         .trim_end()

@@ -345,7 +345,7 @@ pub async fn compare_snapshot(
     artifact: &Artifact,
     session: &Session,
     focus: Option<&str>,
-) -> Report {
+) -> (Report, Option<Artifact>) {
     let started = Instant::now();
     let deadline = Deadline::new(COMPARISON_DEADLINE_MS);
     let target = match deadline
@@ -357,24 +357,36 @@ pub async fn compare_snapshot(
     {
         Ok(target) => target,
         Err(error) => {
-            return compare::preparation_required_session(
-                artifact.digest.clone(),
-                started.elapsed().as_millis(),
-                error.to_string(),
+            return (
+                compare::preparation_required_session(
+                    artifact.digest.clone(),
+                    started.elapsed().as_millis(),
+                    error.to_string(),
+                ),
+                None,
             );
         }
     };
     match capture::compare_candidate_snapshot(session, target, deadline).await {
-        Ok(actual) => match focus {
-            Some(focus) => {
-                compare::artifacts_focused(artifact, &actual, started.elapsed().as_millis(), focus)
-            }
-            None => compare::artifacts(artifact, &actual, started.elapsed().as_millis()),
-        },
-        Err(error) => compare::inconclusive(
-            artifact.digest.clone(),
-            started.elapsed().as_millis(),
-            error.to_string(),
+        Ok(actual) => {
+            let report = match focus {
+                Some(focus) => compare::artifacts_focused(
+                    artifact,
+                    &actual,
+                    started.elapsed().as_millis(),
+                    focus,
+                ),
+                None => compare::artifacts(artifact, &actual, started.elapsed().as_millis()),
+            };
+            (report, Some(actual))
+        }
+        Err(error) => (
+            compare::inconclusive(
+                artifact.digest.clone(),
+                started.elapsed().as_millis(),
+                error.to_string(),
+            ),
+            None,
         ),
     }
 }

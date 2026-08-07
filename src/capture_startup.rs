@@ -30,7 +30,8 @@ async fn wait_ready_mode(
         };
         let source = format!(
             r#"(() => {{
-              const visible = [];
+              let shownCount = 0;
+              let digest = 0;
               let blocking = false;
               for (const element of document.querySelectorAll('*')) {{
                 const rect = element.getBoundingClientRect();
@@ -38,12 +39,16 @@ async fn wait_ready_mode(
                 const shown = rect.width > 0 && rect.height > 0 &&
                   style.display !== 'none' && style.visibility !== 'hidden' &&
                   Number(style.opacity || 1) > 0;
-                if (shown && visible.length < 80) {{
-                  visible.push([
+                if (shown) {{
+                  const part = [
                     element.tagName, Math.round(rect.x), Math.round(rect.y),
                     Math.round(rect.width), Math.round(rect.height),
                     style.display
-                  ].join(':'));
+                  ].join(':');
+                  for (let index = 0; index < part.length; index++) {{
+                    digest = (Math.imul(digest, 31) + part.charCodeAt(index)) | 0;
+                  }}
+                  shownCount++;
                 }}
                 const area = rect.width * rect.height;
                 const z = Number(style.zIndex);
@@ -57,7 +62,7 @@ async fn wait_ready_mode(
                 document.fonts.status === 'loaded' &&
                 {lifecycle}
                 (window.__recreatePendingRequests || 0) === 0,
-              signature: visible.join('|'),
+              signature: shownCount ? `${{shownCount}}:${{digest}}` : '',
               blocking
             }};
             }})()"#
@@ -66,21 +71,34 @@ async fn wait_ready_mode(
         let signature = value["signature"].as_str().unwrap_or_default();
         let startup_complete = !wait_for_startup || value["blocking"].as_bool() != Some(true);
         let ready = value["ready"].as_bool() == Some(true) && !signature.is_empty();
-        if ready && startup_complete && started.elapsed() >= Duration::from_secs(1) {
-            return Ok(());
-        }
         if ready && startup_complete && signature == previous {
             stable += 1;
-            if stable >= 3 {
-                return Ok(());
-            }
         } else {
             stable = 0;
+        }
+        if ready && startup_complete && capture_ready(started.elapsed(), stable) {
+            return Ok(());
         }
         previous = signature.to_string();
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
     anyhow::bail!("page did not become stable")
+}
+
+/// The repeated geometry readings a ready page must record before capture.
+const STABLE_POLLS: u32 = 2;
+/// The longest a ready page waits for its geometry to stop changing.
+const STABLE_CEILING_MS: u64 = 8_000;
+
+/// Decides when a ready page may be captured.
+///
+/// Layout keeps changing after the last resource resolves, so readiness alone
+/// snapshots a half-laid-out page. Capture waits for the geometry signature to
+/// repeat. The ceiling releases a page whose geometry never repeats, such as
+/// one running a looping animation.
+pub(crate) fn capture_ready(elapsed: Duration, stable: u32) -> bool {
+    let floor = elapsed >= Duration::from_secs(1);
+    (stable >= STABLE_POLLS && floor) || elapsed >= Duration::from_millis(STABLE_CEILING_MS)
 }
 
 pub fn ensure_settled(state: &PageState) -> Result<()> {
@@ -189,4 +207,40 @@ pub fn startup_nodes(state: &PageState, animation_targets: &[String]) -> Vec<cra
             node
         })
         .collect()
+}
+
+#[cfg(test)]
+mod capture_ready_tests {
+    use super::{STABLE_CEILING_MS, STABLE_POLLS, capture_ready};
+    use std::time::Duration;
+
+    fn ms(value: u64) -> Duration {
+        Duration::from_millis(value)
+    }
+
+    #[test]
+    fn a_ready_page_whose_layout_still_moves_is_not_captured() {
+        assert!(
+            !capture_ready(ms(1_200), 0),
+            "got true: polls={} ceiling={}",
+            STABLE_POLLS,
+            STABLE_CEILING_MS
+        );
+        assert!(!capture_ready(ms(3_000), 1));
+    }
+
+    #[test]
+    fn a_ready_page_with_repeated_geometry_is_captured() {
+        assert!(capture_ready(ms(1_200), 2));
+    }
+
+    #[test]
+    fn the_one_second_floor_still_applies() {
+        assert!(!capture_ready(ms(900), 5));
+    }
+
+    #[test]
+    fn a_page_that_never_repeats_is_released_at_the_ceiling() {
+        assert!(capture_ready(ms(STABLE_CEILING_MS), 0));
+    }
 }

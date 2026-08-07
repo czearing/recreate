@@ -68,20 +68,6 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         .map(|node| (node.path.as_str(), node))
         .collect();
     let children = super::css_visual::child_nodes(&base.nodes);
-    let text_parents: HashSet<_> = base
-        .nodes
-        .iter()
-        .filter(|node| node.tag == "#text" && !node.text.trim().is_empty())
-        .filter_map(|node| node.parent.clone())
-        .filter(|path| {
-            nodes.get(path.as_str()).is_none_or(|node| {
-                !matches!(
-                    node.tag.as_str(),
-                    "button" | "input" | "select" | "textarea"
-                )
-            })
-        })
-        .collect();
     for node in &base.nodes {
         if node.tag == "#text" {
             continue;
@@ -133,7 +119,6 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
                 assets,
                 &authored_rules,
                 fluid_heights.contains(&node.path),
-                text_parents.contains(&node.path),
             );
             super::css_base_style::append_indexed(
                 node,

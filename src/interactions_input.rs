@@ -5,26 +5,6 @@ pub fn text_entry(tag: &str) -> bool {
     tag.eq_ignore_ascii_case("textarea") || tag.eq_ignore_ascii_case("input")
 }
 
-pub async fn focused_path(cdp: &mut Cdp) -> Result<Option<String>> {
-    let value = cdp
-        .evaluate(
-            r#"(() => {
-              const element = document.activeElement;
-              if (!element || element === document.body) return null;
-              const parts = [];
-              for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
-                const peers = node.parentElement
-                  ? Array.from(node.parentElement.children).filter(child => child.tagName === node.tagName)
-                  : [node];
-                parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
-              }
-              return `html>${parts.reverse().join('>')}`;
-            })()"#,
-        )
-        .await?;
-    Ok(value.as_str().map(str::to_string))
-}
-
 pub async fn click_matching(
     cdp: &mut Cdp,
     path: &str,
@@ -102,42 +82,6 @@ pub async fn click_matching(
     ))
     .await?;
     Ok(true)
-}
-
-pub async fn hover_matching(cdp: &mut Cdp, path: &str) -> Result<bool> {
-    let position = cdp
-        .evaluate(&format!(
-            "(()=>{{const element=document.querySelector({});if(!element)return null;\
-             element.scrollIntoView({{block:'center',inline:'center',behavior:'instant'}});\
-             const rect=element.getBoundingClientRect();\
-             return [rect.x+rect.width/2,rect.y+rect.height/2]}})()",
-            serde_json::to_string(path)?
-        ))
-        .await?;
-    let Some(position) = position.as_array() else {
-        return Ok(false);
-    };
-    let (Some(x), Some(y)) = (
-        position.first().and_then(serde_json::Value::as_f64),
-        position.get(1).and_then(serde_json::Value::as_f64),
-    ) else {
-        return Ok(false);
-    };
-    cdp.send(
-        "Input.dispatchMouseEvent",
-        serde_json::json!({"type":"mouseMoved","x":x,"y":y}),
-    )
-    .await?;
-    Ok(true)
-}
-
-pub async fn leave_pointer(cdp: &mut Cdp) -> Result<()> {
-    cdp.send(
-        "Input.dispatchMouseEvent",
-        serde_json::json!({"type":"mouseMoved","x":-1,"y":-1}),
-    )
-    .await?;
-    Ok(())
 }
 
 pub async fn submit_text_matching(

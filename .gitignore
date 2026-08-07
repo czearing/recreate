@@ -4,3 +4,6 @@
 /review/
 /node_modules/
 *.log
+/recreate-backtest-output/
+*.pfx
+*.cer

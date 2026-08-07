@@ -62,11 +62,11 @@ pub(super) fn append_node_rules_indexed(
     if !super::super::authored_css::has_property_indexed(node, css_rules, "width")
         && fluid_flex_item(node, parent)
     {
-        if shrunk_flex_item(base, node, parent) {
-            changed.insert("width".into(), "100%".into());
-            changed.insert("max-width".into(), format!("{}px", node.rect.width));
-        } else {
-            changed.remove("width");
+        changed.remove("width");
+        if shrunk_flex_item(base, node, parent)
+            && !super::super::authored_css::has_property_indexed(node, css_rules, "min-width")
+        {
+            changed.insert("min-width".into(), "0".into());
         }
     }
     if fluid_height {
@@ -236,5 +236,76 @@ mod tests {
             false,
         );
         assert!(css.contains("font-size:53.76px"), "{css}");
+    }
+
+    fn shrinking_title(width: f64) -> Node {
+        Node {
+            path: "html>body>div>span".into(),
+            parent: Some("html>body>div".into()),
+            tag: "span".into(),
+            text: "Untitled notebook".into(),
+            attributes: Default::default(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width,
+                height: 22.0,
+            },
+            style: Styles::from([
+                ("flex-shrink".into(), "1".into()),
+                ("width".into(), format!("{width}px")),
+            ]),
+            before: None,
+            after: None,
+        }
+    }
+
+    fn shrinking_title_row(width: f64) -> Node {
+        let mut parent = shrinking_title(width);
+        parent.path = "html>body>div".into();
+        parent.tag = "div".into();
+        parent.style = Styles::from([
+            ("display".into(), "flex".into()),
+            ("flex-direction".into(), "row".into()),
+        ]);
+        parent
+    }
+
+    fn shrunk_title_rule() -> String {
+        append_node_rules(
+            &shrinking_title(234.0),
+            &shrinking_title(170.65625),
+            Some(&shrinking_title_row(420.0)),
+            (
+                &Viewport {
+                    width: 1440,
+                    height: 900,
+                    dpr: 1.0,
+                },
+                &Viewport {
+                    width: 768,
+                    height: 1024,
+                    dpr: 1.0,
+                },
+            ),
+            "title",
+            &Default::default(),
+            &[],
+            false,
+            false,
+        )
+    }
+
+    #[test]
+    fn lets_a_shrunk_flex_item_shrink_instead_of_pinning_its_sampled_width() {
+        let css = shrunk_title_rule();
+        assert!(css.contains("min-width:0"), "{css}");
+    }
+
+    #[test]
+    fn never_freezes_a_sampled_pixel_width_on_a_shrunk_flex_item() {
+        let css = shrunk_title_rule();
+        assert!(!css.contains("max-width:170.65625px"), "{css}");
+        assert!(!css.contains("width:170.65625px"), "{css}");
     }
 }

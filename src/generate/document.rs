@@ -48,7 +48,21 @@ fn safe_head_node(node: &Node) -> bool {
     }
     let relation = node.attributes.get("rel").map(String::as_str);
     let kind = node.attributes.get("as").map(String::as_str);
-    safe_link(relation, kind)
+    let href = node.attributes.get("href").map(String::as_str);
+    safe_link(relation, kind) && resolvable_link(href)
+}
+
+/// A relative href names a file in the source site's own build output, which the
+/// recreation never produces, so keeping it only yields a guaranteed 404. Absolute
+/// and data hrefs still resolve, so they are kept.
+fn resolvable_link(href: Option<&str>) -> bool {
+    let Some(href) = href.map(str::trim) else {
+        return false;
+    };
+    href.starts_with("data:") || href.starts_with("//") || {
+        let scheme = href.split_once("://").map(|(scheme, _)| scheme);
+        matches!(scheme, Some("http") | Some("https"))
+    }
 }
 
 fn safe_link(relation: Option<&str>, kind: Option<&str>) -> bool {
@@ -111,7 +125,7 @@ fn escape(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::safe_link;
+    use super::{resolvable_link, safe_link};
 
     #[test]
     fn excludes_executable_source_preloads() {
@@ -119,5 +133,23 @@ mod tests {
         assert!(!safe_link(Some("preload"), Some("script")));
         assert!(safe_link(Some("stylesheet"), None));
         assert!(safe_link(Some("icon"), None));
+    }
+
+    /// A relative href names the source site's build output, so the recreation
+    /// would request a file it never generates and the browser logs a 404.
+    #[test]
+    fn excludes_links_to_the_source_projects_own_files() {
+        assert!(!resolvable_link(Some("./assets/index-BIZnfT4P.css")));
+        assert!(!resolvable_link(Some("./onenote-favicon.svg")));
+        assert!(!resolvable_link(Some("/static/app.css")));
+        assert!(!resolvable_link(None));
+    }
+
+    #[test]
+    fn keeps_links_that_still_resolve() {
+        assert!(resolvable_link(Some("https://fonts.example.com/font.css")));
+        assert!(resolvable_link(Some("http://cdn.example.com/a.css")));
+        assert!(resolvable_link(Some("//cdn.example.com/a.css")));
+        assert!(resolvable_link(Some("data:,")));
     }
 }

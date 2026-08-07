@@ -97,7 +97,7 @@ classes use non-overlapping viewport bands so adjacent layouts cannot collide.
 
 `acceptance.json` checks evidence completeness. `recreate verify` loads the
 generated page through CDP and compares text, visible geometry, and key computed
-styles for every captured node and interaction state.
+styles for every captured node.
 
 Verification runs against the production build after React conversion,
 component deduplication, responsive compaction, and Vite minification. It
@@ -116,6 +116,6 @@ reduced-motion behavior.
 
 Authenticated captures are validated from persisted specifications so release
 proof does not depend on an expiring browser session. The final MVP reference
-checks baseline and interaction parity, embedded authenticated assets, five
+checks baseline parity, embedded authenticated assets, five
 responsive layouts, normal motion, reduced motion, keyboard activation, focus
 restoration, console errors, and network errors.

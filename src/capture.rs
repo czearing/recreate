@@ -1,7 +1,7 @@
 use crate::{
     browser,
     cli::CaptureArgs,
-    generate, interactions, lifecycle_script,
+    generate, lifecycle_script,
     model::{PageState, Specification},
     probe, validate,
 };
@@ -16,15 +16,15 @@ mod state;
 #[path = "capture/dynamic.rs"]
 mod dynamic;
 
+#[path = "capture/authored_sheets.rs"]
+mod authored_sheets;
+
 use state::{
     browser_cookies, capture_state_with_startup, capture_state_without_assets, set_motion,
 };
 
 pub(crate) use state::set_focus;
-pub use state::{
-    capture_state, prepare_interaction_state, read_interaction_state, read_state,
-    read_visual_interaction_state,
-};
+pub use state::{capture_state, prepare_interaction_state, read_interaction_state, read_state};
 
 pub async fn run(args: CaptureArgs) -> Result<()> {
     let capture_started = std::time::Instant::now();
@@ -100,27 +100,13 @@ pub async fn run(args: CaptureArgs) -> Result<()> {
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
-    let interaction_graph = if args.baseline_only || args.spec_only {
-        interactions::CapturedGraph {
-            interactions: Vec::new(),
-            transitions: Vec::new(),
-        }
-    } else {
-        let interactions_started = std::time::Instant::now();
-        let captured = interactions::capture_graph(&mut cdp, &states).await?;
-        eprintln!(
-            "captured interactions in {:.2}s",
-            interactions_started.elapsed().as_secs_f64()
-        );
-        captured
-    };
     let mut specification = Specification {
         schema_version: 1,
         requested_url,
         captured_url,
         states,
-        interactions: interaction_graph.interactions,
-        transitions: interaction_graph.transitions,
+        interactions: Vec::new(),
+        transitions: Vec::new(),
     };
     crate::interaction_surface::normalize(&mut specification);
     fs::write(

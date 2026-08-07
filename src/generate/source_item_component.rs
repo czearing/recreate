@@ -5,7 +5,10 @@ pub fn render(name: &str, template: &str, props: &[(usize, String)]) -> String {
     let components = uppercase_tags(template)
         .into_iter()
         .filter(|tag| {
-            !tag.starts_with("Generated") && tag != "SharedComponents" && tag != "CollectionItems"
+            !tag.starts_with("Generated")
+                && tag != "SharedComponents"
+                && tag != "CollectionItems"
+                && tag != name
         })
         .collect::<BTreeSet<_>>();
     format!(

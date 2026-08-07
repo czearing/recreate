@@ -28,7 +28,6 @@ fn removes_measured_width_when_border_box_fills_parent_content() {
         &Default::default(),
         &[],
         false,
-        false,
     );
     assert!(!css.contains("width:714px"));
 }
@@ -60,7 +59,6 @@ fn removes_measured_width_when_parent_uses_border_shorthand() {
         &Default::default(),
         &[],
         false,
-        false,
     );
     assert!(!css.contains("width:978px"));
 }
@@ -74,15 +72,7 @@ fn removes_measured_height_for_evidence_backed_content_reflow() {
     };
     let mut card = node("button", 0.0, 369.0);
     card.style.insert("height".into(), "245px".into());
-    let css = base_declarations(
-        &card,
-        None,
-        &viewport,
-        &Default::default(),
-        &[],
-        true,
-        false,
-    );
+    let css = base_declarations(&card, None, &viewport, &Default::default(), &[], true);
     assert!(!css.contains("height:245px"));
 }
 

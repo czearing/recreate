@@ -1,5 +1,6 @@
 
 (async () => {
+  const authoredSheetTexts = __AUTHORED_SHEETS__;
   const props = [__STYLE_PROPERTIES__];
   const ignored = new Set(['SCRIPT','NOSCRIPT']), directionalBorders = [__DIRECTIONAL_BORDERS__];
   const styleMap = style => { const values = Object.fromEntries(props.map(p => [p, style.getPropertyValue(p)])); if (!values.border) for (const property of directionalBorders) values[property] = style.getPropertyValue(property); return values; };
@@ -233,7 +234,9 @@ __ASSET_CAPTURE__
     title: document.title,
     nodes,
     dom,
-    capture_blockers: [],
+    capture_blockers: unreadableSheets > 0
+      ? [`${unreadableSheets} stylesheet(s) could not be read; their authored rules are missing`]
+      : [],
     animations,
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,

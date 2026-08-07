@@ -73,11 +73,81 @@ fn normalize_parent_filling(styles: &mut Styles, node: &Node, parent: &Node, has
         .get("width")
         .is_some_and(|width| width.ends_with("px"))
     {
-        if has_base {
+        if pinned_along_main_axis(node, parent) {
+            // A flex item that cannot grow has a definite inline size and does not track
+            // its parent, so the sampled width is the authored width. Keep it.
+        } else if needs_explicit_inline_fill(node, parent) {
+            styles.insert("width".into(), "100%".into());
+        } else if has_base {
             styles.insert("width".into(), "auto".into());
         } else {
             styles.remove("width");
         }
+    }
+}
+
+/// A flex item laid out along the inline axis only absorbs its parent's free space when it
+/// is allowed to grow. Otherwise its width is its own, and coincides with the parent's
+/// content box at the sampled viewport only because that is what the author sized it to.
+fn pinned_along_main_axis(node: &Node, parent: &Node) -> bool {
+    matches!(
+        parent.style.get("display").map(String::as_str),
+        Some("flex" | "inline-flex")
+    ) && !inline_axis_is_cross_axis(parent)
+        && !grows_along_main_axis(node)
+}
+
+/// Dropping a sampled width is safe only when the box fills its parent on its own. A block
+/// child of a block does; a flex item only does so on the cross axis while it is stretched.
+/// Under a flex parent that aligns its items to one edge, dropping the width instead
+/// collapses the box onto its content, so state the fill explicitly.
+fn needs_explicit_inline_fill(node: &Node, parent: &Node) -> bool {
+    if !matches!(
+        parent.style.get("display").map(String::as_str),
+        Some("flex" | "inline-flex")
+    ) {
+        return false;
+    }
+    if !inline_axis_is_cross_axis(parent) {
+        return false;
+    }
+    let alignment = node
+        .style
+        .get("align-self")
+        .map(String::as_str)
+        .filter(|alignment| *alignment != "auto")
+        .or_else(|| parent.style.get("align-items").map(String::as_str))
+        .unwrap_or("normal");
+    !matches!(alignment, "normal" | "stretch")
+}
+
+/// A row flex container lays its items out along the inline axis; a column one lays them
+/// out along the block axis, leaving the inline axis as the cross axis.
+fn inline_axis_is_cross_axis(parent: &Node) -> bool {
+    parent
+        .style
+        .get("flex-direction")
+        .map(String::as_str)
+        .unwrap_or("row")
+        .starts_with("column")
+}
+
+/// A flex item only absorbs its parent's free inline space when it is allowed to grow, or
+/// when its basis already asks for the whole line.
+fn grows_along_main_axis(node: &Node) -> bool {
+    if let Some(grow) = node.style.get("flex-grow") {
+        return grow.trim().parse::<f64>().is_ok_and(|grow| grow > 0.0);
+    }
+    let Some(flex) = node.style.get("flex").map(|flex| flex.trim()) else {
+        return false;
+    };
+    match flex {
+        "auto" | "none" | "initial" => flex == "auto",
+        _ => flex
+            .split_whitespace()
+            .next()
+            .and_then(|grow| grow.parse::<f64>().ok())
+            .is_some_and(|grow| grow > 0.0),
     }
 }
 

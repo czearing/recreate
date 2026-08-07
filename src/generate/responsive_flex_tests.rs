@@ -82,13 +82,14 @@ fn removes_sampled_width_from_fluid_flex_items() {
         &Default::default(),
         &[],
         false,
-        false,
     );
     assert!(!css.contains("width:600px"));
 }
 
+/// A fixed width inside a centred column survives because the source authored it, not
+/// because the emitter recognised the shape of the parent.
 #[test]
-fn preserves_fixed_width_inside_centered_column_flex() {
+fn preserves_authored_width_inside_centered_column_flex() {
     let viewport = Viewport {
         width: 1440,
         height: 900,
@@ -107,8 +108,7 @@ fn preserves_fixed_width_inside_centered_column_flex() {
         Some(&parent),
         &viewport,
         &Default::default(),
-        &[],
-        false,
+        &["*{width:48px;}".to_string()],
         false,
     );
     assert!(css.contains("width:48px"));
@@ -140,7 +140,6 @@ fn removes_measured_width_from_intrinsic_column_flex_text() {
         &Default::default(),
         &[],
         false,
-        true,
     );
     assert!(!css.contains("width:475.765625px"));
 }

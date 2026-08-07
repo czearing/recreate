@@ -61,9 +61,6 @@ pub struct CaptureArgs {
     /// Reload after instrumentation to record startup behavior.
     #[arg(long)]
     pub reload: bool,
-    /// Capture only the baseline page without replaying interactions.
-    #[arg(long)]
-    pub baseline_only: bool,
     /// Write capture evidence without generating the React project.
     #[arg(long)]
     pub spec_only: bool,
@@ -146,11 +143,10 @@ mod tests {
     }
 
     #[test]
-    fn parses_fast_baseline_spec_capture() {
+    fn parses_fast_spec_capture() {
         let cli = Cli::try_parse_from([
             "recreate",
             "capture",
-            "--baseline-only",
             "--spec-only",
             "--viewports",
             "1440x900",
@@ -159,7 +155,6 @@ mod tests {
         let Command::Capture(args) = cli.command else {
             panic!("expected capture");
         };
-        assert!(args.baseline_only);
         assert!(args.spec_only);
     }
 

@@ -52,6 +52,14 @@ fn data_extension(metadata: &str) -> &'static str {
         "webp"
     } else if metadata.contains("image/svg+xml") {
         "svg"
+    } else if metadata.contains("font/woff2") || metadata.contains("application/font-woff2") {
+        "woff2"
+    } else if metadata.contains("font/woff") || metadata.contains("application/font-woff") {
+        "woff"
+    } else if metadata.contains("font/ttf") || metadata.contains("font/truetype") {
+        "ttf"
+    } else if metadata.contains("font/otf") || metadata.contains("font/opentype") {
+        "otf"
     } else {
         "bin"
     }
@@ -103,6 +111,13 @@ mod tests {
         }))
         .unwrap();
         assert_eq!(states(&specification).count(), 2);
+    }
+
+    #[test]
+    fn names_an_inline_webfont_by_its_real_format() {
+        assert_eq!(data_extension("data:font/woff2;base64"), "woff2");
+        assert_eq!(data_extension("data:font/woff;base64"), "woff");
+        assert_eq!(data_extension("data:image/png;base64"), "png");
     }
 
     #[test]
