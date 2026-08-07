@@ -1,0 +1,596 @@
+{
+  "workItem": "009-frozen-derived-geometry-over-authored-anchor",
+  "symptom": "Layout breaks when resizing: an absolutely positioned box jumps between the capture viewports instead of tracking the author fluid anchor.",
+  "callSite": {
+    "file": "src/generate/authored_css.rs",
+    "function": "normalize_indexed",
+    "line": 80,
+    "detail": "suppress_derived_insets runs last, after styles.extend(authored), so it arbitrates the final merged map. Implementation in src/generate/authored_css_insets.rs. This one site serves BOTH emission paths: the base declarations (responsive_output.rs) and the per-viewport media bands (responsive_node_rules.rs:49), which both call normalize_indexed."
+  },
+  "mechanism": "Capture reads getComputedStyle, which returns USED pixels, so the generator cannot distinguish an authored right:30% from an engine-derived left:864px and emits both. Per CSS 2.1 section 10.3.7 an absolutely positioned box with left, width and right all non-auto is over-constrained, and in a left-to-right direction the engine ignores right - the AUTHOR declaration. The frozen left therefore wins and the fluid anchor becomes dead code, producing a step function pinned to the capture viewports 1920/1440/768/390/320.",
+  "rule": {
+    "statement": "On an absolute or fixed box, drop a derived pixel inset only on an axis where the author anchored the OPPOSITE edge. Removal is the repair: an absent inset is auto, which is precisely the unknown the over-constraint equation solves for, so the box re-derives its offset at every width instead of at one.",
+    "testedAgainst": "the AUTHORED cascade (authored_css Index), never computed style",
+    "neitherEdgeAuthored": "KEPT - no competing declaration exists, the box is not over-constrained, and the sampled pixel is the only positional information there is. Dropping insets unconditionally would break every page positioned by sampling alone.",
+    "bothEdgesAuthored": "UNTOUCHED - the cascade is entirely the author own.",
+    "staticAndRelative": "UNTOUCHED - offsets on a static box are inert, and a relative box has no width term so the over-constraint equation does not apply.",
+    "logicalNames": "inset-inline-start/end, inset-block-start/end, inset-inline, inset-block and inset all count as anchors, because authored_css_rules::physical_property maps only the size logicals and returns empty for every inset name.",
+    "writingMode": "Vertical writing modes are declined rather than guessed, since the inline axis is vertical there and an LTR mapping would arbitrate the wrong axis.",
+    "shorthand": "inset/inset-block/inset-inline are expanded into physical longhands before arbitration, because a shorthand re-states every edge it covers and would otherwise smuggle the derived pixel back. A shorthand containing a function is left intact."
+  },
+  "oracle": {
+    "what": "Rendered box geometry from getBoundingClientRect, compared source page against generated recreation, at 19 widths from 320 to 1920.",
+    "keying": "tag plus trimmed text or aria-label, never a selector, so the two sides are matched by identity rather than by structure.",
+    "bidirectional": "sourceOnly and recreationOnly counted in both directions at every width; a box present on one side only is a miss, not a match.",
+    "tolerancePx": 1.0,
+    "whyNotDeclarationCounts": "A declaration count can be improved by deleting declarations. Only rendered geometry can show the box tracks the anchor."
+  },
+  "perWidth": [
+    {
+      "width": 320,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 360,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 390,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 414,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 480,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 3,
+        "xMismatchAfter": 2,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 560,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 4,
+        "xMismatchAfter": 3,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 640,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 4,
+        "xMismatchAfter": 3,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 720,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 6,
+        "xMismatchAfter": 5,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 768,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 4,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 860,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 960,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 2,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1024,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1120,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1200,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 6,
+        "xMismatchAfter": 5,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1280,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1366,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 4,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1440,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 5,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1680,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 1,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 6,
+        "xMismatchAfter": 5,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    },
+    {
+      "width": 1920,
+      "frozenOffset": {
+        "boxes": 2,
+        "xMismatchBefore": 0,
+        "xMismatchAfter": 0,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      },
+      "wrapCollision": {
+        "boxes": 9,
+        "xMismatchBefore": 5,
+        "xMismatchAfter": 5,
+        "widthMismatchBefore": 0,
+        "widthMismatchAfter": 0,
+        "sourceOnlyBefore": 0,
+        "sourceOnlyAfter": 0,
+        "recreationOnlyBefore": 0,
+        "recreationOnlyAfter": 0
+      }
+    }
+  ],
+  "results": {
+    "frozenOffset": {
+      "page": "backtest/fixtures/frozen-offset/source/index.html",
+      "authored": ".marker{position:absolute; right:30%; top:0; width:25%}",
+      "frozenLeftBefore": [
+        "864px base",
+        "648px",
+        "345.609px",
+        "175.5px",
+        "144px"
+      ],
+      "frozenLeftAfter": "none - no left in base or any media band",
+      "xMismatchWidthsBefore": 14,
+      "xMismatchWidthsAfter": 0,
+      "totalWidths": 19,
+      "cleanBeforeOnlyAt": [
+        320,
+        390,
+        768,
+        1440,
+        1920
+      ],
+      "note": "The five widths clean BEFORE are exactly the five capture viewports - the step-function signature."
+    },
+    "wrapCollision": {
+      "page": "backtest/fixtures/wrap-collision/source/index.html",
+      "authored": ".aside{position:absolute; right:0; top:0; width:34%}",
+      "xMismatchSumBefore": 75,
+      "xMismatchSumAfter": 61,
+      "boxesPerWidth": 9,
+      "note": "Improves at 14 of 19 widths and regresses at none. The residual mismatches are other boxes on the page whose cause is a different defect, not this one."
+    },
+    "noFluidAnchorPage": {
+      "page": "backtest/fixtures/layout-isolation/source/index.html",
+      "declarationsChanged": "one rule (.gamma, authored left:1100px top:700px) lost the derived right:700px and bottom:340px",
+      "everyOtherNode": "byte identical",
+      "renderedGeometry": "IDENTICAL - all 9 elements, all rects, at 320/480/768/1024/1280/1440/1920, zero differing",
+      "why": "The removed declarations are precisely the ones CSS already discards as over-constrained, so removing them cannot move the box."
+    }
+  },
+  "canary": {
+    "method": "Rebuilt the release binary with the single call at authored_css.rs:80 disabled, then re-ran both the unit tests and the geometry oracle.",
+    "unitTests": "FAILED as required - derived_inset_gives_way_to_an_authored_anchor_on_the_same_axis and derived_inset_survives_when_the_author_anchored_nothing both fail with the rule off.",
+    "geometry": "FAILED as required - the canary binary reproduces the frozen left and the 14-of-19 x-mismatch on frozen-offset.",
+    "conclusion": "The check is capable of failing, so the passing result carries information."
+  },
+  "qualification": {
+    "denominatorCountedFirst": "29 fixture directories, 48 mutants, counted directly from the manifests BEFORE reading any score. Floor was 28 fixtures / 44 mutants.",
+    "fixtures": 29,
+    "totalMutations": 48,
+    "before": {
+      "detectedMutations": 48,
+      "undetected": 0,
+      "duplicateFindings": 0,
+      "passedComparisons": 77,
+      "p95Ms": 1233,
+      "p99Ms": 1519,
+      "maximumMs": 1519,
+      "exit": 0
+    },
+    "after": {
+      "detectedMutations": 48,
+      "undetected": 0,
+      "duplicateFindings": 0,
+      "passedComparisons": 77,
+      "p95Ms": 1242,
+      "p99Ms": 1747,
+      "maximumMs": 1747,
+      "failures": 0,
+      "exit": 0
+    },
+    "contendedRuns": "Two earlier runs on a host pinned at 99-137% by peer processes scored 45/48 and 47/48. In every case undetectedMutations was 0 and the failures were exceededBudget with character-identical expected and actual - timeouts, not blindness. A different case failed each run.",
+    "attribution": "backtest/Cargo.toml declares an empty [dependencies] and does not link the recreate crate. The gate compares hand-authored HTML fixtures in a browser and never invokes the generator, so this change cannot affect its timings by construction.",
+    "scopeCaveat": "The qualification gate cannot referee this change. Its fixtures are hand-written HTML, not generator output. It is a gate-integrity trust axis only: it proves nothing was broken. The correctness claim rests entirely on the rendered geometry above."
+  },
+  "tests": {
+    "suite": "cargo test: 267 passed, 1 failed",
+    "knownFailure": "release_gate_tests::generic_browser_release_gate - pre-existing and environmental (shared Vite build / browser start), reproduces on an unmodified tree.",
+    "added": "8 tests in src/generate/authored_css_insets_tests.rs: logical inset recognised as an anchor; inline axis follows direction (rtl); shorthand cannot smuggle the derived edge back; shorthand containing a function left alone; both edges authored untouched; scheme read from captured style not the diff; fixed box arbitrated; only a sampled pixel removed.",
+    "adopted": "3 pre-existing red tests in src/generate/authored_css_tests_3.rs (written by a peer as a spec, no implementation) now pass."
+  },
+  "writeSet": [
+    "src/generate/authored_css_insets.rs (new)",
+    "src/generate/authored_css_insets_tests.rs (new)",
+    "src/generate/authored_css.rs (2 lines: mod declaration and the call)",
+    ".agents/fidelity/measurements/frozen-geometry-fix.json (new)"
+  ],
+  "untouched": [
+    "backtest/src/deadline.rs - verified still 4400 / 4800",
+    "backtest/fixtures/** - zero edits, no expected.json touched"
+  ]
+}

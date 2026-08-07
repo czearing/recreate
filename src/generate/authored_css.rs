@@ -77,6 +77,7 @@ pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
         styles.remove("height");
     }
     styles.extend(authored);
+    insets::suppress_derived_insets(styles, node, rules);
 }
 
 pub fn has_property_indexed(node: &Node, rules: &Index<'_>, property: &str) -> bool {
@@ -113,6 +114,9 @@ fn flexible(styles: &Styles) -> bool {
 }
 
 pub(super) use super::authored_css_rules::directly_targets_node;
+
+#[path = "authored_css_insets.rs"]
+mod insets;
 
 #[cfg(test)]
 #[path = "authored_css_tests_1.rs"]
