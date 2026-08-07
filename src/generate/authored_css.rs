@@ -79,10 +79,6 @@ pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
     styles.extend(authored);
 }
 
-pub fn has_property(node: &Node, rules: &[String], property: &str) -> bool {
-    has_property_indexed(node, &Index::new(rules), property)
-}
-
 pub fn has_property_indexed(node: &Node, rules: &Index<'_>, property: &str) -> bool {
     rules.has_property(node, property)
 }

@@ -1,0 +1,204 @@
+{
+  "workItem": "land the has_property Index hoist and qualify it",
+  "agent": "verification-gate",
+  "verdict": "LANDED; end-to-end budget MISSED",
+  "commit": "216c24fd78fe5f890dc8545c5dcd2a57ca7392ed",
+  "profile": "release",
+
+  "diffSummary": {
+    "files": 2,
+    "insertions": 2,
+    "deletions": 5,
+    "writeSetRespected": true,
+    "changes": [
+      {
+        "file": "src/generate/css_state_helpers.rs",
+        "change": "fluid_height_paths: hoisted `let rules = super::authored_css::Index::new(&state.css_rules);` to the per-state scope, outside the per-node loop; call site switched to has_property_indexed(node, &rules, \"height\")."
+      },
+      {
+        "file": "src/generate/authored_css.rs",
+        "change": "Deleted the 4-line free `has_property` wrapper (formerly lines 82-85). Reference search showed css_state_helpers.rs:24 was its only caller, so the hoist orphaned it."
+      }
+    ],
+    "wrapperDisposition": {
+      "decision": "DELETED, not documented-in-place",
+      "reason": "With its last caller moved, the wrapper was a per-call Index::new trap left maximally easy to reach. A grep for `has_property(` across src/generate confirmed zero remaining callers.",
+      "proof": "Release build after deletion emits the same two pre-existing warnings (`unresolvable` never used at authored_css_index.rs:68; `source` never used at page_script.rs:4) and NO new dead-code warning, which is the compiler confirming no caller was severed.",
+      "positiveIntegerProperty": {
+        "identicalShape": true,
+        "cfgTest": true,
+        "caller": "src/generate/authored_css_tests_1.rs:26",
+        "decision": "LEFT IN PLACE - it does NOT matter",
+        "reason": "It is #[cfg(test)] and therefore not compiled into the release binary, so it costs the hot path nothing. It also still has a live test caller, so deleting it would break the build. This was checked, not assumed."
+      }
+    },
+    "noNewApi": true,
+    "noEnvFlag": true
+  },
+
+  "qualification": {
+    "note": "denominator first, as required",
+    "fixtureDirectoriesWithExpectedJson": 28,
+    "floorFixtures": 28,
+    "mutantDirectories": 44,
+    "floorMutants": 44,
+    "denominatorRegressed": false,
+    "cases": 28,
+    "comparisons": 72,
+    "passedComparisons": 72,
+    "totalMutations": 44,
+    "detectedMutations": 44,
+    "killRate": "44/44 = 1.000",
+    "undetectedMutations": 0,
+    "exceededBudgetMutations": 0,
+    "duplicateFindings": 0,
+    "failures": 0,
+    "p95Ms": 966,
+    "p99Ms": 1376,
+    "maximumMs": 1376,
+    "exitCode": 0,
+    "stderrBytes": 0,
+    "wallMs": 259469,
+    "baselineThisSession": {
+      "totalMutations": 44,
+      "detectedMutations": 44,
+      "comparisons": 72,
+      "passedComparisons": 72,
+      "p95Ms": 1001,
+      "p99Ms": 1456,
+      "maximumMs": 1456,
+      "wallMs": 126551
+    },
+    "killRateDroppedFromPreviousRun": false,
+    "deadlines": {
+      "COMPARISON_DEADLINE_MS": 4400,
+      "WATCHDOG_MS": 4800,
+      "staticAssertGapMs": 250,
+      "unchanged": true
+    },
+    "isolation": {
+      "reason": "The live backtest crate DID NOT COMPILE at measurement time: `error[E0425]: cannot find value \\`finding_order\\` in this scope` at backtest/src/compare.rs:82. That file is owned by fidelity-developer and is mid-edit. It is not in my write set and I did not touch it.",
+      "method": "robocopy byte-copy of backtest/ (excluding target/) to a scratch directory, then `git show HEAD:backtest/src/compare.rs` restored ONLY that one peer-owned file in the COPY. The live tree was not modified.",
+      "whyNotAWorktree": "Only 9 of the 28 fixture directories are tracked at HEAD and one tracked fixture (comprehensive) is deleted on disk. A git worktree would have supplied 9 fixtures including the deleted one and omitted 19, shrinking the denominator in one direction while resurrecting it in the other. A byte-copy preserves the real corpus.",
+      "denominatorVerifiedInCopy": "28 fixtures / 44 mutants, counted directly in the copy and matching a direct count of the live source."
+    },
+    "reachabilityCaveat": {
+      "gateExecutesTheChangedCode": false,
+      "evidence": "backtest/src/fixture.rs:244 is the ONLY use of the recreate binary and it feeds the processEvidence probe alone. The qualification loads static fixture HTML into two browsers and compares captures; it never invokes the generator, so it cannot execute fluid_height_paths.",
+      "meaning": "The unchanged 44/44 proves GATE INTEGRITY ONLY. It is NOT evidence that this refactor is correct. The correctness claim rests entirely on the golden master below."
+    }
+  },
+
+  "byteIdentity": {
+    "oracle": "golden master / characterization test - the correct oracle because a pure refactor is forbidden to change emitted source",
+    "method": "For each spec, every emitted file hashed SHA-256, entries sorted by path, joined as path=hash, and the joined manifest hashed again to one aggregate SHA-256. Both arms run 5 times.",
+    "isolation": "Both arms measured inside a single detached worktree at 216c24f with a private CARGO_TARGET_DIR, because peers were concurrently editing src/generate/ (jsx_app.rs, jsx_state_generation.rs, new templates/) in the live tree, which would have changed emitted output underneath both arms and voided the comparison.",
+    "totalFiles": 615,
+    "identical": true,
+    "deterministicWithinEachArm": true,
+    "specs": [
+      { "spec": "live-r15", "files": 148, "aggregateSha256": "EE4A2005D549578226C7BECD46BE7343058A4B508B9F46CF1B5803DF4CC48722", "armAEqualsArmB": true },
+      { "spec": "fluid-r1", "files": 148, "aggregateSha256": "882C561764E581CE312C38EA171B9FEFA7F279AF317FA037C470613D22714370", "armAEqualsArmB": true },
+      { "spec": "fluid-r5", "files": 112, "aggregateSha256": "23EBEB73774ED8297BBFEF13EBC8003D6BE8F8328CB69CB8D2E32E2708BFAA1E", "armAEqualsArmB": true },
+      { "spec": "review/authenticated-reference-v1", "files": 187, "aggregateSha256": "E9EAD164B71697C76A5FE4F0E924CA3F203AF864C32428CA9BB0B47D96F14AE1", "armAEqualsArmB": true },
+      { "spec": "recreate-output", "files": 20, "aggregateSha256": "02FAF4A495A6C38711CAEDE40030688A515BE5211E0FFEEACCE9C0B550982816", "armAEqualsArmB": true }
+    ]
+  },
+
+  "endToEnd": {
+    "budgetMs": 5000,
+    "budgetInterpretation": "sum across the 5 specs, as stated in the assignment",
+    "runsPerArm": 5,
+    "armA_unmodifiedHead": { "medianMs": 27165, "minMs": 25352, "worstMs": 27205 },
+    "armB_withHoist": { "medianMs": 13217, "minMs": 12135, "worstMs": 15196 },
+    "medianReductionMs": 13948,
+    "medianSpeedup": "2.05x",
+    "verdict": "MISSED",
+    "verdictReason": "Arm B median 13217ms and best-case min 12135ms both exceed the 5000ms budget. The hoist removes roughly half the end-to-end time but does not by itself bring the sum inside budget. Even the single fastest observed run is 2.4x the budget, so no amount of host-noise correction changes this verdict.",
+    "perSpecMedianMs": [
+      { "spec": "live-r15",        "armA": 7032, "armB": 2235, "reductionPct": 68.2 },
+      { "spec": "fluid-r1",        "armA": 7037, "armB": 2034, "reductionPct": 71.1 },
+      { "spec": "fluid-r5",        "armA": 4031, "armB": 4039, "reductionPct": -0.2 },
+      { "spec": "review",          "armA": 8037, "armB": 3031, "reductionPct": 62.3 },
+      { "spec": "recreate-output", "armA": 1036, "armB": 1031, "reductionPct": 0.5 }
+    ],
+    "perSpecObservation": "The three specs that improved are exactly the ones with large authored CSS rule sets, which is the signature the css-base-subphase profile predicted (cost scales states x nodes x rules). fluid-r5 and recreate-output are flat, correctly indicating they were never paying this cost.",
+    "secondaryInterpretation": "If the 5000ms budget were read PER SPEC rather than as a sum, arm B would meet it at the median on all five specs (worst median 4039ms) whereas arm A missed on three (7032, 7037, 8037). The assignment says sum, so the recorded verdict is MISSED; this alternative is noted, not claimed.",
+    "hostContention": "The host is saturated by concurrent peer browser runs; the qualification cost table itself reports host load between 100% and 287%. All timings are therefore CONTAMINATED UPPER BOUNDS. A prior control measured ~900ms of host noise on an unchanged binary. Additionally, observed wall times quantize near 1000ms boundaries, so per-run precision is roughly +/-1s and only the arm-to-arm gap (about 14s at the median) is far enough outside the noise band to be load-bearing.",
+    "rawSumsMs": {
+      "armA": [25352, 27148, 27194, 27205, 27165],
+      "armB": [12357, 13245, 13217, 15196, 12135]
+    }
+  },
+
+  "negativeCase": {
+    "requirement": "confirm a clean result is reachable by disabling the change and seeing the failure return",
+    "applicability": "The mutation gate CANNOT execute the changed code (see reachabilityCaveat), so disabling the change cannot make the gate fail. Reporting a gate-based negative case here would have been a false fact.",
+    "substituted": "The reachable negative case is the timing signal itself: with the change disabled (arm A) the per-spec cost returns to 7032/7037/8037ms on the three rule-heavy specs, and with it restored (arm B) it drops to 2235/2034/3031ms. The effect disappears when disabled and returns when restored, on the same binary source, in the same worktree, counterbalanced across 5 runs each.",
+    "testSuiteControl": {
+      "withChange": "cargo test --release --bin recreate -> 264 passed, 1 failed, 2 ignored; failure release_gate_tests::generic_browser_release_gate, panic at src/release_gate_tests/browser_support.rs:42 'browser did not start'.",
+      "withoutChange": "Same test at unmodified HEAD in the same worktree -> also FAILED, 0 passed 1 failed, panic at src/release_gate_tests/mod.rs:69 'shared Vite build failed with exit code: 1'.",
+      "conclusion": "The failure is PRE-EXISTING and environmental (browser launch / Vite build on a saturated host), not caused by this change. It reproduces at unmodified HEAD. The two panic sites differ between runs, which is itself the signature of an environment-dependent failure rather than a deterministic code defect."
+    }
+  },
+
+  "consoleErrors": {
+    "generationRuns": "50 runs (2 arms x 5 specs x 5 repeats), every run exit 0 and stderr length 0 bytes.",
+    "qualification": "exit 0, stderr 0 bytes.",
+    "otherOutput": "Chromium/Edge identity ERROR lines appeared only during `cargo test`, emitted by the browser process on this host, and appear identically in the unmodified-HEAD control. Not attributable to this change.",
+    "verdict": "no console errors attributable to this change"
+  },
+
+  "premiseCorrections": [
+    {
+      "claim": "615 files across the 5 specs",
+      "finding": "CONFIRMED at 216c24f: 148+148+112+187+20 = 615.",
+      "note": "A prior session of mine reported 391 files and flagged 615 as wrong. That earlier figure was measured at commit ef88899 and is stale, not incorrect at the time. I RETRACT that premise correction. The durable lesson is that a golden-master file count must never be carried across a commit boundary; both arms must be re-taken at one sha in one session."
+    },
+    {
+      "claim": "the defect is at authored_css.rs:82-84 reached from css_state_helpers.rs:24",
+      "finding": "CONFIRMED by direct read. has_property_indexed was already public and css_base.rs:57 already builds an Index, so no new API was needed."
+    },
+    {
+      "claim": "run cargo from backtest/",
+      "finding": "PARTIALLY BLOCKED: backtest/src/compare.rs does not currently compile due to peer in-flight edits. Worked around by byte-copy plus HEAD restore of that single peer file. Reported, not fixed."
+    }
+  ],
+
+  "notFixed": {
+    "item": "backtest/src/compare.rs contains() discards fully-enclosing pairs",
+    "reason": "Explicitly out of my write set and owned by fidelity-developer / raised by fixture-author. Not touched.",
+    "alsoNotFixed": "backtest/src/compare.rs:82 does not compile (finding_order not in scope). Peer-owned in-flight edit; reported here as a blocker I routed around rather than repaired."
+  },
+
+  "newBaseline": {
+    "commit": "216c24fd78fe5f890dc8545c5dcd2a57ca7392ed",
+    "fixtures": 28,
+    "mutants": 44,
+    "detectedOverTotal": "44/44",
+    "comparisons": "72/72",
+    "p95Ms": 966,
+    "p99Ms": 1376,
+    "maximumMs": 1376,
+    "duplicateFindings": 0,
+    "qualificationWallMs": 259469,
+    "generationSumMedianMs": 13217,
+    "generationSumMinMs": 12135,
+    "generationSumWorstMs": 15196,
+    "goldenMasterTotalFiles": 615,
+    "goldenMasterAggregates": {
+      "live-r15": "EE4A2005D549578226C7BECD46BE7343058A4B508B9F46CF1B5803DF4CC48722",
+      "fluid-r1": "882C561764E581CE312C38EA171B9FEFA7F279AF317FA037C470613D22714370",
+      "fluid-r5": "23EBEB73774ED8297BBFEF13EBC8003D6BE8F8328CB69CB8D2E32E2708BFAA1E",
+      "review": "E9EAD164B71697C76A5FE4F0E924CA3F203AF864C32428CA9BB0B47D96F14AE1",
+      "recreate-output": "02FAF4A495A6C38711CAEDE40030688A515BE5211E0FFEEACCE9C0B550982816"
+    }
+  },
+
+  "decision": {
+    "landed": true,
+    "reason": "Mutation qualification did not regress (44/44 at both floors, 0 undetected, 0 duplicates, 0 over budget, exit 0), emitted output is byte-identical across all 615 files on all 5 specs with determinism proven in both arms, no protected file was modified, no fixture manifest / expected value / mutant / deadline was touched by me, and the change halves end-to-end generation time.",
+    "budgetVerdict": "MISSED - 13217ms median against a 5000ms sum budget. The hoist is a real 2.05x improvement but is not sufficient on its own; further work is required elsewhere to reach 5000ms.",
+    "noFloorAdjusted": true
+  }
+}

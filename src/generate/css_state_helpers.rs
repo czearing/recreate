@@ -16,12 +16,13 @@ pub fn fluid_height_paths(specification: &Specification) -> HashSet<String> {
     let mut heights = HashMap::<String, Vec<f64>>::new();
     let mut authored = HashSet::new();
     for state in &specification.states {
+        let rules = super::authored_css::Index::new(&state.css_rules);
         for node in &state.nodes {
             heights
                 .entry(node.path.clone())
                 .or_default()
                 .push(node.rect.height);
-            if super::authored_css::has_property(node, &state.css_rules, "height") {
+            if super::authored_css::has_property_indexed(node, &rules, "height") {
                 authored.insert(node.path.clone());
             }
         }
