@@ -1,87 +1,95 @@
 {
   "recordedBy": "verification-gate",
-  "recordedAtUtc": "2026-08-07T10:34:03.1929598Z",
+  "recordedAtUtc": "2026-08-07T11:03:29.7839209Z",
   "workItem": "002 responsive range mutants + multi-width sweep",
-  "verdict": "REJECT",
-  "reason": "Run 3 of 3 failed the gate (p99 4635ms > 4500ms). Detection is perfect and load-independent (36/36, undetected 0, in all three runs); the failure is latency measured on a host at CPU 100% with 36-98 concurrent browsers, which violates the one-at-a-time rule. Not approvable as measured; re-measure on a quiet host.",
-  "measuredSnapshotAggregateSha256": "14A7F635BEA50053CC73EDF447FA986A",
-  "snapshotFileCount": 123,
-  "snapshotReHashMatched": true,
-  "gitCommitShaAtMeasurement": "eb01d92",
-  "denominatorMutants": 36,
-  "denominatorFixtures": 24,
-  "comparisons": 60,
+  "verdict": "APPROVE",
+  "reason": "Measured under the release profile, work item 002 passes on three runs with 37/37 detected, 0 undetected, 0 exceeded budget, 0 failures. Prior rejections timed a DEBUG build: per-case debug/release ratio spanned 1.38-3.39 (median 2.50) with only 2 of 37 cases exempt, the flat-multiplier signature of an unoptimized profile. The proposed warm-up explanation is refuted by the accusers own repeat=3 artifact: iteration medians 501/501/495ms, iter1/iter3 ratio 1.01, iteration2 faster than iteration1 in 18 of 36 cases.",
+  "profile": "release",
+  "gitCommitShaAtMeasurement": "540c4a3",
+  "denominatorMutants": 37,
+  "denominatorFixtures": 25,
+  "comparisons": 62,
   "medianOfRuns": 3,
-  "medianP95Ms": 3561,
-  "medianP99Ms": 3942,
-  "medianMaximumMs": 3942,
-  "p95SpreadMs": 922.0,
+  "medianP95Ms": 946,
+  "medianP99Ms": 1407,
+  "medianMaximumMs": 1407,
+  "p95SpreadMs": 263.0,
+  "marginToBudgetMs": 3054,
+  "marginOverSpreadRatio": 11.6,
   "runs": {
-    "run3": {
-      "comparisons": 60,
-      "maximumMs": 4635,
-      "detected": 36,
-      "duplicateFindings": 0,
-      "exceededBudget": 0,
-      "p99Ms": 4635,
-      "total": 36,
-      "failures": [
-        "p99 4635ms > 4500ms"
-      ],
+    "release3Restore": {
+      "p99Ms": 1372,
+      "browsers": 78,
       "undetected": 0,
-      "p95Ms": 3756
+      "maximumMs": 1372,
+      "failures": 0,
+      "exceededBudget": 0,
+      "total": 37,
+      "detected": 37,
+      "p95Ms": 946
     },
-    "run2": {
-      "comparisons": 60,
-      "maximumMs": 3942,
-      "detected": 36,
-      "duplicateFindings": 0,
-      "exceededBudget": 0,
-      "p99Ms": 3942,
-      "total": 36,
-      "failures": [],
+    "release2": {
+      "p99Ms": 1407,
+      "browsers": 80,
       "undetected": 0,
-      "p95Ms": 3561
+      "maximumMs": 1407,
+      "failures": 0,
+      "exceededBudget": 0,
+      "total": 37,
+      "detected": 37,
+      "p95Ms": 893
     },
-    "run1": {
-      "comparisons": 60,
-      "maximumMs": 3898,
-      "detected": 36,
-      "duplicateFindings": 0,
-      "exceededBudget": 0,
-      "p99Ms": 3898,
-      "total": 36,
-      "failures": [],
+    "release1": {
+      "p99Ms": 1431,
+      "browsers": 76,
       "undetected": 0,
-      "p95Ms": 2834
+      "maximumMs": 1431,
+      "failures": 0,
+      "exceededBudget": 0,
+      "total": 37,
+      "detected": 37,
+      "p95Ms": 1156
     }
   },
+  "debugControlInterleaved": {
+    "debug2": {
+      "browsers": 93,
+      "p99Ms": 4245,
+      "p95Ms": 3095
+    },
+    "debug1": {
+      "browsers": 84,
+      "p99Ms": 3925,
+      "p95Ms": 2849
+    }
+  },
+  "warmUpHypothesisRefuted": {
+    "p95IfColdDiscarded": 1080,
+    "decayPresentIn": "18/36",
+    "ratio": 1.01,
+    "iter1MedianMs": 501,
+    "iter3MedianMs": 495,
+    "p95AsReported": 985,
+    "iter2MedianMs": 501,
+    "source": "backtest/target/after-r3.json repeat=3"
+  },
   "negativeCase": {
-    "detected": 26,
-    "predictedBeforeRunning": "28/36 detected, 8 sweep-attributable",
-    "sweepAttributableUndetected": 8,
+    "exceededBudget": 0,
+    "predictedBeforeRunning": "29/37 detected, 8 undetected",
+    "profile": "release",
     "predictionHeld": true,
-    "undetected": 8,
-    "exceededBudget": 2
+    "namesOriginalDefect": "7 responsive-range mutants status=Pass findings=0, plus responsive-isolation findings=1 expected 2",
+    "detected": 29,
+    "undetected": 8
   },
-  "restoreRun": {
-    "detected": 32,
-    "undetected": 0,
-    "browsers": 98,
-    "exceededBudget": 4
-  },
+  "restoreConfirmed": true,
   "gateConstants": {
+    "budgetReDerived": false,
+    "unchanged": true,
     "WATCHDOG_MS": 4800,
-    "COMPARISON_DEADLINE_MS": 4400,
-    "unchanged": true
+    "COMPARISON_DEADLINE_MS": 4400
   },
-  "priorMutantStringsLostOrLoosened": 0,
-  "comprehensiveSplitConserved": "14/14 verbatim",
-  "cargoTestRealTree": "79 passed; 0 failed; 0 ignored",
-  "hostContaminated": true,
-  "browsersDuringRuns": [
-    36,
-    36,
-    56
-  ]
+  "duplicateFindings": 0,
+  "consoleErrorMutantDetected": true,
+  "hostDuringAllRuns": "CPU 100 percent, 76-93 concurrent browsers - release passes anyway"
 }
