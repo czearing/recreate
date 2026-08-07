@@ -1,0 +1,99 @@
+// Writes the PRE-REGISTRATION block only. Run and commit BEFORE any capture.
+// Outcomes are added by a separate script that must not modify this block.
+import { writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+const preRegistration = {
+  registeredAtUtc: new Date().toISOString(),
+  registeredAtHeadSha: process.argv[2] || 'UNKNOWN',
+  status: 'LOCKED BEFORE CAPTURE. No page in this sample had been captured, built, served or measured when this block was written and committed.',
+
+  hypothesis:
+    'Per-element box WIDTH fidelity separates pages whose recreation diverges in overlap from pages whose recreation does not. Identified post hoc on the six pages of overlap-property-census.json (6/6, exactly zero vs nonzero) and therefore untested. This run is its first out-of-sample test.',
+
+  decisionRule: {
+    statement: 'A page is predicted CLEAN if and only if its width-mismatch percent is exactly 0 at ALL eight probe widths. Any width with a nonzero width-mismatch percent predicts DIVERGENT.',
+    covariate: 'For each text present on BOTH sides at a given width, compare the recreation box width to the source box width. Count the text as mismatched when |width_rec - width_src| > tolerance. widthMismatchPct = 100 * mismatched / sharedTexts.',
+    tolerancePx: 2,
+    note: 'Tolerance 2px is inherited unchanged from overlap-property-census.json. It is NOT re-tuned for this sample.',
+    probeWidths: [400, 450, 480, 600, 661, 800, 1076, 1440],
+    outcomeVariable: 'A page COUNTS AS DIVERGENT in outcome if the overlap predicate reports any nonzero recreation-only OR source-only pair at any probe width. Both directions count, because phpman showed 619 source-only against 690 recreation-only in the prior run, so a one-directional outcome would mislabel a page.',
+    gradingOfZeros: 'Inherited unchanged: a page is weak, and leaves the denominator, if it is structurally incapable (inline-row capacity 0 at every width), does not reflow on both sides between 400 and 1440, or the predicate never fired on it at any width.',
+  },
+
+  mechanismUnderTest: {
+    claim: 'The width error is the inline-axis expression of frozen derived geometry, the same root cause fidelity-developer traced for the resize defect.',
+    why: 'For layout-dependent properties the CSSOM resolved value IS the used value. getComputedStyle(el).width returns 400px for an authored width:50% inside an 800px parent, and the CSSOM exposes no way to recover the 50%. A capture that reads computed style therefore cannot distinguish an authored length from an engine-derived one, and emits the pixel it read. That pixel is right at the sampled viewport and wrong elsewhere.',
+    predictionItGenerates: 'Pages whose main column is FLUID (percentage, vw, auto margins, flex or grid fractions) get pinned and should diverge. Pages with little authored CSS and no horizontal constraint to freeze should stay clean.',
+    thisIsTheBasisForEveryLabelBelow: true,
+  },
+
+  // ---- the committed labels. Written before any measurement existed. ----
+  predictedLabels: {
+    wikipedia: {
+      url: 'https://en.wikipedia.org/wiki/CSS',
+      stack: 'MediaWiki, Vector 2022 skin (PHP-rendered, hand-authored CSS)',
+      predicted: 'DIVERGENT',
+      reasoning: 'Vector 2022 lays the article out as a fluid grid with a sticky table-of-contents rail and a percentage/max-width content column that rebalances across breakpoints. Every one of those widths is engine-derived, so all of them are freezable.',
+    },
+    reactdev: {
+      url: 'https://react.dev/',
+      stack: 'React + Next.js + Tailwind',
+      predicted: 'DIVERGENT',
+      reasoning: 'Tailwind container utilities resolve to percentage and max-width based columns, and the sidebar/content split is a fluid grid. Chosen also because it is a different framework from every page in the fitting sample.',
+    },
+    sveltedev: {
+      url: 'https://svelte.dev/',
+      stack: 'Svelte + SvelteKit',
+      predicted: 'DIVERGENT',
+      reasoning: 'SvelteKit marketing layout uses fluid max-width sections with clamp/vw-driven type and spacing. A fourth distinct framework.',
+    },
+    vuejs: {
+      url: 'https://vuejs.org/',
+      stack: 'Vue + VitePress',
+      predicted: 'DIVERGENT',
+      reasoning: 'VitePress renders a fluid two-column shell whose sidebar width and content width are both derived at layout time. A fifth distinct framework.',
+    },
+    cern: {
+      url: 'https://info.cern.ch/hypertext/WWW/TheProject.html',
+      stack: 'raw HTML, no stylesheet at all',
+      predicted: 'CLEAN',
+      reasoning: 'There is no authored width anywhere on the page, so there is no fluid length for the capture to freeze. Deliberately included as a predicted negative: a rule that only ever sees positives cannot be falsified.',
+    },
+    danluu: {
+      url: 'https://danluu.com/',
+      stack: 'static HTML, deliberately minimal CSS',
+      predicted: 'CLEAN',
+      reasoning: 'Single unconstrained text column, no sidebar, no grid. Second predicted negative, and structurally different from cern in that it does carry a small stylesheet.',
+    },
+    nprtext: {
+      url: 'https://text.npr.org/',
+      stack: 'server-rendered text-only edition, tiny stylesheet',
+      predicted: 'CLEAN',
+      reasoning: 'Text-only edition with a single narrow column. Third predicted negative. Closest analogue to litenews, which was the page that refuted the previous structural property, so it tests whether that refutation generalises.',
+    },
+  },
+
+  baselines: {
+    alwaysDivergent: 'An always-DIVERGENT rule scores exactly the number of pages whose measured outcome is divergent. On the previous sample that was 4 of 6 = 66.7% by luck alone. It is computed on THIS sample in the outcomes block and the predictor must beat it to mean anything.',
+    alwaysClean: 'Reported for symmetry.',
+    predictedClassBalance: '4 predicted DIVERGENT, 3 predicted CLEAN, of 7 registered pages.',
+  },
+
+  registeredDeviationsPolicy:
+    'If a page cannot be captured, built or served, it is reported as a tool limit with its exact error and REMOVED from the denominator. It is never relabelled. No page may be added after measurement begins, and no label may be edited. Any departure is recorded in outcomes.deviationsFromPlan.',
+
+  instrumentIntegrity:
+    'The overlap predicate is inherited byte-identically by extracting the PROBE literal from overlap-multi-site.mjs at runtime. Expected sha a5bcc101a9d8367b, verified again in outcomes. Neither the predicate nor the 2px tolerance is changed for this run.',
+
+  outOfScope: ['backtest/src/', 'src/', 'backtest/src/deadline.rs', 'any fixture, comparator or generator file'],
+};
+
+writeFileSync('width-fidelity-prereg.json', JSON.stringify({ preRegistration }, null, 2));
+const labelHash = createHash('sha256')
+  .update(JSON.stringify(preRegistration.predictedLabels) + JSON.stringify(preRegistration.decisionRule))
+  .digest('hex').slice(0, 16);
+writeFileSync('prereg-lock.txt', `predictedLabels+decisionRule sha256/16 = ${labelHash}\nregistered ${preRegistration.registeredAtUtc}\n`);
+console.log('wrote width-fidelity-prereg.json (pre-registration only)');
+console.log('lock hash', labelHash);
+console.log('labels:', Object.entries(preRegistration.predictedLabels).map(([k, v]) => `${k}=${v.predicted}`).join(' '));
