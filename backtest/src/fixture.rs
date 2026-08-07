@@ -56,10 +56,12 @@ pub struct Qualification {
     p99_ms: u128,
     duplicate_findings: usize,
     process_evidence: Option<ProcessEvidence>,
+    cost_lines: Vec<CostLine>,
     failures: Vec<String>,
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct CaseResult {
     case: String,
     control_durations_ms: Vec<u128>,
@@ -67,12 +69,118 @@ struct CaseResult {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct MutationResult {
     id: String,
     iterations: usize,
     durations_ms: Vec<u128>,
     finding: String,
     outcome: MutationOutcome,
+}
+
+/// Names why a comparison was ruled over budget, and is the single source of
+/// that verdict.
+///
+/// Reporting "4847ms > 4999ms" for a comparison that was interrupted before it
+/// ever reached its budget is false, so the message and the verdict are derived
+/// from the same place rather than computed twice and allowed to disagree.
+fn budget_cause(
+    status: &Status,
+    elapsed_ms: u128,
+    budget_ms: u128,
+    under_five_seconds: bool,
+) -> Option<String> {
+    if !matches!(status, Status::Fail | Status::Pass) {
+        return Some(format!(
+            "interrupted after {elapsed_ms}ms with status {status:?}"
+        ));
+    }
+    if elapsed_ms > budget_ms {
+        return Some(format!("{elapsed_ms}ms over {budget_ms}ms budget"));
+    }
+    if !under_five_seconds {
+        return Some(format!("{elapsed_ms}ms over the 5000ms ceiling"));
+    }
+    None
+}
+
+/// A fixed unit of arithmetic whose duration depends only on how much CPU the
+/// host is currently granting this process.
+///
+/// Sampled beside each comparison, it separates a case that is genuinely
+/// expensive from one that was merely descheduled: wall time rises in both,
+/// this rises only in the second. The harness's own CPU time cannot serve here
+/// because the browser does the real work in a separate process, and
+/// "comparisons in flight" cannot either, because every comparison in this
+/// loop is a sequential await and the count is therefore always one.
+fn contention_probe() -> u128 {
+    let started = Instant::now();
+    let mut value: u64 = 0;
+    for index in 0..400_000u64 {
+        value = std::hint::black_box(value.wrapping_add(index ^ (value >> 3)));
+    }
+    std::hint::black_box(value);
+    started.elapsed().as_micros().max(1)
+}
+
+/// One comparison's cost, carrying the budget it is judged against so a reader
+/// need not recall which of the corpus's two budgets applies. The same wall
+/// time is healthy under one and a breach under the other, so a bare duration
+/// cannot be acted on.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CostLine {
+    case: String,
+    unit: String,
+    wall_ms: u128,
+    budget_ms: u128,
+    margin_ms: i128,
+    /// Host contention at the moment this comparison ran, as a percentage of
+    /// the quietest probe seen this run. 100 means the host was as free as it
+    /// ever was; a high value means the duration beside it is ambient.
+    contention_pct: u128,
+    outcome: String,
+    cause: Option<String>,
+}
+
+impl CostLine {
+    fn new(
+        case: &str,
+        unit: &str,
+        wall_ms: u128,
+        budget_ms: u128,
+        probe_us: u128,
+        outcome: String,
+        cause: Option<String>,
+    ) -> Self {
+        Self {
+            case: case.to_string(),
+            unit: unit.to_string(),
+            wall_ms,
+            budget_ms,
+            margin_ms: budget_ms as i128 - wall_ms as i128,
+            contention_pct: probe_us,
+            outcome,
+            cause,
+        }
+    }
+
+    fn render(&self) -> String {
+        format!(
+            "cost {:>6}ms  budget {:>6}ms  margin {:>+7}ms  host {:>4}%  {:<14} {} {}{}",
+            self.wall_ms,
+            self.budget_ms,
+            self.margin_ms,
+            self.contention_pct,
+            self.outcome,
+            self.case,
+            self.unit,
+            match &self.cause {
+                Some(cause) => format!("  [{cause}]"),
+                None => String::new(),
+            }
+        )
+    }
 }
 
 /// A mutant that ran out of time never produced a verdict, so folding it into
@@ -137,6 +245,7 @@ pub async fn qualify(
         .map(|path| blackbox::run(path, recreate_args))
         .transpose()?;
     let mut all_durations = Vec::new();
+    let mut cost_lines: Vec<CostLine> = Vec::new();
     let mut failures = Vec::new();
     let mut duplicate_findings = 0;
     let mut passed_comparisons = 0;
@@ -215,6 +324,20 @@ pub async fn qualify(
                     report::text(&report).trim()
                 ));
             }
+            cost_lines.push(CostLine::new(
+                &case.case,
+                "control",
+                report.elapsed_ms,
+                case.control.maximum_duration_ms,
+                contention_probe(),
+                if valid { "CONTROL" } else { "CONTROL-FAIL" }.into(),
+                budget_cause(
+                    &report.status,
+                    report.elapsed_ms,
+                    case.control.maximum_duration_ms,
+                    result.under_five_seconds,
+                ),
+            ));
         }
 
         let mut mutation_results = Vec::new();
@@ -251,11 +374,13 @@ pub async fn qualify(
                     .map(|finding| finding.line.as_str())
                     .unwrap_or_default();
                 let normalized = normalized_json(&report)?;
-                let within_budget = report.elapsed_ms <= mutation.maximum_duration_ms
-                    && result.under_five_seconds;
-                // Inconclusive and PreparationRequired mean the comparison was
-                // interrupted, so no verdict exists to call blind.
-                let verdict_reached = matches!(report.status, Status::Fail | Status::Pass);
+                let cause = budget_cause(
+                    &report.status,
+                    report.elapsed_ms,
+                    mutation.maximum_duration_ms,
+                    result.under_five_seconds,
+                );
+                let within_budget = cause.is_none();
                 let content_expected = report.status == Status::Fail
                     && report.findings.len() == mutation.primary_findings
                     && mutation.unexpected_primary_findings == 0
@@ -268,20 +393,18 @@ pub async fn qualify(
                 let expected = content_expected && within_budget;
                 if expected {
                     passed_comparisons += 1;
-                } else if within_budget && verdict_reached {
+                } else if within_budget {
                     mutation_content_valid = false;
                 } else {
                     mutation_within_budget = false;
                 }
                 if !expected {
                     failures.push(format!(
-                        "{} {}: outcome={:?} elapsed={}ms budget={}ms expected={} actual={} status={:?} findings={} duplicates={} lines={:?}",
+                        "{} {}: outcome={:?} cause={} elapsed={}ms budget={}ms expected={} actual={} status={:?} findings={} duplicates={} lines={:?}",
                         case.case,
                         mutation.id,
-                        MutationOutcome::classify(
-                            content_expected,
-                            within_budget && verdict_reached
-                        ),
+                        MutationOutcome::classify(content_expected, within_budget),
+                        cause.clone().unwrap_or_else(|| "content mismatch".into()),
                         report.elapsed_ms,
                         mutation.maximum_duration_ms,
                         mutation.finding,
@@ -300,6 +423,19 @@ pub async fn qualify(
                 stable_json.get_or_insert(normalized);
                 durations.push(report.elapsed_ms);
                 all_durations.push(report.elapsed_ms);
+                cost_lines.push(CostLine::new(
+                    &case.case,
+                    &mutation.id,
+                    report.elapsed_ms,
+                    mutation.maximum_duration_ms,
+                    contention_probe(),
+                    format!(
+                        "{:?}",
+                        MutationOutcome::classify(content_expected, within_budget)
+                    )
+                    .to_uppercase(),
+                    cause,
+                ));
             }
             let outcome =
                 MutationOutcome::classify(mutation_content_valid, mutation_within_budget);
@@ -323,6 +459,19 @@ pub async fn qualify(
         });
     }
     all_durations.sort_unstable();
+    // The quietest probe of the run is the closest thing to an uncontended
+    // host, because contention only ever adds time. Every other sample is
+    // expressed against it, so a high percentage marks a duration as ambient.
+    let quietest_probe = cost_lines
+        .iter()
+        .map(|line| line.contention_pct)
+        .min()
+        .unwrap_or(1)
+        .max(1);
+    for line in &mut cost_lines {
+        line.contention_pct = line.contention_pct * 100 / quietest_probe;
+    }
+    cost_lines.sort_by(|a, b| b.wall_ms.cmp(&a.wall_ms));
     let p95 = percentile(&all_durations, 0.95);
     let p99 = percentile(&all_durations, 0.99);
     let maximum = all_durations.last().copied().unwrap_or_default();
@@ -350,8 +499,24 @@ pub async fn qualify(
         ));
     }
     if exceeded_budget_mutations != 0 {
+        // Naming each case and its measured duration is the point of the label:
+        // a count alone sends the reader back to the JSON to find out which
+        // case ran out of time.
+        let named = cost_lines
+            .iter()
+            .filter(|line| line.outcome == "EXCEEDEDBUDGET")
+            .map(|line| {
+                format!(
+                    "{} {} ({})",
+                    line.case,
+                    line.unit,
+                    line.cause.as_deref().unwrap_or("over budget")
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
         failures.push(format!(
-            "exceeded budget {exceeded_budget_mutations}/{total_mutations} mutations (detected {detected_mutations})"
+            "exceeded budget {exceeded_budget_mutations}/{total_mutations} mutations (detected {detected_mutations}): {named}"
         ));
     }
     if process_evidence
@@ -372,6 +537,7 @@ pub async fn qualify(
         p99_ms: p99,
         duplicate_findings,
         process_evidence,
+        cost_lines,
         cases: case_results,
         failures,
     };
@@ -383,6 +549,15 @@ pub async fn qualify(
         fs::write(path, &bytes)?;
     }
     println!("{}", String::from_utf8_lossy(&bytes));
+    // Printed after the artifact so the slowest comparison is the first cost
+    // line a reader meets, and ordering is checkable without parsing JSON.
+    println!(
+        "cost table: {} comparisons, slowest first",
+        qualification.cost_lines.len()
+    );
+    for line in &qualification.cost_lines {
+        println!("{}", line.render());
+    }
     anyhow::ensure!(
         qualification.failures.is_empty(),
         "qualification failed: {}",
