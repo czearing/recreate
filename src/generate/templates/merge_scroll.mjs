@@ -1,0 +1,3 @@
+const mergeHorizontalScroll=(current,captured)=>{const live=new Map(current.elements.map(value=>[value[0],value]));const paths=new Set(captured.elements.map(value=>value[0]));return{window:current.window,elements:[...captured.elements.map(([path,left])=>[path,left,live.get(path)?.[2]??0]),...current.elements.filter(([path])=>!paths.has(path))]}};
+const mergeStateScroll=(current,captured)=>{const live=new Map(current.elements.map(value=>[value[0],value]));const paths=new Set(captured.elements.map(value=>value[0]));return{window:current.window,elements:[...captured.elements.map(([path,,top])=>[path,live.get(path)?.[1]??0,top]),...current.elements.filter(([path])=>!paths.has(path))]}};
+const capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;

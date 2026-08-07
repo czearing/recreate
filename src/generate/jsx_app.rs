@@ -5,6 +5,42 @@ use super::{
 use crate::model::Specification;
 use std::collections::BTreeMap;
 
+/// The app module is authored as real JavaScript under `templates/`, so a syntax
+/// error is caught by `node --check` rather than by the browser gate. Every
+/// interpolation point is a token that parses in place: `"__RECREATE_X__"` where a
+/// value is expected, `//__RECREATE_X__` on its own line where a statement is.
+const APP_TEMPLATE: &str = concat!(
+    include_str!("templates/app_runtime.mjs"),
+    include_str!("templates/app_component.jsx"),
+);
+
+/// Substitute placeholder tokens into an extracted template.
+///
+/// `format!` substitutes simultaneously; this substitutes in sequence, so the two
+/// agree only while no replacement value contains a token. The debug assertions
+/// hold that invariant and catch a token that never matched anything.
+pub(super) fn fill(template: &str, holes: &[(&str, &str)]) -> String {
+    let mut output = template.to_string();
+    for (token, value) in holes {
+        debug_assert!(
+            output.contains(token),
+            "template has no placeholder {token}"
+        );
+        debug_assert!(
+            !value.contains("__RECREATE_"),
+            "value for {token} would re-introduce a placeholder"
+        );
+        output = output.replace(token, value);
+    }
+    output
+}
+
+/// Splice snippets are stored with a trailing newline so they are ordinary text
+/// files; that newline is never part of the emitted JavaScript.
+fn snippet(text: &str) -> &str {
+    text.trim_end_matches('\n')
+}
+
 pub fn app(
     specification: &Specification,
     components: &Components,
@@ -329,13 +365,38 @@ pub fn app(
             .collect::<Vec<_>>(),
     )
     .unwrap();
-    let output = format!(
-        "import React,{{useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore}} from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{moveCarousel}} from './runtime/carousel.mjs';\nimport {{reduceInteraction}} from './runtime/interaction.mjs';\nimport {{startSequences}} from './runtime/sequence.mjs';\n{component_import}{state_import}const keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\nconst pathOf=element=>{{const parts=[];for(let node=element;node&&node!==document.documentElement;node=node.parentElement){{const peers=node.parentElement?[...node.parentElement.children].filter(child=>child.tagName===node.tagName):[node];parts.push(`${{node.tagName.toLowerCase()}}:nth-of-type(${{peers.indexOf(node)+1}})`)}}return `html>${{parts.reverse().join('>')}}`}};\nconst captureScroll=element=>{{const elements=[];for(let node=element?.parentElement;node&&node!==document.documentElement;node=node.parentElement){{if(node.scrollLeft||node.scrollTop)elements.push([pathOf(node),node.scrollLeft,node.scrollTop])}}return{{window:[scrollX,scrollY],elements}}}};\n        const scrollAnimations=new WeakMap();const scrollEase=value=>{{let current=value;for(let index=0;index<5;index++){{const inverse=1-current;const x=3*inverse*inverse*current*.4+3*inverse*current*current*.2+current*current*current;const slope=3*inverse*inverse*.4+6*inverse*current*(.2-.4)+3*current*current*(1-.2);if(Math.abs(slope)<1e-4)break;current=Math.max(0,Math.min(1,current-(x-value)/slope))}}const inverse=1-current;return 3*inverse*current*current+current*current*current}};const setScroll=(element,left,top)=>element===window?scrollTo(left,top):element.scrollTo(left,top);const animateScroll=(element,left,top)=>{{if(element!==window&&top===0){{const content=[...element.children].find(child=>child.scrollWidth>element.clientWidth&&getComputedStyle(child).transition.includes('transform'));        if(content){{element.scrollTo(0,0);requestAnimationFrame(()=>requestAnimationFrame(()=>{{content.style.transform=`translateX(${{-left}}px)`}}));return}}}}const startLeft=element===window?scrollX:element.scrollLeft;const startTop=element===window?scrollY:element.scrollTop;if(Math.abs(startLeft-left)<1&&Math.abs(startTop-top)<1)return;const token={{}};scrollAnimations.set(element,token);const started=performance.now();const frame=now=>{{if(scrollAnimations.get(element)!==token)return;const progress=Math.min(1,(now-started)/320);const eased=scrollEase(progress);setScroll(element,startLeft+(left-startLeft)*eased,startTop+(top-startTop)*eased);if(progress<1)requestAnimationFrame(frame)}};requestAnimationFrame(frame)}};const restoreScroll=snapshot=>{{if(snapshot.smooth){{animateScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)animateScroll(element,left,top)}});return}}setScroll(window,snapshot.window[0],snapshot.window[1]);snapshot.elements.forEach(([path,left,top])=>{{const element=document.querySelector(path);if(element)setScroll(element,left,top)}})}};\n{}\nconst viewportWidths=[{widths}];\nconst closableStates=[{closable}];\nconst statefulStates=[{stateful}];\nconst replacementStates=[{replacement_states}];\nconst capturedScrolls={scroll_targets};\nconst carouselState={carousel_state};\n        const attributeSequences={attribute_sequences};\nconst responsiveAttributePaths={responsive_attribute_paths};\nconst responsiveAttributeValues={responsive_attribute_values};\nconst responsiveAttributes={responsive_attributes};\nconst capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;\n        const subscribe=notify=>{{const media=viewportWidths.slice(1).map(width=>matchMedia(`(max-width:${{width}}px)`));media.forEach(query=>query.addEventListener('change',notify));addEventListener('resize',notify);return()=>{{media.forEach(query=>query.removeEventListener('change',notify));removeEventListener('resize',notify)}}}};\n{views}const baselineViews=[{view_names}];\n                                                export default function App(){{const[state,setState]=useState(0);const[scrollRevision,setScrollRevision]=useState(0);const[carouselAdvanced,setCarouselAdvanced]=useState(false);const lastTrigger=useRef('');const scroll=useRef(null);const viewport=useSyncExternalStore(subscribe,()=>selectViewport(document.documentElement.clientWidth,viewportWidths),()=>0);const reset=()=>{{const selector='[data-recreate-trigger=\"'+lastTrigger.current+'\"]';scroll.current=captureScroll(document.querySelector(selector));setState(0);requestAnimationFrame(()=>document.querySelector(selector)?.focus({{preventScroll:true}}))}};const activate=(event,next,inputActive)=>{{if(inputActive===false){{if(state===next)reset();return}}if(inputActive===true&&state===next)return;lastTrigger.current=event.currentTarget.dataset.recreateTrigger;const captured=capturedScroll(next,viewport);if(!statefulStates[next]){{scroll.current=captured?{{...mergeHorizontalScroll(captureScroll(event.currentTarget),captured),smooth:true}}:null;if(next===carouselState)setCarouselAdvanced(true);if(scroll.current)setScrollRevision(value=>value+1);return}}if(state===next){{reset();return}}scroll.current=event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{{window:[0,0],elements:[]}}):captureScroll(event.currentTarget);setState(next)}};useLayoutEffect(()=>{{if(state!==0)return;for(const[pathIndex,attributesIndex]of responsiveAttributes[viewport]||[]){{const element=document.querySelector(responsiveAttributePaths[pathIndex]);if(!element)continue;for(const[name,value]of responsiveAttributeValues[attributesIndex])value===null?element.removeAttribute(name):element.setAttribute(name,value)}}}},[viewport,state]);useLayoutEffect(()=>{{document.querySelectorAll('[data-recreate-trigger][aria-expanded]').forEach(element=>element.setAttribute('aria-expanded',String(Number(element.dataset.recreateTrigger)===state)));if(state&&closableStates[state])requestAnimationFrame(()=>{{const surfaces=[...document.querySelectorAll('[data-recreate-surface]')];const surface=surfaces.at(-1);const target=(focusedTargets[state]&&document.querySelector(focusedTargets[state]))||[...surfaces].reverse().find(element=>element.matches('input,button,[tabindex]'))||surface?.querySelector('input,button,[tabindex]')||surface;if(target){{if(target===surface&&!target.matches('input,button,[tabindex]'))target.tabIndex=-1;target.focus({{preventScroll:true}})}}}});if(!scroll.current)return;const snapshot=scroll.current;restoreScroll(snapshot);if(!snapshot.smooth)requestAnimationFrame(()=>restoreScroll(snapshot))}},[state,scrollRevision]);useEffect(()=>{{if(!carouselState||!carouselPrevious||!carouselNext)return;const previous=document.querySelector(carouselPrevious);const more=document.querySelector(carouselNext);if(!previous||!more)return;previous.disabled=!carouselAdvanced;more.disabled=carouselAdvanced;const reverse=()=>{{if(!carouselAdvanced)return;const captured=capturedScroll(carouselState,viewport);if(!captured)return;const origin={{window:[0,0],elements:captured.elements.map(([path,left,top])=>[path,0,top])}};scroll.current={{...mergeHorizontalScroll(captureScroll(more),origin),smooth:true}};setCarouselAdvanced(false);setScrollRevision(value=>value+1)}};previous.addEventListener('click',reverse);return()=>previous.removeEventListener('click',reverse)}},[carouselAdvanced,viewport]);useEffect(()=>{{const timers=(attributeSequences[viewport]||[]).map((sequence,index)=>{{const element=document.querySelector(`[data-recreate-sequence=\"${{index}}\"]`);if(!element||sequence.values.length<2)return null;let current=0;element.setAttribute(sequence.attribute,sequence.values[current]);return setInterval(()=>{{current=(current+1)%sequence.values.length;element.setAttribute(sequence.attribute,sequence.values[current])}},sequence.interval_ms)}});return()=>timers.forEach(timer=>timer&&clearInterval(timer))}},[viewport]);useEffect(()=>{{if(!state||!closableStates[state])return;const key=event=>{{if(event.key==='Escape')reset()}};const pointer=event=>{{if(!event.target.closest('[data-recreate-surface],[data-recreate-control]'))reset()}}        ;addEventListener('keydown',key);addEventListener('pointerdown',pointer);return()=>{{removeEventListener('keydown',key);removeEventListener('pointerdown',pointer)}}}},[state]);const renderState=value=>{render_state};const contentState=closableStates[state]?returnState.current:state;const content=renderState(contentState);const popup=closableStates[state]?renderState(state):null;const baseline=baselineViews[viewport]({{activate,showStartup:!startupDone,onStartupDone:()=>setStartupDone(true)}});return replacementStates[contentState]?<>{{content}}{{popup}}</>:<>{{baseline}}{{content}}{{popup}}</>}}\n",
-        jsx_variants::selector(),
+    let selector = jsx_variants::selector();
+    let carousel_state = carousel_state.to_string();
+    let output = fill(
+        APP_TEMPLATE,
+        &[
+            ("//__RECREATE_COMPONENT_IMPORT__\n", &component_import),
+            ("//__RECREATE_STATE_IMPORT__\n", &state_import),
+            ("\"__RECREATE_POSITIONAL__\"", &selector),
+            ("\"__RECREATE_WIDTHS__\"", &widths),
+            ("\"__RECREATE_CLOSABLE__\"", &closable),
+            ("\"__RECREATE_STATEFUL__\"", &stateful),
+            ("\"__RECREATE_REPLACEMENT_STATES__\"", &replacement_states),
+            ("\"__RECREATE_SCROLL_TARGETS__\"", &scroll_targets),
+            ("\"__RECREATE_CAROUSEL_STATE__\"", &carousel_state),
+            ("\"__RECREATE_ATTRIBUTE_SEQUENCES__\"", &attribute_sequences),
+            (
+                "\"__RECREATE_RESPONSIVE_ATTRIBUTE_PATHS__\"",
+                &responsive_attribute_paths,
+            ),
+            (
+                "\"__RECREATE_RESPONSIVE_ATTRIBUTE_VALUES__\"",
+                &responsive_attribute_values,
+            ),
+            ("\"__RECREATE_RESPONSIVE_ATTRIBUTES__\"", &responsive_attributes),
+            ("//__RECREATE_VIEWS__\n", &views),
+            ("\"__RECREATE_VIEW_NAMES__\"", &view_names),
+            ("\"__RECREATE_RENDER_STATE__\"", &render_state),
+        ],
     );
     let output = output.replace(
         "const setScroll=(element,left,top)=>element===window?scrollTo(left,top):element.scrollTo(left,top);",
-        "const ensureScrollExtent=(element,left)=>{if(element===window||left<=element.scrollWidth-element.clientWidth)return;let extent=[...element.children].find(child=>child.hasAttribute('data-recreate-scroll-extent'));if(!extent){extent=document.createElement('span');extent.setAttribute('data-recreate-startup','true');extent.setAttribute('data-recreate-scroll-extent','true');extent.style.cssText='display:block;height:0;flex:none;pointer-events:none;visibility:hidden';element.append(extent)}extent.style.width=`${element.clientWidth+left}px`};const setScroll=(element,left,top)=>{ensureScrollExtent(element,left);element===window?scrollTo(left,top):element.scrollTo(left,top)};",
+        snippet(include_str!("templates/scroll_extent.mjs")),
     );
     let output = output.replace(
         "document.querySelectorAll('[data-recreate-trigger][aria-expanded]').forEach(element=>element.setAttribute('aria-expanded',String(Number(element.dataset.recreateTrigger)===state)));",
@@ -343,11 +404,11 @@ pub fn app(
     );
     let output = output.replace(
         "if(state&&closableStates[state])requestAnimationFrame",
-        "if(transitionGraph){const syncActive=()=>{const activeState=closableStates[state]?returnState.current:state;for(const attribute of ['aria-selected','aria-pressed']){const name=attribute==='aria-selected'?'recreateSelected':'recreatePressed';const baselineToken=(attribute==='aria-selected'?baselineSelectedTokens:baselinePressedTokens)[0];const remembered=document.documentElement.dataset[name]||baselineToken;document.querySelectorAll(`[data-recreate-trigger][${attribute}]`).forEach(element=>{if(!remembered&&activeState===0)return;const active=remembered?element.dataset.recreateTrigger===remembered:transitionEdges.find(edge=>edge.from===0&&edge.key===element.dataset.recreateTrigger)?.to===activeState;element.setAttribute(attribute,String(active));const styles=controlStyles[element.dataset.recreateTrigger]||{};const paint=styles[active?'active':'inactive']||{};for(const[property,value]of Object.entries(paint))element.style.setProperty(property,value,'important');const foreground=styles[active?'activeForeground':'inactiveForeground']||{};for(const child of element.querySelectorAll('span'))for(const[property,value]of Object.entries(foreground))child.style.setProperty(property,value,'important')})}};syncActive();requestAnimationFrame(syncActive)}if(state&&closableStates[state])requestAnimationFrame",
+        snippet(include_str!("templates/sync_active_controls.mjs")),
     );
     let output = output.replace(
         "const capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;",
-        "const mergeHorizontalScroll=(current,captured)=>{const live=new Map(current.elements.map(value=>[value[0],value]));const paths=new Set(captured.elements.map(value=>value[0]));return{window:current.window,elements:[...captured.elements.map(([path,left])=>[path,left,live.get(path)?.[2]??0]),...current.elements.filter(([path])=>!paths.has(path))]}};\nconst mergeStateScroll=(current,captured)=>{const live=new Map(current.elements.map(value=>[value[0],value]));const paths=new Set(captured.elements.map(value=>value[0]));return{window:current.window,elements:[...captured.elements.map(([path,,top])=>[path,live.get(path)?.[1]??0,top]),...current.elements.filter(([path])=>!paths.has(path))]}};\nconst capturedScroll=(state,viewport)=>capturedScrolls[state]?.[viewport]??null;",
+        snippet(include_str!("templates/merge_scroll.mjs")),
     );
     let output = output.replace(
         "const statefulStates=",
@@ -394,7 +455,7 @@ pub fn app(
     );
     let output = output.replace(
         "const activate=(event,next,inputActive)=>{if(inputActive===false){if(state===next)reset();return}if(inputActive===true&&state===next)return;lastTrigger.current=event.currentTarget.dataset.recreateTrigger;",
-        "const activate=(event,next,inputActive,actionType='activate')=>{if(transitionGraph){const currentState=Number(document.documentElement.dataset.recreateState||state);const repeatedSurface=actionType==='activate'&&closableStates[currentState]&&event.currentTarget.dataset.recreateActive==='true'&&document.querySelector('[data-recreate-surface]');const openedBy=transitionEdges.some(candidate=>candidate.from===0&&candidate.to===currentState&&candidate.key===next&&candidate.action===actionType);if(repeatedSurface||currentState&&closableStates[currentState]&&(openedBy||lastTrigger.current===next))next=returnState.current;else{let matches=transitionEdges.filter(candidate=>candidate.from===currentState&&candidate.key===next&&candidate.action===actionType);if(!matches.length&&!closableStates[currentState])matches=transitionEdges.filter(candidate=>candidate.from===0&&candidate.key===next&&candidate.action===actionType);const edge=matches.find(candidate=>candidate.to!==currentState)??matches[0];if(!edge)return;next=edge.to}if(event.currentTarget.hasAttribute('aria-selected'))selectedState.current=next;if(event.currentTarget.hasAttribute('aria-pressed')&&baselinePressedTokens.includes(event.currentTarget.dataset.recreateTrigger))next=selectedState.current;if(closableStates[currentState]&&!closableStates[next]){const trigger=lastTriggerElement.current??event.currentTarget;trigger?.removeAttribute('data-recreate-active');lastTrigger.current='';restoreFocus.current=trigger;scroll.current=captureScroll(trigger);setState(next);return}if(event.currentTarget.hasAttribute('aria-selected'))document.documentElement.dataset.recreateSelected=event.currentTarget.dataset.recreateTrigger;if(event.currentTarget.hasAttribute('aria-pressed'))document.documentElement.dataset.recreatePressed=event.currentTarget.dataset.recreateTrigger;if(closableStates[next])returnState.current=currentState;const previousTrigger=lastTriggerElement.current;previousTrigger?.removeAttribute('data-recreate-active');lastTriggerElement.current=event.currentTarget;event.currentTarget.dataset.recreateActive='true';lastTrigger.current=next===0?'':event.currentTarget.dataset.recreateTrigger;const destination=capturedScroll(next,viewport);const origin=capturedScroll(currentState,viewport);const stateControl=event.currentTarget.getAttribute('role')==='tab'||event.currentTarget.hasAttribute('aria-selected')||event.currentTarget.hasAttribute('aria-pressed');const preservePosition=closableStates[currentState]||closableStates[next];scroll.current=stateControl&&destination?{...mergeStateScroll(captureScroll(event.currentTarget),destination),smooth:true}:preservePosition?captureScroll(event.currentTarget):destination??(next===0&&origin?{window:[0,0],elements:origin.elements.map(([path])=>[path,0,0])}:null);setState(next);return}if(inputActive===false){if(state===next)reset();return}if(inputActive===true&&state===next)return;const previousTrigger=lastTriggerElement.current;previousTrigger?.removeAttribute('data-recreate-active');lastTriggerElement.current=event.currentTarget;event.currentTarget.dataset.recreateActive='true';lastTrigger.current=event.currentTarget.dataset.recreateTrigger;const[,command]=reduceInteraction({openSurface:state||null,activeTrigger:previousTrigger},{type:'activate',trigger:event.currentTarget,surface:next,stateful:statefulStates[next],closable:closableStates[next]});",
+        snippet(include_str!("templates/activate_transition.fragment")),
     );
     let output = output
         .replace("if(!statefulStates[next]){", "if(command.type==='invoke'){")
@@ -404,16 +465,16 @@ pub fn app(
         )
         .replace(
             "captureScroll(event.currentTarget);setState(next)};useLayoutEffect",
-            "captureScroll(event.currentTarget);setState(command.surface)};useLayoutEffect(()=>{document.documentElement.dataset.recreateState=String(state);for(const name of ['Selected','Pressed']){const key=`${returnStorageKey}:${name}`;const value=sessionStorage.getItem(key);if(value)document.documentElement.dataset[`recreate${name}`]=value;sessionStorage.removeItem(key)}},[state]);useLayoutEffect(()=>{for(const[path,left,top]of initialScrolls[viewport]||[])document.querySelector(path)?.scrollTo(left,top)},[viewport]);useLayoutEffect(()=>{if(closableStates[state])return;const trigger=restoreFocus.current;if(!trigger)return;const frame=requestAnimationFrame(()=>requestAnimationFrame(()=>{trigger.focus({preventScroll:true});trigger.removeAttribute('data-recreate-active');restoreFocus.current=null}));return()=>cancelAnimationFrame(frame)},[state]);useLayoutEffect",
+            snippet(include_str!("templates/state_effects.fragment")),
         );
     let output = output.replace(
         "scroll.current=event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{window:[0,0],elements:[]}):captureScroll(event.currentTarget);setState(command.surface)",
-        "scroll.current=event.currentTarget.getAttribute('role')==='tab'&&captured?{window:captured.window,elements:captured.elements.map(([path,,top],index)=>[path,index===0&&width<=390&&captured.elements.some(([,left])=>left>5)?5:0,top])}:event.currentTarget.dataset.recreatePreserveScroll==='false'?(captured??{window:[0,0],elements:[]}):(event.currentTarget.hasAttribute('aria-pressed')&&captured?captured:captureScroll(event.currentTarget));setState(command.surface)",
+        snippet(include_str!("templates/tab_scroll.mjs")),
     );
     let output = attribute_sequences::runtime(output);
     let output = output.replace(
         "useEffect(()=>startSequences(document,attributeSequences[viewport]||[]),[viewport,state]);",
-        "useLayoutEffect(()=>{if(!transitionGraph)return;const dispatch=(event,action)=>{const control=event.target.closest?.('[data-recreate-trigger]');if(!control)return;const token=control.dataset.recreateTrigger;const currentState=Number(document.documentElement.dataset.recreateState||0);const repeatedSurface=action==='activate'&&closableStates[currentState]&&control.dataset.recreateActive==='true'&&document.querySelector('[data-recreate-surface]');const direct=transitionEdges.some(edge=>edge.from===currentState&&edge.key===token&&edge.action===action);const baseline=!closableStates[currentState]&&transitionEdges.some(edge=>edge.from===0&&edge.key===token&&edge.action===action);if(!direct&&!baseline&&!repeatedSurface)return;activate({currentTarget:control},token,undefined,action)};const click=event=>dispatch(event,'activate');const hover=event=>dispatch(event,'hover');const leave=event=>{const control=event.target.closest?.('[data-recreate-trigger]');if(control?.contains(event.relatedTarget))return;dispatch(event,'leave')};const focus=event=>dispatch(event,'focus');const input=event=>dispatch(event,'activate');const key=event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('button,[role=button],[role=tab],summary')){event.preventDefault();event.stopImmediatePropagation();dispatch(event,'activate')}};addEventListener('click',click,true);addEventListener('pointerover',hover,true);addEventListener('pointerout',leave,true);addEventListener('focusin',focus,true);addEventListener('input',input,true);addEventListener('keydown',key,true);return()=>{removeEventListener('click',click,true);removeEventListener('pointerover',hover,true);removeEventListener('pointerout',leave,true);removeEventListener('focusin',focus,true);removeEventListener('input',input,true);removeEventListener('keydown',key,true)}},[]);useEffect(()=>startSequences(document,attributeSequences[viewport]||[]),[viewport,state]);",
+        snippet(include_str!("templates/transition_dispatch.mjs")),
     );
     let output = startup_overlays::runtime(output, &specification.states);
     output.replace(

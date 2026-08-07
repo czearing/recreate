@@ -1,0 +1,11 @@
+# Compile-time JavaScript templates are embedded verbatim by include_str!, so
+# the bytes on disk become bytes in every generated project. Pin them to LF or
+# a CRLF checkout would silently change generated output, differently per
+# machine, where the original Rust "\n" escapes always emitted LF.
+#
+# Scoped to this directory deliberately. A blanket *.mjs rule would eventually
+# renormalize runtime/*.mjs, which are emitted assets that already ship CRLF,
+# and would change bytes those files have always written.
+src/generate/templates/*.mjs text eol=lf
+src/generate/templates/*.jsx text eol=lf
+src/generate/templates/*.fragment text eol=lf
