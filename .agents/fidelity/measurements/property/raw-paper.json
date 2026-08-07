@@ -1,0 +1,10737 @@
+{
+ "site": {
+  "sourceUrl": "https://arxiv.org/abs/1706.03762",
+  "key": "paper",
+  "recreationUrl": "http://127.0.0.1:8826/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 9,
+    "candidates": 126,
+    "protruding": 2,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 13,
+    "candidates": 129,
+    "protruding": 18,
+    "scrollWidth": 927,
+    "clientWidth": 400
+   },
+   "recreationOnly": 13,
+   "sourceOnly": 9,
+   "recreationOnlyExamples": [
+    "cs ||| cs.lg",
+    "() ||| nasa ads",
+    "() ||| google scholar",
+    "() ||| semantic scholar",
+    "bookmark ||| export bibtex citation",
+    "() ||| bibliographic explorer",
+    "bibliographic explorer ||| what is the explorer?",
+    "() ||| connected papers"
+   ],
+   "sourceOnlyExamples": [
+    "ashish vaswani ||| llion jones",
+    "llion jones ||| noam shazeer",
+    "llion jones ||| niki parmar",
+    "jakob uszkoreit ||| llion jones",
+    "aidan n. gomez ||| llion jones",
+    "llion jones ||| lukasz kaiser",
+    "illia polosukhin ||| llion jones",
+    "disable mathjax ||| which authors of this paper are endorsers?"
+   ],
+   "sharedTextKeys": 101,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 109,
+     "rowParents": 29,
+     "maxRowMembers": 15,
+     "navInlinePairs": 58
+    },
+    "recreation": {
+     "inlineSiblingPairs": 124,
+     "rowParents": 28,
+     "maxRowMembers": 15,
+     "navInlinePairs": 62
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      61,
+      230
+     ],
+     [
+      "learn more",
+      298,
+      68
+     ],
+     [
+      "×",
+      191,
+      22
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      400
+     ],
+     [
+      "(cs)",
+      12,
+      388
+     ],
+     [
+      "arxiv:1706.03762",
+      12,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      11,
+      389
+     ],
+     [
+      "v1",
+      149,
+      12
+     ],
+     [
+      "attention is all you need",
+      12,
+      383
+     ],
+     [
+      ", , , , , , ,",
+      12,
+      385
+     ],
+     [
+      "ashish vaswani",
+      12,
+      81
+     ],
+     [
+      "noam shazeer",
+      100,
+      77
+     ],
+     [
+      "niki parmar",
+      183,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      250,
+      83
+     ],
+     [
+      "llion jones",
+      12,
+      352
+     ],
+     [
+      "aidan n. gomez",
+      49,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      141,
+      73
+     ],
+     [
+      "illia polosukhin",
+      220,
+      78
+     ],
+     [
+      "view pdf",
+      5,
+      390
+     ],
+     [
+      "html (experimental)",
+      5,
+      390
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      14,
+      373
+     ],
+     [
+      "comments:",
+      20,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      89,
+      309
+     ],
+     [
+      "subjects:",
+      20,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      89,
+      309
+     ],
+     [
+      "computation and language (cs.cl)",
+      89,
+      197
+     ],
+     [
+      "cite as:",
+      20,
+      66
+     ],
+     [
+      "[cs.cl]",
+      89,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      89,
+      92
+     ],
+     [
+      "(or  for this version)",
+      89,
+      309
+     ],
+     [
+      "[cs.cl]",
+      106,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      106,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      89,
+      217
+     ],
+     [
+      "focus to learn more",
+      327,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      0,
+      400
+     ],
+     [
+      "submission history",
+      13,
+      374
+     ],
+     [
+      "view email",
+      123,
+      61
+     ],
+     [
+      "[v1]",
+      13,
+      21
+     ],
+     [
+      "[v2]",
+      13,
+      21
+     ],
+     [
+      "[v3]",
+      13,
+      21
+     ],
+     [
+      "[v4]",
+      13,
+      21
+     ],
+     [
+      "[v5]",
+      13,
+      21
+     ],
+     [
+      "[v6]",
+      13,
+      21
+     ],
+     [
+      "[v7]",
+      13,
+      23
+     ],
+     [
+      "access paper:",
+      12,
+      376
+     ],
+     [
+      "view pdf",
+      12,
+      83
+     ],
+     [
+      "html (experimental)",
+      100,
+      157
+     ],
+     [
+      "tex source",
+      262,
+      95
+     ],
+     [
+      "view license",
+      12,
+      49
+     ],
+     [
+      "current browse context:",
+      12,
+      149
+     ],
+     [
+      "cs.cl",
+      164,
+      33
+     ],
+     [
+      "< prev",
+      20,
+      59
+     ],
+     [
+      "next >",
+      103,
+      58
+     ],
+     [
+      "new",
+      12,
+      48
+     ],
+     [
+      "recent",
+      69,
+      59
+     ],
+     [
+      "2017-06",
+      138,
+      70
+     ],
+     [
+      "change to browse by:",
+      12,
+      376
+     ],
+     [
+      "cs",
+      132,
+      13
+     ],
+     [
+      "cs.lg",
+      146,
+      40
+     ],
+     [
+      "references & citations",
+      12,
+      376
+     ],
+     [
+      "nasa ads",
+      12,
+      85
+     ],
+     [
+      "google scholar",
+      103,
+      109
+     ],
+     [
+      "semantic scholar",
+      218,
+      120
+     ],
+     [
+      "()",
+      14,
+      375
+     ],
+     [
+      "123 blog links",
+      14,
+      116
+     ],
+     [
+      "what is this?",
+      142,
+      50
+     ],
+     [
+      "- cs bibliography",
+      14,
+      375
+     ],
+     [
+      "dblp",
+      14,
+      36
+     ],
+     [
+      "|",
+      34,
+      355
+     ],
+     [
+      "listing",
+      34,
+      28
+     ],
+     [
+      "bibtex",
+      70,
+      29
+     ],
+     [
+      "ashish vaswani",
+      34,
+      75
+     ],
+     [
+      "noam shazeer",
+      34,
+      72
+     ],
+     [
+      "niki parmar",
+      34,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      34,
+      77
+     ],
+     [
+      "llion jones",
+      34,
+      55
+     ],
+     [
+      "…",
+      54,
+      335
+     ],
+     [
+      "export bibtex citation",
+      12,
+      146
+     ],
+     [
+      "bookmark",
+      12,
+      382
+     ],
+     [
+      "bibliographic tools",
+      14,
+      371
+     ],
+     [
+      "bibliographic and citation tools",
+      32,
+      335
+     ],
+     [
+      "bibliographic explorer toggle",
+      51,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      91,
+      117
+     ],
+     [
+      "()",
+      211,
+      113
+     ],
+     [
+      "what is the explorer?",
+      214,
+      105
+     ],
+     [
+      "connected papers toggle",
+      51,
+      0
+     ],
+     [
+      "connected papers",
+      91,
+      99
+     ],
+     [
+      "()",
+      193,
+      144
+     ],
+     [
+      "what is connected papers?",
+      197,
+      137
+     ],
+     [
+      "litmaps toggle",
+      51,
+      0
+     ],
+     [
+      "litmaps",
+      91,
+      42
+     ],
+     [
+      "()",
+      136,
+      92
+     ],
+     [
+      "what is litmaps?",
+      140,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      51,
+      0
+     ],
+     [
+      "scite smart citations",
+      91,
+      110
+     ],
+     [
+      "()",
+      204,
+      136
+     ],
+     [
+      "what are smart citations?",
+      208,
+      129
+     ],
+     [
+      "code, data, media",
+      14,
+      371
+     ],
+     [
+      "demos",
+      14,
+      371
+     ],
+     [
+      "related papers",
+      14,
+      371
+     ],
+     [
+      "about arxivlabs",
+      14,
+      371
+     ],
+     [
+      "|\n     ()",
+      13,
+      374
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      27,
+      249
+     ],
+     [
+      "disable mathjax",
+      27,
+      303
+     ],
+     [
+      "what is mathjax?",
+      84,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      380
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      10,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      10,
+      42
+     ],
+     [
+      "·",
+      64,
+      4
+     ],
+     [
+      "accessibility",
+      80,
+      73
+     ],
+     [
+      "·",
+      165,
+      4
+     ],
+     [
+      "operational status",
+      181,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      289,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      380
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      61,
+      231
+     ],
+     [
+      "learn more",
+      299,
+      67
+     ],
+     [
+      "×",
+      191,
+      22
+     ],
+     [
+      "search",
+      111,
+      80
+     ],
+     [
+      "submit",
+      195,
+      62
+     ],
+     [
+      "donate",
+      261,
+      63
+     ],
+     [
+      "log in",
+      111,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      768
+     ],
+     [
+      "(cs)",
+      -182,
+      756
+     ],
+     [
+      "arxiv:1706.03762",
+      -182,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      -183,
+      757
+     ],
+     [
+      "v1",
+      -45,
+      12
+     ],
+     [
+      "attention is all you need",
+      -182,
+      751
+     ],
+     [
+      ", , , , , , ,",
+      -182,
+      753
+     ],
+     [
+      "ashish vaswani",
+      -182,
+      81
+     ],
+     [
+      "noam shazeer",
+      -94,
+      77
+     ],
+     [
+      "niki parmar",
+      -11,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      56,
+      83
+     ],
+     [
+      "llion jones",
+      145,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      210,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      302,
+      73
+     ],
+     [
+      "illia polosukhin",
+      381,
+      78
+     ],
+     [
+      "view pdf",
+      -5,
+      758
+     ],
+     [
+      "html (experimental)",
+      -5,
+      758
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      4,
+      741
+     ],
+     [
+      "comments:",
+      10,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      79,
+      345
+     ],
+     [
+      "subjects:",
+      10,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      79,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      79,
+      197
+     ],
+     [
+      "cite as:",
+      10,
+      66
+     ],
+     [
+      "[cs.cl]",
+      79,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      79,
+      92
+     ],
+     [
+      "(or  for this version)",
+      79,
+      345
+     ],
+     [
+      "[cs.cl]",
+      96,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      96,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      79,
+      217
+     ],
+     [
+      "focus to learn more",
+      317,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      -10,
+      768
+     ],
+     [
+      "submission history",
+      3,
+      742
+     ],
+     [
+      "view email",
+      113,
+      61
+     ],
+     [
+      "[v1]",
+      3,
+      21
+     ],
+     [
+      "[v2]",
+      3,
+      21
+     ],
+     [
+      "[v3]",
+      3,
+      21
+     ],
+     [
+      "[v4]",
+      3,
+      21
+     ],
+     [
+      "[v5]",
+      3,
+      21
+     ],
+     [
+      "[v6]",
+      3,
+      21
+     ],
+     [
+      "[v7]",
+      3,
+      23
+     ],
+     [
+      "access paper:",
+      2,
+      744
+     ],
+     [
+      "view pdf",
+      2,
+      83
+     ],
+     [
+      "html (experimental)",
+      90,
+      157
+     ],
+     [
+      "tex source",
+      252,
+      95
+     ],
+     [
+      "view license",
+      2,
+      49
+     ],
+     [
+      "current browse context:",
+      2,
+      149
+     ],
+     [
+      "cs.cl",
+      151,
+      33
+     ],
+     [
+      "< prev",
+      10,
+      59
+     ],
+     [
+      "next >",
+      90,
+      58
+     ],
+     [
+      "new",
+      2,
+      48
+     ],
+     [
+      "recent",
+      56,
+      59
+     ],
+     [
+      "2017-06",
+      121,
+      70
+     ],
+     [
+      "change to browse by:",
+      2,
+      744
+     ],
+     [
+      "cs",
+      122,
+      13
+     ],
+     [
+      "cs.lg",
+      132,
+      40
+     ],
+     [
+      "references & citations",
+      2,
+      744
+     ],
+     [
+      "nasa ads",
+      2,
+      85
+     ],
+     [
+      "google scholar",
+      93,
+      109
+     ],
+     [
+      "semantic scholar",
+      208,
+      120
+     ],
+     [
+      "()",
+      4,
+      743
+     ],
+     [
+      "123 blog links",
+      334,
+      116
+     ],
+     [
+      "what is this?",
+      462,
+      50
+     ],
+     [
+      "- cs bibliography",
+      4,
+      743
+     ],
+     [
+      "dblp",
+      4,
+      36
+     ],
+     [
+      "|",
+      24,
+      723
+     ],
+     [
+      "listing",
+      24,
+      28
+     ],
+     [
+      "bibtex",
+      60,
+      29
+     ],
+     [
+      "ashish vaswani",
+      24,
+      75
+     ],
+     [
+      "noam shazeer",
+      24,
+      72
+     ],
+     [
+      "niki parmar",
+      24,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      24,
+      77
+     ],
+     [
+      "llion jones",
+      24,
+      55
+     ],
+     [
+      "…",
+      44,
+      703
+     ],
+     [
+      "export bibtex citation",
+      2,
+      146
+     ],
+     [
+      "bookmark",
+      2,
+      750
+     ],
+     [
+      "bibliographic tools",
+      758,
+      117
+     ],
+     [
+      "bibliographic explorer toggle",
+      801,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      839,
+      69
+     ],
+     [
+      "()",
+      839,
+      74
+     ],
+     [
+      "what is the explorer?",
+      839,
+      74
+     ],
+     [
+      "connected papers toggle",
+      801,
+      2
+     ],
+     [
+      "connected papers",
+      839,
+      58
+     ],
+     [
+      "()",
+      839,
+      67
+     ],
+     [
+      "what is connected papers?",
+      839,
+      67
+     ],
+     [
+      "litmaps toggle",
+      801,
+      2
+     ],
+     [
+      "litmaps",
+      839,
+      42
+     ],
+     [
+      "()",
+      839,
+      71
+     ],
+     [
+      "what is litmaps?",
+      839,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      801,
+      2
+     ],
+     [
+      "scite smart citations",
+      839,
+      60
+     ],
+     [
+      "()",
+      839,
+      76
+     ],
+     [
+      "what are smart citations?",
+      839,
+      76
+     ],
+     [
+      "code, data, media",
+      758,
+      71
+     ],
+     [
+      "demos",
+      758,
+      78
+     ],
+     [
+      "related papers",
+      758,
+      81
+     ],
+     [
+      "about arxivlabs",
+      758,
+      95
+     ],
+     [
+      "|  ()",
+      3,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      17,
+      249
+     ],
+     [
+      "disable mathjax",
+      277,
+      96
+     ],
+     [
+      "what is mathjax?",
+      381,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      380
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      10,
+      119
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      10,
+      40
+     ],
+     [
+      "·",
+      62,
+      3
+     ],
+     [
+      "accessibility",
+      77,
+      69
+     ],
+     [
+      "·",
+      158,
+      3
+     ],
+     [
+      "operational status",
+      173,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      380
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 9,
+    "candidates": 126,
+    "protruding": 2,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 14,
+    "candidates": 129,
+    "protruding": 18,
+    "scrollWidth": 927,
+    "clientWidth": 450
+   },
+   "recreationOnly": 14,
+   "sourceOnly": 9,
+   "recreationOnlyExamples": [
+    "cs ||| cs.lg",
+    "() ||| nasa ads",
+    "() ||| google scholar",
+    "() ||| semantic scholar",
+    "bookmark ||| export bibtex citation",
+    "() ||| bibliographic explorer",
+    "bibliographic explorer ||| what is the explorer?",
+    "() ||| connected papers"
+   ],
+   "sourceOnlyExamples": [
+    "aidan n. gomez ||| ashish vaswani",
+    "aidan n. gomez ||| noam shazeer",
+    "aidan n. gomez ||| niki parmar",
+    "aidan n. gomez ||| jakob uszkoreit",
+    "aidan n. gomez ||| llion jones",
+    "aidan n. gomez ||| lukasz kaiser",
+    "aidan n. gomez ||| illia polosukhin",
+    "what is mathjax? ||| which authors of this paper are endorsers?"
+   ],
+   "sharedTextKeys": 101,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 129,
+     "rowParents": 29,
+     "maxRowMembers": 15,
+     "navInlinePairs": 72
+    },
+    "recreation": {
+     "inlineSiblingPairs": 147,
+     "rowParents": 30,
+     "maxRowMembers": 15,
+     "navInlinePairs": 80
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      69,
+      230
+     ],
+     [
+      "learn more",
+      306,
+      68
+     ],
+     [
+      "×",
+      386,
+      22
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      450
+     ],
+     [
+      "(cs)",
+      12,
+      438
+     ],
+     [
+      "arxiv:1706.03762",
+      12,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      11,
+      439
+     ],
+     [
+      "v1",
+      149,
+      12
+     ],
+     [
+      "attention is all you need",
+      12,
+      433
+     ],
+     [
+      ", , , , , , ,",
+      12,
+      435
+     ],
+     [
+      "ashish vaswani",
+      12,
+      81
+     ],
+     [
+      "noam shazeer",
+      100,
+      77
+     ],
+     [
+      "niki parmar",
+      183,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      250,
+      83
+     ],
+     [
+      "llion jones",
+      339,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      12,
+      422
+     ],
+     [
+      "lukasz kaiser",
+      71,
+      73
+     ],
+     [
+      "illia polosukhin",
+      150,
+      78
+     ],
+     [
+      "view pdf",
+      5,
+      440
+     ],
+     [
+      "html (experimental)",
+      5,
+      440
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      14,
+      423
+     ],
+     [
+      "comments:",
+      20,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      89,
+      345
+     ],
+     [
+      "subjects:",
+      20,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      89,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      89,
+      197
+     ],
+     [
+      "cite as:",
+      20,
+      66
+     ],
+     [
+      "[cs.cl]",
+      89,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      89,
+      92
+     ],
+     [
+      "(or  for this version)",
+      89,
+      345
+     ],
+     [
+      "[cs.cl]",
+      106,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      106,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      89,
+      217
+     ],
+     [
+      "focus to learn more",
+      327,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      0,
+      450
+     ],
+     [
+      "submission history",
+      13,
+      424
+     ],
+     [
+      "view email",
+      123,
+      61
+     ],
+     [
+      "[v1]",
+      13,
+      21
+     ],
+     [
+      "[v2]",
+      13,
+      21
+     ],
+     [
+      "[v3]",
+      13,
+      21
+     ],
+     [
+      "[v4]",
+      13,
+      21
+     ],
+     [
+      "[v5]",
+      13,
+      21
+     ],
+     [
+      "[v6]",
+      13,
+      21
+     ],
+     [
+      "[v7]",
+      13,
+      23
+     ],
+     [
+      "access paper:",
+      12,
+      426
+     ],
+     [
+      "view pdf",
+      12,
+      83
+     ],
+     [
+      "html (experimental)",
+      100,
+      157
+     ],
+     [
+      "tex source",
+      262,
+      95
+     ],
+     [
+      "view license",
+      12,
+      49
+     ],
+     [
+      "current browse context:",
+      12,
+      149
+     ],
+     [
+      "cs.cl",
+      164,
+      33
+     ],
+     [
+      "< prev",
+      20,
+      59
+     ],
+     [
+      "next >",
+      103,
+      58
+     ],
+     [
+      "new",
+      12,
+      48
+     ],
+     [
+      "recent",
+      69,
+      59
+     ],
+     [
+      "2017-06",
+      138,
+      70
+     ],
+     [
+      "change to browse by:",
+      12,
+      426
+     ],
+     [
+      "cs",
+      132,
+      13
+     ],
+     [
+      "cs.lg",
+      146,
+      40
+     ],
+     [
+      "references & citations",
+      12,
+      426
+     ],
+     [
+      "nasa ads",
+      12,
+      85
+     ],
+     [
+      "google scholar",
+      103,
+      109
+     ],
+     [
+      "semantic scholar",
+      218,
+      120
+     ],
+     [
+      "()",
+      14,
+      425
+     ],
+     [
+      "123 blog links",
+      14,
+      116
+     ],
+     [
+      "what is this?",
+      142,
+      50
+     ],
+     [
+      "- cs bibliography",
+      14,
+      425
+     ],
+     [
+      "dblp",
+      14,
+      36
+     ],
+     [
+      "|",
+      34,
+      405
+     ],
+     [
+      "listing",
+      34,
+      28
+     ],
+     [
+      "bibtex",
+      70,
+      29
+     ],
+     [
+      "ashish vaswani",
+      34,
+      75
+     ],
+     [
+      "noam shazeer",
+      34,
+      72
+     ],
+     [
+      "niki parmar",
+      34,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      34,
+      77
+     ],
+     [
+      "llion jones",
+      34,
+      55
+     ],
+     [
+      "…",
+      54,
+      385
+     ],
+     [
+      "export bibtex citation",
+      12,
+      146
+     ],
+     [
+      "bookmark",
+      12,
+      432
+     ],
+     [
+      "bibliographic tools",
+      14,
+      421
+     ],
+     [
+      "bibliographic and citation tools",
+      32,
+      385
+     ],
+     [
+      "bibliographic explorer toggle",
+      51,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      91,
+      117
+     ],
+     [
+      "()",
+      211,
+      113
+     ],
+     [
+      "what is the explorer?",
+      214,
+      105
+     ],
+     [
+      "connected papers toggle",
+      51,
+      0
+     ],
+     [
+      "connected papers",
+      91,
+      99
+     ],
+     [
+      "()",
+      193,
+      144
+     ],
+     [
+      "what is connected papers?",
+      197,
+      137
+     ],
+     [
+      "litmaps toggle",
+      51,
+      0
+     ],
+     [
+      "litmaps",
+      91,
+      42
+     ],
+     [
+      "()",
+      136,
+      92
+     ],
+     [
+      "what is litmaps?",
+      140,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      51,
+      0
+     ],
+     [
+      "scite smart citations",
+      91,
+      110
+     ],
+     [
+      "()",
+      204,
+      136
+     ],
+     [
+      "what are smart citations?",
+      208,
+      129
+     ],
+     [
+      "code, data, media",
+      14,
+      421
+     ],
+     [
+      "demos",
+      14,
+      421
+     ],
+     [
+      "related papers",
+      14,
+      421
+     ],
+     [
+      "about arxivlabs",
+      14,
+      421
+     ],
+     [
+      "|\n     ()",
+      13,
+      424
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      27,
+      249
+     ],
+     [
+      "disable mathjax",
+      287,
+      96
+     ],
+     [
+      "what is mathjax?",
+      27,
+      394
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      430
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      10,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      10,
+      73
+     ],
+     [
+      "·",
+      95,
+      4
+     ],
+     [
+      "operational status",
+      111,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      219,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      430
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      69,
+      231
+     ],
+     [
+      "learn more",
+      307,
+      67
+     ],
+     [
+      "×",
+      386,
+      22
+     ],
+     [
+      "search",
+      111,
+      80
+     ],
+     [
+      "submit",
+      195,
+      62
+     ],
+     [
+      "donate",
+      261,
+      63
+     ],
+     [
+      "log in",
+      341,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      768
+     ],
+     [
+      "(cs)",
+      -157,
+      756
+     ],
+     [
+      "arxiv:1706.03762",
+      -157,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      -158,
+      757
+     ],
+     [
+      "v1",
+      -20,
+      12
+     ],
+     [
+      "attention is all you need",
+      -157,
+      751
+     ],
+     [
+      ", , , , , , ,",
+      -157,
+      753
+     ],
+     [
+      "ashish vaswani",
+      -157,
+      81
+     ],
+     [
+      "noam shazeer",
+      -69,
+      77
+     ],
+     [
+      "niki parmar",
+      14,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      81,
+      83
+     ],
+     [
+      "llion jones",
+      170,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      235,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      327,
+      73
+     ],
+     [
+      "illia polosukhin",
+      406,
+      78
+     ],
+     [
+      "view pdf",
+      -5,
+      758
+     ],
+     [
+      "html (experimental)",
+      -5,
+      758
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      4,
+      741
+     ],
+     [
+      "comments:",
+      10,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      79,
+      345
+     ],
+     [
+      "subjects:",
+      10,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      79,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      79,
+      197
+     ],
+     [
+      "cite as:",
+      10,
+      66
+     ],
+     [
+      "[cs.cl]",
+      79,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      79,
+      92
+     ],
+     [
+      "(or  for this version)",
+      79,
+      345
+     ],
+     [
+      "[cs.cl]",
+      96,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      96,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      79,
+      217
+     ],
+     [
+      "focus to learn more",
+      317,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      -10,
+      768
+     ],
+     [
+      "submission history",
+      3,
+      742
+     ],
+     [
+      "view email",
+      113,
+      61
+     ],
+     [
+      "[v1]",
+      3,
+      21
+     ],
+     [
+      "[v2]",
+      3,
+      21
+     ],
+     [
+      "[v3]",
+      3,
+      21
+     ],
+     [
+      "[v4]",
+      3,
+      21
+     ],
+     [
+      "[v5]",
+      3,
+      21
+     ],
+     [
+      "[v6]",
+      3,
+      21
+     ],
+     [
+      "[v7]",
+      3,
+      23
+     ],
+     [
+      "access paper:",
+      2,
+      744
+     ],
+     [
+      "view pdf",
+      2,
+      83
+     ],
+     [
+      "html (experimental)",
+      90,
+      157
+     ],
+     [
+      "tex source",
+      252,
+      95
+     ],
+     [
+      "view license",
+      2,
+      49
+     ],
+     [
+      "current browse context:",
+      2,
+      149
+     ],
+     [
+      "cs.cl",
+      151,
+      33
+     ],
+     [
+      "< prev",
+      10,
+      59
+     ],
+     [
+      "next >",
+      90,
+      58
+     ],
+     [
+      "new",
+      2,
+      48
+     ],
+     [
+      "recent",
+      56,
+      59
+     ],
+     [
+      "2017-06",
+      121,
+      70
+     ],
+     [
+      "change to browse by:",
+      2,
+      744
+     ],
+     [
+      "cs",
+      122,
+      13
+     ],
+     [
+      "cs.lg",
+      132,
+      40
+     ],
+     [
+      "references & citations",
+      2,
+      744
+     ],
+     [
+      "nasa ads",
+      2,
+      85
+     ],
+     [
+      "google scholar",
+      93,
+      109
+     ],
+     [
+      "semantic scholar",
+      208,
+      120
+     ],
+     [
+      "()",
+      4,
+      743
+     ],
+     [
+      "123 blog links",
+      334,
+      116
+     ],
+     [
+      "what is this?",
+      462,
+      50
+     ],
+     [
+      "- cs bibliography",
+      4,
+      743
+     ],
+     [
+      "dblp",
+      4,
+      36
+     ],
+     [
+      "|",
+      24,
+      723
+     ],
+     [
+      "listing",
+      24,
+      28
+     ],
+     [
+      "bibtex",
+      60,
+      29
+     ],
+     [
+      "ashish vaswani",
+      24,
+      75
+     ],
+     [
+      "noam shazeer",
+      24,
+      72
+     ],
+     [
+      "niki parmar",
+      24,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      24,
+      77
+     ],
+     [
+      "llion jones",
+      24,
+      55
+     ],
+     [
+      "…",
+      44,
+      703
+     ],
+     [
+      "export bibtex citation",
+      2,
+      146
+     ],
+     [
+      "bookmark",
+      2,
+      750
+     ],
+     [
+      "bibliographic tools",
+      758,
+      117
+     ],
+     [
+      "bibliographic explorer toggle",
+      801,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      839,
+      69
+     ],
+     [
+      "()",
+      839,
+      74
+     ],
+     [
+      "what is the explorer?",
+      839,
+      74
+     ],
+     [
+      "connected papers toggle",
+      801,
+      2
+     ],
+     [
+      "connected papers",
+      839,
+      58
+     ],
+     [
+      "()",
+      839,
+      67
+     ],
+     [
+      "what is connected papers?",
+      839,
+      67
+     ],
+     [
+      "litmaps toggle",
+      801,
+      2
+     ],
+     [
+      "litmaps",
+      839,
+      42
+     ],
+     [
+      "()",
+      839,
+      71
+     ],
+     [
+      "what is litmaps?",
+      839,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      801,
+      2
+     ],
+     [
+      "scite smart citations",
+      839,
+      60
+     ],
+     [
+      "()",
+      839,
+      76
+     ],
+     [
+      "what are smart citations?",
+      839,
+      76
+     ],
+     [
+      "code, data, media",
+      758,
+      71
+     ],
+     [
+      "demos",
+      758,
+      78
+     ],
+     [
+      "related papers",
+      758,
+      81
+     ],
+     [
+      "about arxivlabs",
+      758,
+      95
+     ],
+     [
+      "|  ()",
+      3,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      17,
+      249
+     ],
+     [
+      "disable mathjax",
+      277,
+      96
+     ],
+     [
+      "what is mathjax?",
+      381,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      430
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      10,
+      426
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      10,
+      69
+     ],
+     [
+      "·",
+      91,
+      3
+     ],
+     [
+      "operational status",
+      106,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      430
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 10,
+    "candidates": 126,
+    "protruding": 2,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 14,
+    "candidates": 129,
+    "protruding": 18,
+    "scrollWidth": 927,
+    "clientWidth": 480
+   },
+   "recreationOnly": 13,
+   "sourceOnly": 9,
+   "recreationOnlyExamples": [
+    "cs ||| cs.lg",
+    "() ||| nasa ads",
+    "() ||| google scholar",
+    "() ||| semantic scholar",
+    "bookmark ||| export bibtex citation",
+    "() ||| bibliographic explorer",
+    "bibliographic explorer ||| what is the explorer?",
+    "() ||| connected papers"
+   ],
+   "sourceOnlyExamples": [
+    "aidan n. gomez ||| ashish vaswani",
+    "aidan n. gomez ||| noam shazeer",
+    "aidan n. gomez ||| niki parmar",
+    "aidan n. gomez ||| jakob uszkoreit",
+    "aidan n. gomez ||| llion jones",
+    "aidan n. gomez ||| lukasz kaiser",
+    "aidan n. gomez ||| illia polosukhin",
+    "what is mathjax? ||| which authors of this paper are endorsers?"
+   ],
+   "sharedTextKeys": 101,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 130,
+     "rowParents": 30,
+     "maxRowMembers": 15,
+     "navInlinePairs": 72
+    },
+    "recreation": {
+     "inlineSiblingPairs": 147,
+     "rowParents": 30,
+     "maxRowMembers": 15,
+     "navInlinePairs": 80
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      84,
+      230
+     ],
+     [
+      "learn more",
+      321,
+      68
+     ],
+     [
+      "×",
+      401,
+      22
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      480
+     ],
+     [
+      "(cs)",
+      12,
+      468
+     ],
+     [
+      "arxiv:1706.03762",
+      12,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      11,
+      469
+     ],
+     [
+      "v1",
+      149,
+      12
+     ],
+     [
+      "attention is all you need",
+      12,
+      463
+     ],
+     [
+      ", , , , , , ,",
+      12,
+      465
+     ],
+     [
+      "ashish vaswani",
+      12,
+      81
+     ],
+     [
+      "noam shazeer",
+      100,
+      77
+     ],
+     [
+      "niki parmar",
+      183,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      250,
+      83
+     ],
+     [
+      "llion jones",
+      339,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      12,
+      437
+     ],
+     [
+      "lukasz kaiser",
+      56,
+      73
+     ],
+     [
+      "illia polosukhin",
+      135,
+      78
+     ],
+     [
+      "view pdf",
+      5,
+      470
+     ],
+     [
+      "html (experimental)",
+      5,
+      470
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      14,
+      453
+     ],
+     [
+      "comments:",
+      20,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      89,
+      345
+     ],
+     [
+      "subjects:",
+      20,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      89,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      89,
+      197
+     ],
+     [
+      "cite as:",
+      20,
+      66
+     ],
+     [
+      "[cs.cl]",
+      89,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      89,
+      92
+     ],
+     [
+      "(or  for this version)",
+      89,
+      345
+     ],
+     [
+      "[cs.cl]",
+      106,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      106,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      89,
+      217
+     ],
+     [
+      "focus to learn more",
+      327,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      0,
+      480
+     ],
+     [
+      "submission history",
+      13,
+      454
+     ],
+     [
+      "view email",
+      123,
+      61
+     ],
+     [
+      "[v1]",
+      13,
+      21
+     ],
+     [
+      "[v2]",
+      13,
+      21
+     ],
+     [
+      "[v3]",
+      13,
+      21
+     ],
+     [
+      "[v4]",
+      13,
+      21
+     ],
+     [
+      "[v5]",
+      13,
+      21
+     ],
+     [
+      "[v6]",
+      13,
+      21
+     ],
+     [
+      "[v7]",
+      13,
+      23
+     ],
+     [
+      "access paper:",
+      12,
+      456
+     ],
+     [
+      "view pdf",
+      12,
+      83
+     ],
+     [
+      "html (experimental)",
+      100,
+      157
+     ],
+     [
+      "tex source",
+      262,
+      95
+     ],
+     [
+      "view license",
+      12,
+      49
+     ],
+     [
+      "current browse context:",
+      12,
+      149
+     ],
+     [
+      "cs.cl",
+      164,
+      33
+     ],
+     [
+      "< prev",
+      20,
+      59
+     ],
+     [
+      "next >",
+      103,
+      58
+     ],
+     [
+      "new",
+      12,
+      48
+     ],
+     [
+      "recent",
+      69,
+      59
+     ],
+     [
+      "2017-06",
+      138,
+      70
+     ],
+     [
+      "change to browse by:",
+      12,
+      456
+     ],
+     [
+      "cs",
+      132,
+      13
+     ],
+     [
+      "cs.lg",
+      146,
+      40
+     ],
+     [
+      "references & citations",
+      12,
+      456
+     ],
+     [
+      "nasa ads",
+      12,
+      85
+     ],
+     [
+      "google scholar",
+      103,
+      109
+     ],
+     [
+      "semantic scholar",
+      218,
+      120
+     ],
+     [
+      "()",
+      14,
+      455
+     ],
+     [
+      "123 blog links",
+      14,
+      116
+     ],
+     [
+      "what is this?",
+      142,
+      50
+     ],
+     [
+      "- cs bibliography",
+      14,
+      455
+     ],
+     [
+      "dblp",
+      14,
+      36
+     ],
+     [
+      "|",
+      34,
+      435
+     ],
+     [
+      "listing",
+      34,
+      28
+     ],
+     [
+      "bibtex",
+      70,
+      29
+     ],
+     [
+      "ashish vaswani",
+      34,
+      75
+     ],
+     [
+      "noam shazeer",
+      34,
+      72
+     ],
+     [
+      "niki parmar",
+      34,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      34,
+      77
+     ],
+     [
+      "llion jones",
+      34,
+      55
+     ],
+     [
+      "…",
+      54,
+      415
+     ],
+     [
+      "export bibtex citation",
+      12,
+      146
+     ],
+     [
+      "bookmark",
+      12,
+      462
+     ],
+     [
+      "bibliographic tools",
+      14,
+      451
+     ],
+     [
+      "bibliographic and citation tools",
+      32,
+      415
+     ],
+     [
+      "bibliographic explorer toggle",
+      51,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      91,
+      117
+     ],
+     [
+      "()",
+      211,
+      113
+     ],
+     [
+      "what is the explorer?",
+      214,
+      105
+     ],
+     [
+      "connected papers toggle",
+      51,
+      0
+     ],
+     [
+      "connected papers",
+      91,
+      99
+     ],
+     [
+      "()",
+      193,
+      144
+     ],
+     [
+      "what is connected papers?",
+      197,
+      137
+     ],
+     [
+      "litmaps toggle",
+      51,
+      0
+     ],
+     [
+      "litmaps",
+      91,
+      42
+     ],
+     [
+      "()",
+      136,
+      92
+     ],
+     [
+      "what is litmaps?",
+      140,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      51,
+      0
+     ],
+     [
+      "scite smart citations",
+      91,
+      110
+     ],
+     [
+      "()",
+      204,
+      136
+     ],
+     [
+      "what are smart citations?",
+      208,
+      129
+     ],
+     [
+      "code, data, media",
+      14,
+      451
+     ],
+     [
+      "demos",
+      14,
+      451
+     ],
+     [
+      "related papers",
+      14,
+      451
+     ],
+     [
+      "about arxivlabs",
+      14,
+      451
+     ],
+     [
+      "|\n     ()",
+      13,
+      454
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      27,
+      249
+     ],
+     [
+      "disable mathjax",
+      287,
+      96
+     ],
+     [
+      "what is mathjax?",
+      27,
+      407
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      460
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      10,
+      430
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      10,
+      73
+     ],
+     [
+      "·",
+      95,
+      4
+     ],
+     [
+      "operational status",
+      111,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      219,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      460
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      84,
+      231
+     ],
+     [
+      "learn more",
+      322,
+      67
+     ],
+     [
+      "×",
+      401,
+      22
+     ],
+     [
+      "search",
+      111,
+      80
+     ],
+     [
+      "submit",
+      195,
+      62
+     ],
+     [
+      "donate",
+      261,
+      63
+     ],
+     [
+      "log in",
+      341,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      768
+     ],
+     [
+      "(cs)",
+      -142,
+      756
+     ],
+     [
+      "arxiv:1706.03762",
+      -142,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      -143,
+      757
+     ],
+     [
+      "v1",
+      -5,
+      12
+     ],
+     [
+      "attention is all you need",
+      -142,
+      751
+     ],
+     [
+      ", , , , , , ,",
+      -142,
+      753
+     ],
+     [
+      "ashish vaswani",
+      -142,
+      81
+     ],
+     [
+      "noam shazeer",
+      -54,
+      77
+     ],
+     [
+      "niki parmar",
+      29,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      96,
+      83
+     ],
+     [
+      "llion jones",
+      185,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      250,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      342,
+      73
+     ],
+     [
+      "illia polosukhin",
+      421,
+      78
+     ],
+     [
+      "view pdf",
+      -5,
+      758
+     ],
+     [
+      "html (experimental)",
+      -5,
+      758
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      4,
+      741
+     ],
+     [
+      "comments:",
+      10,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      79,
+      345
+     ],
+     [
+      "subjects:",
+      10,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      79,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      79,
+      197
+     ],
+     [
+      "cite as:",
+      10,
+      66
+     ],
+     [
+      "[cs.cl]",
+      79,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      79,
+      92
+     ],
+     [
+      "(or  for this version)",
+      79,
+      345
+     ],
+     [
+      "[cs.cl]",
+      96,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      96,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      79,
+      217
+     ],
+     [
+      "focus to learn more",
+      317,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      -10,
+      768
+     ],
+     [
+      "submission history",
+      3,
+      742
+     ],
+     [
+      "view email",
+      113,
+      61
+     ],
+     [
+      "[v1]",
+      3,
+      21
+     ],
+     [
+      "[v2]",
+      3,
+      21
+     ],
+     [
+      "[v3]",
+      3,
+      21
+     ],
+     [
+      "[v4]",
+      3,
+      21
+     ],
+     [
+      "[v5]",
+      3,
+      21
+     ],
+     [
+      "[v6]",
+      3,
+      21
+     ],
+     [
+      "[v7]",
+      3,
+      23
+     ],
+     [
+      "access paper:",
+      2,
+      744
+     ],
+     [
+      "view pdf",
+      2,
+      83
+     ],
+     [
+      "html (experimental)",
+      90,
+      157
+     ],
+     [
+      "tex source",
+      252,
+      95
+     ],
+     [
+      "view license",
+      2,
+      49
+     ],
+     [
+      "current browse context:",
+      2,
+      149
+     ],
+     [
+      "cs.cl",
+      151,
+      33
+     ],
+     [
+      "< prev",
+      10,
+      59
+     ],
+     [
+      "next >",
+      90,
+      58
+     ],
+     [
+      "new",
+      2,
+      48
+     ],
+     [
+      "recent",
+      56,
+      59
+     ],
+     [
+      "2017-06",
+      121,
+      70
+     ],
+     [
+      "change to browse by:",
+      2,
+      744
+     ],
+     [
+      "cs",
+      122,
+      13
+     ],
+     [
+      "cs.lg",
+      132,
+      40
+     ],
+     [
+      "references & citations",
+      2,
+      744
+     ],
+     [
+      "nasa ads",
+      2,
+      85
+     ],
+     [
+      "google scholar",
+      93,
+      109
+     ],
+     [
+      "semantic scholar",
+      208,
+      120
+     ],
+     [
+      "()",
+      4,
+      743
+     ],
+     [
+      "123 blog links",
+      334,
+      116
+     ],
+     [
+      "what is this?",
+      462,
+      50
+     ],
+     [
+      "- cs bibliography",
+      4,
+      743
+     ],
+     [
+      "dblp",
+      4,
+      36
+     ],
+     [
+      "|",
+      24,
+      723
+     ],
+     [
+      "listing",
+      24,
+      28
+     ],
+     [
+      "bibtex",
+      60,
+      29
+     ],
+     [
+      "ashish vaswani",
+      24,
+      75
+     ],
+     [
+      "noam shazeer",
+      24,
+      72
+     ],
+     [
+      "niki parmar",
+      24,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      24,
+      77
+     ],
+     [
+      "llion jones",
+      24,
+      55
+     ],
+     [
+      "…",
+      44,
+      703
+     ],
+     [
+      "export bibtex citation",
+      2,
+      146
+     ],
+     [
+      "bookmark",
+      2,
+      750
+     ],
+     [
+      "bibliographic tools",
+      758,
+      117
+     ],
+     [
+      "bibliographic explorer toggle",
+      801,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      839,
+      69
+     ],
+     [
+      "()",
+      839,
+      74
+     ],
+     [
+      "what is the explorer?",
+      839,
+      74
+     ],
+     [
+      "connected papers toggle",
+      801,
+      2
+     ],
+     [
+      "connected papers",
+      839,
+      58
+     ],
+     [
+      "()",
+      839,
+      67
+     ],
+     [
+      "what is connected papers?",
+      839,
+      67
+     ],
+     [
+      "litmaps toggle",
+      801,
+      2
+     ],
+     [
+      "litmaps",
+      839,
+      42
+     ],
+     [
+      "()",
+      839,
+      71
+     ],
+     [
+      "what is litmaps?",
+      839,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      801,
+      2
+     ],
+     [
+      "scite smart citations",
+      839,
+      60
+     ],
+     [
+      "()",
+      839,
+      76
+     ],
+     [
+      "what are smart citations?",
+      839,
+      76
+     ],
+     [
+      "code, data, media",
+      758,
+      71
+     ],
+     [
+      "demos",
+      758,
+      78
+     ],
+     [
+      "related papers",
+      758,
+      81
+     ],
+     [
+      "about arxivlabs",
+      758,
+      95
+     ],
+     [
+      "|  ()",
+      3,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      17,
+      249
+     ],
+     [
+      "disable mathjax",
+      277,
+      96
+     ],
+     [
+      "what is mathjax?",
+      381,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      460
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      10,
+      426
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      10,
+      69
+     ],
+     [
+      "·",
+      91,
+      3
+     ],
+     [
+      "operational status",
+      106,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      460
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 7,
+    "candidates": 130,
+    "protruding": 2,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 13,
+    "candidates": 129,
+    "protruding": 18,
+    "scrollWidth": 927,
+    "clientWidth": 600
+   },
+   "recreationOnly": 13,
+   "sourceOnly": 7,
+   "recreationOnlyExamples": [
+    "cs ||| cs.lg",
+    "() ||| nasa ads",
+    "() ||| google scholar",
+    "() ||| semantic scholar",
+    "bookmark ||| export bibtex citation",
+    "() ||| bibliographic explorer",
+    "bibliographic explorer ||| what is the explorer?",
+    "() ||| connected papers"
+   ],
+   "sourceOnlyExamples": [
+    "ashish vaswani ||| illia polosukhin",
+    "illia polosukhin ||| noam shazeer",
+    "illia polosukhin ||| niki parmar",
+    "illia polosukhin ||| jakob uszkoreit",
+    "illia polosukhin ||| llion jones",
+    "aidan n. gomez ||| illia polosukhin",
+    "illia polosukhin ||| lukasz kaiser"
+   ],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 174,
+     "rowParents": 33,
+     "maxRowMembers": 15,
+     "navInlinePairs": 105
+    },
+    "recreation": {
+     "inlineSiblingPairs": 171,
+     "rowParents": 30,
+     "maxRowMembers": 15,
+     "navInlinePairs": 104
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      144,
+      230
+     ],
+     [
+      "learn more",
+      381,
+      68
+     ],
+     [
+      "×",
+      461,
+      22
+     ],
+     [
+      "search",
+      288,
+      82
+     ],
+     [
+      "submit",
+      374,
+      63
+     ],
+     [
+      "donate",
+      441,
+      63
+     ],
+     [
+      "log in",
+      521,
+      55
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      600
+     ],
+     [
+      "(cs)",
+      12,
+      588
+     ],
+     [
+      "arxiv:1706.03762",
+      12,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      11,
+      589
+     ],
+     [
+      "v1",
+      149,
+      12
+     ],
+     [
+      "attention is all you need",
+      12,
+      583
+     ],
+     [
+      ", , , , , , ,",
+      12,
+      585
+     ],
+     [
+      "ashish vaswani",
+      12,
+      81
+     ],
+     [
+      "noam shazeer",
+      100,
+      77
+     ],
+     [
+      "niki parmar",
+      183,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      250,
+      83
+     ],
+     [
+      "llion jones",
+      339,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      404,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      496,
+      73
+     ],
+     [
+      "illia polosukhin",
+      12,
+      581
+     ],
+     [
+      "view pdf",
+      5,
+      590
+     ],
+     [
+      "html (experimental)",
+      5,
+      590
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      14,
+      573
+     ],
+     [
+      "comments:",
+      20,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      89,
+      345
+     ],
+     [
+      "subjects:",
+      20,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      89,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      89,
+      197
+     ],
+     [
+      "cite as:",
+      20,
+      66
+     ],
+     [
+      "[cs.cl]",
+      89,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      89,
+      92
+     ],
+     [
+      "(or  for this version)",
+      89,
+      345
+     ],
+     [
+      "[cs.cl]",
+      106,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      106,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      89,
+      217
+     ],
+     [
+      "focus to learn more",
+      327,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      0,
+      600
+     ],
+     [
+      "submission history",
+      13,
+      574
+     ],
+     [
+      "view email",
+      123,
+      61
+     ],
+     [
+      "[v1]",
+      13,
+      21
+     ],
+     [
+      "[v2]",
+      13,
+      21
+     ],
+     [
+      "[v3]",
+      13,
+      21
+     ],
+     [
+      "[v4]",
+      13,
+      21
+     ],
+     [
+      "[v5]",
+      13,
+      21
+     ],
+     [
+      "[v6]",
+      13,
+      21
+     ],
+     [
+      "[v7]",
+      13,
+      23
+     ],
+     [
+      "access paper:",
+      12,
+      576
+     ],
+     [
+      "view pdf",
+      12,
+      83
+     ],
+     [
+      "html (experimental)",
+      100,
+      157
+     ],
+     [
+      "tex source",
+      262,
+      95
+     ],
+     [
+      "view license",
+      12,
+      49
+     ],
+     [
+      "current browse context:",
+      12,
+      149
+     ],
+     [
+      "cs.cl",
+      164,
+      33
+     ],
+     [
+      "< prev",
+      20,
+      59
+     ],
+     [
+      "next >",
+      103,
+      58
+     ],
+     [
+      "new",
+      12,
+      48
+     ],
+     [
+      "recent",
+      69,
+      59
+     ],
+     [
+      "2017-06",
+      138,
+      70
+     ],
+     [
+      "change to browse by:",
+      12,
+      576
+     ],
+     [
+      "cs",
+      132,
+      13
+     ],
+     [
+      "cs.lg",
+      146,
+      40
+     ],
+     [
+      "references & citations",
+      12,
+      576
+     ],
+     [
+      "nasa ads",
+      12,
+      85
+     ],
+     [
+      "google scholar",
+      103,
+      109
+     ],
+     [
+      "semantic scholar",
+      218,
+      120
+     ],
+     [
+      "()",
+      14,
+      575
+     ],
+     [
+      "123 blog links",
+      14,
+      116
+     ],
+     [
+      "what is this?",
+      142,
+      50
+     ],
+     [
+      "- cs bibliography",
+      14,
+      575
+     ],
+     [
+      "dblp",
+      14,
+      36
+     ],
+     [
+      "|",
+      34,
+      555
+     ],
+     [
+      "listing",
+      34,
+      28
+     ],
+     [
+      "bibtex",
+      70,
+      29
+     ],
+     [
+      "ashish vaswani",
+      34,
+      75
+     ],
+     [
+      "noam shazeer",
+      34,
+      72
+     ],
+     [
+      "niki parmar",
+      34,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      34,
+      77
+     ],
+     [
+      "llion jones",
+      34,
+      55
+     ],
+     [
+      "…",
+      54,
+      535
+     ],
+     [
+      "export bibtex citation",
+      12,
+      146
+     ],
+     [
+      "bookmark",
+      12,
+      582
+     ],
+     [
+      "bibliographic tools",
+      14,
+      571
+     ],
+     [
+      "bibliographic and citation tools",
+      32,
+      535
+     ],
+     [
+      "bibliographic explorer toggle",
+      51,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      91,
+      117
+     ],
+     [
+      "()",
+      211,
+      113
+     ],
+     [
+      "what is the explorer?",
+      214,
+      105
+     ],
+     [
+      "connected papers toggle",
+      51,
+      0
+     ],
+     [
+      "connected papers",
+      91,
+      99
+     ],
+     [
+      "()",
+      193,
+      144
+     ],
+     [
+      "what is connected papers?",
+      197,
+      137
+     ],
+     [
+      "litmaps toggle",
+      51,
+      0
+     ],
+     [
+      "litmaps",
+      91,
+      42
+     ],
+     [
+      "()",
+      136,
+      92
+     ],
+     [
+      "what is litmaps?",
+      140,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      51,
+      0
+     ],
+     [
+      "scite smart citations",
+      91,
+      110
+     ],
+     [
+      "()",
+      204,
+      136
+     ],
+     [
+      "what are smart citations?",
+      208,
+      129
+     ],
+     [
+      "code, data, media",
+      14,
+      571
+     ],
+     [
+      "demos",
+      14,
+      571
+     ],
+     [
+      "related papers",
+      14,
+      571
+     ],
+     [
+      "about arxivlabs",
+      14,
+      571
+     ],
+     [
+      "|\n     ()",
+      13,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      27,
+      249
+     ],
+     [
+      "disable mathjax",
+      287,
+      96
+     ],
+     [
+      "what is mathjax?",
+      391,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      580
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      390,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      444,
+      73
+     ],
+     [
+      "·",
+      528,
+      4
+     ],
+     [
+      "operational status",
+      10,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      118,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      580
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      144,
+      231
+     ],
+     [
+      "learn more",
+      382,
+      67
+     ],
+     [
+      "×",
+      461,
+      22
+     ],
+     [
+      "search",
+      289,
+      80
+     ],
+     [
+      "submit",
+      373,
+      62
+     ],
+     [
+      "donate",
+      439,
+      63
+     ],
+     [
+      "log in",
+      519,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      768
+     ],
+     [
+      "(cs)",
+      -82,
+      756
+     ],
+     [
+      "arxiv:1706.03762",
+      -82,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      -83,
+      757
+     ],
+     [
+      "v1",
+      55,
+      12
+     ],
+     [
+      "attention is all you need",
+      -82,
+      751
+     ],
+     [
+      ", , , , , , ,",
+      -82,
+      753
+     ],
+     [
+      "ashish vaswani",
+      -82,
+      81
+     ],
+     [
+      "noam shazeer",
+      6,
+      77
+     ],
+     [
+      "niki parmar",
+      89,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      156,
+      83
+     ],
+     [
+      "llion jones",
+      245,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      310,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      402,
+      73
+     ],
+     [
+      "illia polosukhin",
+      481,
+      78
+     ],
+     [
+      "view pdf",
+      -5,
+      758
+     ],
+     [
+      "html (experimental)",
+      -5,
+      758
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      4,
+      741
+     ],
+     [
+      "comments:",
+      10,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      79,
+      345
+     ],
+     [
+      "subjects:",
+      10,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      79,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      79,
+      197
+     ],
+     [
+      "cite as:",
+      10,
+      66
+     ],
+     [
+      "[cs.cl]",
+      79,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      79,
+      92
+     ],
+     [
+      "(or  for this version)",
+      79,
+      345
+     ],
+     [
+      "[cs.cl]",
+      96,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      96,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      79,
+      217
+     ],
+     [
+      "focus to learn more",
+      317,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      -10,
+      768
+     ],
+     [
+      "submission history",
+      3,
+      742
+     ],
+     [
+      "view email",
+      113,
+      61
+     ],
+     [
+      "[v1]",
+      3,
+      21
+     ],
+     [
+      "[v2]",
+      3,
+      21
+     ],
+     [
+      "[v3]",
+      3,
+      21
+     ],
+     [
+      "[v4]",
+      3,
+      21
+     ],
+     [
+      "[v5]",
+      3,
+      21
+     ],
+     [
+      "[v6]",
+      3,
+      21
+     ],
+     [
+      "[v7]",
+      3,
+      23
+     ],
+     [
+      "access paper:",
+      2,
+      744
+     ],
+     [
+      "view pdf",
+      2,
+      83
+     ],
+     [
+      "html (experimental)",
+      90,
+      157
+     ],
+     [
+      "tex source",
+      252,
+      95
+     ],
+     [
+      "view license",
+      2,
+      49
+     ],
+     [
+      "current browse context:",
+      2,
+      149
+     ],
+     [
+      "cs.cl",
+      151,
+      33
+     ],
+     [
+      "< prev",
+      10,
+      59
+     ],
+     [
+      "next >",
+      90,
+      58
+     ],
+     [
+      "new",
+      2,
+      48
+     ],
+     [
+      "recent",
+      56,
+      59
+     ],
+     [
+      "2017-06",
+      121,
+      70
+     ],
+     [
+      "change to browse by:",
+      2,
+      744
+     ],
+     [
+      "cs",
+      122,
+      13
+     ],
+     [
+      "cs.lg",
+      132,
+      40
+     ],
+     [
+      "references & citations",
+      2,
+      744
+     ],
+     [
+      "nasa ads",
+      2,
+      85
+     ],
+     [
+      "google scholar",
+      93,
+      109
+     ],
+     [
+      "semantic scholar",
+      208,
+      120
+     ],
+     [
+      "()",
+      4,
+      743
+     ],
+     [
+      "123 blog links",
+      334,
+      116
+     ],
+     [
+      "what is this?",
+      462,
+      50
+     ],
+     [
+      "- cs bibliography",
+      4,
+      743
+     ],
+     [
+      "dblp",
+      4,
+      36
+     ],
+     [
+      "|",
+      24,
+      723
+     ],
+     [
+      "listing",
+      24,
+      28
+     ],
+     [
+      "bibtex",
+      60,
+      29
+     ],
+     [
+      "ashish vaswani",
+      24,
+      75
+     ],
+     [
+      "noam shazeer",
+      24,
+      72
+     ],
+     [
+      "niki parmar",
+      24,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      24,
+      77
+     ],
+     [
+      "llion jones",
+      24,
+      55
+     ],
+     [
+      "…",
+      44,
+      703
+     ],
+     [
+      "export bibtex citation",
+      2,
+      146
+     ],
+     [
+      "bookmark",
+      2,
+      750
+     ],
+     [
+      "bibliographic tools",
+      758,
+      117
+     ],
+     [
+      "bibliographic explorer toggle",
+      801,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      839,
+      69
+     ],
+     [
+      "()",
+      839,
+      74
+     ],
+     [
+      "what is the explorer?",
+      839,
+      74
+     ],
+     [
+      "connected papers toggle",
+      801,
+      2
+     ],
+     [
+      "connected papers",
+      839,
+      58
+     ],
+     [
+      "()",
+      839,
+      67
+     ],
+     [
+      "what is connected papers?",
+      839,
+      67
+     ],
+     [
+      "litmaps toggle",
+      801,
+      2
+     ],
+     [
+      "litmaps",
+      839,
+      42
+     ],
+     [
+      "()",
+      839,
+      71
+     ],
+     [
+      "what is litmaps?",
+      839,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      801,
+      2
+     ],
+     [
+      "scite smart citations",
+      839,
+      60
+     ],
+     [
+      "()",
+      839,
+      76
+     ],
+     [
+      "what are smart citations?",
+      839,
+      76
+     ],
+     [
+      "code, data, media",
+      758,
+      71
+     ],
+     [
+      "demos",
+      758,
+      78
+     ],
+     [
+      "related papers",
+      758,
+      81
+     ],
+     [
+      "about arxivlabs",
+      758,
+      95
+     ],
+     [
+      "|  ()",
+      3,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      17,
+      249
+     ],
+     [
+      "disable mathjax",
+      277,
+      96
+     ],
+     [
+      "what is mathjax?",
+      381,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      580
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      387,
+      119
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      430,
+      69
+     ],
+     [
+      "·",
+      511,
+      3
+     ],
+     [
+      "operational status",
+      10,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      580
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 130,
+    "protruding": 2,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 13,
+    "candidates": 129,
+    "protruding": 17,
+    "scrollWidth": 927,
+    "clientWidth": 661
+   },
+   "recreationOnly": 13,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "cs ||| cs.lg",
+    "() ||| nasa ads",
+    "() ||| google scholar",
+    "() ||| semantic scholar",
+    "bookmark ||| export bibtex citation",
+    "() ||| bibliographic explorer",
+    "bibliographic explorer ||| what is the explorer?",
+    "() ||| connected papers"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 174,
+     "rowParents": 33,
+     "maxRowMembers": 15,
+     "navInlinePairs": 105
+    },
+    "recreation": {
+     "inlineSiblingPairs": 187,
+     "rowParents": 30,
+     "maxRowMembers": 15,
+     "navInlinePairs": 118
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      174,
+      230
+     ],
+     [
+      "learn more",
+      412,
+      68
+     ],
+     [
+      "×",
+      492,
+      22
+     ],
+     [
+      "search",
+      349,
+      82
+     ],
+     [
+      "submit",
+      435,
+      63
+     ],
+     [
+      "donate",
+      502,
+      63
+     ],
+     [
+      "log in",
+      582,
+      55
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      661
+     ],
+     [
+      "(cs)",
+      12,
+      649
+     ],
+     [
+      "arxiv:1706.03762",
+      12,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      11,
+      650
+     ],
+     [
+      "v1",
+      149,
+      12
+     ],
+     [
+      "attention is all you need",
+      12,
+      644
+     ],
+     [
+      ", , , , , , ,",
+      12,
+      646
+     ],
+     [
+      "ashish vaswani",
+      12,
+      81
+     ],
+     [
+      "noam shazeer",
+      100,
+      77
+     ],
+     [
+      "niki parmar",
+      183,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      250,
+      83
+     ],
+     [
+      "llion jones",
+      339,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      404,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      496,
+      73
+     ],
+     [
+      "illia polosukhin",
+      575,
+      78
+     ],
+     [
+      "view pdf",
+      5,
+      651
+     ],
+     [
+      "html (experimental)",
+      5,
+      651
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      14,
+      634
+     ],
+     [
+      "comments:",
+      20,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      89,
+      345
+     ],
+     [
+      "subjects:",
+      20,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      89,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      89,
+      197
+     ],
+     [
+      "cite as:",
+      20,
+      66
+     ],
+     [
+      "[cs.cl]",
+      89,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      89,
+      92
+     ],
+     [
+      "(or  for this version)",
+      89,
+      345
+     ],
+     [
+      "[cs.cl]",
+      106,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      106,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      89,
+      217
+     ],
+     [
+      "focus to learn more",
+      327,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      0,
+      661
+     ],
+     [
+      "submission history",
+      13,
+      635
+     ],
+     [
+      "view email",
+      123,
+      61
+     ],
+     [
+      "[v1]",
+      13,
+      21
+     ],
+     [
+      "[v2]",
+      13,
+      21
+     ],
+     [
+      "[v3]",
+      13,
+      21
+     ],
+     [
+      "[v4]",
+      13,
+      21
+     ],
+     [
+      "[v5]",
+      13,
+      21
+     ],
+     [
+      "[v6]",
+      13,
+      21
+     ],
+     [
+      "[v7]",
+      13,
+      23
+     ],
+     [
+      "access paper:",
+      12,
+      637
+     ],
+     [
+      "view pdf",
+      12,
+      83
+     ],
+     [
+      "html (experimental)",
+      100,
+      157
+     ],
+     [
+      "tex source",
+      262,
+      95
+     ],
+     [
+      "view license",
+      12,
+      49
+     ],
+     [
+      "current browse context:",
+      12,
+      149
+     ],
+     [
+      "cs.cl",
+      164,
+      33
+     ],
+     [
+      "< prev",
+      20,
+      59
+     ],
+     [
+      "next >",
+      103,
+      58
+     ],
+     [
+      "new",
+      12,
+      48
+     ],
+     [
+      "recent",
+      69,
+      59
+     ],
+     [
+      "2017-06",
+      138,
+      70
+     ],
+     [
+      "change to browse by:",
+      12,
+      637
+     ],
+     [
+      "cs",
+      132,
+      13
+     ],
+     [
+      "cs.lg",
+      146,
+      40
+     ],
+     [
+      "references & citations",
+      12,
+      637
+     ],
+     [
+      "nasa ads",
+      12,
+      85
+     ],
+     [
+      "google scholar",
+      103,
+      109
+     ],
+     [
+      "semantic scholar",
+      218,
+      120
+     ],
+     [
+      "()",
+      14,
+      636
+     ],
+     [
+      "123 blog links",
+      14,
+      116
+     ],
+     [
+      "what is this?",
+      142,
+      50
+     ],
+     [
+      "- cs bibliography",
+      14,
+      636
+     ],
+     [
+      "dblp",
+      14,
+      36
+     ],
+     [
+      "|",
+      34,
+      616
+     ],
+     [
+      "listing",
+      34,
+      28
+     ],
+     [
+      "bibtex",
+      70,
+      29
+     ],
+     [
+      "ashish vaswani",
+      34,
+      75
+     ],
+     [
+      "noam shazeer",
+      34,
+      72
+     ],
+     [
+      "niki parmar",
+      34,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      34,
+      77
+     ],
+     [
+      "llion jones",
+      34,
+      55
+     ],
+     [
+      "…",
+      54,
+      596
+     ],
+     [
+      "export bibtex citation",
+      12,
+      146
+     ],
+     [
+      "bookmark",
+      12,
+      643
+     ],
+     [
+      "bibliographic tools",
+      14,
+      632
+     ],
+     [
+      "bibliographic and citation tools",
+      32,
+      596
+     ],
+     [
+      "bibliographic explorer toggle",
+      51,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      91,
+      117
+     ],
+     [
+      "()",
+      211,
+      113
+     ],
+     [
+      "what is the explorer?",
+      214,
+      105
+     ],
+     [
+      "connected papers toggle",
+      51,
+      0
+     ],
+     [
+      "connected papers",
+      91,
+      99
+     ],
+     [
+      "()",
+      193,
+      144
+     ],
+     [
+      "what is connected papers?",
+      197,
+      137
+     ],
+     [
+      "litmaps toggle",
+      51,
+      0
+     ],
+     [
+      "litmaps",
+      91,
+      42
+     ],
+     [
+      "()",
+      136,
+      92
+     ],
+     [
+      "what is litmaps?",
+      140,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      51,
+      0
+     ],
+     [
+      "scite smart citations",
+      91,
+      110
+     ],
+     [
+      "()",
+      204,
+      136
+     ],
+     [
+      "what are smart citations?",
+      208,
+      129
+     ],
+     [
+      "code, data, media",
+      14,
+      632
+     ],
+     [
+      "demos",
+      14,
+      632
+     ],
+     [
+      "related papers",
+      14,
+      632
+     ],
+     [
+      "about arxivlabs",
+      14,
+      632
+     ],
+     [
+      "|\n     ()",
+      13,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      27,
+      249
+     ],
+     [
+      "disable mathjax",
+      287,
+      96
+     ],
+     [
+      "what is mathjax?",
+      391,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      641
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      390,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      444,
+      73
+     ],
+     [
+      "·",
+      528,
+      4
+     ],
+     [
+      "operational status",
+      10,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      118,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      641
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      73
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      174,
+      231
+     ],
+     [
+      "learn more",
+      413,
+      67
+     ],
+     [
+      "×",
+      492,
+      22
+     ],
+     [
+      "search",
+      350,
+      80
+     ],
+     [
+      "submit",
+      434,
+      62
+     ],
+     [
+      "donate",
+      500,
+      63
+     ],
+     [
+      "log in",
+      580,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      768
+     ],
+     [
+      "(cs)",
+      -51,
+      756
+     ],
+     [
+      "arxiv:1706.03762",
+      -51,
+      99
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      -53,
+      757
+     ],
+     [
+      "v1",
+      86,
+      12
+     ],
+     [
+      "attention is all you need",
+      -52,
+      751
+     ],
+     [
+      ", , , , , , ,",
+      -52,
+      753
+     ],
+     [
+      "ashish vaswani",
+      -52,
+      81
+     ],
+     [
+      "noam shazeer",
+      36,
+      77
+     ],
+     [
+      "niki parmar",
+      120,
+      60
+     ],
+     [
+      "jakob uszkoreit",
+      186,
+      83
+     ],
+     [
+      "llion jones",
+      276,
+      59
+     ],
+     [
+      "aidan n. gomez",
+      341,
+      86
+     ],
+     [
+      "lukasz kaiser",
+      433,
+      73
+     ],
+     [
+      "illia polosukhin",
+      512,
+      78
+     ],
+     [
+      "view pdf",
+      -5,
+      758
+     ],
+     [
+      "html (experimental)",
+      -5,
+      758
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      4,
+      741
+     ],
+     [
+      "comments:",
+      10,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      79,
+      345
+     ],
+     [
+      "subjects:",
+      10,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      79,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      79,
+      197
+     ],
+     [
+      "cite as:",
+      10,
+      66
+     ],
+     [
+      "[cs.cl]",
+      79,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      79,
+      92
+     ],
+     [
+      "(or  for this version)",
+      79,
+      345
+     ],
+     [
+      "[cs.cl]",
+      96,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      96,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      79,
+      217
+     ],
+     [
+      "focus to learn more",
+      317,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      -10,
+      768
+     ],
+     [
+      "submission history",
+      3,
+      742
+     ],
+     [
+      "view email",
+      113,
+      61
+     ],
+     [
+      "[v1]",
+      3,
+      21
+     ],
+     [
+      "[v2]",
+      3,
+      21
+     ],
+     [
+      "[v3]",
+      3,
+      21
+     ],
+     [
+      "[v4]",
+      3,
+      21
+     ],
+     [
+      "[v5]",
+      3,
+      21
+     ],
+     [
+      "[v6]",
+      3,
+      21
+     ],
+     [
+      "[v7]",
+      3,
+      23
+     ],
+     [
+      "access paper:",
+      2,
+      744
+     ],
+     [
+      "view pdf",
+      2,
+      83
+     ],
+     [
+      "html (experimental)",
+      90,
+      157
+     ],
+     [
+      "tex source",
+      252,
+      95
+     ],
+     [
+      "view license",
+      2,
+      49
+     ],
+     [
+      "current browse context:",
+      2,
+      149
+     ],
+     [
+      "cs.cl",
+      151,
+      33
+     ],
+     [
+      "< prev",
+      10,
+      59
+     ],
+     [
+      "next >",
+      90,
+      58
+     ],
+     [
+      "new",
+      2,
+      48
+     ],
+     [
+      "recent",
+      56,
+      59
+     ],
+     [
+      "2017-06",
+      121,
+      70
+     ],
+     [
+      "change to browse by:",
+      2,
+      744
+     ],
+     [
+      "cs",
+      122,
+      13
+     ],
+     [
+      "cs.lg",
+      132,
+      40
+     ],
+     [
+      "references & citations",
+      2,
+      744
+     ],
+     [
+      "nasa ads",
+      2,
+      85
+     ],
+     [
+      "google scholar",
+      93,
+      109
+     ],
+     [
+      "semantic scholar",
+      208,
+      120
+     ],
+     [
+      "()",
+      4,
+      743
+     ],
+     [
+      "123 blog links",
+      334,
+      116
+     ],
+     [
+      "what is this?",
+      462,
+      50
+     ],
+     [
+      "- cs bibliography",
+      4,
+      743
+     ],
+     [
+      "dblp",
+      4,
+      36
+     ],
+     [
+      "|",
+      24,
+      723
+     ],
+     [
+      "listing",
+      24,
+      28
+     ],
+     [
+      "bibtex",
+      60,
+      29
+     ],
+     [
+      "ashish vaswani",
+      24,
+      75
+     ],
+     [
+      "noam shazeer",
+      24,
+      72
+     ],
+     [
+      "niki parmar",
+      24,
+      56
+     ],
+     [
+      "jakob uszkoreit",
+      24,
+      77
+     ],
+     [
+      "llion jones",
+      24,
+      55
+     ],
+     [
+      "…",
+      44,
+      703
+     ],
+     [
+      "export bibtex citation",
+      2,
+      146
+     ],
+     [
+      "bookmark",
+      2,
+      750
+     ],
+     [
+      "bibliographic tools",
+      758,
+      117
+     ],
+     [
+      "bibliographic explorer toggle",
+      801,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      839,
+      69
+     ],
+     [
+      "()",
+      839,
+      74
+     ],
+     [
+      "what is the explorer?",
+      839,
+      74
+     ],
+     [
+      "connected papers toggle",
+      801,
+      2
+     ],
+     [
+      "connected papers",
+      839,
+      58
+     ],
+     [
+      "()",
+      839,
+      67
+     ],
+     [
+      "what is connected papers?",
+      839,
+      67
+     ],
+     [
+      "litmaps toggle",
+      801,
+      2
+     ],
+     [
+      "litmaps",
+      839,
+      42
+     ],
+     [
+      "()",
+      839,
+      71
+     ],
+     [
+      "what is litmaps?",
+      839,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      801,
+      2
+     ],
+     [
+      "scite smart citations",
+      839,
+      60
+     ],
+     [
+      "()",
+      839,
+      76
+     ],
+     [
+      "what are smart citations?",
+      839,
+      76
+     ],
+     [
+      "code, data, media",
+      758,
+      71
+     ],
+     [
+      "demos",
+      758,
+      78
+     ],
+     [
+      "related papers",
+      758,
+      81
+     ],
+     [
+      "about arxivlabs",
+      758,
+      95
+     ],
+     [
+      "|  ()",
+      3,
+      500
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      17,
+      249
+     ],
+     [
+      "disable mathjax",
+      277,
+      96
+     ],
+     [
+      "what is mathjax?",
+      381,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      641
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      387,
+      119
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      430,
+      69
+     ],
+     [
+      "·",
+      511,
+      3
+     ],
+     [
+      "operational status",
+      526,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      641
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 7,
+    "candidates": 129,
+    "protruding": 2,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 44,
+    "candidates": 129,
+    "protruding": 14,
+    "scrollWidth": 1430,
+    "clientWidth": 800
+   },
+   "recreationOnly": 43,
+   "sourceOnly": 7,
+   "recreationOnlyExamples": [
+    "access paper: ||| bibliographic tools",
+    "bibliographic tools ||| view pdf",
+    "code, data, media ||| view license",
+    "current browse context: ||| demos",
+    "cs.cl ||| related papers",
+    "new ||| related papers",
+    "related papers ||| |",
+    "about arxivlabs ||| change to browse by:"
+   ],
+   "sourceOnlyExamples": [
+    "ashish vaswani ||| llion jones",
+    "llion jones ||| noam shazeer",
+    "llion jones ||| niki parmar",
+    "jakob uszkoreit ||| llion jones",
+    "aidan n. gomez ||| llion jones",
+    "llion jones ||| lukasz kaiser",
+    "illia polosukhin ||| llion jones"
+   ],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 190,
+     "rowParents": 31,
+     "maxRowMembers": 15,
+     "navInlinePairs": 119
+    },
+    "recreation": {
+     "inlineSiblingPairs": 190,
+     "rowParents": 26,
+     "maxRowMembers": 15,
+     "navInlinePairs": 118
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      244,
+      230
+     ],
+     [
+      "learn more",
+      481,
+      68
+     ],
+     [
+      "×",
+      561,
+      22
+     ],
+     [
+      "search",
+      488,
+      82
+     ],
+     [
+      "submit",
+      574,
+      63
+     ],
+     [
+      "donate",
+      641,
+      63
+     ],
+     [
+      "log in",
+      721,
+      55
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      541
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      20,
+      521
+     ],
+     [
+      "v1",
+      167,
+      12
+     ],
+     [
+      "attention is all you need",
+      20,
+      521
+     ],
+     [
+      ", , , , , , ,",
+      20,
+      521
+     ],
+     [
+      "ashish vaswani",
+      20,
+      112
+     ],
+     [
+      "noam shazeer",
+      140,
+      107
+     ],
+     [
+      "niki parmar",
+      256,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      348,
+      114
+     ],
+     [
+      "llion jones",
+      20,
+      484
+     ],
+     [
+      "aidan n. gomez",
+      71,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      197,
+      101
+     ],
+     [
+      "illia polosukhin",
+      307,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      40,
+      461
+     ],
+     [
+      "comments:",
+      22,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      90,
+      345
+     ],
+     [
+      "subjects:",
+      22,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      90,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      90,
+      197
+     ],
+     [
+      "cite as:",
+      22,
+      66
+     ],
+     [
+      "[cs.cl]",
+      90,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      90,
+      92
+     ],
+     [
+      "(or  for this version)",
+      90,
+      345
+     ],
+     [
+      "[cs.cl]",
+      108,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      108,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      90,
+      217
+     ],
+     [
+      "focus to learn more",
+      328,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      20,
+      521
+     ],
+     [
+      "submission history",
+      20,
+      521
+     ],
+     [
+      "view email",
+      130,
+      61
+     ],
+     [
+      "[v1]",
+      20,
+      21
+     ],
+     [
+      "[v2]",
+      20,
+      21
+     ],
+     [
+      "[v3]",
+      20,
+      21
+     ],
+     [
+      "[v4]",
+      20,
+      21
+     ],
+     [
+      "[v5]",
+      20,
+      21
+     ],
+     [
+      "[v6]",
+      20,
+      21
+     ],
+     [
+      "[v7]",
+      20,
+      23
+     ],
+     [
+      "access paper:",
+      562,
+      223
+     ],
+     [
+      "view pdf",
+      577,
+      70
+     ],
+     [
+      "html (experimental)",
+      577,
+      148
+     ],
+     [
+      "tex source",
+      577,
+      82
+     ],
+     [
+      "view license",
+      562,
+      49
+     ],
+     [
+      "current browse context:",
+      558,
+      170
+     ],
+     [
+      "cs.cl",
+      558,
+      229
+     ],
+     [
+      "< prev",
+      566,
+      36
+     ],
+     [
+      "|",
+      614,
+      18
+     ],
+     [
+      "next >",
+      643,
+      36
+     ],
+     [
+      "new",
+      558,
+      24
+     ],
+     [
+      "|",
+      585,
+      7
+     ],
+     [
+      "recent",
+      592,
+      36
+     ],
+     [
+      "|",
+      632,
+      7
+     ],
+     [
+      "2017-06",
+      639,
+      48
+     ],
+     [
+      "change to browse by:",
+      558,
+      229
+     ],
+     [
+      "cs",
+      558,
+      13
+     ],
+     [
+      "cs.lg",
+      558,
+      53
+     ],
+     [
+      "references & citations",
+      558,
+      229
+     ],
+     [
+      "nasa ads",
+      578,
+      64
+     ],
+     [
+      "google scholar",
+      578,
+      89
+     ],
+     [
+      "semantic scholar",
+      578,
+      102
+     ],
+     [
+      "()",
+      558,
+      229
+     ],
+     [
+      "123 blog links",
+      558,
+      98
+     ],
+     [
+      "what is this?",
+      661,
+      50
+     ],
+     [
+      "- cs bibliography",
+      558,
+      229
+     ],
+     [
+      "dblp",
+      558,
+      42
+     ],
+     [
+      "|",
+      578,
+      209
+     ],
+     [
+      "listing",
+      578,
+      33
+     ],
+     [
+      "bibtex",
+      621,
+      35
+     ],
+     [
+      "ashish vaswani",
+      578,
+      91
+     ],
+     [
+      "noam shazeer",
+      578,
+      86
+     ],
+     [
+      "niki parmar",
+      578,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      578,
+      92
+     ],
+     [
+      "llion jones",
+      578,
+      66
+     ],
+     [
+      "…",
+      598,
+      189
+     ],
+     [
+      "export bibtex citation",
+      558,
+      149
+     ],
+     [
+      "bookmark",
+      558,
+      229
+     ],
+     [
+      "bibliographic tools",
+      22,
+      152
+     ],
+     [
+      "bibliographic and citation tools",
+      39,
+      723
+     ],
+     [
+      "bibliographic explorer toggle",
+      57,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      97,
+      117
+     ],
+     [
+      "()",
+      217,
+      113
+     ],
+     [
+      "what is the explorer?",
+      221,
+      105
+     ],
+     [
+      "connected papers toggle",
+      57,
+      0
+     ],
+     [
+      "connected papers",
+      97,
+      99
+     ],
+     [
+      "()",
+      200,
+      144
+     ],
+     [
+      "what is connected papers?",
+      203,
+      137
+     ],
+     [
+      "litmaps toggle",
+      57,
+      0
+     ],
+     [
+      "litmaps",
+      97,
+      42
+     ],
+     [
+      "()",
+      142,
+      92
+     ],
+     [
+      "what is litmaps?",
+      146,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      57,
+      0
+     ],
+     [
+      "scite smart citations",
+      97,
+      110
+     ],
+     [
+      "()",
+      210,
+      136
+     ],
+     [
+      "what are smart citations?",
+      214,
+      129
+     ],
+     [
+      "code, data, media",
+      177,
+      142
+     ],
+     [
+      "demos",
+      322,
+      78
+     ],
+     [
+      "related papers",
+      403,
+      125
+     ],
+     [
+      "about arxivlabs",
+      531,
+      134
+     ],
+     [
+      "|\n     ()",
+      20,
+      780
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      20,
+      249
+     ],
+     [
+      "disable mathjax",
+      280,
+      96
+     ],
+     [
+      "what is mathjax?",
+      384,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      720
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      390,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      444,
+      73
+     ],
+     [
+      "·",
+      528,
+      4
+     ],
+     [
+      "operational status",
+      545,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      588
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      244,
+      231
+     ],
+     [
+      "learn more",
+      482,
+      67
+     ],
+     [
+      "×",
+      561,
+      22
+     ],
+     [
+      "search",
+      489,
+      80
+     ],
+     [
+      "submit",
+      573,
+      62
+     ],
+     [
+      "donate",
+      639,
+      63
+     ],
+     [
+      "log in",
+      719,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      1181
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      10,
+      1161
+     ],
+     [
+      "v1",
+      156,
+      12
+     ],
+     [
+      "attention is all you need",
+      10,
+      1161
+     ],
+     [
+      ", , , , , , ,",
+      10,
+      1161
+     ],
+     [
+      "ashish vaswani",
+      10,
+      112
+     ],
+     [
+      "noam shazeer",
+      130,
+      107
+     ],
+     [
+      "niki parmar",
+      246,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      338,
+      114
+     ],
+     [
+      "llion jones",
+      460,
+      81
+     ],
+     [
+      "aidan n. gomez",
+      550,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      676,
+      101
+     ],
+     [
+      "illia polosukhin",
+      785,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      30,
+      1101
+     ],
+     [
+      "comments:",
+      12,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      80,
+      345
+     ],
+     [
+      "subjects:",
+      12,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      80,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      80,
+      197
+     ],
+     [
+      "cite as:",
+      12,
+      66
+     ],
+     [
+      "[cs.cl]",
+      80,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      80,
+      92
+     ],
+     [
+      "(or  for this version)",
+      80,
+      345
+     ],
+     [
+      "[cs.cl]",
+      98,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      98,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      80,
+      217
+     ],
+     [
+      "focus to learn more",
+      318,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      10,
+      1161
+     ],
+     [
+      "submission history",
+      10,
+      1161
+     ],
+     [
+      "view email",
+      120,
+      61
+     ],
+     [
+      "[v1]",
+      10,
+      21
+     ],
+     [
+      "[v2]",
+      10,
+      21
+     ],
+     [
+      "[v3]",
+      10,
+      21
+     ],
+     [
+      "[v4]",
+      10,
+      21
+     ],
+     [
+      "[v5]",
+      10,
+      21
+     ],
+     [
+      "[v6]",
+      10,
+      21
+     ],
+     [
+      "[v7]",
+      10,
+      23
+     ],
+     [
+      "access paper:",
+      1230,
+      164
+     ],
+     [
+      "view pdf",
+      1246,
+      70
+     ],
+     [
+      "html (experimental)",
+      1246,
+      148
+     ],
+     [
+      "tex source",
+      1246,
+      82
+     ],
+     [
+      "view license",
+      1230,
+      49
+     ],
+     [
+      "current browse context:",
+      1226,
+      170
+     ],
+     [
+      "cs.cl",
+      1226,
+      171
+     ],
+     [
+      "< prev",
+      1234,
+      36
+     ],
+     [
+      "|",
+      1278,
+      11
+     ],
+     [
+      "next >",
+      1297,
+      36
+     ],
+     [
+      "new",
+      1226,
+      24
+     ],
+     [
+      "|",
+      1250,
+      11
+     ],
+     [
+      "recent",
+      1260,
+      36
+     ],
+     [
+      "|",
+      1296,
+      11
+     ],
+     [
+      "2017-06",
+      1307,
+      48
+     ],
+     [
+      "change to browse by:",
+      1226,
+      171
+     ],
+     [
+      "cs",
+      1226,
+      13
+     ],
+     [
+      "cs.lg",
+      1226,
+      53
+     ],
+     [
+      "references & citations",
+      1226,
+      171
+     ],
+     [
+      "nasa ads",
+      1246,
+      64
+     ],
+     [
+      "google scholar",
+      1246,
+      89
+     ],
+     [
+      "semantic scholar",
+      1246,
+      102
+     ],
+     [
+      "()",
+      1226,
+      171
+     ],
+     [
+      "123 blog links",
+      1226,
+      98
+     ],
+     [
+      "what is this?",
+      1329,
+      50
+     ],
+     [
+      "- cs bibliography",
+      1226,
+      171
+     ],
+     [
+      "dblp",
+      1226,
+      42
+     ],
+     [
+      "|",
+      1246,
+      151
+     ],
+     [
+      "listing",
+      1246,
+      33
+     ],
+     [
+      "bibtex",
+      1290,
+      35
+     ],
+     [
+      "ashish vaswani",
+      1246,
+      91
+     ],
+     [
+      "noam shazeer",
+      1246,
+      86
+     ],
+     [
+      "niki parmar",
+      1246,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      1246,
+      92
+     ],
+     [
+      "llion jones",
+      1246,
+      66
+     ],
+     [
+      "…",
+      1266,
+      131
+     ],
+     [
+      "export bibtex citation",
+      1226,
+      149
+     ],
+     [
+      "bookmark",
+      1226,
+      171
+     ],
+     [
+      "bibliographic tools",
+      1171,
+      117
+     ],
+     [
+      "bibliographic and citation tools",
+      1188,
+      4
+     ],
+     [
+      "bibliographic explorer toggle",
+      1214,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      1252,
+      69
+     ],
+     [
+      "()",
+      1252,
+      74
+     ],
+     [
+      "what is the explorer?",
+      1252,
+      74
+     ],
+     [
+      "connected papers toggle",
+      1214,
+      2
+     ],
+     [
+      "connected papers",
+      1252,
+      58
+     ],
+     [
+      "()",
+      1252,
+      67
+     ],
+     [
+      "what is connected papers?",
+      1252,
+      67
+     ],
+     [
+      "litmaps toggle",
+      1214,
+      2
+     ],
+     [
+      "litmaps",
+      1252,
+      42
+     ],
+     [
+      "()",
+      1252,
+      71
+     ],
+     [
+      "what is litmaps?",
+      1252,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      1214,
+      2
+     ],
+     [
+      "scite smart citations",
+      1252,
+      60
+     ],
+     [
+      "()",
+      1252,
+      76
+     ],
+     [
+      "what are smart citations?",
+      1252,
+      76
+     ],
+     [
+      "code, data, media",
+      1171,
+      71
+     ],
+     [
+      "demos",
+      1171,
+      78
+     ],
+     [
+      "related papers",
+      1171,
+      81
+     ],
+     [
+      "about arxivlabs",
+      1171,
+      95
+     ],
+     [
+      "|  ()",
+      10,
+      1420
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      10,
+      249
+     ],
+     [
+      "disable mathjax",
+      270,
+      96
+     ],
+     [
+      "what is mathjax?",
+      374,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      720
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      387,
+      119
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      430,
+      69
+     ],
+     [
+      "·",
+      511,
+      3
+     ],
+     [
+      "operational status",
+      526,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      10,
+      588
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 1,
+    "candidates": 129,
+    "protruding": 2,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 45,
+    "candidates": 129,
+    "protruding": 14,
+    "scrollWidth": 1430,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 43,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "access paper: ||| bibliographic tools",
+    "bibliographic tools ||| view pdf",
+    "code, data, media ||| view license",
+    "current browse context: ||| demos",
+    "cs.cl ||| related papers",
+    "new ||| related papers",
+    "related papers ||| |",
+    "about arxivlabs ||| change to browse by:"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 160,
+     "rowParents": 32,
+     "maxRowMembers": 15,
+     "navInlinePairs": 83
+    },
+    "recreation": {
+     "inlineSiblingPairs": 155,
+     "rowParents": 27,
+     "maxRowMembers": 15,
+     "navInlinePairs": 82
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      382,
+      230
+     ],
+     [
+      "learn more",
+      619,
+      68
+     ],
+     [
+      "×",
+      699,
+      22
+     ],
+     [
+      "search",
+      764,
+      82
+     ],
+     [
+      "submit",
+      850,
+      63
+     ],
+     [
+      "donate",
+      917,
+      63
+     ],
+     [
+      "log in",
+      997,
+      55
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      817
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      20,
+      797
+     ],
+     [
+      "v1",
+      167,
+      12
+     ],
+     [
+      "attention is all you need",
+      20,
+      797
+     ],
+     [
+      ", , , , , , ,",
+      20,
+      797
+     ],
+     [
+      "ashish vaswani",
+      20,
+      112
+     ],
+     [
+      "noam shazeer",
+      140,
+      107
+     ],
+     [
+      "niki parmar",
+      256,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      348,
+      114
+     ],
+     [
+      "llion jones",
+      470,
+      81
+     ],
+     [
+      "aidan n. gomez",
+      560,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      686,
+      101
+     ],
+     [
+      "illia polosukhin",
+      20,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      40,
+      737
+     ],
+     [
+      "comments:",
+      22,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      90,
+      345
+     ],
+     [
+      "subjects:",
+      22,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      90,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      90,
+      197
+     ],
+     [
+      "cite as:",
+      22,
+      66
+     ],
+     [
+      "[cs.cl]",
+      90,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      90,
+      92
+     ],
+     [
+      "(or  for this version)",
+      90,
+      345
+     ],
+     [
+      "[cs.cl]",
+      108,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      108,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      90,
+      217
+     ],
+     [
+      "focus to learn more",
+      328,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      20,
+      797
+     ],
+     [
+      "submission history",
+      20,
+      797
+     ],
+     [
+      "view email",
+      130,
+      61
+     ],
+     [
+      "[v1]",
+      20,
+      21
+     ],
+     [
+      "[v2]",
+      20,
+      21
+     ],
+     [
+      "[v3]",
+      20,
+      21
+     ],
+     [
+      "[v4]",
+      20,
+      21
+     ],
+     [
+      "[v5]",
+      20,
+      21
+     ],
+     [
+      "[v6]",
+      20,
+      21
+     ],
+     [
+      "[v7]",
+      20,
+      23
+     ],
+     [
+      "access paper:",
+      838,
+      223
+     ],
+     [
+      "view pdf",
+      853,
+      70
+     ],
+     [
+      "html (experimental)",
+      853,
+      148
+     ],
+     [
+      "tex source",
+      853,
+      82
+     ],
+     [
+      "view license",
+      838,
+      49
+     ],
+     [
+      "current browse context:",
+      834,
+      170
+     ],
+     [
+      "cs.cl",
+      834,
+      229
+     ],
+     [
+      "< prev",
+      842,
+      36
+     ],
+     [
+      "|",
+      890,
+      18
+     ],
+     [
+      "next >",
+      919,
+      36
+     ],
+     [
+      "new",
+      834,
+      24
+     ],
+     [
+      "|",
+      861,
+      7
+     ],
+     [
+      "recent",
+      868,
+      36
+     ],
+     [
+      "|",
+      908,
+      7
+     ],
+     [
+      "2017-06",
+      915,
+      48
+     ],
+     [
+      "change to browse by:",
+      834,
+      229
+     ],
+     [
+      "cs",
+      834,
+      13
+     ],
+     [
+      "cs.lg",
+      834,
+      53
+     ],
+     [
+      "references & citations",
+      834,
+      229
+     ],
+     [
+      "nasa ads",
+      854,
+      64
+     ],
+     [
+      "google scholar",
+      854,
+      89
+     ],
+     [
+      "semantic scholar",
+      854,
+      102
+     ],
+     [
+      "()",
+      834,
+      229
+     ],
+     [
+      "123 blog links",
+      834,
+      98
+     ],
+     [
+      "what is this?",
+      937,
+      50
+     ],
+     [
+      "- cs bibliography",
+      834,
+      229
+     ],
+     [
+      "dblp",
+      834,
+      42
+     ],
+     [
+      "|",
+      854,
+      209
+     ],
+     [
+      "listing",
+      854,
+      33
+     ],
+     [
+      "bibtex",
+      897,
+      35
+     ],
+     [
+      "ashish vaswani",
+      854,
+      91
+     ],
+     [
+      "noam shazeer",
+      854,
+      86
+     ],
+     [
+      "niki parmar",
+      854,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      854,
+      92
+     ],
+     [
+      "llion jones",
+      854,
+      66
+     ],
+     [
+      "…",
+      874,
+      189
+     ],
+     [
+      "export bibtex citation",
+      834,
+      149
+     ],
+     [
+      "bookmark",
+      834,
+      229
+     ],
+     [
+      "bibliographic tools",
+      22,
+      152
+     ],
+     [
+      "bibliographic and citation tools",
+      39,
+      999
+     ],
+     [
+      "bibliographic explorer toggle",
+      57,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      97,
+      117
+     ],
+     [
+      "()",
+      217,
+      113
+     ],
+     [
+      "what is the explorer?",
+      221,
+      105
+     ],
+     [
+      "connected papers toggle",
+      57,
+      0
+     ],
+     [
+      "connected papers",
+      97,
+      99
+     ],
+     [
+      "()",
+      200,
+      144
+     ],
+     [
+      "what is connected papers?",
+      203,
+      137
+     ],
+     [
+      "litmaps toggle",
+      57,
+      0
+     ],
+     [
+      "litmaps",
+      97,
+      42
+     ],
+     [
+      "()",
+      142,
+      92
+     ],
+     [
+      "what is litmaps?",
+      146,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      57,
+      0
+     ],
+     [
+      "scite smart citations",
+      97,
+      110
+     ],
+     [
+      "()",
+      210,
+      136
+     ],
+     [
+      "what are smart citations?",
+      214,
+      129
+     ],
+     [
+      "code, data, media",
+      177,
+      142
+     ],
+     [
+      "demos",
+      322,
+      78
+     ],
+     [
+      "related papers",
+      403,
+      125
+     ],
+     [
+      "about arxivlabs",
+      531,
+      134
+     ],
+     [
+      "|\n     ()",
+      20,
+      1056
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      20,
+      249
+     ],
+     [
+      "disable mathjax",
+      280,
+      96
+     ],
+     [
+      "what is mathjax?",
+      384,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      436
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      10,
+      430
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      10,
+      73
+     ],
+     [
+      "·",
+      95,
+      4
+     ],
+     [
+      "operational status",
+      111,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      219,
+      0
+     ],
+     [
+      "major funding support from",
+      478,
+      588
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      32
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      382,
+      231
+     ],
+     [
+      "learn more",
+      620,
+      67
+     ],
+     [
+      "×",
+      699,
+      22
+     ],
+     [
+      "search",
+      765,
+      80
+     ],
+     [
+      "submit",
+      849,
+      62
+     ],
+     [
+      "donate",
+      915,
+      63
+     ],
+     [
+      "log in",
+      995,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      1181
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      10,
+      1161
+     ],
+     [
+      "v1",
+      156,
+      12
+     ],
+     [
+      "attention is all you need",
+      10,
+      1161
+     ],
+     [
+      ", , , , , , ,",
+      10,
+      1161
+     ],
+     [
+      "ashish vaswani",
+      10,
+      112
+     ],
+     [
+      "noam shazeer",
+      130,
+      107
+     ],
+     [
+      "niki parmar",
+      246,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      338,
+      114
+     ],
+     [
+      "llion jones",
+      460,
+      81
+     ],
+     [
+      "aidan n. gomez",
+      550,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      676,
+      101
+     ],
+     [
+      "illia polosukhin",
+      785,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      30,
+      1101
+     ],
+     [
+      "comments:",
+      12,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      80,
+      345
+     ],
+     [
+      "subjects:",
+      12,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      80,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      80,
+      197
+     ],
+     [
+      "cite as:",
+      12,
+      66
+     ],
+     [
+      "[cs.cl]",
+      80,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      80,
+      92
+     ],
+     [
+      "(or  for this version)",
+      80,
+      345
+     ],
+     [
+      "[cs.cl]",
+      98,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      98,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      80,
+      217
+     ],
+     [
+      "focus to learn more",
+      318,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      10,
+      1161
+     ],
+     [
+      "submission history",
+      10,
+      1161
+     ],
+     [
+      "view email",
+      120,
+      61
+     ],
+     [
+      "[v1]",
+      10,
+      21
+     ],
+     [
+      "[v2]",
+      10,
+      21
+     ],
+     [
+      "[v3]",
+      10,
+      21
+     ],
+     [
+      "[v4]",
+      10,
+      21
+     ],
+     [
+      "[v5]",
+      10,
+      21
+     ],
+     [
+      "[v6]",
+      10,
+      21
+     ],
+     [
+      "[v7]",
+      10,
+      23
+     ],
+     [
+      "access paper:",
+      1230,
+      164
+     ],
+     [
+      "view pdf",
+      1246,
+      70
+     ],
+     [
+      "html (experimental)",
+      1246,
+      148
+     ],
+     [
+      "tex source",
+      1246,
+      82
+     ],
+     [
+      "view license",
+      1230,
+      49
+     ],
+     [
+      "current browse context:",
+      1226,
+      170
+     ],
+     [
+      "cs.cl",
+      1226,
+      171
+     ],
+     [
+      "< prev",
+      1234,
+      36
+     ],
+     [
+      "|",
+      1278,
+      11
+     ],
+     [
+      "next >",
+      1297,
+      36
+     ],
+     [
+      "new",
+      1226,
+      24
+     ],
+     [
+      "|",
+      1250,
+      11
+     ],
+     [
+      "recent",
+      1260,
+      36
+     ],
+     [
+      "|",
+      1296,
+      11
+     ],
+     [
+      "2017-06",
+      1307,
+      48
+     ],
+     [
+      "change to browse by:",
+      1226,
+      171
+     ],
+     [
+      "cs",
+      1226,
+      13
+     ],
+     [
+      "cs.lg",
+      1226,
+      53
+     ],
+     [
+      "references & citations",
+      1226,
+      171
+     ],
+     [
+      "nasa ads",
+      1246,
+      64
+     ],
+     [
+      "google scholar",
+      1246,
+      89
+     ],
+     [
+      "semantic scholar",
+      1246,
+      102
+     ],
+     [
+      "()",
+      1226,
+      171
+     ],
+     [
+      "123 blog links",
+      1226,
+      98
+     ],
+     [
+      "what is this?",
+      1329,
+      50
+     ],
+     [
+      "- cs bibliography",
+      1226,
+      171
+     ],
+     [
+      "dblp",
+      1226,
+      42
+     ],
+     [
+      "|",
+      1246,
+      151
+     ],
+     [
+      "listing",
+      1246,
+      33
+     ],
+     [
+      "bibtex",
+      1290,
+      35
+     ],
+     [
+      "ashish vaswani",
+      1246,
+      91
+     ],
+     [
+      "noam shazeer",
+      1246,
+      86
+     ],
+     [
+      "niki parmar",
+      1246,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      1246,
+      92
+     ],
+     [
+      "llion jones",
+      1246,
+      66
+     ],
+     [
+      "…",
+      1266,
+      131
+     ],
+     [
+      "export bibtex citation",
+      1226,
+      149
+     ],
+     [
+      "bookmark",
+      1226,
+      171
+     ],
+     [
+      "bibliographic tools",
+      1171,
+      117
+     ],
+     [
+      "bibliographic and citation tools",
+      1188,
+      4
+     ],
+     [
+      "bibliographic explorer toggle",
+      1214,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      1252,
+      69
+     ],
+     [
+      "()",
+      1252,
+      74
+     ],
+     [
+      "what is the explorer?",
+      1252,
+      74
+     ],
+     [
+      "connected papers toggle",
+      1214,
+      2
+     ],
+     [
+      "connected papers",
+      1252,
+      58
+     ],
+     [
+      "()",
+      1252,
+      67
+     ],
+     [
+      "what is connected papers?",
+      1252,
+      67
+     ],
+     [
+      "litmaps toggle",
+      1214,
+      2
+     ],
+     [
+      "litmaps",
+      1252,
+      42
+     ],
+     [
+      "()",
+      1252,
+      71
+     ],
+     [
+      "what is litmaps?",
+      1252,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      1214,
+      2
+     ],
+     [
+      "scite smart citations",
+      1252,
+      60
+     ],
+     [
+      "()",
+      1252,
+      76
+     ],
+     [
+      "what are smart citations?",
+      1252,
+      76
+     ],
+     [
+      "code, data, media",
+      1171,
+      71
+     ],
+     [
+      "demos",
+      1171,
+      78
+     ],
+     [
+      "related papers",
+      1171,
+      81
+     ],
+     [
+      "about arxivlabs",
+      1171,
+      95
+     ],
+     [
+      "|  ()",
+      10,
+      1420
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      10,
+      249
+     ],
+     [
+      "disable mathjax",
+      270,
+      96
+     ],
+     [
+      "what is mathjax?",
+      374,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      436
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      10,
+      426
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      10,
+      69
+     ],
+     [
+      "·",
+      91,
+      3
+     ],
+     [
+      "operational status",
+      106,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      478,
+      588
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 129,
+    "protruding": 2,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 44,
+    "candidates": 129,
+    "protruding": 11,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 43,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "access paper: ||| bibliographic tools",
+    "bibliographic tools ||| view pdf",
+    "code, data, media ||| view license",
+    "current browse context: ||| demos",
+    "cs.cl ||| related papers",
+    "new ||| related papers",
+    "related papers ||| |",
+    "about arxivlabs ||| change to browse by:"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 203,
+     "rowParents": 32,
+     "maxRowMembers": 15,
+     "navInlinePairs": 119
+    },
+    "recreation": {
+     "inlineSiblingPairs": 191,
+     "rowParents": 27,
+     "maxRowMembers": 15,
+     "navInlinePairs": 118
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      564,
+      230
+     ],
+     [
+      "learn more",
+      801,
+      68
+     ],
+     [
+      "×",
+      881,
+      22
+     ],
+     [
+      "search",
+      1128,
+      82
+     ],
+     [
+      "submit",
+      1214,
+      63
+     ],
+     [
+      "donate",
+      1281,
+      63
+     ],
+     [
+      "log in",
+      1361,
+      55
+     ],
+     [
+      "computer science > computation and language",
+      0,
+      1181
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      20,
+      1161
+     ],
+     [
+      "v1",
+      167,
+      12
+     ],
+     [
+      "attention is all you need",
+      20,
+      1161
+     ],
+     [
+      ", , , , , , ,",
+      20,
+      1161
+     ],
+     [
+      "ashish vaswani",
+      20,
+      112
+     ],
+     [
+      "noam shazeer",
+      140,
+      107
+     ],
+     [
+      "niki parmar",
+      256,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      348,
+      114
+     ],
+     [
+      "llion jones",
+      470,
+      81
+     ],
+     [
+      "aidan n. gomez",
+      560,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      686,
+      101
+     ],
+     [
+      "illia polosukhin",
+      795,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      40,
+      1101
+     ],
+     [
+      "comments:",
+      22,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      90,
+      345
+     ],
+     [
+      "subjects:",
+      22,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      90,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      90,
+      197
+     ],
+     [
+      "cite as:",
+      22,
+      66
+     ],
+     [
+      "[cs.cl]",
+      90,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      90,
+      92
+     ],
+     [
+      "(or  for this version)",
+      90,
+      345
+     ],
+     [
+      "[cs.cl]",
+      108,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      108,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      90,
+      217
+     ],
+     [
+      "focus to learn more",
+      328,
+      1
+     ],
+     [
+      "from: llion jones []                  \n        mon, 12 jun 2017 17:57:34 utc (1,102 kb)\n            \n        mon, 19 jun 2017 16:49:45 utc (1,125 kb)\n            \n        tue, 20 jun 2017 05:20:02 utc (1,125 kb)\n            \n        fri, 30 jun 2017 17:29:30 utc (1,124 kb)\n            \n        wed, 6 dec 2017 03:30:32 utc (1,124 kb)\n            \n        mon, 24 jul 2023 00:48:54 utc (1,124 kb)\n    \n        wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      20,
+      1161
+     ],
+     [
+      "submission history",
+      20,
+      1161
+     ],
+     [
+      "view email",
+      130,
+      61
+     ],
+     [
+      "[v1]",
+      20,
+      21
+     ],
+     [
+      "[v2]",
+      20,
+      21
+     ],
+     [
+      "[v3]",
+      20,
+      21
+     ],
+     [
+      "[v4]",
+      20,
+      21
+     ],
+     [
+      "[v5]",
+      20,
+      21
+     ],
+     [
+      "[v6]",
+      20,
+      21
+     ],
+     [
+      "[v7]",
+      20,
+      23
+     ],
+     [
+      "access paper:",
+      1202,
+      223
+     ],
+     [
+      "view pdf",
+      1217,
+      70
+     ],
+     [
+      "html (experimental)",
+      1217,
+      148
+     ],
+     [
+      "tex source",
+      1217,
+      82
+     ],
+     [
+      "view license",
+      1202,
+      49
+     ],
+     [
+      "current browse context:",
+      1198,
+      170
+     ],
+     [
+      "cs.cl",
+      1198,
+      229
+     ],
+     [
+      "< prev",
+      1206,
+      36
+     ],
+     [
+      "|",
+      1254,
+      18
+     ],
+     [
+      "next >",
+      1283,
+      36
+     ],
+     [
+      "new",
+      1198,
+      24
+     ],
+     [
+      "|",
+      1225,
+      7
+     ],
+     [
+      "recent",
+      1232,
+      36
+     ],
+     [
+      "|",
+      1272,
+      7
+     ],
+     [
+      "2017-06",
+      1279,
+      48
+     ],
+     [
+      "change to browse by:",
+      1198,
+      229
+     ],
+     [
+      "cs",
+      1198,
+      13
+     ],
+     [
+      "cs.lg",
+      1198,
+      53
+     ],
+     [
+      "references & citations",
+      1198,
+      229
+     ],
+     [
+      "nasa ads",
+      1218,
+      64
+     ],
+     [
+      "google scholar",
+      1218,
+      89
+     ],
+     [
+      "semantic scholar",
+      1218,
+      102
+     ],
+     [
+      "()",
+      1198,
+      229
+     ],
+     [
+      "123 blog links",
+      1198,
+      98
+     ],
+     [
+      "what is this?",
+      1301,
+      50
+     ],
+     [
+      "- cs bibliography",
+      1198,
+      229
+     ],
+     [
+      "dblp",
+      1198,
+      42
+     ],
+     [
+      "|",
+      1218,
+      209
+     ],
+     [
+      "listing",
+      1218,
+      33
+     ],
+     [
+      "bibtex",
+      1261,
+      35
+     ],
+     [
+      "ashish vaswani",
+      1218,
+      91
+     ],
+     [
+      "noam shazeer",
+      1218,
+      86
+     ],
+     [
+      "niki parmar",
+      1218,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      1218,
+      92
+     ],
+     [
+      "llion jones",
+      1218,
+      66
+     ],
+     [
+      "…",
+      1238,
+      189
+     ],
+     [
+      "export bibtex citation",
+      1198,
+      149
+     ],
+     [
+      "bookmark",
+      1198,
+      229
+     ],
+     [
+      "bibliographic tools",
+      22,
+      152
+     ],
+     [
+      "bibliographic and citation tools",
+      39,
+      1363
+     ],
+     [
+      "bibliographic explorer toggle",
+      57,
+      0
+     ],
+     [
+      "bibliographic explorer",
+      97,
+      117
+     ],
+     [
+      "()",
+      217,
+      113
+     ],
+     [
+      "what is the explorer?",
+      221,
+      105
+     ],
+     [
+      "connected papers toggle",
+      57,
+      0
+     ],
+     [
+      "connected papers",
+      97,
+      99
+     ],
+     [
+      "()",
+      200,
+      144
+     ],
+     [
+      "what is connected papers?",
+      203,
+      137
+     ],
+     [
+      "litmaps toggle",
+      57,
+      0
+     ],
+     [
+      "litmaps",
+      97,
+      42
+     ],
+     [
+      "()",
+      142,
+      92
+     ],
+     [
+      "what is litmaps?",
+      146,
+      84
+     ],
+     [
+      "scite.ai toggle",
+      57,
+      0
+     ],
+     [
+      "scite smart citations",
+      97,
+      110
+     ],
+     [
+      "()",
+      210,
+      136
+     ],
+     [
+      "what are smart citations?",
+      214,
+      129
+     ],
+     [
+      "code, data, media",
+      177,
+      142
+     ],
+     [
+      "demos",
+      322,
+      78
+     ],
+     [
+      "related papers",
+      403,
+      125
+     ],
+     [
+      "about arxivlabs",
+      531,
+      134
+     ],
+     [
+      "|\n     ()",
+      20,
+      1420
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      20,
+      249
+     ],
+     [
+      "disable mathjax",
+      280,
+      96
+     ],
+     [
+      "what is mathjax?",
+      384,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from\n        our ,\n        ,\n        and all contributors.",
+      10,
+      720
+     ],
+     [
+      "major funders",
+      292,
+      91
+     ],
+     [
+      "member institutions",
+      390,
+      122
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      4
+     ],
+     [
+      "help",
+      73,
+      27
+     ],
+     [
+      "·",
+      113,
+      4
+     ],
+     [
+      "contact",
+      129,
+      45
+     ],
+     [
+      "·",
+      186,
+      4
+     ],
+     [
+      "subscribe",
+      203,
+      58
+     ],
+     [
+      "·",
+      273,
+      4
+     ],
+     [
+      "copyright",
+      289,
+      56
+     ],
+     [
+      "·",
+      357,
+      4
+     ],
+     [
+      "privacy",
+      373,
+      42
+     ],
+     [
+      "·",
+      427,
+      4
+     ],
+     [
+      "accessibility",
+      444,
+      73
+     ],
+     [
+      "·",
+      528,
+      4
+     ],
+     [
+      "operational status",
+      545,
+      109
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      842,
+      588
+     ]
+    ],
+    "recreation": [
+     [
+      "skip to main content",
+      8,
+      180
+     ],
+     [
+      "arxiv is now an independent nonprofit!",
+      564,
+      231
+     ],
+     [
+      "learn more",
+      802,
+      67
+     ],
+     [
+      "×",
+      881,
+      22
+     ],
+     [
+      "search",
+      1129,
+      80
+     ],
+     [
+      "submit",
+      1213,
+      62
+     ],
+     [
+      "donate",
+      1279,
+      63
+     ],
+     [
+      "log in",
+      1359,
+      57
+     ],
+     [
+      "computer science > computation and language",
+      -10,
+      1181
+     ],
+     [
+      "[submitted on 12 jun 2017 (), last revised 2 aug 2023 (this version, v7)]",
+      10,
+      1161
+     ],
+     [
+      "v1",
+      156,
+      12
+     ],
+     [
+      "attention is all you need",
+      10,
+      1161
+     ],
+     [
+      ", , , , , , ,",
+      10,
+      1161
+     ],
+     [
+      "ashish vaswani",
+      10,
+      112
+     ],
+     [
+      "noam shazeer",
+      130,
+      107
+     ],
+     [
+      "niki parmar",
+      246,
+      84
+     ],
+     [
+      "jakob uszkoreit",
+      338,
+      114
+     ],
+     [
+      "llion jones",
+      460,
+      81
+     ],
+     [
+      "aidan n. gomez",
+      550,
+      117
+     ],
+     [
+      "lukasz kaiser",
+      676,
+      101
+     ],
+     [
+      "illia polosukhin",
+      785,
+      107
+     ],
+     [
+      "the dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. the best performing models also connect the encoder and decoder through an attention mechanism. we propose a new simple network architecture, the transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. our model achieves 28.4 bleu on the wmt 2014 english-to-german translation task, improving over the existing best results, including ensembles by over 2 bleu. on the wmt 2014 english-to-french translation task, our model establishes a new single-model state-of-the-art bleu score of 41.8 after training for 3.5 days on eight gpus, a small fraction of the training costs of the best models from the literature. we show that the transformer generalizes well to other tasks by applying it successfully to english constituency parsing both with large and limited training data.",
+      30,
+      1101
+     ],
+     [
+      "comments:",
+      12,
+      66
+     ],
+     [
+      "15 pages, 5 figures",
+      80,
+      345
+     ],
+     [
+      "subjects:",
+      12,
+      66
+     ],
+     [
+      "; machine learning (cs.lg)",
+      80,
+      345
+     ],
+     [
+      "computation and language (cs.cl)",
+      80,
+      197
+     ],
+     [
+      "cite as:",
+      12,
+      66
+     ],
+     [
+      "[cs.cl]",
+      80,
+      135
+     ],
+     [
+      "arxiv:1706.03762",
+      80,
+      92
+     ],
+     [
+      "(or  for this version)",
+      80,
+      345
+     ],
+     [
+      "[cs.cl]",
+      98,
+      147
+     ],
+     [
+      "arxiv:1706.03762v7",
+      98,
+      104
+     ],
+     [
+      "https://doi.org/10.48550/arxiv.1706.03762",
+      80,
+      217
+     ],
+     [
+      "focus to learn more",
+      318,
+      1
+     ],
+     [
+      "from: llion jones []  mon, 12 jun 2017 17:57:34 utc (1,102 kb) mon, 19 jun 2017 16:49:45 utc (1,125 kb) tue, 20 jun 2017 05:20:02 utc (1,125 kb) fri, 30 jun 2017 17:29:30 utc (1,124 kb) wed, 6 dec 2017 03:30:32 utc (1,124 kb) mon, 24 jul 2023 00:48:54 utc (1,124 kb) wed, 2 aug 2023 00:41:18 utc (1,124 kb)",
+      10,
+      1161
+     ],
+     [
+      "submission history",
+      10,
+      1161
+     ],
+     [
+      "view email",
+      120,
+      61
+     ],
+     [
+      "[v1]",
+      10,
+      21
+     ],
+     [
+      "[v2]",
+      10,
+      21
+     ],
+     [
+      "[v3]",
+      10,
+      21
+     ],
+     [
+      "[v4]",
+      10,
+      21
+     ],
+     [
+      "[v5]",
+      10,
+      21
+     ],
+     [
+      "[v6]",
+      10,
+      21
+     ],
+     [
+      "[v7]",
+      10,
+      23
+     ],
+     [
+      "access paper:",
+      1230,
+      164
+     ],
+     [
+      "view pdf",
+      1246,
+      70
+     ],
+     [
+      "html (experimental)",
+      1246,
+      148
+     ],
+     [
+      "tex source",
+      1246,
+      82
+     ],
+     [
+      "view license",
+      1230,
+      49
+     ],
+     [
+      "current browse context:",
+      1226,
+      170
+     ],
+     [
+      "cs.cl",
+      1226,
+      171
+     ],
+     [
+      "< prev",
+      1234,
+      36
+     ],
+     [
+      "|",
+      1278,
+      11
+     ],
+     [
+      "next >",
+      1297,
+      36
+     ],
+     [
+      "new",
+      1226,
+      24
+     ],
+     [
+      "|",
+      1250,
+      11
+     ],
+     [
+      "recent",
+      1260,
+      36
+     ],
+     [
+      "|",
+      1296,
+      11
+     ],
+     [
+      "2017-06",
+      1307,
+      48
+     ],
+     [
+      "change to browse by:",
+      1226,
+      171
+     ],
+     [
+      "cs",
+      1226,
+      13
+     ],
+     [
+      "cs.lg",
+      1226,
+      53
+     ],
+     [
+      "references & citations",
+      1226,
+      171
+     ],
+     [
+      "nasa ads",
+      1246,
+      64
+     ],
+     [
+      "google scholar",
+      1246,
+      89
+     ],
+     [
+      "semantic scholar",
+      1246,
+      102
+     ],
+     [
+      "()",
+      1226,
+      171
+     ],
+     [
+      "123 blog links",
+      1226,
+      98
+     ],
+     [
+      "what is this?",
+      1329,
+      50
+     ],
+     [
+      "- cs bibliography",
+      1226,
+      171
+     ],
+     [
+      "dblp",
+      1226,
+      42
+     ],
+     [
+      "|",
+      1246,
+      151
+     ],
+     [
+      "listing",
+      1246,
+      33
+     ],
+     [
+      "bibtex",
+      1290,
+      35
+     ],
+     [
+      "ashish vaswani",
+      1246,
+      91
+     ],
+     [
+      "noam shazeer",
+      1246,
+      86
+     ],
+     [
+      "niki parmar",
+      1246,
+      68
+     ],
+     [
+      "jakob uszkoreit",
+      1246,
+      92
+     ],
+     [
+      "llion jones",
+      1246,
+      66
+     ],
+     [
+      "…",
+      1266,
+      131
+     ],
+     [
+      "export bibtex citation",
+      1226,
+      149
+     ],
+     [
+      "bookmark",
+      1226,
+      171
+     ],
+     [
+      "bibliographic tools",
+      1171,
+      117
+     ],
+     [
+      "bibliographic and citation tools",
+      1188,
+      4
+     ],
+     [
+      "bibliographic explorer toggle",
+      1214,
+      2
+     ],
+     [
+      "bibliographic explorer",
+      1252,
+      69
+     ],
+     [
+      "()",
+      1252,
+      74
+     ],
+     [
+      "what is the explorer?",
+      1252,
+      74
+     ],
+     [
+      "connected papers toggle",
+      1214,
+      2
+     ],
+     [
+      "connected papers",
+      1252,
+      58
+     ],
+     [
+      "()",
+      1252,
+      67
+     ],
+     [
+      "what is connected papers?",
+      1252,
+      67
+     ],
+     [
+      "litmaps toggle",
+      1214,
+      2
+     ],
+     [
+      "litmaps",
+      1252,
+      42
+     ],
+     [
+      "()",
+      1252,
+      71
+     ],
+     [
+      "what is litmaps?",
+      1252,
+      71
+     ],
+     [
+      "scite.ai toggle",
+      1214,
+      2
+     ],
+     [
+      "scite smart citations",
+      1252,
+      60
+     ],
+     [
+      "()",
+      1252,
+      76
+     ],
+     [
+      "what are smart citations?",
+      1252,
+      76
+     ],
+     [
+      "code, data, media",
+      1171,
+      71
+     ],
+     [
+      "demos",
+      1171,
+      78
+     ],
+     [
+      "related papers",
+      1171,
+      81
+     ],
+     [
+      "about arxivlabs",
+      1171,
+      95
+     ],
+     [
+      "|  ()",
+      10,
+      1420
+     ],
+     [
+      "which authors of this paper are endorsers?",
+      10,
+      249
+     ],
+     [
+      "disable mathjax",
+      270,
+      96
+     ],
+     [
+      "what is mathjax?",
+      374,
+      103
+     ],
+     [
+      "we gratefully acknowledge support from our , , and all contributors.",
+      10,
+      720
+     ],
+     [
+      "major funders",
+      291,
+      89
+     ],
+     [
+      "member institutions",
+      387,
+      119
+     ],
+     [
+      "about",
+      10,
+      35
+     ],
+     [
+      "·",
+      57,
+      3
+     ],
+     [
+      "help",
+      72,
+      27
+     ],
+     [
+      "·",
+      111,
+      3
+     ],
+     [
+      "contact",
+      126,
+      44
+     ],
+     [
+      "·",
+      182,
+      3
+     ],
+     [
+      "subscribe",
+      197,
+      56
+     ],
+     [
+      "·",
+      265,
+      3
+     ],
+     [
+      "copyright",
+      280,
+      57
+     ],
+     [
+      "·",
+      348,
+      3
+     ],
+     [
+      "privacy",
+      363,
+      40
+     ],
+     [
+      "·",
+      415,
+      3
+     ],
+     [
+      "accessibility",
+      430,
+      69
+     ],
+     [
+      "·",
+      511,
+      3
+     ],
+     [
+      "operational status",
+      526,
+      106
+     ],
+     [
+      "(opens in new tab)",
+      653,
+      0
+     ],
+     [
+      "major funding support from",
+      842,
+      588
+     ]
+    ]
+   }
+  }
+ }
+}

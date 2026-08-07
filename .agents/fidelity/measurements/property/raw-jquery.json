@@ -1,0 +1,10789 @@
+{
+ "site": {
+  "sourceUrl": "https://jquery.com/",
+  "key": "jquery",
+  "recreationUrl": "http://127.0.0.1:8822/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 11,
+    "candidates": 121,
+    "protruding": 3,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 11,
+    "candidates": 120,
+    "protruding": 19,
+    "scrollWidth": 779,
+    "clientWidth": 400
+   },
+   "recreationOnly": 5,
+   "sourceOnly": 5,
+   "recreationOnlyExamples": [
+    "data ||| zipcode",
+    "openjs foundation ||| trademark policy",
+    "code of conduct ||| terms of use",
+    "code of conduct ||| privacy",
+    "code of conduct ||| cookie"
+   ],
+   "sourceOnlyExamples": [
+    "chat ||| copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| github",
+    "openjs foundation ||| trademark list",
+    "trademark list ||| trademark policy",
+    "list of openjs foundation trademarks ||| trademark list"
+   ],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 34,
+     "rowParents": 18,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 28,
+     "rowParents": 17,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      400
+     ],
+     [
+      "herodevs.com",
+      189,
+      94
+     ],
+     [
+      "jquery",
+      79,
+      243
+     ],
+     [
+      "navigation",
+      283,
+      107
+     ],
+     [
+      "download jquery",
+      148,
+      149
+     ],
+     [
+      "v4.0.0",
+      204,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      48,
+      303
+     ],
+     [
+      "discover support options",
+      48,
+      303
+     ],
+     [
+      "view source on github →",
+      48,
+      303
+     ],
+     [
+      "how jquery works →",
+      48,
+      303
+     ],
+     [
+      "lightweight footprint",
+      30,
+      340
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      30,
+      340
+     ],
+     [
+      "css3 compliant",
+      30,
+      340
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      30,
+      340
+     ],
+     [
+      "cross-browser",
+      30,
+      340
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      46,
+      308
+     ],
+     [
+      "what is jquery?",
+      35,
+      330
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      35,
+      330
+     ],
+     [
+      "resources",
+      35,
+      330
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      213
+     ],
+     [
+      "jquery learning center",
+      75,
+      156
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      205
+     ],
+     [
+      "a brief look",
+      35,
+      330
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      330
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      330
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      75,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      100,
+      140
+     ],
+     [
+      "\"next step...\"",
+      314,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      330
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      35,
+      330
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      115,
+      92
+     ],
+     [
+      "#button-container",
+      97,
+      128
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      75,
+      528
+     ],
+     [
+      "var",
+      75,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      232,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      75,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      100,
+      214
+     ],
+     [
+      "\"click\"",
+      372,
+      58
+     ],
+     [
+      "()",
+      446,
+      148
+     ],
+     [
+      "function",
+      446,
+      66
+     ],
+     [
+      "event",
+      521,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      75,
+      528
+     ],
+     [
+      "});",
+      75,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      330
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      35,
+      330
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      205,
+      99
+     ],
+     [
+      "#weather-temp",
+      171,
+      99
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "5",
+      35,
+      31
+     ],
+     [
+      "6",
+      35,
+      31
+     ],
+     [
+      "7",
+      35,
+      31
+     ],
+     [
+      "8",
+      35,
+      31
+     ],
+     [
+      "9",
+      35,
+      31
+     ],
+     [
+      "$.ajax({",
+      75,
+      619
+     ],
+     [
+      ": ,",
+      75,
+      619
+     ],
+     [
+      "url",
+      92,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      133,
+      140
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "data",
+      92,
+      33
+     ],
+     [
+      ":",
+      75,
+      619
+     ],
+     [
+      "zipcode",
+      108,
+      58
+     ],
+     [
+      "97201",
+      182,
+      41
+     ],
+     [
+      "},",
+      75,
+      619
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "success",
+      92,
+      58
+     ],
+     [
+      "()",
+      166,
+      157
+     ],
+     [
+      "function",
+      166,
+      66
+     ],
+     [
+      "result",
+      240,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      75,
+      619
+     ],
+     [
+      "\"#weather-temp\"",
+      133,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      331,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      512,
+      157
+     ],
+     [
+      "}",
+      75,
+      619
+     ],
+     [
+      "});",
+      75,
+      619
+     ],
+     [
+      "related projects",
+      35,
+      330
+     ],
+     [
+      "jquery ui",
+      35,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      330
+     ],
+     [
+      "learn more",
+      35,
+      319
+     ],
+     [
+      "jquery mobile",
+      35,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      330
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      165,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      116
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      116
+     ],
+     [
+      "jquery in action",
+      142,
+      116
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      142,
+      116
+     ],
+     [
+      "jquery succinctly",
+      274,
+      116
+     ],
+     [
+      "cody lindley",
+      274,
+      116
+     ],
+     [
+      "learning center",
+      51,
+      123
+     ],
+     [
+      "chat",
+      199,
+      57
+     ],
+     [
+      "twitter",
+      280,
+      68
+     ],
+     [
+      "github",
+      175,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      380
+     ],
+     [
+      "openjs foundation",
+      107,
+      98
+     ],
+     [
+      "jquery license",
+      85,
+      73
+     ],
+     [
+      "openjs foundation",
+      288,
+      98
+     ],
+     [
+      "openjs foundation",
+      39,
+      98
+     ],
+     [
+      "trademark policy",
+      218,
+      85
+     ],
+     [
+      "trademark list",
+      20,
+      360
+     ],
+     [
+      "list of openjs foundation trademarks",
+      18,
+      362
+     ],
+     [
+      "terms of use",
+      156,
+      65
+     ],
+     [
+      "privacy",
+      227,
+      35
+     ],
+     [
+      "code of conduct",
+      268,
+      83
+     ],
+     [
+      "cookie",
+      135,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      380
+     ],
+     [
+      "web hosting by digital ocean",
+      32,
+      167
+     ],
+     [
+      "cdn by fastly",
+      208,
+      71
+     ],
+     [
+      "powered by wordpress",
+      173,
+      195
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      400
+     ],
+     [
+      "herodevs.com",
+      189,
+      94
+     ],
+     [
+      "jquery",
+      30,
+      71
+     ],
+     [
+      "download jquery",
+      520,
+      238
+     ],
+     [
+      "v4.0.0",
+      619,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      489,
+      290
+     ],
+     [
+      "discover support options",
+      489,
+      290
+     ],
+     [
+      "view source on github →",
+      489,
+      290
+     ],
+     [
+      "how jquery works →",
+      489,
+      290
+     ],
+     [
+      "lightweight footprint",
+      -199,
+      290
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -199,
+      290
+     ],
+     [
+      "css3 compliant",
+      -199,
+      290
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -199,
+      290
+     ],
+     [
+      "cross-browser",
+      -199,
+      290
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      -144,
+      180
+     ],
+     [
+      "what is jquery?",
+      35,
+      330
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      35,
+      330
+     ],
+     [
+      "resources",
+      35,
+      330
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      108
+     ],
+     [
+      "jquery learning center",
+      75,
+      107
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      118
+     ],
+     [
+      "a brief look",
+      35,
+      330
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      330
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      330
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      103,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      128,
+      140
+     ],
+     [
+      "\"next step...\"",
+      342,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      330
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      35,
+      330
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      115,
+      92
+     ],
+     [
+      "#button-container",
+      97,
+      128
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      103,
+      528
+     ],
+     [
+      "var",
+      103,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      259,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      103,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      128,
+      214
+     ],
+     [
+      "\"click\"",
+      400,
+      58
+     ],
+     [
+      "()",
+      474,
+      148
+     ],
+     [
+      "function",
+      474,
+      66
+     ],
+     [
+      "event",
+      548,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      103,
+      528
+     ],
+     [
+      "});",
+      103,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      330
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      35,
+      330
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      205,
+      99
+     ],
+     [
+      "#weather-temp",
+      171,
+      99
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "5",
+      73,
+      31
+     ],
+     [
+      "6",
+      73,
+      31
+     ],
+     [
+      "7",
+      73,
+      31
+     ],
+     [
+      "8",
+      73,
+      31
+     ],
+     [
+      "9",
+      73,
+      31
+     ],
+     [
+      "$.ajax({",
+      103,
+      594
+     ],
+     [
+      ": ,",
+      103,
+      594
+     ],
+     [
+      "url",
+      103,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      144,
+      140
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "data",
+      103,
+      33
+     ],
+     [
+      ":",
+      103,
+      594
+     ],
+     [
+      "zipcode",
+      103,
+      58
+     ],
+     [
+      "97201",
+      177,
+      41
+     ],
+     [
+      "},",
+      103,
+      594
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "success",
+      103,
+      58
+     ],
+     [
+      "()",
+      177,
+      157
+     ],
+     [
+      "function",
+      177,
+      66
+     ],
+     [
+      "result",
+      251,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      103,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      136,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      334,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      515,
+      157
+     ],
+     [
+      "}",
+      103,
+      594
+     ],
+     [
+      "});",
+      103,
+      594
+     ],
+     [
+      "related projects",
+      35,
+      330
+     ],
+     [
+      "jquery ui",
+      35,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      330
+     ],
+     [
+      "learn more",
+      35,
+      319
+     ],
+     [
+      "jquery mobile",
+      35,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      330
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      161,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      158
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      158
+     ],
+     [
+      "jquery in action",
+      184,
+      206
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      184,
+      206
+     ],
+     [
+      "jquery succinctly",
+      10,
+      380
+     ],
+     [
+      "cody lindley",
+      10,
+      380
+     ],
+     [
+      "learning center",
+      189,
+      123
+     ],
+     [
+      "chat",
+      333,
+      57
+     ],
+     [
+      "twitter",
+      231,
+      68
+     ],
+     [
+      "github",
+      320,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      291
+     ],
+     [
+      "openjs foundation",
+      10,
+      117
+     ],
+     [
+      "jquery license",
+      33,
+      73
+     ],
+     [
+      "openjs foundation",
+      10,
+      122
+     ],
+     [
+      "openjs foundation",
+      10,
+      247
+     ],
+     [
+      "trademark policy",
+      146,
+      85
+     ],
+     [
+      "trademark list",
+      10,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      10,
+      185
+     ],
+     [
+      "terms of use",
+      141,
+      65
+     ],
+     [
+      "privacy",
+      212,
+      35
+     ],
+     [
+      "code of conduct",
+      10,
+      282
+     ],
+     [
+      "cookie",
+      79,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      380
+     ],
+     [
+      "web hosting by digital ocean",
+      10,
+      167
+     ],
+     [
+      "cdn by fastly",
+      186,
+      71
+     ],
+     [
+      "powered by wordpress",
+      10,
+      336
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 7,
+    "candidates": 121,
+    "protruding": 3,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 9,
+    "candidates": 120,
+    "protruding": 19,
+    "scrollWidth": 829,
+    "clientWidth": 450
+   },
+   "recreationOnly": 4,
+   "sourceOnly": 2,
+   "recreationOnlyExamples": [
+    "data ||| zipcode",
+    "code of conduct ||| terms of use",
+    "code of conduct ||| privacy",
+    "code of conduct ||| cookie"
+   ],
+   "sourceOnlyExamples": [
+    "chat ||| copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| github"
+   ],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 36,
+     "rowParents": 19,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 29,
+     "rowParents": 18,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      450
+     ],
+     [
+      "herodevs.com",
+      176,
+      94
+     ],
+     [
+      "jquery",
+      104,
+      243
+     ],
+     [
+      "navigation",
+      333,
+      107
+     ],
+     [
+      "download jquery",
+      173,
+      149
+     ],
+     [
+      "v4.0.0",
+      229,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      73,
+      303
+     ],
+     [
+      "discover support options",
+      73,
+      303
+     ],
+     [
+      "view source on github →",
+      73,
+      303
+     ],
+     [
+      "how jquery works →",
+      73,
+      303
+     ],
+     [
+      "lightweight footprint",
+      30,
+      390
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      30,
+      390
+     ],
+     [
+      "css3 compliant",
+      30,
+      390
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      30,
+      390
+     ],
+     [
+      "cross-browser",
+      30,
+      390
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      71,
+      308
+     ],
+     [
+      "what is jquery?",
+      35,
+      380
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      35,
+      380
+     ],
+     [
+      "resources",
+      35,
+      380
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      213
+     ],
+     [
+      "jquery learning center",
+      75,
+      156
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      205
+     ],
+     [
+      "a brief look",
+      35,
+      380
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      380
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      380
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      75,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      100,
+      140
+     ],
+     [
+      "\"next step...\"",
+      314,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      380
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      35,
+      380
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      35,
+      92
+     ],
+     [
+      "#button-container",
+      35,
+      356
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      75,
+      528
+     ],
+     [
+      "var",
+      75,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      232,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      75,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      100,
+      214
+     ],
+     [
+      "\"click\"",
+      372,
+      58
+     ],
+     [
+      "()",
+      446,
+      148
+     ],
+     [
+      "function",
+      446,
+      66
+     ],
+     [
+      "event",
+      521,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      75,
+      528
+     ],
+     [
+      "});",
+      75,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      380
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      35,
+      380
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      149,
+      99
+     ],
+     [
+      "#weather-temp",
+      35,
+      99
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "5",
+      35,
+      31
+     ],
+     [
+      "6",
+      35,
+      31
+     ],
+     [
+      "7",
+      35,
+      31
+     ],
+     [
+      "8",
+      35,
+      31
+     ],
+     [
+      "9",
+      35,
+      31
+     ],
+     [
+      "$.ajax({",
+      75,
+      619
+     ],
+     [
+      ": ,",
+      75,
+      619
+     ],
+     [
+      "url",
+      92,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      133,
+      140
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "data",
+      92,
+      33
+     ],
+     [
+      ":",
+      75,
+      619
+     ],
+     [
+      "zipcode",
+      108,
+      58
+     ],
+     [
+      "97201",
+      182,
+      41
+     ],
+     [
+      "},",
+      75,
+      619
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "success",
+      92,
+      58
+     ],
+     [
+      "()",
+      166,
+      157
+     ],
+     [
+      "function",
+      166,
+      66
+     ],
+     [
+      "result",
+      240,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      75,
+      619
+     ],
+     [
+      "\"#weather-temp\"",
+      133,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      331,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      512,
+      157
+     ],
+     [
+      "}",
+      75,
+      619
+     ],
+     [
+      "});",
+      75,
+      619
+     ],
+     [
+      "related projects",
+      35,
+      380
+     ],
+     [
+      "jquery ui",
+      35,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      380
+     ],
+     [
+      "learn more",
+      316,
+      77
+     ],
+     [
+      "jquery mobile",
+      35,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      380
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      190,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      133
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      133
+     ],
+     [
+      "jquery in action",
+      159,
+      133
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      159,
+      133
+     ],
+     [
+      "jquery succinctly",
+      307,
+      133
+     ],
+     [
+      "cody lindley",
+      307,
+      133
+     ],
+     [
+      "learning center",
+      29,
+      123
+     ],
+     [
+      "chat",
+      176,
+      57
+     ],
+     [
+      "twitter",
+      258,
+      68
+     ],
+     [
+      "github",
+      351,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      430
+     ],
+     [
+      "openjs foundation",
+      97,
+      98
+     ],
+     [
+      "jquery license",
+      38,
+      73
+     ],
+     [
+      "openjs foundation",
+      241,
+      98
+     ],
+     [
+      "openjs foundation",
+      331,
+      98
+     ],
+     [
+      "trademark policy",
+      105,
+      85
+     ],
+     [
+      "trademark list",
+      214,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      93,
+      185
+     ],
+     [
+      "terms of use",
+      233,
+      65
+     ],
+     [
+      "privacy",
+      304,
+      35
+     ],
+     [
+      "code of conduct",
+      345,
+      83
+     ],
+     [
+      "cookie",
+      171,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      430
+     ],
+     [
+      "web hosting by digital ocean",
+      29,
+      167
+     ],
+     [
+      "cdn by fastly",
+      204,
+      71
+     ],
+     [
+      "powered by wordpress",
+      284,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      450
+     ],
+     [
+      "herodevs.com",
+      176,
+      94
+     ],
+     [
+      "jquery",
+      30,
+      71
+     ],
+     [
+      "download jquery",
+      520,
+      288
+     ],
+     [
+      "v4.0.0",
+      644,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      489,
+      340
+     ],
+     [
+      "discover support options",
+      489,
+      340
+     ],
+     [
+      "view source on github →",
+      489,
+      340
+     ],
+     [
+      "how jquery works →",
+      489,
+      340
+     ],
+     [
+      "lightweight footprint",
+      -199,
+      340
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -199,
+      340
+     ],
+     [
+      "css3 compliant",
+      -199,
+      340
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -199,
+      340
+     ],
+     [
+      "cross-browser",
+      -199,
+      340
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      -143,
+      227
+     ],
+     [
+      "what is jquery?",
+      35,
+      380
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      35,
+      380
+     ],
+     [
+      "resources",
+      35,
+      380
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      108
+     ],
+     [
+      "jquery learning center",
+      75,
+      107
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      118
+     ],
+     [
+      "a brief look",
+      35,
+      380
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      380
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      380
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      103,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      128,
+      140
+     ],
+     [
+      "\"next step...\"",
+      342,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      380
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      35,
+      380
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      35,
+      92
+     ],
+     [
+      "#button-container",
+      35,
+      356
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      103,
+      528
+     ],
+     [
+      "var",
+      103,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      259,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      103,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      128,
+      214
+     ],
+     [
+      "\"click\"",
+      400,
+      58
+     ],
+     [
+      "()",
+      474,
+      148
+     ],
+     [
+      "function",
+      474,
+      66
+     ],
+     [
+      "event",
+      548,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      103,
+      528
+     ],
+     [
+      "});",
+      103,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      380
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      35,
+      380
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      149,
+      99
+     ],
+     [
+      "#weather-temp",
+      35,
+      99
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "5",
+      73,
+      31
+     ],
+     [
+      "6",
+      73,
+      31
+     ],
+     [
+      "7",
+      73,
+      31
+     ],
+     [
+      "8",
+      73,
+      31
+     ],
+     [
+      "9",
+      73,
+      31
+     ],
+     [
+      "$.ajax({",
+      103,
+      594
+     ],
+     [
+      ": ,",
+      103,
+      594
+     ],
+     [
+      "url",
+      103,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      144,
+      140
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "data",
+      103,
+      33
+     ],
+     [
+      ":",
+      103,
+      594
+     ],
+     [
+      "zipcode",
+      103,
+      58
+     ],
+     [
+      "97201",
+      177,
+      41
+     ],
+     [
+      "},",
+      103,
+      594
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "success",
+      103,
+      58
+     ],
+     [
+      "()",
+      177,
+      157
+     ],
+     [
+      "function",
+      177,
+      66
+     ],
+     [
+      "result",
+      251,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      103,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      136,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      334,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      515,
+      157
+     ],
+     [
+      "}",
+      103,
+      594
+     ],
+     [
+      "});",
+      103,
+      594
+     ],
+     [
+      "related projects",
+      35,
+      380
+     ],
+     [
+      "jquery ui",
+      35,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      380
+     ],
+     [
+      "learn more",
+      316,
+      77
+     ],
+     [
+      "jquery mobile",
+      35,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      380
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      186,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      183
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      183
+     ],
+     [
+      "jquery in action",
+      209,
+      231
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      209,
+      231
+     ],
+     [
+      "jquery succinctly",
+      10,
+      430
+     ],
+     [
+      "cody lindley",
+      10,
+      430
+     ],
+     [
+      "learning center",
+      239,
+      123
+     ],
+     [
+      "chat",
+      383,
+      57
+     ],
+     [
+      "twitter",
+      281,
+      68
+     ],
+     [
+      "github",
+      370,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      291
+     ],
+     [
+      "openjs foundation",
+      88,
+      98
+     ],
+     [
+      "jquery license",
+      82,
+      73
+     ],
+     [
+      "openjs foundation",
+      10,
+      150
+     ],
+     [
+      "openjs foundation",
+      10,
+      98
+     ],
+     [
+      "trademark policy",
+      189,
+      85
+     ],
+     [
+      "trademark list",
+      10,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      10,
+      185
+     ],
+     [
+      "terms of use",
+      141,
+      65
+     ],
+     [
+      "privacy",
+      212,
+      35
+     ],
+     [
+      "code of conduct",
+      10,
+      282
+     ],
+     [
+      "cookie",
+      79,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      430
+     ],
+     [
+      "web hosting by digital ocean",
+      10,
+      167
+     ],
+     [
+      "cdn by fastly",
+      186,
+      71
+     ],
+     [
+      "powered by wordpress",
+      266,
+      137
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 12,
+    "candidates": 121,
+    "protruding": 3,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 5,
+    "candidates": 120,
+    "protruding": 19,
+    "scrollWidth": 859,
+    "clientWidth": 480
+   },
+   "recreationOnly": 1,
+   "sourceOnly": 8,
+   "recreationOnlyExamples": [
+    "data ||| zipcode"
+   ],
+   "sourceOnlyExamples": [
+    "chat ||| copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| twitter",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| github",
+    "jquery license ||| openjs foundation",
+    "openjs foundation ||| trademark policy",
+    "trademark list ||| trademark policy",
+    "list of openjs foundation trademarks ||| trademark policy",
+    "list of openjs foundation trademarks ||| trademark list"
+   ],
+   "sharedTextKeys": 105,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 42,
+     "rowParents": 19,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 28,
+     "rowParents": 18,
+     "maxRowMembers": 11,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      480
+     ],
+     [
+      "herodevs.com",
+      361,
+      94
+     ],
+     [
+      "jquery",
+      119,
+      243
+     ],
+     [
+      "navigation",
+      363,
+      107
+     ],
+     [
+      "download jquery",
+      188,
+      149
+     ],
+     [
+      "v4.0.0",
+      244,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      88,
+      303
+     ],
+     [
+      "discover support options",
+      88,
+      303
+     ],
+     [
+      "view source on github →",
+      88,
+      303
+     ],
+     [
+      "how jquery works →",
+      88,
+      303
+     ],
+     [
+      "lightweight footprint",
+      30,
+      420
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      30,
+      420
+     ],
+     [
+      "css3 compliant",
+      30,
+      420
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      30,
+      420
+     ],
+     [
+      "cross-browser",
+      30,
+      420
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      86,
+      308
+     ],
+     [
+      "what is jquery?",
+      35,
+      410
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      35,
+      410
+     ],
+     [
+      "resources",
+      35,
+      410
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      213
+     ],
+     [
+      "jquery learning center",
+      75,
+      156
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      205
+     ],
+     [
+      "a brief look",
+      35,
+      410
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      410
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      410
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      75,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      100,
+      140
+     ],
+     [
+      "\"next step...\"",
+      314,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      410
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      35,
+      410
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      35,
+      92
+     ],
+     [
+      "#button-container",
+      35,
+      356
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      75,
+      528
+     ],
+     [
+      "var",
+      75,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      232,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      75,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      100,
+      214
+     ],
+     [
+      "\"click\"",
+      372,
+      58
+     ],
+     [
+      "()",
+      446,
+      148
+     ],
+     [
+      "function",
+      446,
+      66
+     ],
+     [
+      "event",
+      521,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      75,
+      528
+     ],
+     [
+      "});",
+      75,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      410
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      35,
+      410
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      149,
+      99
+     ],
+     [
+      "#weather-temp",
+      35,
+      99
+     ],
+     [
+      "1",
+      35,
+      31
+     ],
+     [
+      "2",
+      35,
+      31
+     ],
+     [
+      "3",
+      35,
+      31
+     ],
+     [
+      "4",
+      35,
+      31
+     ],
+     [
+      "5",
+      35,
+      31
+     ],
+     [
+      "6",
+      35,
+      31
+     ],
+     [
+      "7",
+      35,
+      31
+     ],
+     [
+      "8",
+      35,
+      31
+     ],
+     [
+      "9",
+      35,
+      31
+     ],
+     [
+      "$.ajax({",
+      75,
+      619
+     ],
+     [
+      ": ,",
+      75,
+      619
+     ],
+     [
+      "url",
+      92,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      133,
+      140
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "data",
+      92,
+      33
+     ],
+     [
+      ":",
+      75,
+      619
+     ],
+     [
+      "zipcode",
+      108,
+      58
+     ],
+     [
+      "97201",
+      182,
+      41
+     ],
+     [
+      "},",
+      75,
+      619
+     ],
+     [
+      ": {",
+      75,
+      619
+     ],
+     [
+      "success",
+      92,
+      58
+     ],
+     [
+      "()",
+      166,
+      157
+     ],
+     [
+      "function",
+      166,
+      66
+     ],
+     [
+      "result",
+      240,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      75,
+      619
+     ],
+     [
+      "\"#weather-temp\"",
+      133,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      331,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      512,
+      157
+     ],
+     [
+      "}",
+      75,
+      619
+     ],
+     [
+      "});",
+      75,
+      619
+     ],
+     [
+      "related projects",
+      35,
+      410
+     ],
+     [
+      "jquery ui",
+      35,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      410
+     ],
+     [
+      "learn more",
+      316,
+      77
+     ],
+     [
+      "jquery mobile",
+      35,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      410
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      205,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      143
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      143
+     ],
+     [
+      "jquery in action",
+      169,
+      143
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      169,
+      143
+     ],
+     [
+      "jquery succinctly",
+      327,
+      143
+     ],
+     [
+      "cody lindley",
+      327,
+      143
+     ],
+     [
+      "learning center",
+      44,
+      123
+     ],
+     [
+      "chat",
+      191,
+      57
+     ],
+     [
+      "twitter",
+      273,
+      68
+     ],
+     [
+      "github",
+      366,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      460
+     ],
+     [
+      "openjs foundation",
+      94,
+      98
+     ],
+     [
+      "jquery license",
+      18,
+      446
+     ],
+     [
+      "openjs foundation",
+      185,
+      98
+     ],
+     [
+      "openjs foundation",
+      228,
+      98
+     ],
+     [
+      "trademark policy",
+      34,
+      426
+     ],
+     [
+      "trademark list",
+      88,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      29,
+      417
+     ],
+     [
+      "terms of use",
+      93,
+      65
+     ],
+     [
+      "privacy",
+      164,
+      35
+     ],
+     [
+      "code of conduct",
+      205,
+      83
+     ],
+     [
+      "cookie",
+      315,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      460
+     ],
+     [
+      "web hosting by digital ocean",
+      44,
+      167
+     ],
+     [
+      "cdn by fastly",
+      219,
+      71
+     ],
+     [
+      "powered by wordpress",
+      299,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      480
+     ],
+     [
+      "herodevs.com",
+      361,
+      94
+     ],
+     [
+      "jquery",
+      30,
+      71
+     ],
+     [
+      "download jquery",
+      520,
+      318
+     ],
+     [
+      "v4.0.0",
+      659,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      489,
+      370
+     ],
+     [
+      "discover support options",
+      489,
+      370
+     ],
+     [
+      "view source on github →",
+      489,
+      370
+     ],
+     [
+      "how jquery works →",
+      489,
+      370
+     ],
+     [
+      "lightweight footprint",
+      -199,
+      370
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -199,
+      370
+     ],
+     [
+      "css3 compliant",
+      -199,
+      370
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -199,
+      370
+     ],
+     [
+      "cross-browser",
+      -199,
+      370
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      -141,
+      254
+     ],
+     [
+      "what is jquery?",
+      35,
+      410
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      35,
+      410
+     ],
+     [
+      "resources",
+      35,
+      410
+     ],
+     [
+      "jquery core api documentation",
+      75,
+      108
+     ],
+     [
+      "jquery learning center",
+      75,
+      107
+     ],
+     [
+      "jquery blog",
+      75,
+      78
+     ],
+     [
+      "contribute to jquery",
+      75,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      75,
+      118
+     ],
+     [
+      "a brief look",
+      35,
+      410
+     ],
+     [
+      "dom traversal and manipulation",
+      35,
+      410
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      35,
+      410
+     ],
+     [
+      "<button>",
+      88,
+      63
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      103,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      128,
+      140
+     ],
+     [
+      "\"next step...\"",
+      342,
+      115
+     ],
+     [
+      "event handling",
+      35,
+      410
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      35,
+      410
+     ],
+     [
+      "#banner-message",
+      102,
+      113
+     ],
+     [
+      "display:none",
+      35,
+      92
+     ],
+     [
+      "#button-container",
+      35,
+      356
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      103,
+      528
+     ],
+     [
+      "var",
+      103,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      259,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      103,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      128,
+      214
+     ],
+     [
+      "\"click\"",
+      400,
+      58
+     ],
+     [
+      "()",
+      474,
+      148
+     ],
+     [
+      "function",
+      474,
+      66
+     ],
+     [
+      "event",
+      548,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      103,
+      528
+     ],
+     [
+      "});",
+      103,
+      528
+     ],
+     [
+      "ajax",
+      35,
+      410
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      35,
+      410
+     ],
+     [
+      "/api/getweather",
+      244,
+      113
+     ],
+     [
+      "zipcode=97201",
+      149,
+      99
+     ],
+     [
+      "#weather-temp",
+      35,
+      99
+     ],
+     [
+      "1",
+      73,
+      31
+     ],
+     [
+      "2",
+      73,
+      31
+     ],
+     [
+      "3",
+      73,
+      31
+     ],
+     [
+      "4",
+      73,
+      31
+     ],
+     [
+      "5",
+      73,
+      31
+     ],
+     [
+      "6",
+      73,
+      31
+     ],
+     [
+      "7",
+      73,
+      31
+     ],
+     [
+      "8",
+      73,
+      31
+     ],
+     [
+      "9",
+      73,
+      31
+     ],
+     [
+      "$.ajax({",
+      103,
+      594
+     ],
+     [
+      ": ,",
+      103,
+      594
+     ],
+     [
+      "url",
+      103,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      144,
+      140
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "data",
+      103,
+      33
+     ],
+     [
+      ":",
+      103,
+      594
+     ],
+     [
+      "zipcode",
+      103,
+      58
+     ],
+     [
+      "97201",
+      177,
+      41
+     ],
+     [
+      "},",
+      103,
+      594
+     ],
+     [
+      ": {",
+      103,
+      594
+     ],
+     [
+      "success",
+      103,
+      58
+     ],
+     [
+      "()",
+      177,
+      157
+     ],
+     [
+      "function",
+      177,
+      66
+     ],
+     [
+      "result",
+      251,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      103,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      136,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      334,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      515,
+      157
+     ],
+     [
+      "}",
+      103,
+      594
+     ],
+     [
+      "});",
+      103,
+      594
+     ],
+     [
+      "related projects",
+      35,
+      410
+     ],
+     [
+      "jquery ui",
+      35,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      35,
+      410
+     ],
+     [
+      "learn more",
+      316,
+      77
+     ],
+     [
+      "jquery mobile",
+      35,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      35,
+      410
+     ],
+     [
+      "learn more",
+      215,
+      77
+     ],
+     [
+      "books",
+      201,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      10,
+      198
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      10,
+      198
+     ],
+     [
+      "jquery in action",
+      224,
+      246
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      224,
+      246
+     ],
+     [
+      "jquery succinctly",
+      10,
+      460
+     ],
+     [
+      "cody lindley",
+      10,
+      460
+     ],
+     [
+      "learning center",
+      269,
+      123
+     ],
+     [
+      "chat",
+      413,
+      57
+     ],
+     [
+      "twitter",
+      311,
+      68
+     ],
+     [
+      "github",
+      400,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      10,
+      291
+     ],
+     [
+      "openjs foundation",
+      88,
+      98
+     ],
+     [
+      "jquery license",
+      82,
+      73
+     ],
+     [
+      "openjs foundation",
+      92,
+      98
+     ],
+     [
+      "openjs foundation",
+      28,
+      98
+     ],
+     [
+      "trademark policy",
+      29,
+      85
+     ],
+     [
+      "trademark list",
+      138,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      10,
+      255
+     ],
+     [
+      "terms of use",
+      68,
+      65
+     ],
+     [
+      "privacy",
+      139,
+      35
+     ],
+     [
+      "code of conduct",
+      180,
+      83
+     ],
+     [
+      "cookie",
+      10,
+      34
+     ],
+     [
+      "|  |",
+      10,
+      460
+     ],
+     [
+      "web hosting by digital ocean",
+      10,
+      167
+     ],
+     [
+      "cdn by fastly",
+      186,
+      71
+     ],
+     [
+      "powered by wordpress",
+      266,
+      137
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 6,
+    "candidates": 131,
+    "protruding": 1,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 7,
+    "candidates": 136,
+    "protruding": 7,
+    "scrollWidth": 1009,
+    "clientWidth": 600
+   },
+   "recreationOnly": 4,
+   "sourceOnly": 3,
+   "recreationOnlyExamples": [
+    "data ||| zipcode",
+    "jquery license ||| openjs foundation",
+    "openjs foundation ||| trademark policy",
+    "trademark list ||| trademark policy"
+   ],
+   "sourceOnlyExamples": [
+    "chat ||| copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| twitter",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| github"
+   ],
+   "sharedTextKeys": 114,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 67,
+     "rowParents": 22,
+     "maxRowMembers": 11,
+     "navInlinePairs": 25
+    },
+    "recreation": {
+     "inlineSiblingPairs": 63,
+     "rowParents": 22,
+     "maxRowMembers": 11,
+     "navInlinePairs": 30
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      600
+     ],
+     [
+      "herodevs.com",
+      350,
+      94
+     ],
+     [
+      "plugins",
+      22,
+      63
+     ],
+     [
+      "contribute",
+      87,
+      79
+     ],
+     [
+      "events",
+      169,
+      61
+     ],
+     [
+      "support",
+      231,
+      66
+     ],
+     [
+      "openjs foundation",
+      299,
+      131
+     ],
+     [
+      "jquery",
+      179,
+      243
+     ],
+     [
+      "download",
+      41,
+      67
+     ],
+     [
+      "api documentation",
+      112,
+      123
+     ],
+     [
+      "blog",
+      239,
+      33
+     ],
+     [
+      "plugins",
+      277,
+      51
+     ],
+     [
+      "browser support",
+      331,
+      108
+     ],
+     [
+      "version support",
+      444,
+      103
+     ],
+     [
+      "download jquery",
+      248,
+      149
+     ],
+     [
+      "v4.0.0",
+      304,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      148,
+      303
+     ],
+     [
+      "discover support options",
+      148,
+      303
+     ],
+     [
+      "view source on github →",
+      148,
+      303
+     ],
+     [
+      "how jquery works →",
+      148,
+      303
+     ],
+     [
+      "lightweight footprint",
+      40,
+      520
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      40,
+      520
+     ],
+     [
+      "css3 compliant",
+      40,
+      520
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      40,
+      520
+     ],
+     [
+      "cross-browser",
+      40,
+      520
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      146,
+      308
+     ],
+     [
+      "what is jquery?",
+      30,
+      540
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      30,
+      540
+     ],
+     [
+      "resources",
+      30,
+      540
+     ],
+     [
+      "jquery core api documentation",
+      70,
+      213
+     ],
+     [
+      "jquery learning center",
+      70,
+      156
+     ],
+     [
+      "jquery blog",
+      70,
+      78
+     ],
+     [
+      "contribute to jquery",
+      70,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      70,
+      205
+     ],
+     [
+      "a brief look",
+      30,
+      540
+     ],
+     [
+      "dom traversal and manipulation",
+      30,
+      540
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      30,
+      540
+     ],
+     [
+      "<button>",
+      83,
+      63
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      70,
+      492
+     ],
+     [
+      "\"button.continue\"",
+      95,
+      140
+     ],
+     [
+      "\"next step...\"",
+      309,
+      115
+     ],
+     [
+      "event handling",
+      30,
+      540
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      30,
+      540
+     ],
+     [
+      "#banner-message",
+      97,
+      113
+     ],
+     [
+      "display:none",
+      396,
+      92
+     ],
+     [
+      "#button-container",
+      160,
+      128
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "2",
+      30,
+      31
+     ],
+     [
+      "3",
+      30,
+      31
+     ],
+     [
+      "4",
+      30,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      70,
+      528
+     ],
+     [
+      "var",
+      70,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      227,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      70,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      95,
+      214
+     ],
+     [
+      "\"click\"",
+      367,
+      58
+     ],
+     [
+      "()",
+      441,
+      148
+     ],
+     [
+      "function",
+      441,
+      66
+     ],
+     [
+      "event",
+      516,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      70,
+      528
+     ],
+     [
+      "});",
+      70,
+      528
+     ],
+     [
+      "ajax",
+      30,
+      540
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      30,
+      540
+     ],
+     [
+      "/api/getweather",
+      239,
+      113
+     ],
+     [
+      "zipcode=97201",
+      30,
+      99
+     ],
+     [
+      "#weather-temp",
+      298,
+      99
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "2",
+      30,
+      31
+     ],
+     [
+      "3",
+      30,
+      31
+     ],
+     [
+      "4",
+      30,
+      31
+     ],
+     [
+      "5",
+      30,
+      31
+     ],
+     [
+      "6",
+      30,
+      31
+     ],
+     [
+      "7",
+      30,
+      31
+     ],
+     [
+      "8",
+      30,
+      31
+     ],
+     [
+      "9",
+      30,
+      31
+     ],
+     [
+      "$.ajax({",
+      70,
+      619
+     ],
+     [
+      ": ,",
+      70,
+      619
+     ],
+     [
+      "url",
+      87,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      128,
+      140
+     ],
+     [
+      ": {",
+      70,
+      619
+     ],
+     [
+      "data",
+      87,
+      33
+     ],
+     [
+      ":",
+      70,
+      619
+     ],
+     [
+      "zipcode",
+      103,
+      58
+     ],
+     [
+      "97201",
+      177,
+      41
+     ],
+     [
+      "},",
+      70,
+      619
+     ],
+     [
+      ": {",
+      70,
+      619
+     ],
+     [
+      "success",
+      87,
+      58
+     ],
+     [
+      "()",
+      161,
+      157
+     ],
+     [
+      "function",
+      161,
+      66
+     ],
+     [
+      "result",
+      235,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      70,
+      619
+     ],
+     [
+      "\"#weather-temp\"",
+      128,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      326,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      507,
+      157
+     ],
+     [
+      "}",
+      70,
+      619
+     ],
+     [
+      "});",
+      70,
+      619
+     ],
+     [
+      "related projects",
+      30,
+      540
+     ],
+     [
+      "jquery ui",
+      30,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      30,
+      540
+     ],
+     [
+      "learn more",
+      311,
+      77
+     ],
+     [
+      "jquery mobile",
+      30,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      30,
+      540
+     ],
+     [
+      "learn more",
+      210,
+      77
+     ],
+     [
+      "books",
+      265,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      20,
+      176
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      20,
+      176
+     ],
+     [
+      "jquery in action",
+      212,
+      176
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      212,
+      176
+     ],
+     [
+      "jquery succinctly",
+      404,
+      176
+     ],
+     [
+      "cody lindley",
+      404,
+      176
+     ],
+     [
+      "learning center",
+      104,
+      123
+     ],
+     [
+      "chat",
+      251,
+      57
+     ],
+     [
+      "twitter",
+      333,
+      68
+     ],
+     [
+      "github",
+      426,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      560
+     ],
+     [
+      "openjs foundation",
+      111,
+      98
+     ],
+     [
+      "jquery license",
+      449,
+      73
+     ],
+     [
+      "openjs foundation",
+      109,
+      98
+     ],
+     [
+      "openjs foundation",
+      62,
+      98
+     ],
+     [
+      "trademark policy",
+      241,
+      85
+     ],
+     [
+      "trademark list",
+      350,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      120,
+      185
+     ],
+     [
+      "terms of use",
+      124,
+      65
+     ],
+     [
+      "privacy",
+      195,
+      35
+     ],
+     [
+      "code of conduct",
+      236,
+      83
+     ],
+     [
+      "cookie",
+      346,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      560
+     ],
+     [
+      "web hosting by digital ocean",
+      104,
+      167
+     ],
+     [
+      "cdn by fastly",
+      279,
+      71
+     ],
+     [
+      "powered by wordpress",
+      359,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      600
+     ],
+     [
+      "herodevs.com",
+      350,
+      94
+     ],
+     [
+      "jquery",
+      22,
+      62
+     ],
+     [
+      "jquery ui",
+      86,
+      79
+     ],
+     [
+      "jquery mobile",
+      167,
+      104
+     ],
+     [
+      "sizzle",
+      273,
+      59
+     ],
+     [
+      "qunit",
+      334,
+      57
+     ],
+     [
+      "plugins",
+      22,
+      67
+     ],
+     [
+      "contribute",
+      91,
+      84
+     ],
+     [
+      "events",
+      177,
+      64
+     ],
+     [
+      "support",
+      242,
+      70
+     ],
+     [
+      "openjs foundation",
+      314,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      71
+     ],
+     [
+      "download",
+      41,
+      73
+     ],
+     [
+      "api documentation",
+      118,
+      135
+     ],
+     [
+      "blog",
+      257,
+      37
+     ],
+     [
+      "plugins",
+      298,
+      57
+     ],
+     [
+      "browser support",
+      359,
+      120
+     ],
+     [
+      "version support",
+      41,
+      114
+     ],
+     [
+      "download jquery",
+      520,
+      468
+     ],
+     [
+      "v4.0.0",
+      734,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      489,
+      520
+     ],
+     [
+      "discover support options",
+      489,
+      520
+     ],
+     [
+      "view source on github →",
+      489,
+      520
+     ],
+     [
+      "how jquery works →",
+      489,
+      520
+     ],
+     [
+      "lightweight footprint",
+      -199,
+      520
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -199,
+      520
+     ],
+     [
+      "css3 compliant",
+      -199,
+      520
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -199,
+      520
+     ],
+     [
+      "cross-browser",
+      -199,
+      520
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      -93,
+      308
+     ],
+     [
+      "what is jquery?",
+      20,
+      560
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      20,
+      560
+     ],
+     [
+      "resources",
+      20,
+      560
+     ],
+     [
+      "jquery core api documentation",
+      60,
+      108
+     ],
+     [
+      "jquery learning center",
+      60,
+      107
+     ],
+     [
+      "jquery blog",
+      60,
+      78
+     ],
+     [
+      "contribute to jquery",
+      60,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      60,
+      118
+     ],
+     [
+      "a brief look",
+      20,
+      560
+     ],
+     [
+      "dom traversal and manipulation",
+      20,
+      560
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      20,
+      560
+     ],
+     [
+      "<button>",
+      73,
+      63
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      113,
+      422
+     ],
+     [
+      "\"button.continue\"",
+      138,
+      140
+     ],
+     [
+      "\"next step...\"",
+      352,
+      115
+     ],
+     [
+      "event handling",
+      20,
+      560
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      20,
+      560
+     ],
+     [
+      "#banner-message",
+      87,
+      113
+     ],
+     [
+      "display:none",
+      386,
+      92
+     ],
+     [
+      "#button-container",
+      150,
+      128
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "2",
+      58,
+      31
+     ],
+     [
+      "3",
+      58,
+      31
+     ],
+     [
+      "4",
+      58,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      113,
+      528
+     ],
+     [
+      "var",
+      113,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      269,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      113,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      138,
+      214
+     ],
+     [
+      "\"click\"",
+      410,
+      58
+     ],
+     [
+      "()",
+      484,
+      148
+     ],
+     [
+      "function",
+      484,
+      66
+     ],
+     [
+      "event",
+      558,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      113,
+      528
+     ],
+     [
+      "});",
+      113,
+      528
+     ],
+     [
+      "ajax",
+      20,
+      560
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      20,
+      560
+     ],
+     [
+      "/api/getweather",
+      229,
+      113
+     ],
+     [
+      "zipcode=97201",
+      20,
+      99
+     ],
+     [
+      "#weather-temp",
+      288,
+      99
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "2",
+      58,
+      31
+     ],
+     [
+      "3",
+      58,
+      31
+     ],
+     [
+      "4",
+      58,
+      31
+     ],
+     [
+      "5",
+      58,
+      31
+     ],
+     [
+      "6",
+      58,
+      31
+     ],
+     [
+      "7",
+      58,
+      31
+     ],
+     [
+      "8",
+      58,
+      31
+     ],
+     [
+      "9",
+      58,
+      31
+     ],
+     [
+      "$.ajax({",
+      113,
+      594
+     ],
+     [
+      ": ,",
+      113,
+      594
+     ],
+     [
+      "url",
+      113,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      154,
+      140
+     ],
+     [
+      ": {",
+      113,
+      594
+     ],
+     [
+      "data",
+      113,
+      33
+     ],
+     [
+      ":",
+      113,
+      594
+     ],
+     [
+      "zipcode",
+      113,
+      58
+     ],
+     [
+      "97201",
+      187,
+      41
+     ],
+     [
+      "},",
+      113,
+      594
+     ],
+     [
+      ": {",
+      113,
+      594
+     ],
+     [
+      "success",
+      113,
+      58
+     ],
+     [
+      "()",
+      187,
+      157
+     ],
+     [
+      "function",
+      187,
+      66
+     ],
+     [
+      "result",
+      261,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      113,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      146,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      344,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      525,
+      157
+     ],
+     [
+      "}",
+      113,
+      594
+     ],
+     [
+      "});",
+      113,
+      594
+     ],
+     [
+      "related projects",
+      20,
+      560
+     ],
+     [
+      "jquery ui",
+      20,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      20,
+      560
+     ],
+     [
+      "learn more",
+      301,
+      77
+     ],
+     [
+      "jquery mobile",
+      20,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      20,
+      560
+     ],
+     [
+      "learn more",
+      200,
+      77
+     ],
+     [
+      "books",
+      261,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      20,
+      176
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      20,
+      176
+     ],
+     [
+      "jquery in action",
+      212,
+      224
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      212,
+      224
+     ],
+     [
+      "jquery succinctly",
+      453,
+      127
+     ],
+     [
+      "cody lindley",
+      453,
+      127
+     ],
+     [
+      "learning center",
+      291,
+      123
+     ],
+     [
+      "chat",
+      434,
+      57
+     ],
+     [
+      "twitter",
+      512,
+      68
+     ],
+     [
+      "github",
+      510,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      291
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      20,
+      212
+     ],
+     [
+      "openjs foundation",
+      20,
+      207
+     ],
+     [
+      "openjs foundation",
+      20,
+      98
+     ],
+     [
+      "trademark policy",
+      20,
+      232
+     ],
+     [
+      "trademark list",
+      74,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      20,
+      255
+     ],
+     [
+      "terms of use",
+      78,
+      65
+     ],
+     [
+      "privacy",
+      149,
+      35
+     ],
+     [
+      "code of conduct",
+      190,
+      83
+     ],
+     [
+      "cookie",
+      20,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      560
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 8,
+    "candidates": 131,
+    "protruding": 1,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 6,
+    "candidates": 136,
+    "protruding": 7,
+    "scrollWidth": 1070,
+    "clientWidth": 661
+   },
+   "recreationOnly": 4,
+   "sourceOnly": 6,
+   "recreationOnlyExamples": [
+    "data ||| zipcode",
+    "code of conduct ||| terms of use",
+    "code of conduct ||| privacy",
+    "code of conduct ||| cookie"
+   ],
+   "sourceOnlyExamples": [
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| learning center",
+    "chat ||| copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| twitter",
+    "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply. ||| github",
+    "list of openjs foundation trademarks ||| trademark policy",
+    "list of openjs foundation trademarks ||| trademark list"
+   ],
+   "sharedTextKeys": 114,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 68,
+     "rowParents": 22,
+     "maxRowMembers": 11,
+     "navInlinePairs": 25
+    },
+    "recreation": {
+     "inlineSiblingPairs": 68,
+     "rowParents": 22,
+     "maxRowMembers": 11,
+     "navInlinePairs": 35
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      661
+     ],
+     [
+      "herodevs.com",
+      353,
+      94
+     ],
+     [
+      "plugins",
+      22,
+      63
+     ],
+     [
+      "contribute",
+      87,
+      79
+     ],
+     [
+      "events",
+      169,
+      61
+     ],
+     [
+      "support",
+      231,
+      66
+     ],
+     [
+      "openjs foundation",
+      299,
+      131
+     ],
+     [
+      "jquery",
+      209,
+      243
+     ],
+     [
+      "download",
+      41,
+      67
+     ],
+     [
+      "api documentation",
+      112,
+      123
+     ],
+     [
+      "blog",
+      239,
+      33
+     ],
+     [
+      "plugins",
+      277,
+      51
+     ],
+     [
+      "browser support",
+      331,
+      108
+     ],
+     [
+      "version support",
+      444,
+      103
+     ],
+     [
+      "download jquery",
+      279,
+      149
+     ],
+     [
+      "v4.0.0",
+      334,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      179,
+      303
+     ],
+     [
+      "discover support options",
+      179,
+      303
+     ],
+     [
+      "view source on github →",
+      179,
+      303
+     ],
+     [
+      "how jquery works →",
+      179,
+      303
+     ],
+     [
+      "lightweight footprint",
+      40,
+      581
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      40,
+      581
+     ],
+     [
+      "css3 compliant",
+      40,
+      581
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      40,
+      581
+     ],
+     [
+      "cross-browser",
+      40,
+      581
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      176,
+      308
+     ],
+     [
+      "what is jquery?",
+      30,
+      601
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      30,
+      601
+     ],
+     [
+      "resources",
+      30,
+      601
+     ],
+     [
+      "jquery core api documentation",
+      70,
+      213
+     ],
+     [
+      "jquery learning center",
+      70,
+      156
+     ],
+     [
+      "jquery blog",
+      70,
+      78
+     ],
+     [
+      "contribute to jquery",
+      70,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      70,
+      205
+     ],
+     [
+      "a brief look",
+      30,
+      601
+     ],
+     [
+      "dom traversal and manipulation",
+      30,
+      601
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      30,
+      601
+     ],
+     [
+      "<button>",
+      83,
+      63
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      70,
+      553
+     ],
+     [
+      "\"button.continue\"",
+      95,
+      140
+     ],
+     [
+      "\"next step...\"",
+      309,
+      115
+     ],
+     [
+      "event handling",
+      30,
+      601
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      30,
+      601
+     ],
+     [
+      "#banner-message",
+      97,
+      113
+     ],
+     [
+      "display:none",
+      396,
+      92
+     ],
+     [
+      "#button-container",
+      92,
+      128
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "2",
+      30,
+      31
+     ],
+     [
+      "3",
+      30,
+      31
+     ],
+     [
+      "4",
+      30,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      70,
+      553
+     ],
+     [
+      "var",
+      70,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      227,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      70,
+      553
+     ],
+     [
+      "\"#button-container button\"",
+      95,
+      214
+     ],
+     [
+      "\"click\"",
+      367,
+      58
+     ],
+     [
+      "()",
+      441,
+      148
+     ],
+     [
+      "function",
+      441,
+      66
+     ],
+     [
+      "event",
+      516,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      70,
+      553
+     ],
+     [
+      "});",
+      70,
+      553
+     ],
+     [
+      "ajax",
+      30,
+      601
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      30,
+      601
+     ],
+     [
+      "/api/getweather",
+      239,
+      113
+     ],
+     [
+      "zipcode=97201",
+      527,
+      99
+     ],
+     [
+      "#weather-temp",
+      195,
+      99
+     ],
+     [
+      "1",
+      30,
+      31
+     ],
+     [
+      "2",
+      30,
+      31
+     ],
+     [
+      "3",
+      30,
+      31
+     ],
+     [
+      "4",
+      30,
+      31
+     ],
+     [
+      "5",
+      30,
+      31
+     ],
+     [
+      "6",
+      30,
+      31
+     ],
+     [
+      "7",
+      30,
+      31
+     ],
+     [
+      "8",
+      30,
+      31
+     ],
+     [
+      "9",
+      30,
+      31
+     ],
+     [
+      "$.ajax({",
+      70,
+      619
+     ],
+     [
+      ": ,",
+      70,
+      619
+     ],
+     [
+      "url",
+      87,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      128,
+      140
+     ],
+     [
+      ": {",
+      70,
+      619
+     ],
+     [
+      "data",
+      87,
+      33
+     ],
+     [
+      ":",
+      70,
+      619
+     ],
+     [
+      "zipcode",
+      103,
+      58
+     ],
+     [
+      "97201",
+      177,
+      41
+     ],
+     [
+      "},",
+      70,
+      619
+     ],
+     [
+      ": {",
+      70,
+      619
+     ],
+     [
+      "success",
+      87,
+      58
+     ],
+     [
+      "()",
+      161,
+      157
+     ],
+     [
+      "function",
+      161,
+      66
+     ],
+     [
+      "result",
+      235,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      70,
+      619
+     ],
+     [
+      "\"#weather-temp\"",
+      128,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      326,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      507,
+      157
+     ],
+     [
+      "}",
+      70,
+      619
+     ],
+     [
+      "});",
+      70,
+      619
+     ],
+     [
+      "related projects",
+      30,
+      601
+     ],
+     [
+      "jquery ui",
+      30,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      30,
+      601
+     ],
+     [
+      "learn more",
+      311,
+      77
+     ],
+     [
+      "jquery mobile",
+      30,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      30,
+      601
+     ],
+     [
+      "learn more",
+      210,
+      77
+     ],
+     [
+      "books",
+      296,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      20,
+      196
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      20,
+      196
+     ],
+     [
+      "jquery in action",
+      232,
+      196
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      232,
+      196
+     ],
+     [
+      "jquery succinctly",
+      445,
+      196
+     ],
+     [
+      "cody lindley",
+      445,
+      196
+     ],
+     [
+      "learning center",
+      135,
+      123
+     ],
+     [
+      "chat",
+      282,
+      57
+     ],
+     [
+      "twitter",
+      364,
+      68
+     ],
+     [
+      "github",
+      456,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      621
+     ],
+     [
+      "openjs foundation",
+      101,
+      98
+     ],
+     [
+      "jquery license",
+      438,
+      73
+     ],
+     [
+      "openjs foundation",
+      37,
+      98
+     ],
+     [
+      "openjs foundation",
+      523,
+      98
+     ],
+     [
+      "trademark policy",
+      105,
+      85
+     ],
+     [
+      "trademark list",
+      214,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      26,
+      605
+     ],
+     [
+      "terms of use",
+      279,
+      65
+     ],
+     [
+      "privacy",
+      350,
+      35
+     ],
+     [
+      "code of conduct",
+      391,
+      83
+     ],
+     [
+      "cookie",
+      501,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      621
+     ],
+     [
+      "web hosting by digital ocean",
+      134,
+      167
+     ],
+     [
+      "cdn by fastly",
+      310,
+      71
+     ],
+     [
+      "powered by wordpress",
+      390,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      661
+     ],
+     [
+      "herodevs.com",
+      353,
+      94
+     ],
+     [
+      "jquery",
+      22,
+      62
+     ],
+     [
+      "jquery ui",
+      86,
+      79
+     ],
+     [
+      "jquery mobile",
+      167,
+      104
+     ],
+     [
+      "sizzle",
+      273,
+      59
+     ],
+     [
+      "qunit",
+      334,
+      57
+     ],
+     [
+      "plugins",
+      22,
+      67
+     ],
+     [
+      "contribute",
+      91,
+      84
+     ],
+     [
+      "events",
+      177,
+      64
+     ],
+     [
+      "support",
+      242,
+      70
+     ],
+     [
+      "openjs foundation",
+      314,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      71
+     ],
+     [
+      "download",
+      41,
+      73
+     ],
+     [
+      "api documentation",
+      118,
+      135
+     ],
+     [
+      "blog",
+      257,
+      37
+     ],
+     [
+      "plugins",
+      298,
+      57
+     ],
+     [
+      "browser support",
+      359,
+      120
+     ],
+     [
+      "version support",
+      482,
+      114
+     ],
+     [
+      "download jquery",
+      520,
+      529
+     ],
+     [
+      "v4.0.0",
+      765,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      489,
+      581
+     ],
+     [
+      "discover support options",
+      489,
+      581
+     ],
+     [
+      "view source on github →",
+      489,
+      581
+     ],
+     [
+      "how jquery works →",
+      489,
+      581
+     ],
+     [
+      "lightweight footprint",
+      -199,
+      581
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -199,
+      581
+     ],
+     [
+      "css3 compliant",
+      -199,
+      581
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -199,
+      581
+     ],
+     [
+      "cross-browser",
+      -199,
+      581
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      -63,
+      308
+     ],
+     [
+      "what is jquery?",
+      20,
+      621
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      20,
+      621
+     ],
+     [
+      "resources",
+      20,
+      621
+     ],
+     [
+      "jquery core api documentation",
+      60,
+      108
+     ],
+     [
+      "jquery learning center",
+      60,
+      107
+     ],
+     [
+      "jquery blog",
+      60,
+      78
+     ],
+     [
+      "contribute to jquery",
+      60,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      60,
+      118
+     ],
+     [
+      "a brief look",
+      20,
+      621
+     ],
+     [
+      "dom traversal and manipulation",
+      20,
+      621
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      20,
+      621
+     ],
+     [
+      "<button>",
+      73,
+      63
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      113,
+      483
+     ],
+     [
+      "\"button.continue\"",
+      138,
+      140
+     ],
+     [
+      "\"next step...\"",
+      352,
+      115
+     ],
+     [
+      "event handling",
+      20,
+      621
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      20,
+      621
+     ],
+     [
+      "#banner-message",
+      87,
+      113
+     ],
+     [
+      "display:none",
+      386,
+      92
+     ],
+     [
+      "#button-container",
+      82,
+      128
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "2",
+      58,
+      31
+     ],
+     [
+      "3",
+      58,
+      31
+     ],
+     [
+      "4",
+      58,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      113,
+      528
+     ],
+     [
+      "var",
+      113,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      269,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      113,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      138,
+      214
+     ],
+     [
+      "\"click\"",
+      410,
+      58
+     ],
+     [
+      "()",
+      484,
+      148
+     ],
+     [
+      "function",
+      484,
+      66
+     ],
+     [
+      "event",
+      558,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      113,
+      528
+     ],
+     [
+      "});",
+      113,
+      528
+     ],
+     [
+      "ajax",
+      20,
+      621
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      20,
+      621
+     ],
+     [
+      "/api/getweather",
+      229,
+      113
+     ],
+     [
+      "zipcode=97201",
+      517,
+      99
+     ],
+     [
+      "#weather-temp",
+      185,
+      99
+     ],
+     [
+      "1",
+      58,
+      31
+     ],
+     [
+      "2",
+      58,
+      31
+     ],
+     [
+      "3",
+      58,
+      31
+     ],
+     [
+      "4",
+      58,
+      31
+     ],
+     [
+      "5",
+      58,
+      31
+     ],
+     [
+      "6",
+      58,
+      31
+     ],
+     [
+      "7",
+      58,
+      31
+     ],
+     [
+      "8",
+      58,
+      31
+     ],
+     [
+      "9",
+      58,
+      31
+     ],
+     [
+      "$.ajax({",
+      113,
+      594
+     ],
+     [
+      ": ,",
+      113,
+      594
+     ],
+     [
+      "url",
+      113,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      154,
+      140
+     ],
+     [
+      ": {",
+      113,
+      594
+     ],
+     [
+      "data",
+      113,
+      33
+     ],
+     [
+      ":",
+      113,
+      594
+     ],
+     [
+      "zipcode",
+      113,
+      58
+     ],
+     [
+      "97201",
+      187,
+      41
+     ],
+     [
+      "},",
+      113,
+      594
+     ],
+     [
+      ": {",
+      113,
+      594
+     ],
+     [
+      "success",
+      113,
+      58
+     ],
+     [
+      "()",
+      187,
+      157
+     ],
+     [
+      "function",
+      187,
+      66
+     ],
+     [
+      "result",
+      261,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      113,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      146,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      344,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      525,
+      157
+     ],
+     [
+      "}",
+      113,
+      594
+     ],
+     [
+      "});",
+      113,
+      594
+     ],
+     [
+      "related projects",
+      20,
+      621
+     ],
+     [
+      "jquery ui",
+      20,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      20,
+      621
+     ],
+     [
+      "learn more",
+      301,
+      77
+     ],
+     [
+      "jquery mobile",
+      20,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      20,
+      621
+     ],
+     [
+      "learn more",
+      200,
+      77
+     ],
+     [
+      "books",
+      291,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      20,
+      197
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      20,
+      197
+     ],
+     [
+      "jquery in action",
+      233,
+      245
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      233,
+      245
+     ],
+     [
+      "jquery succinctly",
+      493,
+      148
+     ],
+     [
+      "cody lindley",
+      493,
+      148
+     ],
+     [
+      "learning center",
+      352,
+      123
+     ],
+     [
+      "chat",
+      495,
+      57
+     ],
+     [
+      "twitter",
+      573,
+      68
+     ],
+     [
+      "github",
+      571,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      291
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      200,
+      73
+     ],
+     [
+      "openjs foundation",
+      146,
+      98
+     ],
+     [
+      "openjs foundation",
+      137,
+      98
+     ],
+     [
+      "trademark policy",
+      60,
+      85
+     ],
+     [
+      "trademark list",
+      169,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      20,
+      237
+     ],
+     [
+      "terms of use",
+      151,
+      65
+     ],
+     [
+      "privacy",
+      222,
+      35
+     ],
+     [
+      "code of conduct",
+      20,
+      282
+     ],
+     [
+      "cookie",
+      89,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      621
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 6,
+    "candidates": 136,
+    "protruding": 6,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 92,
+    "candidates": 136,
+    "protruding": 19,
+    "scrollWidth": 903,
+    "clientWidth": 800
+   },
+   "recreationOnly": 86,
+   "sourceOnly": 4,
+   "recreationOnlyExamples": [
+    "a brief look ||| download jquery",
+    "a brief look ||| v4.0.0",
+    "a brief look ||| only the latest version of jquery is supported.",
+    "a brief look ||| discover support options",
+    "a brief look ||| view source on github →",
+    "a brief look ||| how jquery works →",
+    "a brief look ||| cross-browser",
+    "a brief look ||| chrome, edge, firefox, ie, safari, android, ios, and more"
+   ],
+   "sourceOnlyExamples": [
+    "openjs foundation ||| trademark policy",
+    "openjs foundation ||| trademark list",
+    "trademark list ||| trademark policy",
+    "list of openjs foundation trademarks ||| trademark list"
+   ],
+   "sharedTextKeys": 116,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 70,
+     "rowParents": 27,
+     "maxRowMembers": 11,
+     "navInlinePairs": 28
+    },
+    "recreation": {
+     "inlineSiblingPairs": 63,
+     "rowParents": 24,
+     "maxRowMembers": 11,
+     "navInlinePairs": 27
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      800
+     ],
+     [
+      "herodevs.com",
+      351,
+      94
+     ],
+     [
+      "jquery",
+      20,
+      52
+     ],
+     [
+      "jquery ui",
+      72,
+      41
+     ],
+     [
+      "jquery mobile",
+      115,
+      40
+     ],
+     [
+      "sizzle",
+      157,
+      40
+     ],
+     [
+      "qunit",
+      199,
+      40
+     ],
+     [
+      "plugins",
+      346,
+      67
+     ],
+     [
+      "contribute",
+      415,
+      84
+     ],
+     [
+      "events",
+      501,
+      64
+     ],
+     [
+      "support",
+      567,
+      70
+     ],
+     [
+      "openjs foundation",
+      638,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      243
+     ],
+     [
+      "download",
+      41,
+      92
+     ],
+     [
+      "api documentation",
+      135,
+      156
+     ],
+     [
+      "blog",
+      293,
+      53
+     ],
+     [
+      "plugins",
+      348,
+      73
+     ],
+     [
+      "browser support",
+      41,
+      139
+     ],
+     [
+      "version support",
+      182,
+      133
+     ],
+     [
+      "download jquery",
+      611,
+      103
+     ],
+     [
+      "v4.0.0",
+      644,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      545,
+      190
+     ],
+     [
+      "discover support options",
+      545,
+      190
+     ],
+     [
+      "view source on github →",
+      545,
+      190
+     ],
+     [
+      "how jquery works →",
+      545,
+      190
+     ],
+     [
+      "lightweight footprint",
+      115,
+      93
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      115,
+      93
+     ],
+     [
+      "css3 compliant",
+      258,
+      93
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      258,
+      93
+     ],
+     [
+      "cross-browser",
+      402,
+      93
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      407,
+      82
+     ],
+     [
+      "what is jquery?",
+      45,
+      457
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      45,
+      457
+     ],
+     [
+      "resources",
+      552,
+      203
+     ],
+     [
+      "jquery core api documentation",
+      592,
+      108
+     ],
+     [
+      "jquery learning center",
+      592,
+      156
+     ],
+     [
+      "jquery blog",
+      592,
+      78
+     ],
+     [
+      "contribute to jquery",
+      592,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      592,
+      118
+     ],
+     [
+      "a brief look",
+      45,
+      710
+     ],
+     [
+      "dom traversal and manipulation",
+      45,
+      710
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      45,
+      710
+     ],
+     [
+      "<button>",
+      98,
+      63
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      85,
+      662
+     ],
+     [
+      "\"button.continue\"",
+      110,
+      140
+     ],
+     [
+      "\"next step...\"",
+      324,
+      115
+     ],
+     [
+      "event handling",
+      45,
+      710
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      45,
+      710
+     ],
+     [
+      "#banner-message",
+      112,
+      113
+     ],
+     [
+      "display:none",
+      411,
+      92
+     ],
+     [
+      "#button-container",
+      45,
+      128
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "2",
+      45,
+      31
+     ],
+     [
+      "3",
+      45,
+      31
+     ],
+     [
+      "4",
+      45,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      85,
+      662
+     ],
+     [
+      "var",
+      85,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      242,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      85,
+      662
+     ],
+     [
+      "\"#button-container button\"",
+      110,
+      214
+     ],
+     [
+      "\"click\"",
+      382,
+      58
+     ],
+     [
+      "()",
+      456,
+      148
+     ],
+     [
+      "function",
+      456,
+      66
+     ],
+     [
+      "event",
+      531,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      85,
+      662
+     ],
+     [
+      "});",
+      85,
+      662
+     ],
+     [
+      "ajax",
+      45,
+      710
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      45,
+      710
+     ],
+     [
+      "/api/getweather",
+      254,
+      113
+     ],
+     [
+      "zipcode=97201",
+      542,
+      99
+     ],
+     [
+      "#weather-temp",
+      103,
+      99
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "2",
+      45,
+      31
+     ],
+     [
+      "3",
+      45,
+      31
+     ],
+     [
+      "4",
+      45,
+      31
+     ],
+     [
+      "5",
+      45,
+      31
+     ],
+     [
+      "6",
+      45,
+      31
+     ],
+     [
+      "7",
+      45,
+      31
+     ],
+     [
+      "8",
+      45,
+      31
+     ],
+     [
+      "9",
+      45,
+      31
+     ],
+     [
+      "$.ajax({",
+      85,
+      662
+     ],
+     [
+      ": ,",
+      85,
+      662
+     ],
+     [
+      "url",
+      102,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      143,
+      140
+     ],
+     [
+      ": {",
+      85,
+      662
+     ],
+     [
+      "data",
+      102,
+      33
+     ],
+     [
+      ":",
+      85,
+      662
+     ],
+     [
+      "zipcode",
+      118,
+      58
+     ],
+     [
+      "97201",
+      192,
+      41
+     ],
+     [
+      "},",
+      85,
+      662
+     ],
+     [
+      ": {",
+      85,
+      662
+     ],
+     [
+      "success",
+      102,
+      58
+     ],
+     [
+      "()",
+      176,
+      157
+     ],
+     [
+      "function",
+      176,
+      66
+     ],
+     [
+      "result",
+      250,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      85,
+      662
+     ],
+     [
+      "\"#weather-temp\"",
+      143,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      341,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      522,
+      157
+     ],
+     [
+      "}",
+      85,
+      662
+     ],
+     [
+      "});",
+      85,
+      662
+     ],
+     [
+      "related projects",
+      45,
+      710
+     ],
+     [
+      "jquery ui",
+      45,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      45,
+      710
+     ],
+     [
+      "learn more",
+      326,
+      77
+     ],
+     [
+      "jquery mobile",
+      45,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      45,
+      710
+     ],
+     [
+      "learn more",
+      225,
+      77
+     ],
+     [
+      "books",
+      369,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      237,
+      101
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      237,
+      101
+     ],
+     [
+      "jquery in action",
+      354,
+      101
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      354,
+      101
+     ],
+     [
+      "jquery succinctly",
+      470,
+      101
+     ],
+     [
+      "cody lindley",
+      470,
+      101
+     ],
+     [
+      "learning center",
+      388,
+      123
+     ],
+     [
+      "chat",
+      535,
+      57
+     ],
+     [
+      "twitter",
+      617,
+      68
+     ],
+     [
+      "github",
+      710,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      304
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      137,
+      73
+     ],
+     [
+      "openjs foundation",
+      42,
+      98
+     ],
+     [
+      "openjs foundation",
+      20,
+      247
+     ],
+     [
+      "trademark policy",
+      156,
+      85
+     ],
+     [
+      "trademark list",
+      20,
+      298
+     ],
+     [
+      "list of openjs foundation trademarks",
+      20,
+      303
+     ],
+     [
+      "terms of use",
+      78,
+      65
+     ],
+     [
+      "privacy",
+      149,
+      35
+     ],
+     [
+      "code of conduct",
+      190,
+      83
+     ],
+     [
+      "cookie",
+      20,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      760
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      800
+     ],
+     [
+      "herodevs.com",
+      351,
+      94
+     ],
+     [
+      "jquery",
+      22,
+      62
+     ],
+     [
+      "jquery ui",
+      86,
+      79
+     ],
+     [
+      "jquery mobile",
+      167,
+      104
+     ],
+     [
+      "sizzle",
+      273,
+      59
+     ],
+     [
+      "qunit",
+      334,
+      57
+     ],
+     [
+      "plugins",
+      22,
+      67
+     ],
+     [
+      "contribute",
+      91,
+      84
+     ],
+     [
+      "events",
+      177,
+      64
+     ],
+     [
+      "support",
+      242,
+      70
+     ],
+     [
+      "openjs foundation",
+      314,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      71
+     ],
+     [
+      "download",
+      41,
+      98
+     ],
+     [
+      "api documentation",
+      141,
+      170
+     ],
+     [
+      "blog",
+      313,
+      58
+     ],
+     [
+      "plugins",
+      373,
+      80
+     ],
+     [
+      "browser support",
+      41,
+      152
+     ],
+     [
+      "version support",
+      195,
+      146
+     ],
+     [
+      "download jquery",
+      405,
+      53
+     ],
+     [
+      "v4.0.0",
+      412,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      374,
+      105
+     ],
+     [
+      "discover support options",
+      374,
+      105
+     ],
+     [
+      "view source on github →",
+      374,
+      105
+     ],
+     [
+      "how jquery works →",
+      374,
+      105
+     ],
+     [
+      "lightweight footprint",
+      -155,
+      36
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -155,
+      36
+     ],
+     [
+      "css3 compliant",
+      -69,
+      36
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      -69,
+      36
+     ],
+     [
+      "cross-browser",
+      18,
+      36
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      23,
+      25
+     ],
+     [
+      "what is jquery?",
+      70,
+      286
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      70,
+      286
+     ],
+     [
+      "resources",
+      406,
+      118
+     ],
+     [
+      "jquery core api documentation",
+      446,
+      77
+     ],
+     [
+      "jquery learning center",
+      446,
+      58
+     ],
+     [
+      "jquery blog",
+      446,
+      44
+     ],
+     [
+      "contribute to jquery",
+      446,
+      69
+     ],
+     [
+      "browse or submit jquery bugs",
+      446,
+      68
+     ],
+     [
+      "a brief look",
+      45,
+      504
+     ],
+     [
+      "dom traversal and manipulation",
+      45,
+      504
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      45,
+      504
+     ],
+     [
+      "<button>",
+      98,
+      63
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      138,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      163,
+      140
+     ],
+     [
+      "\"next step...\"",
+      377,
+      115
+     ],
+     [
+      "event handling",
+      45,
+      504
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      45,
+      504
+     ],
+     [
+      "#banner-message",
+      112,
+      113
+     ],
+     [
+      "display:none",
+      411,
+      92
+     ],
+     [
+      "#button-container",
+      210,
+      128
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "2",
+      83,
+      31
+     ],
+     [
+      "3",
+      83,
+      31
+     ],
+     [
+      "4",
+      83,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      138,
+      528
+     ],
+     [
+      "var",
+      138,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      294,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      138,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      163,
+      214
+     ],
+     [
+      "\"click\"",
+      435,
+      58
+     ],
+     [
+      "()",
+      509,
+      148
+     ],
+     [
+      "function",
+      509,
+      66
+     ],
+     [
+      "event",
+      583,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      138,
+      528
+     ],
+     [
+      "});",
+      138,
+      528
+     ],
+     [
+      "ajax",
+      45,
+      504
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      45,
+      504
+     ],
+     [
+      "/api/getweather",
+      254,
+      113
+     ],
+     [
+      "zipcode=97201",
+      45,
+      99
+     ],
+     [
+      "#weather-temp",
+      313,
+      99
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "2",
+      83,
+      31
+     ],
+     [
+      "3",
+      83,
+      31
+     ],
+     [
+      "4",
+      83,
+      31
+     ],
+     [
+      "5",
+      83,
+      31
+     ],
+     [
+      "6",
+      83,
+      31
+     ],
+     [
+      "7",
+      83,
+      31
+     ],
+     [
+      "8",
+      83,
+      31
+     ],
+     [
+      "9",
+      83,
+      31
+     ],
+     [
+      "$.ajax({",
+      138,
+      594
+     ],
+     [
+      ": ,",
+      138,
+      594
+     ],
+     [
+      "url",
+      138,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      179,
+      140
+     ],
+     [
+      ": {",
+      138,
+      594
+     ],
+     [
+      "data",
+      138,
+      33
+     ],
+     [
+      ":",
+      138,
+      594
+     ],
+     [
+      "zipcode",
+      138,
+      58
+     ],
+     [
+      "97201",
+      212,
+      41
+     ],
+     [
+      "},",
+      138,
+      594
+     ],
+     [
+      ": {",
+      138,
+      594
+     ],
+     [
+      "success",
+      138,
+      58
+     ],
+     [
+      "()",
+      212,
+      157
+     ],
+     [
+      "function",
+      212,
+      66
+     ],
+     [
+      "result",
+      286,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      138,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      171,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      369,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      550,
+      157
+     ],
+     [
+      "}",
+      138,
+      594
+     ],
+     [
+      "});",
+      138,
+      594
+     ],
+     [
+      "related projects",
+      45,
+      504
+     ],
+     [
+      "jquery ui",
+      45,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      45,
+      504
+     ],
+     [
+      "learn more",
+      326,
+      77
+     ],
+     [
+      "jquery mobile",
+      45,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      45,
+      504
+     ],
+     [
+      "learn more",
+      225,
+      77
+     ],
+     [
+      "books",
+      365,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      694,
+      173
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      694,
+      173
+     ],
+     [
+      "jquery in action",
+      681,
+      198
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      681,
+      198
+     ],
+     [
+      "jquery succinctly",
+      694,
+      173
+     ],
+     [
+      "cody lindley",
+      694,
+      173
+     ],
+     [
+      "learning center",
+      401,
+      123
+     ],
+     [
+      "chat",
+      544,
+      57
+     ],
+     [
+      "twitter",
+      621,
+      68
+     ],
+     [
+      "github",
+      710,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      760
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      122,
+      73
+     ],
+     [
+      "openjs foundation",
+      20,
+      98
+     ],
+     [
+      "openjs foundation",
+      227,
+      98
+     ],
+     [
+      "trademark policy",
+      95,
+      85
+     ],
+     [
+      "trademark list",
+      204,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      20,
+      280
+     ],
+     [
+      "terms of use",
+      662,
+      65
+     ],
+     [
+      "privacy",
+      733,
+      35
+     ],
+     [
+      "code of conduct",
+      20,
+      83
+     ],
+     [
+      "cookie",
+      130,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      760
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 2,
+    "candidates": 136,
+    "protruding": 2,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 87,
+    "candidates": 136,
+    "protruding": 16,
+    "scrollWidth": 1155,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 82,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [
+    "a brief look ||| v4.0.0",
+    "a brief look ||| only the latest version of jquery is supported.",
+    "a brief look ||| discover support options",
+    "a brief look ||| view source on github →",
+    "a brief look ||| how jquery works →",
+    "a brief look ||| css3 compliant",
+    "a brief look ||| supports css3 selectors to find elements as well as in style property manipulation",
+    "dom traversal and manipulation ||| supports css3 selectors to find elements as well as in style property manipulation"
+   ],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 116,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 81,
+     "rowParents": 27,
+     "maxRowMembers": 11,
+     "navInlinePairs": 36
+    },
+    "recreation": {
+     "inlineSiblingPairs": 74,
+     "rowParents": 25,
+     "maxRowMembers": 11,
+     "navInlinePairs": 31
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      1076
+     ],
+     [
+      "herodevs.com",
+      868,
+      94
+     ],
+     [
+      "jquery",
+      20,
+      52
+     ],
+     [
+      "jquery ui",
+      72,
+      41
+     ],
+     [
+      "jquery mobile",
+      115,
+      40
+     ],
+     [
+      "sizzle",
+      157,
+      40
+     ],
+     [
+      "qunit",
+      199,
+      40
+     ],
+     [
+      "plugins",
+      622,
+      67
+     ],
+     [
+      "contribute",
+      691,
+      84
+     ],
+     [
+      "events",
+      777,
+      64
+     ],
+     [
+      "support",
+      843,
+      70
+     ],
+     [
+      "openjs foundation",
+      914,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      243
+     ],
+     [
+      "download",
+      41,
+      92
+     ],
+     [
+      "api documentation",
+      135,
+      156
+     ],
+     [
+      "blog",
+      293,
+      53
+     ],
+     [
+      "plugins",
+      348,
+      73
+     ],
+     [
+      "browser support",
+      423,
+      139
+     ],
+     [
+      "version support",
+      564,
+      133
+     ],
+     [
+      "download jquery",
+      795,
+      149
+     ],
+     [
+      "v4.0.0",
+      851,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      729,
+      282
+     ],
+     [
+      "discover support options",
+      729,
+      282
+     ],
+     [
+      "view source on github →",
+      729,
+      282
+     ],
+     [
+      "how jquery works →",
+      729,
+      282
+     ],
+     [
+      "lightweight footprint",
+      115,
+      155
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      115,
+      155
+     ],
+     [
+      "css3 compliant",
+      320,
+      155
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      320,
+      155
+     ],
+     [
+      "cross-browser",
+      524,
+      155
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      531,
+      142
+     ],
+     [
+      "what is jquery?",
+      45,
+      641
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      45,
+      641
+     ],
+     [
+      "resources",
+      736,
+      295
+     ],
+     [
+      "jquery core api documentation",
+      776,
+      213
+     ],
+     [
+      "jquery learning center",
+      776,
+      156
+     ],
+     [
+      "jquery blog",
+      776,
+      78
+     ],
+     [
+      "contribute to jquery",
+      776,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      776,
+      205
+     ],
+     [
+      "a brief look",
+      45,
+      986
+     ],
+     [
+      "dom traversal and manipulation",
+      45,
+      986
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      45,
+      986
+     ],
+     [
+      "<button>",
+      98,
+      63
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      85,
+      938
+     ],
+     [
+      "\"button.continue\"",
+      110,
+      140
+     ],
+     [
+      "\"next step...\"",
+      324,
+      115
+     ],
+     [
+      "event handling",
+      45,
+      986
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      45,
+      986
+     ],
+     [
+      "#banner-message",
+      112,
+      113
+     ],
+     [
+      "display:none",
+      411,
+      92
+     ],
+     [
+      "#button-container",
+      707,
+      128
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "2",
+      45,
+      31
+     ],
+     [
+      "3",
+      45,
+      31
+     ],
+     [
+      "4",
+      45,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      85,
+      938
+     ],
+     [
+      "var",
+      85,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      242,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      85,
+      938
+     ],
+     [
+      "\"#button-container button\"",
+      110,
+      214
+     ],
+     [
+      "\"click\"",
+      382,
+      58
+     ],
+     [
+      "()",
+      456,
+      148
+     ],
+     [
+      "function",
+      456,
+      66
+     ],
+     [
+      "event",
+      531,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      85,
+      938
+     ],
+     [
+      "});",
+      85,
+      938
+     ],
+     [
+      "ajax",
+      45,
+      986
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      45,
+      986
+     ],
+     [
+      "/api/getweather",
+      254,
+      113
+     ],
+     [
+      "zipcode=97201",
+      542,
+      99
+     ],
+     [
+      "#weather-temp",
+      810,
+      99
+     ],
+     [
+      "1",
+      45,
+      31
+     ],
+     [
+      "2",
+      45,
+      31
+     ],
+     [
+      "3",
+      45,
+      31
+     ],
+     [
+      "4",
+      45,
+      31
+     ],
+     [
+      "5",
+      45,
+      31
+     ],
+     [
+      "6",
+      45,
+      31
+     ],
+     [
+      "7",
+      45,
+      31
+     ],
+     [
+      "8",
+      45,
+      31
+     ],
+     [
+      "9",
+      45,
+      31
+     ],
+     [
+      "$.ajax({",
+      85,
+      938
+     ],
+     [
+      ": ,",
+      85,
+      938
+     ],
+     [
+      "url",
+      102,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      143,
+      140
+     ],
+     [
+      ": {",
+      85,
+      938
+     ],
+     [
+      "data",
+      102,
+      33
+     ],
+     [
+      ":",
+      85,
+      938
+     ],
+     [
+      "zipcode",
+      118,
+      58
+     ],
+     [
+      "97201",
+      192,
+      41
+     ],
+     [
+      "},",
+      85,
+      938
+     ],
+     [
+      ": {",
+      85,
+      938
+     ],
+     [
+      "success",
+      102,
+      58
+     ],
+     [
+      "()",
+      176,
+      157
+     ],
+     [
+      "function",
+      176,
+      66
+     ],
+     [
+      "result",
+      250,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      85,
+      938
+     ],
+     [
+      "\"#weather-temp\"",
+      143,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      341,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      522,
+      157
+     ],
+     [
+      "}",
+      85,
+      938
+     ],
+     [
+      "});",
+      85,
+      938
+     ],
+     [
+      "related projects",
+      45,
+      986
+     ],
+     [
+      "jquery ui",
+      45,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      45,
+      986
+     ],
+     [
+      "learn more",
+      326,
+      77
+     ],
+     [
+      "jquery mobile",
+      45,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      45,
+      986
+     ],
+     [
+      "learn more",
+      225,
+      77
+     ],
+     [
+      "books",
+      503,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      304,
+      145
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      304,
+      145
+     ],
+     [
+      "jquery in action",
+      465,
+      145
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      465,
+      145
+     ],
+     [
+      "jquery succinctly",
+      627,
+      145
+     ],
+     [
+      "cody lindley",
+      627,
+      145
+     ],
+     [
+      "learning center",
+      664,
+      123
+     ],
+     [
+      "chat",
+      811,
+      57
+     ],
+     [
+      "twitter",
+      893,
+      68
+     ],
+     [
+      "github",
+      986,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      414
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      20,
+      73
+     ],
+     [
+      "openjs foundation",
+      223,
+      98
+     ],
+     [
+      "openjs foundation",
+      333,
+      98
+     ],
+     [
+      "trademark policy",
+      95,
+      85
+     ],
+     [
+      "trademark list",
+      204,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      101,
+      185
+     ],
+     [
+      "terms of use",
+      315,
+      65
+     ],
+     [
+      "privacy",
+      386,
+      35
+     ],
+     [
+      "code of conduct",
+      20,
+      83
+     ],
+     [
+      "cookie",
+      130,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      1036
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      1076
+     ],
+     [
+      "herodevs.com",
+      868,
+      94
+     ],
+     [
+      "jquery",
+      22,
+      62
+     ],
+     [
+      "jquery ui",
+      86,
+      79
+     ],
+     [
+      "jquery mobile",
+      167,
+      104
+     ],
+     [
+      "sizzle",
+      273,
+      59
+     ],
+     [
+      "qunit",
+      334,
+      57
+     ],
+     [
+      "plugins",
+      395,
+      67
+     ],
+     [
+      "contribute",
+      464,
+      84
+     ],
+     [
+      "events",
+      550,
+      64
+     ],
+     [
+      "support",
+      616,
+      70
+     ],
+     [
+      "openjs foundation",
+      687,
+      140
+     ],
+     [
+      "jquery",
+      40,
+      71
+     ],
+     [
+      "download",
+      41,
+      98
+     ],
+     [
+      "api documentation",
+      141,
+      170
+     ],
+     [
+      "blog",
+      313,
+      58
+     ],
+     [
+      "plugins",
+      373,
+      80
+     ],
+     [
+      "browser support",
+      454,
+      152
+     ],
+     [
+      "version support",
+      41,
+      146
+     ],
+     [
+      "download jquery",
+      536,
+      118
+     ],
+     [
+      "v4.0.0",
+      576,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      505,
+      170
+     ],
+     [
+      "discover support options",
+      505,
+      170
+     ],
+     [
+      "view source on github →",
+      505,
+      170
+     ],
+     [
+      "how jquery works →",
+      505,
+      170
+     ],
+     [
+      "lightweight footprint",
+      -90,
+      80
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      -90,
+      80
+     ],
+     [
+      "css3 compliant",
+      40,
+      80
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      40,
+      80
+     ],
+     [
+      "cross-browser",
+      170,
+      80
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      184,
+      53
+     ],
+     [
+      "what is jquery?",
+      70,
+      417
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      70,
+      417
+     ],
+     [
+      "resources",
+      537,
+      183
+     ],
+     [
+      "jquery core api documentation",
+      577,
+      108
+     ],
+     [
+      "jquery learning center",
+      577,
+      107
+     ],
+     [
+      "jquery blog",
+      577,
+      78
+     ],
+     [
+      "contribute to jquery",
+      577,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      577,
+      118
+     ],
+     [
+      "a brief look",
+      45,
+      700
+     ],
+     [
+      "dom traversal and manipulation",
+      45,
+      700
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      45,
+      700
+     ],
+     [
+      "<button>",
+      98,
+      63
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      138,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      163,
+      140
+     ],
+     [
+      "\"next step...\"",
+      377,
+      115
+     ],
+     [
+      "event handling",
+      45,
+      700
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      45,
+      700
+     ],
+     [
+      "#banner-message",
+      112,
+      113
+     ],
+     [
+      "display:none",
+      411,
+      92
+     ],
+     [
+      "#button-container",
+      45,
+      128
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "2",
+      83,
+      31
+     ],
+     [
+      "3",
+      83,
+      31
+     ],
+     [
+      "4",
+      83,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      138,
+      528
+     ],
+     [
+      "var",
+      138,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      294,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      138,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      163,
+      214
+     ],
+     [
+      "\"click\"",
+      435,
+      58
+     ],
+     [
+      "()",
+      509,
+      148
+     ],
+     [
+      "function",
+      509,
+      66
+     ],
+     [
+      "event",
+      583,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      138,
+      528
+     ],
+     [
+      "});",
+      138,
+      528
+     ],
+     [
+      "ajax",
+      45,
+      700
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      45,
+      700
+     ],
+     [
+      "/api/getweather",
+      254,
+      113
+     ],
+     [
+      "zipcode=97201",
+      542,
+      99
+     ],
+     [
+      "#weather-temp",
+      128,
+      99
+     ],
+     [
+      "1",
+      83,
+      31
+     ],
+     [
+      "2",
+      83,
+      31
+     ],
+     [
+      "3",
+      83,
+      31
+     ],
+     [
+      "4",
+      83,
+      31
+     ],
+     [
+      "5",
+      83,
+      31
+     ],
+     [
+      "6",
+      83,
+      31
+     ],
+     [
+      "7",
+      83,
+      31
+     ],
+     [
+      "8",
+      83,
+      31
+     ],
+     [
+      "9",
+      83,
+      31
+     ],
+     [
+      "$.ajax({",
+      138,
+      594
+     ],
+     [
+      ": ,",
+      138,
+      594
+     ],
+     [
+      "url",
+      138,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      179,
+      140
+     ],
+     [
+      ": {",
+      138,
+      594
+     ],
+     [
+      "data",
+      138,
+      33
+     ],
+     [
+      ":",
+      138,
+      594
+     ],
+     [
+      "zipcode",
+      138,
+      58
+     ],
+     [
+      "97201",
+      212,
+      41
+     ],
+     [
+      "},",
+      138,
+      594
+     ],
+     [
+      ": {",
+      138,
+      594
+     ],
+     [
+      "success",
+      138,
+      58
+     ],
+     [
+      "()",
+      212,
+      157
+     ],
+     [
+      "function",
+      212,
+      66
+     ],
+     [
+      "result",
+      286,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      138,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      171,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      369,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      550,
+      157
+     ],
+     [
+      "}",
+      138,
+      594
+     ],
+     [
+      "});",
+      138,
+      594
+     ],
+     [
+      "related projects",
+      45,
+      700
+     ],
+     [
+      "jquery ui",
+      45,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      45,
+      700
+     ],
+     [
+      "learn more",
+      326,
+      77
+     ],
+     [
+      "jquery mobile",
+      45,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      45,
+      700
+     ],
+     [
+      "learn more",
+      225,
+      77
+     ],
+     [
+      "books",
+      499,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      970,
+      173
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      970,
+      173
+     ],
+     [
+      "jquery in action",
+      957,
+      198
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      957,
+      198
+     ],
+     [
+      "jquery succinctly",
+      970,
+      173
+     ],
+     [
+      "cody lindley",
+      970,
+      173
+     ],
+     [
+      "learning center",
+      677,
+      123
+     ],
+     [
+      "chat",
+      820,
+      57
+     ],
+     [
+      "twitter",
+      897,
+      68
+     ],
+     [
+      "github",
+      986,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      20,
+      1036
+     ],
+     [
+      "openjs foundation",
+      98,
+      98
+     ],
+     [
+      "jquery license",
+      20,
+      73
+     ],
+     [
+      "openjs foundation",
+      223,
+      98
+     ],
+     [
+      "openjs foundation",
+      275,
+      98
+     ],
+     [
+      "trademark policy",
+      20,
+      85
+     ],
+     [
+      "trademark list",
+      129,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      20,
+      425
+     ],
+     [
+      "terms of use",
+      151,
+      65
+     ],
+     [
+      "privacy",
+      222,
+      35
+     ],
+     [
+      "code of conduct",
+      264,
+      83
+     ],
+     [
+      "cookie",
+      374,
+      34
+     ],
+     [
+      "|  |",
+      20,
+      1036
+     ],
+     [
+      "web hosting by digital ocean",
+      20,
+      167
+     ],
+     [
+      "cdn by fastly",
+      196,
+      71
+     ],
+     [
+      "powered by wordpress",
+      276,
+      137
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 4,
+    "candidates": 136,
+    "protruding": 2,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 85,
+    "candidates": 136,
+    "protruding": 7,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 80,
+   "sourceOnly": 2,
+   "recreationOnlyExamples": [
+    "a brief look ||| only the latest version of jquery is supported.",
+    "a brief look ||| discover support options",
+    "a brief look ||| view source on github →",
+    "a brief look ||| how jquery works →",
+    "a brief look ||| lightweight footprint",
+    "a brief look ||| css3 compliant",
+    "a brief look ||| supports css3 selectors to find elements as well as in style property manipulation",
+    "dom traversal and manipulation ||| supports css3 selectors to find elements as well as in style property manipulation"
+   ],
+   "sourceOnlyExamples": [
+    "jquery license ||| openjs foundation",
+    "list of openjs foundation trademarks ||| trademark list"
+   ],
+   "sharedTextKeys": 116,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 84,
+     "rowParents": 27,
+     "maxRowMembers": 11,
+     "navInlinePairs": 36
+    },
+    "recreation": {
+     "inlineSiblingPairs": 83,
+     "rowParents": 25,
+     "maxRowMembers": 11,
+     "navInlinePairs": 36
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      1440
+     ],
+     [
+      "herodevs.com",
+      1050,
+      94
+     ],
+     [
+      "jquery",
+      120,
+      52
+     ],
+     [
+      "jquery ui",
+      172,
+      41
+     ],
+     [
+      "jquery mobile",
+      215,
+      40
+     ],
+     [
+      "sizzle",
+      257,
+      40
+     ],
+     [
+      "qunit",
+      299,
+      40
+     ],
+     [
+      "plugins",
+      886,
+      67
+     ],
+     [
+      "contribute",
+      955,
+      84
+     ],
+     [
+      "events",
+      1041,
+      64
+     ],
+     [
+      "support",
+      1107,
+      70
+     ],
+     [
+      "openjs foundation",
+      1178,
+      140
+     ],
+     [
+      "jquery",
+      120,
+      243
+     ],
+     [
+      "download",
+      121,
+      92
+     ],
+     [
+      "api documentation",
+      215,
+      156
+     ],
+     [
+      "blog",
+      373,
+      53
+     ],
+     [
+      "plugins",
+      428,
+      73
+     ],
+     [
+      "browser support",
+      503,
+      139
+     ],
+     [
+      "version support",
+      644,
+      133
+     ],
+     [
+      "download jquery",
+      1011,
+      149
+     ],
+     [
+      "v4.0.0",
+      1067,
+      37
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      945,
+      303
+     ],
+     [
+      "discover support options",
+      945,
+      303
+     ],
+     [
+      "view source on github →",
+      945,
+      303
+     ],
+     [
+      "how jquery works →",
+      945,
+      303
+     ],
+     [
+      "lightweight footprint",
+      195,
+      200
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      195,
+      200
+     ],
+     [
+      "css3 compliant",
+      445,
+      200
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      445,
+      200
+     ],
+     [
+      "cross-browser",
+      695,
+      200
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      705,
+      180
+     ],
+     [
+      "what is jquery?",
+      125,
+      777
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes\n\t\tthings like html document traversal and manipulation, event handling,\n\t\tanimation, and ajax much simpler with an easy-to-use api that works across\n\t\ta multitude of browsers. with a combination of versatility and\n\t\textensibility, jquery has changed the way that millions of people write\n\t\tjavascript.",
+      125,
+      777
+     ],
+     [
+      "resources",
+      952,
+      363
+     ],
+     [
+      "jquery core api documentation",
+      992,
+      213
+     ],
+     [
+      "jquery learning center",
+      992,
+      156
+     ],
+     [
+      "jquery blog",
+      992,
+      78
+     ],
+     [
+      "contribute to jquery",
+      992,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      992,
+      205
+     ],
+     [
+      "a brief look",
+      125,
+      1190
+     ],
+     [
+      "dom traversal and manipulation",
+      125,
+      1190
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      125,
+      1190
+     ],
+     [
+      "<button>",
+      178,
+      63
+     ],
+     [
+      "1",
+      125,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      165,
+      1142
+     ],
+     [
+      "\"button.continue\"",
+      190,
+      140
+     ],
+     [
+      "\"next step...\"",
+      404,
+      115
+     ],
+     [
+      "event handling",
+      125,
+      1190
+     ],
+     [
+      "show the  element that is hidden with\n\t\t in its css when any button in  is\n\t\tclicked.",
+      125,
+      1190
+     ],
+     [
+      "#banner-message",
+      192,
+      113
+     ],
+     [
+      "display:none",
+      491,
+      92
+     ],
+     [
+      "#button-container",
+      787,
+      128
+     ],
+     [
+      "1",
+      125,
+      31
+     ],
+     [
+      "2",
+      125,
+      31
+     ],
+     [
+      "3",
+      125,
+      31
+     ],
+     [
+      "4",
+      125,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      165,
+      1142
+     ],
+     [
+      "var",
+      165,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      322,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      165,
+      1142
+     ],
+     [
+      "\"#button-container button\"",
+      190,
+      214
+     ],
+     [
+      "\"click\"",
+      462,
+      58
+     ],
+     [
+      "()",
+      536,
+      148
+     ],
+     [
+      "function",
+      536,
+      66
+     ],
+     [
+      "event",
+      611,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      165,
+      1142
+     ],
+     [
+      "});",
+      165,
+      1142
+     ],
+     [
+      "ajax",
+      125,
+      1190
+     ],
+     [
+      "call a local script on the server \n\t\twith the query parameter \n\t\tand replace the element 's html with the returned text.",
+      125,
+      1190
+     ],
+     [
+      "/api/getweather",
+      334,
+      113
+     ],
+     [
+      "zipcode=97201",
+      622,
+      99
+     ],
+     [
+      "#weather-temp",
+      890,
+      99
+     ],
+     [
+      "1",
+      125,
+      31
+     ],
+     [
+      "2",
+      125,
+      31
+     ],
+     [
+      "3",
+      125,
+      31
+     ],
+     [
+      "4",
+      125,
+      31
+     ],
+     [
+      "5",
+      125,
+      31
+     ],
+     [
+      "6",
+      125,
+      31
+     ],
+     [
+      "7",
+      125,
+      31
+     ],
+     [
+      "8",
+      125,
+      31
+     ],
+     [
+      "9",
+      125,
+      31
+     ],
+     [
+      "$.ajax({",
+      165,
+      1142
+     ],
+     [
+      ": ,",
+      165,
+      1142
+     ],
+     [
+      "url",
+      182,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      223,
+      140
+     ],
+     [
+      ": {",
+      165,
+      1142
+     ],
+     [
+      "data",
+      182,
+      33
+     ],
+     [
+      ":",
+      165,
+      1142
+     ],
+     [
+      "zipcode",
+      198,
+      58
+     ],
+     [
+      "97201",
+      272,
+      41
+     ],
+     [
+      "},",
+      165,
+      1142
+     ],
+     [
+      ": {",
+      165,
+      1142
+     ],
+     [
+      "success",
+      182,
+      58
+     ],
+     [
+      "()",
+      256,
+      157
+     ],
+     [
+      "function",
+      256,
+      66
+     ],
+     [
+      "result",
+      330,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      165,
+      1142
+     ],
+     [
+      "\"#weather-temp\"",
+      223,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      421,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      602,
+      157
+     ],
+     [
+      "}",
+      165,
+      1142
+     ],
+     [
+      "});",
+      165,
+      1142
+     ],
+     [
+      "related projects",
+      125,
+      1190
+     ],
+     [
+      "jquery ui",
+      125,
+      79
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      125,
+      1190
+     ],
+     [
+      "learn more",
+      406,
+      77
+     ],
+     [
+      "jquery mobile",
+      125,
+      120
+     ],
+     [
+      "this project is deprecated. .",
+      125,
+      1190
+     ],
+     [
+      "learn more",
+      305,
+      77
+     ],
+     [
+      "books",
+      685,
+      69
+     ],
+     [
+      "learning jquery fourth edition",
+      445,
+      173
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      445,
+      173
+     ],
+     [
+      "jquery in action",
+      634,
+      173
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      634,
+      173
+     ],
+     [
+      "jquery succinctly",
+      822,
+      173
+     ],
+     [
+      "cody lindley",
+      822,
+      173
+     ],
+     [
+      "learning center",
+      928,
+      123
+     ],
+     [
+      "chat",
+      1075,
+      57
+     ],
+     [
+      "twitter",
+      1157,
+      68
+     ],
+     [
+      "github",
+      1250,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      120,
+      480
+     ],
+     [
+      "openjs foundation",
+      198,
+      98
+     ],
+     [
+      "jquery license",
+      120,
+      448
+     ],
+     [
+      "openjs foundation",
+      287,
+      98
+     ],
+     [
+      "openjs foundation",
+      327,
+      98
+     ],
+     [
+      "trademark policy",
+      506,
+      85
+     ],
+     [
+      "trademark list",
+      141,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      120,
+      438
+     ],
+     [
+      "terms of use",
+      510,
+      65
+     ],
+     [
+      "privacy",
+      120,
+      35
+     ],
+     [
+      "code of conduct",
+      161,
+      83
+     ],
+     [
+      "cookie",
+      271,
+      34
+     ],
+     [
+      "|  |",
+      120,
+      1200
+     ],
+     [
+      "web hosting by digital ocean",
+      120,
+      167
+     ],
+     [
+      "cdn by fastly",
+      296,
+      71
+     ],
+     [
+      "powered by wordpress",
+      376,
+      137
+     ]
+    ],
+    "recreation": [
+     [
+      "jquery 4.0 has been released! jquery 3.x will now only receive critical updates. find support for earlier versions at .",
+      0,
+      1440
+     ],
+     [
+      "herodevs.com",
+      1050,
+      94
+     ],
+     [
+      "jquery",
+      122,
+      62
+     ],
+     [
+      "jquery ui",
+      186,
+      79
+     ],
+     [
+      "jquery mobile",
+      267,
+      104
+     ],
+     [
+      "sizzle",
+      373,
+      59
+     ],
+     [
+      "qunit",
+      434,
+      57
+     ],
+     [
+      "plugins",
+      495,
+      67
+     ],
+     [
+      "contribute",
+      564,
+      84
+     ],
+     [
+      "events",
+      650,
+      64
+     ],
+     [
+      "support",
+      716,
+      70
+     ],
+     [
+      "openjs foundation",
+      787,
+      140
+     ],
+     [
+      "jquery",
+      120,
+      71
+     ],
+     [
+      "download",
+      121,
+      98
+     ],
+     [
+      "api documentation",
+      221,
+      170
+     ],
+     [
+      "blog",
+      393,
+      58
+     ],
+     [
+      "plugins",
+      453,
+      80
+     ],
+     [
+      "browser support",
+      534,
+      152
+     ],
+     [
+      "version support",
+      688,
+      146
+     ],
+     [
+      "download jquery",
+      713,
+      164
+     ],
+     [
+      "v4.0.0",
+      775,
+      39
+     ],
+     [
+      "only the latest version of jquery is supported.",
+      682,
+      218
+     ],
+     [
+      "discover support options",
+      682,
+      218
+     ],
+     [
+      "view source on github →",
+      682,
+      218
+     ],
+     [
+      "how jquery works →",
+      682,
+      218
+     ],
+     [
+      "lightweight footprint",
+      38,
+      112
+     ],
+     [
+      "only 30kb minified and gzipped. can also be included as an amd module",
+      38,
+      112
+     ],
+     [
+      "css3 compliant",
+      200,
+      112
+     ],
+     [
+      "supports css3 selectors to find elements as well as in style property manipulation",
+      200,
+      112
+     ],
+     [
+      "cross-browser",
+      363,
+      112
+     ],
+     [
+      "chrome, edge, firefox, ie, safari, android, ios, and more",
+      381,
+      75
+     ],
+     [
+      "what is jquery?",
+      150,
+      513
+     ],
+     [
+      "jquery is a fast, small, and feature-rich javascript library. it makes things like html document traversal and manipulation, event handling, animation, and ajax much simpler with an easy-to-use api that works across a multitude of browsers. with a combination of versatility and extensibility, jquery has changed the way that millions of people write javascript.",
+      150,
+      513
+     ],
+     [
+      "resources",
+      713,
+      232
+     ],
+     [
+      "jquery core api documentation",
+      753,
+      108
+     ],
+     [
+      "jquery learning center",
+      753,
+      156
+     ],
+     [
+      "jquery blog",
+      753,
+      78
+     ],
+     [
+      "contribute to jquery",
+      753,
+      134
+     ],
+     [
+      "browse or submit jquery bugs",
+      753,
+      167
+     ],
+     [
+      "a brief look",
+      125,
+      845
+     ],
+     [
+      "dom traversal and manipulation",
+      125,
+      845
+     ],
+     [
+      "get the  element with the class 'continue' and change its html to 'next step...'",
+      125,
+      845
+     ],
+     [
+      "<button>",
+      178,
+      63
+     ],
+     [
+      "1",
+      163,
+      31
+     ],
+     [
+      "$(  ).html(  )",
+      218,
+      371
+     ],
+     [
+      "\"button.continue\"",
+      243,
+      140
+     ],
+     [
+      "\"next step...\"",
+      457,
+      115
+     ],
+     [
+      "event handling",
+      125,
+      845
+     ],
+     [
+      "show the  element that is hidden with  in its css when any button in  is clicked.",
+      125,
+      845
+     ],
+     [
+      "#banner-message",
+      192,
+      113
+     ],
+     [
+      "display:none",
+      491,
+      92
+     ],
+     [
+      "#button-container",
+      787,
+      128
+     ],
+     [
+      "1",
+      163,
+      31
+     ],
+     [
+      "2",
+      163,
+      31
+     ],
+     [
+      "3",
+      163,
+      31
+     ],
+     [
+      "4",
+      163,
+      31
+     ],
+     [
+      "hiddenbox = $(  );",
+      218,
+      528
+     ],
+     [
+      "var",
+      218,
+      25
+     ],
+     [
+      "\"#banner-message\"",
+      374,
+      140
+     ],
+     [
+      "$(  ).on( , {",
+      218,
+      528
+     ],
+     [
+      "\"#button-container button\"",
+      243,
+      214
+     ],
+     [
+      "\"click\"",
+      515,
+      58
+     ],
+     [
+      "()",
+      589,
+      148
+     ],
+     [
+      "function",
+      589,
+      66
+     ],
+     [
+      "event",
+      663,
+      58
+     ],
+     [
+      "hiddenbox.show();",
+      218,
+      528
+     ],
+     [
+      "});",
+      218,
+      528
+     ],
+     [
+      "ajax",
+      125,
+      845
+     ],
+     [
+      "call a local script on the server  with the query parameter  and replace the element 's html with the returned text.",
+      125,
+      845
+     ],
+     [
+      "/api/getweather",
+      334,
+      113
+     ],
+     [
+      "zipcode=97201",
+      622,
+      99
+     ],
+     [
+      "#weather-temp",
+      125,
+      832
+     ],
+     [
+      "1",
+      163,
+      31
+     ],
+     [
+      "2",
+      163,
+      31
+     ],
+     [
+      "3",
+      163,
+      31
+     ],
+     [
+      "4",
+      163,
+      31
+     ],
+     [
+      "5",
+      163,
+      31
+     ],
+     [
+      "6",
+      163,
+      31
+     ],
+     [
+      "7",
+      163,
+      31
+     ],
+     [
+      "8",
+      163,
+      31
+     ],
+     [
+      "9",
+      163,
+      31
+     ],
+     [
+      "$.ajax({",
+      218,
+      594
+     ],
+     [
+      ": ,",
+      218,
+      594
+     ],
+     [
+      "url",
+      218,
+      25
+     ],
+     [
+      "\"/api/getweather\"",
+      259,
+      140
+     ],
+     [
+      ": {",
+      218,
+      594
+     ],
+     [
+      "data",
+      218,
+      33
+     ],
+     [
+      ":",
+      218,
+      594
+     ],
+     [
+      "zipcode",
+      218,
+      58
+     ],
+     [
+      "97201",
+      292,
+      41
+     ],
+     [
+      "},",
+      218,
+      594
+     ],
+     [
+      ": {",
+      218,
+      594
+     ],
+     [
+      "success",
+      218,
+      58
+     ],
+     [
+      "()",
+      292,
+      157
+     ],
+     [
+      "function",
+      292,
+      66
+     ],
+     [
+      "result",
+      366,
+      66
+     ],
+     [
+      "$(  ).html(  + result +  );",
+      218,
+      594
+     ],
+     [
+      "\"#weather-temp\"",
+      251,
+      124
+     ],
+     [
+      "\"<strong>\"",
+      449,
+      82
+     ],
+     [
+      "\"</strong> degrees\"",
+      630,
+      157
+     ],
+     [
+      "}",
+      218,
+      594
+     ],
+     [
+      "});",
+      218,
+      594
+     ],
+     [
+      "related projects",
+      125,
+      845
+     ],
+     [
+      "jquery ui",
+      125,
+      89
+     ],
+     [
+      "this project is in maintenance-only mode. .",
+      125,
+      845
+     ],
+     [
+      "learn more",
+      406,
+      77
+     ],
+     [
+      "jquery mobile",
+      125,
+      132
+     ],
+     [
+      "this project is deprecated. .",
+      125,
+      845
+     ],
+     [
+      "learn more",
+      305,
+      77
+     ],
+     [
+      "books",
+      681,
+      79
+     ],
+     [
+      "learning jquery fourth edition",
+      1254,
+      173
+     ],
+     [
+      "karl swedberg and jonathan chaffer",
+      1254,
+      173
+     ],
+     [
+      "jquery in action",
+      1241,
+      198
+     ],
+     [
+      "bear bibeault, yehuda katz, and aurelio de rosa",
+      1241,
+      198
+     ],
+     [
+      "jquery succinctly",
+      1254,
+      173
+     ],
+     [
+      "cody lindley",
+      1254,
+      173
+     ],
+     [
+      "learning center",
+      941,
+      123
+     ],
+     [
+      "chat",
+      1084,
+      57
+     ],
+     [
+      "twitter",
+      1161,
+      68
+     ],
+     [
+      "github",
+      1250,
+      70
+     ],
+     [
+      "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply.",
+      120,
+      1200
+     ],
+     [
+      "openjs foundation",
+      198,
+      98
+     ],
+     [
+      "jquery license",
+      535,
+      73
+     ],
+     [
+      "openjs foundation",
+      246,
+      98
+     ],
+     [
+      "openjs foundation",
+      237,
+      98
+     ],
+     [
+      "trademark policy",
+      416,
+      85
+     ],
+     [
+      "trademark list",
+      526,
+      73
+     ],
+     [
+      "list of openjs foundation trademarks",
+      331,
+      185
+     ],
+     [
+      "terms of use",
+      333,
+      65
+     ],
+     [
+      "privacy",
+      404,
+      35
+     ],
+     [
+      "code of conduct",
+      446,
+      83
+     ],
+     [
+      "cookie",
+      556,
+      34
+     ],
+     [
+      "|  |",
+      120,
+      1200
+     ],
+     [
+      "web hosting by digital ocean",
+      120,
+      167
+     ],
+     [
+      "cdn by fastly",
+      296,
+      71
+     ],
+     [
+      "powered by wordpress",
+      376,
+      137
+     ]
+    ]
+   }
+  }
+ }
+}

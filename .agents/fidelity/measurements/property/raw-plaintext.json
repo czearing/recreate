@@ -1,0 +1,2417 @@
+{
+ "site": {
+  "sourceUrl": "https://motherfuckingwebsite.com/",
+  "key": "plaintext",
+  "recreationUrl": "http://127.0.0.1:8824/"
+ },
+ "perWidth": {
+  "400": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 400,
+    "clientWidth": 400
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 680,
+    "clientWidth": 400
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      384
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      384
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      384
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      384
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      344
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      344
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      344
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      344
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      344
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      384
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      384
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      384
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      384
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      384
+     ],
+     [
+      "it's responsive",
+      8,
+      384
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      384
+     ],
+     [
+      "it fucking works",
+      8,
+      384
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      384
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      384
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      384
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      384
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      384
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      384
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      384
+     ],
+     [
+      "ones we create ourselves",
+      91,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      304
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      384
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      384
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      384
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      384
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      344
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      344
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      344
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      344
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      344
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      384
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      384
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      384
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      384
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      384
+     ],
+     [
+      "it's responsive",
+      8,
+      384
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      384
+     ],
+     [
+      "it fucking works",
+      8,
+      384
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      384
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      384
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      384
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      384
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      384
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      384
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      384
+     ],
+     [
+      "ones we create ourselves",
+      91,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      672
+     ]
+    ]
+   }
+  },
+  "450": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 450,
+    "clientWidth": 450
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 680,
+    "clientWidth": 450
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      434
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      434
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      434
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      434
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      394
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      394
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      394
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      394
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      394
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      434
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      434
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      434
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      434
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      434
+     ],
+     [
+      "it's responsive",
+      8,
+      434
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      434
+     ],
+     [
+      "it fucking works",
+      8,
+      434
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      434
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      434
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      434
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      434
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      434
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      434
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      434
+     ],
+     [
+      "ones we create ourselves",
+      8,
+      422
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      354
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      434
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      434
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      434
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      434
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      394
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      394
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      394
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      394
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      394
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      434
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      434
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      434
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      434
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      434
+     ],
+     [
+      "it's responsive",
+      8,
+      434
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      434
+     ],
+     [
+      "it fucking works",
+      8,
+      434
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      434
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      434
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      434
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      434
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      434
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      434
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      434
+     ],
+     [
+      "ones we create ourselves",
+      8,
+      422
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      672
+     ]
+    ]
+   }
+  },
+  "480": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 480,
+    "clientWidth": 480
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 680,
+    "clientWidth": 480
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      464
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      464
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      464
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      464
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      424
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      424
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      424
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      424
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      424
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      464
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      464
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      464
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      464
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      464
+     ],
+     [
+      "it's responsive",
+      8,
+      464
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      464
+     ],
+     [
+      "it fucking works",
+      8,
+      464
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      464
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      464
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      464
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      464
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      464
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      464
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      464
+     ],
+     [
+      "ones we create ourselves",
+      8,
+      420
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      384
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      464
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      464
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      464
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      464
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      424
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      424
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      424
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      424
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      424
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      464
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      464
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      464
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      464
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      464
+     ],
+     [
+      "it's responsive",
+      8,
+      464
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      464
+     ],
+     [
+      "it fucking works",
+      8,
+      464
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      464
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      464
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      464
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      464
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      464
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      464
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      464
+     ],
+     [
+      "ones we create ourselves",
+      8,
+      420
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      672
+     ]
+    ]
+   }
+  },
+  "600": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 600,
+    "clientWidth": 600
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 680,
+    "clientWidth": 600
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      584
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      584
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      584
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      584
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      544
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      544
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      544
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      544
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      544
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      584
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      584
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      584
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      584
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      584
+     ],
+     [
+      "it's responsive",
+      8,
+      584
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      584
+     ],
+     [
+      "it fucking works",
+      8,
+      584
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      584
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      584
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      584
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      584
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      584
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      584
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      584
+     ],
+     [
+      "ones we create ourselves",
+      243,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      504
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      584
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      584
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      584
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      584
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      544
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      544
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      544
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      544
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      544
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      584
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      584
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      584
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      584
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      584
+     ],
+     [
+      "it's responsive",
+      8,
+      584
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      584
+     ],
+     [
+      "it fucking works",
+      8,
+      584
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      584
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      584
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      584
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      584
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      584
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      584
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      584
+     ],
+     [
+      "ones we create ourselves",
+      243,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      672
+     ]
+    ]
+   }
+  },
+  "661": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 661,
+    "clientWidth": 661
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 680,
+    "clientWidth": 661
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      645
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      645
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      645
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      645
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      605
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      605
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      605
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      605
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      605
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      645
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      645
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      645
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      645
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      645
+     ],
+     [
+      "it's responsive",
+      8,
+      645
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      645
+     ],
+     [
+      "it fucking works",
+      8,
+      645
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      645
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      645
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      645
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      645
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      645
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      645
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      645
+     ],
+     [
+      "ones we create ourselves",
+      180,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      565
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      645
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      645
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      645
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      645
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      605
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      605
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      605
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      605
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      605
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      645
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      645
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      645
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      645
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      645
+     ],
+     [
+      "it's responsive",
+      8,
+      645
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      645
+     ],
+     [
+      "it fucking works",
+      8,
+      645
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      645
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      645
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      645
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      645
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      645
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      645
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      645
+     ],
+     [
+      "ones we create ourselves",
+      180,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      672
+     ]
+    ]
+   }
+  },
+  "800": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 800,
+    "clientWidth": 800
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 1352,
+    "clientWidth": 800
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      784
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      784
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      784
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      784
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      744
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      744
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      744
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      744
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      744
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      784
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      784
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      784
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      784
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      784
+     ],
+     [
+      "it's responsive",
+      8,
+      784
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      784
+     ],
+     [
+      "it fucking works",
+      8,
+      784
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      784
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      784
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      784
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      784
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      784
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      784
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      784
+     ],
+     [
+      "ones we create ourselves",
+      91,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      704
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      784
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      784
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      784
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      784
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      744
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      744
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      744
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      744
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      744
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      784
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      784
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      784
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      784
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      784
+     ],
+     [
+      "it's responsive",
+      8,
+      784
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      784
+     ],
+     [
+      "it fucking works",
+      8,
+      784
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      784
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      784
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      784
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      784
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      784
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      784
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      784
+     ],
+     [
+      "ones we create ourselves",
+      91,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      1344
+     ]
+    ]
+   }
+  },
+  "1076": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 1076,
+    "clientWidth": 1076
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 1352,
+    "clientWidth": 1076
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      1060
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      1060
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      1060
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      1060
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      1020
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      1020
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      1020
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      1020
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      1020
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      1060
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      1060
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      1060
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      1060
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      1060
+     ],
+     [
+      "it's responsive",
+      8,
+      1060
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      1060
+     ],
+     [
+      "it fucking works",
+      8,
+      1060
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      1060
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      1060
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      1060
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      1060
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      1060
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      1060
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      1060
+     ],
+     [
+      "ones we create ourselves",
+      825,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      980
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      1060
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      1060
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      1060
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      1060
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      1020
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      1020
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      1020
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      1020
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      1020
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      1060
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      1060
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      1060
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      1060
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      1060
+     ],
+     [
+      "it's responsive",
+      8,
+      1060
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      1060
+     ],
+     [
+      "it fucking works",
+      8,
+      1060
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      1060
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      1060
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      1060
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      1060
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      1060
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      1060
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      1060
+     ],
+     [
+      "ones we create ourselves",
+      825,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      1344
+     ]
+    ]
+   }
+  },
+  "1440": {
+   "source": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreation": {
+    "pairs": 0,
+    "candidates": 26,
+    "protruding": 0,
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+   },
+   "recreationOnly": 0,
+   "sourceOnly": 0,
+   "recreationOnlyExamples": [],
+   "sourceOnlyExamples": [],
+   "sharedTextKeys": 24,
+   "inlineRowCapacity": {
+    "source": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    },
+    "recreation": {
+     "inlineSiblingPairs": 0,
+     "rowParents": 0,
+     "maxRowMembers": 0,
+     "navInlinePairs": 0
+    }
+   },
+   "boxes": {
+    "source": [
+     [
+      "this is a motherfucking website.",
+      8,
+      1424
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      1424
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      1424
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      1424
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      1384
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      1384
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      1384
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      1384
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      1384
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      1424
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      1424
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      1424
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      1424
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      1424
+     ],
+     [
+      "it's responsive",
+      8,
+      1424
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      1424
+     ],
+     [
+      "it fucking works",
+      8,
+      1424
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      1424
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      1424
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      1424
+     ],
+     [
+      "this is a website. look at it.  you've never seen one before.",
+      8,
+      1424
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      1424
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      1424
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      1424
+     ],
+     [
+      "ones we create ourselves",
+      825,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\"\n            - some german motherfucker",
+      48,
+      1344
+     ]
+    ],
+    "recreation": [
+     [
+      "this is a motherfucking website.",
+      8,
+      1424
+     ],
+     [
+      "and it's fucking perfect.",
+      8,
+      1424
+     ],
+     [
+      "seriously, what the fuck else do you want?",
+      8,
+      1424
+     ],
+     [
+      "you probably build websites and think your shit is special. you think your 13 megabyte parallax-ative home page is going to get you some fucking awwward banner you can glue to the top corner of your site. you think your 40-pound jquery file and 83 polyfills give ie7 a boner because it finally has box-shadow. wrong, motherfucker. let me describe your perfect-ass website:",
+      8,
+      1424
+     ],
+     [
+      "shit's lightweight and loads fast",
+      48,
+      1384
+     ],
+     [
+      "fits on all your shitty screens",
+      48,
+      1384
+     ],
+     [
+      "looks the same in all your shitty browsers",
+      48,
+      1384
+     ],
+     [
+      "the motherfucker's accessible to every asshole that visits your site",
+      48,
+      1384
+     ],
+     [
+      "shit's legible and gets your fucking point across (if you had one instead of just 5mb pics of hipsters drinking coffee)",
+      48,
+      1384
+     ],
+     [
+      "well guess what, motherfucker:",
+      8,
+      1424
+     ],
+     [
+      "you. are. over-designing. look at this shit. it's a motherfucking website. why the fuck do you need to animate a fucking trendy-ass banner flag when i hover over that useless piece of shit? you spent hours on it and added 80 kilobytes to your fucking site, and some motherfucker jabbing at it on their ipad with fat sausage fingers will never see that shit. not to mention blind people will never see that shit, but they don't see any of your shitty shit.",
+      8,
+      1424
+     ],
+     [
+      "you never knew it, but this is your perfect website. here's why.",
+      8,
+      1424
+     ],
+     [
+      "it's fucking lightweight",
+      8,
+      1424
+     ],
+     [
+      "this entire page weighs less than the gradient-meshed facebook logo on your fucking wordpress site. did you seriously load 100kb of jquery ui just so you could animate the fucking background color of a div? you loaded all 7 fontfaces of a shitty webfont just so you could say \"hi.\" at 100px height at the beginning of your site? you piece of shit.",
+      8,
+      1424
+     ],
+     [
+      "it's responsive",
+      8,
+      1424
+     ],
+     [
+      "you dumbass. you thought you needed media queries to be responsive, but no. responsive means that it responds to whatever motherfucking screensize it's viewed on. this site doesn't care if you're on an imac or a motherfucking tamagotchi.",
+      8,
+      1424
+     ],
+     [
+      "it fucking works",
+      8,
+      1424
+     ],
+     [
+      "look at this shit. you can read it ... that is, if you can read, motherfucker. it makes sense. it has motherfucking hierarchy. it's using html5 tags so you and your bitch-ass browser know what the fuck's in this fucking site. that's semantics, motherfucker.",
+      8,
+      1424
+     ],
+     [
+      "it has content on the fucking screen. your site has three bylines and link to your dribbble account, but you spread it over 7 full screens and make me click some bobbing button to show me how cool the jquery scrollto plugin is.",
+      8,
+      1424
+     ],
+     [
+      "cross-browser compatibility? load this motherfucker in ie6. i fucking dare you.",
+      8,
+      1424
+     ],
+     [
+      "this is a website. look at it. you've never seen one before.",
+      8,
+      1424
+     ],
+     [
+      "like the man who's never grown out his beard has no idea what his true natural state is, you have no fucking idea what a website is. all you have ever seen are shitty skeuomorphic bastardizations of what should be text communicating a fucking message. this is a real, naked website. look at it. it's fucking beautiful.",
+      8,
+      1424
+     ],
+     [
+      "yes, this is fucking satire, you fuck",
+      8,
+      1424
+     ],
+     [
+      "i'm not actually saying your shitty site should look like this. what i'm saying is that all the problems we have with websites are . websites aren't broken by default, they are functional, high-performing, and accessible. you break them. you son-of-a-bitch.",
+      8,
+      1424
+     ],
+     [
+      "ones we create ourselves",
+      825,
+      165
+     ],
+     [
+      "\"good design is as little design as possible.\" - some german motherfucker",
+      8,
+      1344
+     ]
+    ]
+   }
+  }
+ }
+}

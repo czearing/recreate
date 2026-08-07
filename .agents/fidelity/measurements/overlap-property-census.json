@@ -1,0 +1,1332 @@
+{
+  "measurement": "overlap-property-census",
+  "question": "Does the candidate property that the three prior failing pages share actually predict where the nav-overlap defect occurs?",
+  "extends": "overlap-multi-site.json",
+  "headSha": "3be8ea0f2e9755fad7e23ac8364b1956497b8b10",
+  "generatedFrom": [
+    "overlap-property-census.mjs",
+    "prop-aggregate.mjs",
+    "prop-correlate.mjs"
+  ],
+  "instrumentIntegrity": {
+    "requirement": "Do not change the overlap predicate or thresholds; changing the instrument makes this incomparable with the run it extends.",
+    "method": "The predicate is not copied. overlap-property-census.mjs reads overlap-multi-site.mjs at runtime and slices the PROBE template literal out of its bytes, so the executed predicate IS the prior run's predicate.",
+    "proof": "verify-predicate.mjs re-extracts independently and compares.",
+    "priorProbeSha": "a5bcc101a9d8367b",
+    "thisRunProbeSha": "a5bcc101a9d8367b",
+    "probeLengthBytes": 2151,
+    "identical": true,
+    "note": "A first attempt DID copy-paste the predicate and silently changed it (2168 vs 1899 chars, comments stripped). That attempt was discarded. Copy-paste is not a safe way to inherit an instrument.",
+    "covariateIsSeparate": "The property covariate and the width-fidelity covariate are computed by expressions outside PROBE, so measuring them cannot perturb the defect measurement."
+  },
+  "premiseCorrections": [
+    {
+      "claimInAssignment": "2 of the 4 clean pages produced no overlap on EITHER side.",
+      "finding": "REFUTED by the artifact the assignment cites. overlap-multi-site.json records page `legacy` (Hacker News) with source-only pair counts 28,36,36,18,6,0,0,0 across the width sweep. It is not clean on either side; it is the most divergent page in the prior set.",
+      "why": "It was scored clean because the prior summary ranked pages on recreation-only pairs. A source-only excess means the recreation LOST overlaps the source has - the recreation failed to reproduce the source's sizing model (native table cells squeezed below content minimum, versus a flex/grid rebuild that respects min-content and wraps). That is an equally real defect and it is the direction no fixture covers.",
+      "consequence": "The prior run has 4 informative results, not 3, and one of them fails in the untested direction."
+    },
+    {
+      "claimInAssignment": "The width-dependence is explained by geometry being exact at the widths the capture sampled (docs passes at 1440).",
+      "finding": "REFUTED by this run. 1440x900 is a capture sample width (src/cli.rs:77 lists 1920x1080,1440x900,768x1024,390x844,320x568), yet at 1440 jquery shows 80 recreation-only pairs and paper shows 43.",
+      "why": "Sampling freezes lengths; it does not guarantee the element receives the same containing-block width. Measured directly on jquery's worst culprit at 1440: the element's LEFT matches exactly (source 125, recreation 125) while its WIDTH does not (source 1190, recreation 845). A narrower box wraps the same text onto more lines, grows taller, and collides with what follows.",
+      "consequence": "Two mechanisms exist and have opposite width signatures. A frozen-length error appears BETWEEN sample widths and vanishes AT them. A containing-block error is present AT a sample width and grows with viewport width. The sampled-width clause is dropped from the property."
+    }
+  ],
+  "candidateProperty": {
+    "statedFalsifiably": "A page shows the defect at width w if and only if, at w, it renders two or more sibling elements whose vertical ranges intersect (inline-row capacity > 0), i.e. it has a horizontal row that has not collapsed to stacked.",
+    "operationalisation": "Measured per width as a covariate independent of the defect predicate: for each parent, count element-child sibling pairs whose rects intersect vertically. Reported as inlineSiblingPairs, restricted to nav/header subtrees as navInlinePairs. A page is classified by this measured curve, never by visual category.",
+    "whatItForbids": "A page with zero inline-row capacity at every width cannot show the defect at any width.",
+    "widthDependenceClauseAsGiven": "The defect band lies between a page's row-collapse breakpoint and the nearest capture sample width, which would explain docs failing 400-1076 and passing at 1440, and hero failing only at 800.",
+    "widthDependenceClauseVerdict": "REFUTED - see premiseCorrections[1]. jquery fails at the sample width 1440 with 80 pairs."
+  },
+  "sampleDesign": {
+    "rule": "Six NEW pages chosen to VARY the property, not chosen by visual category. Four predicted to have it (spanning extreme-high, toggling, constant, and inline-rows-without-nav), two predicted to lack it.",
+    "deliberateVariation": "jquery was selected specifically because the property toggles WITHIN the sweep (navInlinePairs 0,0,0 at 400-480 then 25,25,28,36,36 from 600), giving a within-page test the prior sample did not contain. paper was selected to break the nav/inline-row confound.",
+    "methodInheritedFromPriorRun": [
+      "live source page, not a replay",
+      "text-identity pair keys",
+      "content-drift guard: a pair scores only when both its texts exist on both sides",
+      "per-site candidate-count controls",
+      "both directions at every width",
+      "one headless browser on a private debugging port with a private profile",
+      "tool built into a private CARGO_TARGET_DIR"
+    ],
+    "widths": [
+      400,
+      450,
+      480,
+      600,
+      661,
+      800,
+      1076,
+      1440
+    ]
+  },
+  "pages": {
+    "godev": {
+      "url": "https://go.dev/",
+      "stack": "Go static site generator, custom CSS with container-driven layout",
+      "chosenAs": "predicted TO HAVE the property",
+      "whyChosen": "Horizontal nav present at every width (navInlinePairs 17-35) with no collapse. Chosen as a property-constant control: if the property drives the defect, the defect must not vary with width here.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 7,
+        "450": 7,
+        "480": 4,
+        "600": 2,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 2,
+        "450": 4,
+        "480": 5,
+        "600": 4,
+        "661": 4,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 24,
+          "recreation": 32,
+          "sourceCandidates": 185,
+          "recreationCandidates": 182
+        },
+        "450": {
+          "source": 26,
+          "recreation": 32,
+          "sourceCandidates": 185,
+          "recreationCandidates": 182
+        },
+        "480": {
+          "source": 27,
+          "recreation": 29,
+          "sourceCandidates": 185,
+          "recreationCandidates": 182
+        },
+        "600": {
+          "source": 26,
+          "recreation": 26,
+          "sourceCandidates": 185,
+          "recreationCandidates": 182
+        },
+        "661": {
+          "source": 26,
+          "recreation": 22,
+          "sourceCandidates": 185,
+          "recreationCandidates": 182
+        },
+        "800": {
+          "source": 22,
+          "recreation": 22,
+          "sourceCandidates": 185,
+          "recreationCandidates": 190
+        },
+        "1076": {
+          "source": 23,
+          "recreation": 22,
+          "sourceCandidates": 193,
+          "recreationCandidates": 190
+        },
+        "1440": {
+          "source": 24,
+          "recreation": 24,
+          "sourceCandidates": 193,
+          "recreationCandidates": 191
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 96,
+          "navInlinePairs": 28,
+          "maxRowMembers": 19
+        },
+        "450": {
+          "inlineSiblingPairs": 113,
+          "navInlinePairs": 35,
+          "maxRowMembers": 19
+        },
+        "480": {
+          "inlineSiblingPairs": 118,
+          "navInlinePairs": 35,
+          "maxRowMembers": 19
+        },
+        "600": {
+          "inlineSiblingPairs": 124,
+          "navInlinePairs": 35,
+          "maxRowMembers": 19
+        },
+        "661": {
+          "inlineSiblingPairs": 128,
+          "navInlinePairs": 35,
+          "maxRowMembers": 19
+        },
+        "800": {
+          "inlineSiblingPairs": 129,
+          "navInlinePairs": 35,
+          "maxRowMembers": 19
+        },
+        "1076": {
+          "inlineSiblingPairs": 151,
+          "navInlinePairs": 17,
+          "maxRowMembers": 19
+        },
+        "1440": {
+          "inlineSiblingPairs": 143,
+          "navInlinePairs": 17,
+          "maxRowMembers": 19
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 138,
+          "widthMismatched": 39,
+          "widthMismatchPct": 28.3,
+          "leftAgreePct": 65.9,
+          "maxWidthDeltaPx": 454,
+          "maxWidthDeltaText": "copyright"
+        },
+        "450": {
+          "sharedTexts": 138,
+          "widthMismatched": 34,
+          "widthMismatchPct": 24.6,
+          "leftAgreePct": 67.4,
+          "maxWidthDeltaPx": 454,
+          "maxWidthDeltaText": "copyright"
+        },
+        "480": {
+          "sharedTexts": 138,
+          "widthMismatched": 39,
+          "widthMismatchPct": 28.3,
+          "leftAgreePct": 67.4,
+          "maxWidthDeltaPx": 454,
+          "maxWidthDeltaText": "copyright"
+        },
+        "600": {
+          "sharedTexts": 138,
+          "widthMismatched": 30,
+          "widthMismatchPct": 21.7,
+          "leftAgreePct": 68.1,
+          "maxWidthDeltaPx": 454,
+          "maxWidthDeltaText": "copyright"
+        },
+        "661": {
+          "sharedTexts": 138,
+          "widthMismatched": 26,
+          "widthMismatchPct": 18.8,
+          "leftAgreePct": 69.6,
+          "maxWidthDeltaPx": 454,
+          "maxWidthDeltaText": "copyright"
+        },
+        "800": {
+          "sharedTexts": 138,
+          "widthMismatched": 59,
+          "widthMismatchPct": 42.8,
+          "leftAgreePct": 41.3,
+          "maxWidthDeltaPx": 1126,
+          "maxWidthDeltaText": "copyright"
+        },
+        "1076": {
+          "sharedTexts": 139,
+          "widthMismatched": 17,
+          "widthMismatchPct": 12.2,
+          "leftAgreePct": 78.4,
+          "maxWidthDeltaPx": 451,
+          "maxWidthDeltaText": "within a month, everyone was writing in go"
+        },
+        "1440": {
+          "sharedTexts": 141,
+          "widthMismatched": 11,
+          "widthMismatchPct": 7.8,
+          "leftAgreePct": 78.7,
+          "maxWidthDeltaPx": 1060,
+          "maxWidthDeltaText": "hello, 世界"
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 154,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 150,
+          "movedPct": 100
+        }
+      },
+      "grade": "informative-positive",
+      "gradeReason": "page is capable and reflows, and the instrument recorded divergence."
+    },
+    "jquery": {
+      "url": "https://jquery.com/",
+      "stack": "WordPress theme, classic float/flex CSS",
+      "chosenAs": "predicted TO HAVE the property",
+      "whyChosen": "A horizontal nav that measurably collapses: navInlinePairs is 0 at 400-480 and 25+ from 600 up. Chosen because the property TOGGLES within the width sweep, so the property predicts a defect that switches on at 600.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 5,
+        "450": 4,
+        "480": 1,
+        "600": 4,
+        "661": 4,
+        "800": 86,
+        "1076": 82,
+        "1440": 80
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 5,
+        "450": 2,
+        "480": 8,
+        "600": 3,
+        "661": 6,
+        "800": 4,
+        "1076": 0,
+        "1440": 2
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 11,
+          "recreation": 11,
+          "sourceCandidates": 121,
+          "recreationCandidates": 120
+        },
+        "450": {
+          "source": 7,
+          "recreation": 9,
+          "sourceCandidates": 121,
+          "recreationCandidates": 120
+        },
+        "480": {
+          "source": 12,
+          "recreation": 5,
+          "sourceCandidates": 121,
+          "recreationCandidates": 120
+        },
+        "600": {
+          "source": 6,
+          "recreation": 7,
+          "sourceCandidates": 131,
+          "recreationCandidates": 136
+        },
+        "661": {
+          "source": 8,
+          "recreation": 6,
+          "sourceCandidates": 131,
+          "recreationCandidates": 136
+        },
+        "800": {
+          "source": 6,
+          "recreation": 92,
+          "sourceCandidates": 136,
+          "recreationCandidates": 136
+        },
+        "1076": {
+          "source": 2,
+          "recreation": 87,
+          "sourceCandidates": 136,
+          "recreationCandidates": 136
+        },
+        "1440": {
+          "source": 4,
+          "recreation": 85,
+          "sourceCandidates": 136,
+          "recreationCandidates": 136
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 34,
+          "navInlinePairs": 0,
+          "maxRowMembers": 11
+        },
+        "450": {
+          "inlineSiblingPairs": 36,
+          "navInlinePairs": 0,
+          "maxRowMembers": 11
+        },
+        "480": {
+          "inlineSiblingPairs": 42,
+          "navInlinePairs": 0,
+          "maxRowMembers": 11
+        },
+        "600": {
+          "inlineSiblingPairs": 67,
+          "navInlinePairs": 25,
+          "maxRowMembers": 11
+        },
+        "661": {
+          "inlineSiblingPairs": 68,
+          "navInlinePairs": 25,
+          "maxRowMembers": 11
+        },
+        "800": {
+          "inlineSiblingPairs": 70,
+          "navInlinePairs": 28,
+          "maxRowMembers": 11
+        },
+        "1076": {
+          "inlineSiblingPairs": 81,
+          "navInlinePairs": 36,
+          "maxRowMembers": 11
+        },
+        "1440": {
+          "inlineSiblingPairs": 84,
+          "navInlinePairs": 36,
+          "maxRowMembers": 11
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 105,
+          "widthMismatched": 37,
+          "widthMismatchPct": 35.2,
+          "leftAgreePct": 29.5,
+          "maxWidthDeltaPx": 287,
+          "maxWidthDeltaText": "trademark list"
+        },
+        "450": {
+          "sharedTexts": 105,
+          "widthMismatched": 33,
+          "widthMismatchPct": 31.4,
+          "leftAgreePct": 29.5,
+          "maxWidthDeltaPx": 297,
+          "maxWidthDeltaText": "jquery succinctly"
+        },
+        "480": {
+          "sharedTexts": 105,
+          "widthMismatched": 35,
+          "widthMismatchPct": 33.3,
+          "leftAgreePct": 29.5,
+          "maxWidthDeltaPx": 373,
+          "maxWidthDeltaText": "jquery license"
+        },
+        "600": {
+          "sharedTexts": 114,
+          "widthMismatched": 47,
+          "widthMismatchPct": 41.2,
+          "leftAgreePct": 8.8,
+          "maxWidthDeltaPx": 319,
+          "maxWidthDeltaText": "download jquery"
+        },
+        "661": {
+          "sharedTexts": 114,
+          "widthMismatched": 50,
+          "widthMismatchPct": 43.9,
+          "leftAgreePct": 8.8,
+          "maxWidthDeltaPx": 380,
+          "maxWidthDeltaText": "download jquery"
+        },
+        "800": {
+          "sharedTexts": 116,
+          "widthMismatched": 58,
+          "widthMismatchPct": 50,
+          "leftAgreePct": 21.6,
+          "maxWidthDeltaPx": 456,
+          "maxWidthDeltaText": "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply."
+        },
+        "1076": {
+          "sharedTexts": 116,
+          "widthMismatched": 55,
+          "widthMismatchPct": 47.4,
+          "leftAgreePct": 21.6,
+          "maxWidthDeltaPx": 622,
+          "maxWidthDeltaText": "copyright 2026  and jquery contributors. all rights reserved. see  for more information. the  has registered trademarks and uses trademarks. for a list of trademarks of the , please see our  and . trademarks and logos not indicated on the  are trademarks™ or registered® trademarks of their respective holders. use of them does not imply any affiliation with or endorsement by them. openjs foundation , , , and  policies also apply."
+        },
+        "1440": {
+          "sharedTexts": 116,
+          "widthMismatched": 52,
+          "widthMismatchPct": 44.8,
+          "leftAgreePct": 21.6,
+          "maxWidthDeltaPx": 771,
+          "maxWidthDeltaText": "$(  ).html(  )"
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 108,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 108,
+          "movedPct": 100
+        }
+      },
+      "grade": "informative-positive",
+      "gradeReason": "page is capable and reflows, and the instrument recorded divergence."
+    },
+    "litenews": {
+      "url": "https://lite.cnn.com/",
+      "stack": "server-rendered minimal HTML, tiny stylesheet",
+      "chosenAs": "predicted TO LACK the property",
+      "whyChosen": "A real content site with a reflowing layout but almost no inline structure (navInlinePairs = 1 at every width). Chosen as a near-zero case that is still a genuine page, unlike a degenerate one.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 3,
+          "recreation": 3,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "450": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "480": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "600": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "661": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "800": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "1076": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        },
+        "1440": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 112,
+          "recreationCandidates": 112
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "450": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "480": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "600": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "661": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "800": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "1076": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        },
+        "1440": {
+          "inlineSiblingPairs": 22,
+          "navInlinePairs": 1,
+          "maxRowMembers": 7
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "450": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "480": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "600": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "661": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "800": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1076": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1440": {
+          "sharedTexts": 109,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 99.1,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 110,
+          "movedPct": 96.4
+        },
+        "recreation": {
+          "compared": 110,
+          "movedPct": 96.4
+        }
+      },
+      "grade": "informative-negative",
+      "gradeReason": "page is capable and reflows and the predicate did fire on this page, yet neither side diverged: a real clean result."
+    },
+    "paper": {
+      "url": "https://arxiv.org/abs/1706.03762",
+      "stack": "server-rendered Python/Django, legacy CSS, no responsive nav",
+      "chosenAs": "predicted TO HAVE the property",
+      "whyChosen": "High inline-row capacity from author lists and metadata tables, but NO conventional site nav. Chosen to separate \"inline rows\" from \"navigation\" - the two were confounded in the prior sample.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 13,
+        "450": 14,
+        "480": 13,
+        "600": 13,
+        "661": 13,
+        "800": 43,
+        "1076": 43,
+        "1440": 43
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 9,
+        "450": 9,
+        "480": 9,
+        "600": 7,
+        "661": 0,
+        "800": 7,
+        "1076": 0,
+        "1440": 0
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 9,
+          "recreation": 13,
+          "sourceCandidates": 126,
+          "recreationCandidates": 129
+        },
+        "450": {
+          "source": 9,
+          "recreation": 14,
+          "sourceCandidates": 126,
+          "recreationCandidates": 129
+        },
+        "480": {
+          "source": 10,
+          "recreation": 14,
+          "sourceCandidates": 126,
+          "recreationCandidates": 129
+        },
+        "600": {
+          "source": 7,
+          "recreation": 13,
+          "sourceCandidates": 130,
+          "recreationCandidates": 129
+        },
+        "661": {
+          "source": 0,
+          "recreation": 13,
+          "sourceCandidates": 130,
+          "recreationCandidates": 129
+        },
+        "800": {
+          "source": 7,
+          "recreation": 44,
+          "sourceCandidates": 129,
+          "recreationCandidates": 129
+        },
+        "1076": {
+          "source": 1,
+          "recreation": 45,
+          "sourceCandidates": 129,
+          "recreationCandidates": 129
+        },
+        "1440": {
+          "source": 0,
+          "recreation": 44,
+          "sourceCandidates": 129,
+          "recreationCandidates": 129
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 109,
+          "navInlinePairs": 58,
+          "maxRowMembers": 15
+        },
+        "450": {
+          "inlineSiblingPairs": 129,
+          "navInlinePairs": 72,
+          "maxRowMembers": 15
+        },
+        "480": {
+          "inlineSiblingPairs": 130,
+          "navInlinePairs": 72,
+          "maxRowMembers": 15
+        },
+        "600": {
+          "inlineSiblingPairs": 174,
+          "navInlinePairs": 105,
+          "maxRowMembers": 15
+        },
+        "661": {
+          "inlineSiblingPairs": 174,
+          "navInlinePairs": 105,
+          "maxRowMembers": 15
+        },
+        "800": {
+          "inlineSiblingPairs": 190,
+          "navInlinePairs": 119,
+          "maxRowMembers": 15
+        },
+        "1076": {
+          "inlineSiblingPairs": 160,
+          "navInlinePairs": 83,
+          "maxRowMembers": 15
+        },
+        "1440": {
+          "inlineSiblingPairs": 203,
+          "navInlinePairs": 119,
+          "maxRowMembers": 15
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 101,
+          "widthMismatched": 38,
+          "widthMismatchPct": 37.6,
+          "leftAgreePct": 10.9,
+          "maxWidthDeltaPx": 368,
+          "maxWidthDeltaText": "computer science > computation and language"
+        },
+        "450": {
+          "sharedTexts": 101,
+          "widthMismatched": 35,
+          "widthMismatchPct": 34.7,
+          "leftAgreePct": 10.9,
+          "maxWidthDeltaPx": 350,
+          "maxWidthDeltaText": "code, data, media"
+        },
+        "480": {
+          "sharedTexts": 101,
+          "widthMismatched": 35,
+          "widthMismatchPct": 34.7,
+          "leftAgreePct": 10.9,
+          "maxWidthDeltaPx": 380,
+          "maxWidthDeltaText": "code, data, media"
+        },
+        "600": {
+          "sharedTexts": 105,
+          "widthMismatched": 34,
+          "widthMismatchPct": 32.4,
+          "leftAgreePct": 13.3,
+          "maxWidthDeltaPx": 503,
+          "maxWidthDeltaText": "illia polosukhin"
+        },
+        "661": {
+          "sharedTexts": 105,
+          "widthMismatched": 33,
+          "widthMismatchPct": 31.4,
+          "leftAgreePct": 12.4,
+          "maxWidthDeltaPx": 561,
+          "maxWidthDeltaText": "code, data, media"
+        },
+        "800": {
+          "sharedTexts": 105,
+          "widthMismatched": 32,
+          "widthMismatchPct": 30.5,
+          "leftAgreePct": 13.3,
+          "maxWidthDeltaPx": 719,
+          "maxWidthDeltaText": "bibliographic and citation tools"
+        },
+        "1076": {
+          "sharedTexts": 105,
+          "widthMismatched": 31,
+          "widthMismatchPct": 29.5,
+          "leftAgreePct": 14.3,
+          "maxWidthDeltaPx": 995,
+          "maxWidthDeltaText": "bibliographic and citation tools"
+        },
+        "1440": {
+          "sharedTexts": 105,
+          "widthMismatched": 24,
+          "widthMismatchPct": 22.9,
+          "leftAgreePct": 13.3,
+          "maxWidthDeltaPx": 1359,
+          "maxWidthDeltaText": "bibliographic and citation tools"
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 106,
+          "movedPct": 84.9
+        },
+        "recreation": {
+          "compared": 109,
+          "movedPct": 82.6
+        }
+      },
+      "grade": "informative-positive",
+      "gradeReason": "page is capable and reflows, and the instrument recorded divergence."
+    },
+    "phpman": {
+      "url": "https://www.php.net/manual/en/function.array-map.php",
+      "stack": "server-rendered PHP, hand-authored CSS",
+      "chosenAs": "predicted TO HAVE the property",
+      "whyChosen": "Dense horizontal nav plus wide inline tables. Chosen as an extreme-high case on the candidate property: if inline-row capacity drives the defect, this page must fail hardest.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 83,
+        "450": 105,
+        "480": 91,
+        "600": 99,
+        "661": 80,
+        "800": 76,
+        "1076": 79,
+        "1440": 77
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 87,
+        "450": 78,
+        "480": 78,
+        "600": 79,
+        "661": 87,
+        "800": 85,
+        "1076": 68,
+        "1440": 57
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 250,
+          "recreation": 216,
+          "sourceCandidates": 851,
+          "recreationCandidates": 858
+        },
+        "450": {
+          "source": 258,
+          "recreation": 210,
+          "sourceCandidates": 851,
+          "recreationCandidates": 858
+        },
+        "480": {
+          "source": 245,
+          "recreation": 212,
+          "sourceCandidates": 851,
+          "recreationCandidates": 858
+        },
+        "600": {
+          "source": 263,
+          "recreation": 189,
+          "sourceCandidates": 851,
+          "recreationCandidates": 858
+        },
+        "661": {
+          "source": 269,
+          "recreation": 166,
+          "sourceCandidates": 851,
+          "recreationCandidates": 858
+        },
+        "800": {
+          "source": 246,
+          "recreation": 166,
+          "sourceCandidates": 858,
+          "recreationCandidates": 858
+        },
+        "1076": {
+          "source": 234,
+          "recreation": 168,
+          "sourceCandidates": 863,
+          "recreationCandidates": 863
+        },
+        "1440": {
+          "source": 222,
+          "recreation": 166,
+          "sourceCandidates": 863,
+          "recreationCandidates": 863
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 1677,
+          "navInlinePairs": 5,
+          "maxRowMembers": 83
+        },
+        "450": {
+          "inlineSiblingPairs": 1834,
+          "navInlinePairs": 6,
+          "maxRowMembers": 83
+        },
+        "480": {
+          "inlineSiblingPairs": 1987,
+          "navInlinePairs": 6,
+          "maxRowMembers": 83
+        },
+        "600": {
+          "inlineSiblingPairs": 2158,
+          "navInlinePairs": 7,
+          "maxRowMembers": 83
+        },
+        "661": {
+          "inlineSiblingPairs": 2283,
+          "navInlinePairs": 7,
+          "maxRowMembers": 83
+        },
+        "800": {
+          "inlineSiblingPairs": 2155,
+          "navInlinePairs": 7,
+          "maxRowMembers": 83
+        },
+        "1076": {
+          "inlineSiblingPairs": 2440,
+          "navInlinePairs": 24,
+          "maxRowMembers": 83
+        },
+        "1440": {
+          "inlineSiblingPairs": 2475,
+          "navInlinePairs": 24,
+          "maxRowMembers": 83
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 104,
+          "widthMismatched": 32,
+          "widthMismatchPct": 30.8,
+          "leftAgreePct": 47.1,
+          "maxWidthDeltaPx": 235,
+          "maxWidthDeltaText": "string $m"
+        },
+        "450": {
+          "sharedTexts": 104,
+          "widthMismatched": 33,
+          "widthMismatchPct": 31.7,
+          "leftAgreePct": 36.5,
+          "maxWidthDeltaPx": 227,
+          "maxWidthDeltaText": "= ["
+        },
+        "480": {
+          "sharedTexts": 104,
+          "widthMismatched": 31,
+          "widthMismatchPct": 29.8,
+          "leftAgreePct": 33.7,
+          "maxWidthDeltaPx": 219,
+          "maxWidthDeltaText": "int $n"
+        },
+        "600": {
+          "sharedTexts": 104,
+          "widthMismatched": 26,
+          "widthMismatchPct": 25,
+          "leftAgreePct": 42.3,
+          "maxWidthDeltaPx": 285,
+          "maxWidthDeltaText": "string $m"
+        },
+        "661": {
+          "sharedTexts": 104,
+          "widthMismatched": 25,
+          "widthMismatchPct": 24,
+          "leftAgreePct": 31.7,
+          "maxWidthDeltaPx": 302,
+          "maxWidthDeltaText": "in spanish\""
+        },
+        "800": {
+          "sharedTexts": 110,
+          "widthMismatched": 23,
+          "widthMismatchPct": 20.9,
+          "leftAgreePct": 25.5,
+          "maxWidthDeltaPx": 706,
+          "maxWidthDeltaText": "in spanish\""
+        },
+        "1076": {
+          "sharedTexts": 114,
+          "widthMismatched": 28,
+          "widthMismatchPct": 24.6,
+          "leftAgreePct": 26.3,
+          "maxWidthDeltaPx": 706,
+          "maxWidthDeltaText": "in spanish\""
+        },
+        "1440": {
+          "sharedTexts": 114,
+          "widthMismatched": 9,
+          "widthMismatchPct": 7.9,
+          "leftAgreePct": 30.7,
+          "maxWidthDeltaPx": 706,
+          "maxWidthDeltaText": "in spanish\""
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 132,
+          "movedPct": 99.2
+        },
+        "recreation": {
+          "compared": 138,
+          "movedPct": 97.8
+        }
+      },
+      "grade": "informative-positive",
+      "gradeReason": "page is capable and reflows, and the instrument recorded divergence."
+    },
+    "plaintext": {
+      "url": "https://motherfuckingwebsite.com/",
+      "stack": "raw HTML, essentially no CSS",
+      "chosenAs": "predicted TO LACK the property",
+      "whyChosen": "Single-column block flow with inline-row capacity of exactly 0 at every width. Chosen as the strict negative: the property is absent by construction, so the defect must be absent.",
+      "recreationOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "sourceOnlyPairsPerWidth": {
+        "400": 0,
+        "450": 0,
+        "480": 0,
+        "600": 0,
+        "661": 0,
+        "800": 0,
+        "1076": 0,
+        "1440": 0
+      },
+      "candidatePairsPerWidth": {
+        "400": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "450": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "480": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "600": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "661": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "800": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "1076": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        },
+        "1440": {
+          "source": 0,
+          "recreation": 0,
+          "sourceCandidates": 26,
+          "recreationCandidates": 26
+        }
+      },
+      "propertyCovariatePerWidth": {
+        "400": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "450": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "480": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "600": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "661": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "800": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "1076": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        },
+        "1440": {
+          "inlineSiblingPairs": 0,
+          "navInlinePairs": 0,
+          "maxRowMembers": 0
+        }
+      },
+      "widthFidelityPerWidth": {
+        "400": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "450": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "480": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "600": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "661": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "800": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1076": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        },
+        "1440": {
+          "sharedTexts": 24,
+          "widthMismatched": 0,
+          "widthMismatchPct": 0,
+          "leftAgreePct": 100,
+          "maxWidthDeltaPx": 0,
+          "maxWidthDeltaText": null
+        }
+      },
+      "reflowControl": {
+        "source": {
+          "compared": 26,
+          "movedPct": 100
+        },
+        "recreation": {
+          "compared": 26,
+          "movedPct": 100
+        }
+      },
+      "grade": "weak",
+      "gradeReason": "inline-row capacity is 0 at every width: the page cannot place two elements side by side, so a zero cannot distinguish a correct recreation from an untestable one."
+    }
+  },
+  "zeroGrading": {
+    "rule": "A zero is informative only if the page COULD have shown a defect: both sides render, both sides reflow between 400 and 1440, the page is structurally capable (inline-row capacity > 0), and the predicate fired at least once on that page. Otherwise the zero is graded weak and removed from the denominator.",
+    "grades": {
+      "godev": "informative-positive",
+      "jquery": "informative-positive",
+      "litenews": "informative-negative",
+      "paper": "informative-positive",
+      "phpman": "informative-positive",
+      "plaintext": "weak"
+    },
+    "totalPages": 6,
+    "informativeResults": 5,
+    "weakResults": 1,
+    "realSampleSize": 5,
+    "note": "plaintext is graded weak on purpose. It is not a wasted page: it is the strict negative that tests what the property FORBIDS, and it behaved as forbidden. Its zero confirms the gate and contributes nothing to the predictive test, which is exactly the distinction this grading exists to make."
+  },
+  "results": {
+    "bothDirectionsTotals": {
+      "godev": {
+        "recreationOnly": 20,
+        "sourceOnly": 19
+      },
+      "jquery": {
+        "recreationOnly": 266,
+        "sourceOnly": 30
+      },
+      "litenews": {
+        "recreationOnly": 0,
+        "sourceOnly": 0
+      },
+      "paper": {
+        "recreationOnly": 195,
+        "sourceOnly": 41
+      },
+      "phpman": {
+        "recreationOnly": 690,
+        "sourceOnly": 619
+      },
+      "plaintext": {
+        "recreationOnly": 0,
+        "sourceOnly": 0
+      }
+    },
+    "sourceOnlyDirection": "Measured at every width on every page. It is not rare: phpman totals 619 source-only pairs against 690 recreation-only, and godev totals 19 against 20. On phpman and godev the two directions are nearly balanced, so a one-directional metric would report those pages as roughly half as broken as they are.",
+    "exposureWarning": {
+      "finding": "Pair counts are exposure, not defect count. jquery's 86 pairs at 800 and 80 at 1440 involve only about 9 distinct texts, and the string \"a brief look\" pairs with nearly everything. paper's 43 involve about 13 distinct texts.",
+      "meaning": "One mispositioned element colliding with many neighbours inflates the count linearly in page density. phpman's large numbers are partly its 851-2475 candidate pairs. Rank pages by the count only alongside the exposure it was drawn from."
+    }
+  },
+  "verdict": {
+    "doesThePropertyPredictTheDefect": "NO - it is necessary but not sufficient, and it does not predict width.",
+    "necessaryHolds": "plaintext has inline-row capacity 0 at every width and shows 0 recreation-only and 0 source-only pairs at every width. Nothing the property forbids occurred.",
+    "sufficientFails": "litenews has nonzero capacity (inlineSiblingPairs 22 at every width, maxRowMembers 7), reflows on both sides (96.4% of shared elements move between 400 and 1440), has width-mismatch of exactly 0.0% at every width, and the predicate DID fire on it - 3 overlapping pairs at 400, found identically on BOTH sides and on neither side elsewhere. It shows 0 recreation-only and 0 source-only pairs at every width. The property was present and the defect was absent. This is a genuine informative-negative: the sides agree, rather than the instrument being silent.",
+    "widthPredictionFails": "Within a page, no covariate has a consistent sign against the per-width defect count. Spearman rho of recreation-only count against viewport width: godev -0.932, jquery +0.586, paper +0.717, phpman -0.762. Against navInlinePairs: godev +0.265, jquery +0.722, paper +0.525, phpman -0.605. godev fails NARROW (7,7,4,2,0,0,0,0) while jquery and paper fail WIDE. The prior run's docs page failed narrow and passed wide. There is no single width-dependence story.",
+    "whatTheFailingAndPassingPagesActuallySeparateOn": {
+      "predictor": "Per-width width fidelity: for texts present on both sides, whether the recreation gives the element the same box WIDTH as the source (tolerance 2px).",
+      "separation": "EXACT, 6 of 6, with no fitted threshold. The two pages with zero defect in both directions have width-mismatch of exactly 0.0% at all 8 widths and a max width delta of exactly 0px. All four pages with any defect have width-mismatch between 7.8% and 50.0% and max width deltas of 219px to 1359px.",
+      "mechanism": "On jquery's worst culprit at 1440 the LEFT matches exactly (125 vs 125) while the WIDTH does not (1190 vs 845): the same text in a narrower box wraps onto more lines, grows taller, and collides with its neighbour. Page-wide, left agreement is NOT high (godev 78.7%, phpman 30.7%, jquery 21.6%, paper 13.3% at 1440), so the clean per-element case above is the clearest instance rather than the page-wide norm; once one container is mis-sized, elements after it are displaced horizontally too. What the six pages separate on is the width column, which is exactly 0 on both clean pages and nonzero on all four divergent ones.",
+      "honestLimit": "This separates WHETHER a page diverges. It does NOT predict at which width, with rho of +0.469, +0.830, -0.754, +0.857 across the four divergent pages - one page has the opposite sign. Width-fidelity is a between-page predictor only, on a sample of 5 informative pages, and it was identified from this data rather than pre-registered. It needs a fresh sample before it is treated as established.",
+      "alternativeConsidered": "A revised property threshold of navInlinePairs >= 5 also separates 6 of 6 (litenews sits at 1, plaintext at 0, all others 24-119). It is reported but NOT preferred, because the threshold was fitted after seeing these six points, whereas the width-fidelity split is an exact zero-versus-nonzero boundary with nothing fitted."
+    },
+    "consequenceForTheCorpus": "Neither the property nor its width clause should gate fixture selection. The property should be recorded as an eligibility gate that decides which pages are worth measuring, and the defect itself should be characterised as loss of containing-block width, measured in both directions."
+  },
+  "instrumentGaps": [
+    {
+      "gap": "maxRowMembers is constant across all 8 widths on all 6 pages, so its Spearman correlation is undefined everywhere. It failed to detect row collapse; inlineSiblingPairs and navInlinePairs did detect it (jquery navInlinePairs 0 -> 25 between 480 and 600). Reported as undetected by that measure, not as absent."
+    },
+    {
+      "gap": "The boxes fingerprint records only text, left and width - not top or height. The wrap-taller mechanism is therefore inferred from the width delta plus the collision, not observed directly as a height delta. A height column would make it a direct observation."
+    },
+    {
+      "gap": "Pair examples are capped at 8 per width, so the distinct-culprit counts in exposureWarning are lower bounds on concentration, established from the examples that were retained."
+    }
+  ],
+  "toolLimitsEncountered": [
+    {
+      "site": "https://getbootstrap.com/",
+      "stage": "capture",
+      "error": "Message too long: 80974734 > 67108864",
+      "meaning": "Independent reconfirmation of the capture size ceiling on a mainstream docs site. The cap is written literally at browser/src/cdp.rs:28 and :103. See capture-size-ceiling.json. Site substituted with jquery.com."
+    },
+    {
+      "site": "https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect",
+      "stage": "capture",
+      "error": "TypeError: Cannot read properties of undefined (reading 'matchAll') at line 412 of the injected page_capture script",
+      "meaning": "A second and distinct tool defect, reproducible on all 3 attempts. Reported as a tool limit, not as a missing sample. Site substituted with go.dev."
+    }
+  ]
+}
