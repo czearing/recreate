@@ -5,6 +5,7 @@ use crate::{
 
 fn node(path: &str, x: f64) -> Node {
     Node {
+        disabled: false,
         path: path.into(),
         parent: None,
         tag: "div".into(),

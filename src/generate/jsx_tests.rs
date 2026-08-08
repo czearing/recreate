@@ -3,6 +3,7 @@ use crate::model::{Node, Rect, Styles};
 
 fn text(path: &str, parent: &str, value: &str, x: f64, width: f64) -> Node {
     Node {
+        disabled: false,
         path: path.into(),
         parent: Some(parent.into()),
         tag: "#text".into(),
@@ -43,6 +44,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
     let parent_path = "html>body:nth-of-type(1)>div:nth-of-type(1)";
     let child_path = format!("{parent_path}>div:nth-of-type(3)");
     let parent = Node {
+        disabled: false,
         path: parent_path.into(),
         parent: None,
         tag: "div".into(),
@@ -59,6 +61,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
         after: None,
     };
     let child = Node {
+        disabled: false,
         path: child_path.clone(),
         parent: Some(parent_path.into()),
         tag: "div".into(),

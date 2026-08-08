@@ -10,6 +10,7 @@ fn identifies_dynamic_attributes() {
 
 fn probe(path: &str, tag: &str) -> Node {
     Node {
+        disabled: false,
         path: path.into(),
         parent: None,
         tag: tag.into(),

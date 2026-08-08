@@ -40,6 +40,7 @@ mod tests {
 
     fn node(y: f64, height: f64) -> Node {
         Node {
+            disabled: false,
             path: "html>body>div".into(),
             parent: Some("html>body".into()),
             tag: "div".into(),

@@ -36,6 +36,17 @@ pub struct Node {
     pub style: Styles,
     pub before: Option<Pseudo>,
     pub after: Option<Pseudo>,
+    /// Whether the element matched `:disabled` when the page was read.
+    ///
+    /// Disabled is not always borne by the element that shows it: a `<fieldset disabled>`
+    /// disables every descendant control except those in its first `<legend>`, and the
+    /// descendant carries no attribute of its own. Neither the attribute map nor the
+    /// `disabled` DOM property — which reflects the content attribute and nothing else —
+    /// can answer that, and re-deriving it here would mean re-implementing the rule and
+    /// its carve-out. `:disabled` is specified to select exactly the set that is really
+    /// disabled, so the answer is taken from the engine and recorded once.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub disabled: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

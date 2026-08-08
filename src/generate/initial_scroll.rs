@@ -53,6 +53,7 @@ mod tests {
 
     fn node(path: &str, parent: Option<&str>, y: f64, overflow: &str) -> Node {
         Node {
+            disabled: false,
             path: path.into(),
             parent: parent.map(str::to_string),
             tag: "div".into(),

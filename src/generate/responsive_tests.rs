@@ -8,6 +8,7 @@ pub(super) fn node(tag: &str, x: f64, width: f64) -> Node {
         attributes.insert("id".into(), "root".into());
     }
     Node {
+        disabled: false,
         path: tag.into(),
         parent: None,
         tag: if tag == "root" { "div" } else { tag }.into(),

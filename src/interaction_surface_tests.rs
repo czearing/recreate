@@ -3,6 +3,7 @@ use crate::model::{Interaction, PageState, Rect, Viewport};
 
 fn node(path: &str, parent: Option<&str>, text: &str, visible: bool) -> Node {
     Node {
+        disabled: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: "div".into(),

@@ -111,6 +111,7 @@ __STYLE_BASELINE__
       tag: element.tagName.toLowerCase(),
       text: '',
       attributes,
+      disabled: element.matches(':disabled'),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       before: pseudo(element, '::before'),

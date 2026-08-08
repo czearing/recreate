@@ -189,6 +189,7 @@ mod tests {
 
     fn heading(font_size: &str, width: f64) -> Node {
         Node {
+            disabled: false,
             path: "html>body>h1".into(),
             parent: Some("html>body".into()),
             tag: "h1".into(),
@@ -240,6 +241,7 @@ mod tests {
 
     fn shrinking_title(width: f64) -> Node {
         Node {
+            disabled: false,
             path: "html>body>div>span".into(),
             parent: Some("html>body>div".into()),
             tag: "span".into(),

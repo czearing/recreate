@@ -92,6 +92,7 @@ mod tests {
     #[test]
     fn keeps_accessibility_state_on_component_instances() {
         let mut node = crate::model::Node {
+            disabled: false,
             path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
             parent: Some("html>body:nth-of-type(1)".into()),
             tag: "button".into(),
@@ -118,6 +119,7 @@ mod tests {
     #[test]
     fn preserves_boolean_control_state() {
         let mut node = crate::model::Node {
+            disabled: false,
             path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
             parent: Some("html>body:nth-of-type(1)".into()),
             tag: "button".into(),
@@ -142,6 +144,7 @@ mod tests {
     #[test]
     fn drops_control_state_the_host_expresses_elsewhere() {
         let mut node = crate::model::Node {
+            disabled: false,
             path: "html>body:nth-of-type(1)>select:nth-of-type(1)>option:nth-of-type(1)".into(),
             parent: Some("html>body:nth-of-type(1)>select:nth-of-type(1)".into()),
             tag: "option".into(),

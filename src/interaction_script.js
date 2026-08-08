@@ -69,6 +69,7 @@ __SELECTION__
         .map(attribute => [attribute.name, attribute.value])),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
+      disabled: element.matches(':disabled'),
       before: null,
       after: null
     });

@@ -43,6 +43,7 @@ mod tests {
     #[test]
     fn remaps_direct_authored_media_rules_to_generated_classes() {
         let node = Node {
+            disabled: false,
             path: String::new(),
             parent: None,
             tag: "div".into(),

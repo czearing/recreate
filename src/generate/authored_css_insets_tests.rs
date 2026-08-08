@@ -3,6 +3,7 @@ use crate::model::{Node, Rect, Styles};
 
 fn node(class: &str, position: &str) -> Node {
     let mut node = Node {
+        disabled: false,
         path: "html>body>div>aside".into(),
         parent: Some("html>body>div".into()),
         tag: "aside".into(),

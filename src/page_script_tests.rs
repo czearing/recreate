@@ -63,6 +63,18 @@ fn caches_dom_paths_and_sibling_indexes() {
     assert!(!script.contains("peers.indexOf"));
 }
 
+/// Both node-record producers must ask the engine for the disabled state rather than
+/// re-derive it, and both must be kept in step: a control disabled by an ancestor
+/// `<fieldset>` carries no attribute of its own, and the `disabled` DOM property only
+/// reflects that absent attribute, so either substitute answers `false` for it.
+#[test]
+fn records_the_engine_answered_disabled_state_in_every_node_record() {
+    for script in [source(), crate::interaction_script::source()] {
+        assert!(script.contains("disabled: element.matches(':disabled')"));
+        assert!(!script.contains("disabled: element.disabled"));
+    }
+}
+
 #[test]
 fn generated_capture_script_parses() {
     let script = super::source_without_assets();

@@ -4,6 +4,7 @@ use crate::model::{Node, Rect, Styles};
 #[test]
 fn removes_measured_height_from_growing_flex_items() {
     let mut node = Node {
+        disabled: false,
         path: "form>div".into(),
         parent: Some("form".into()),
         tag: "div".into(),
@@ -37,6 +38,7 @@ fn removes_measured_height_from_growing_flex_items() {
 #[test]
 fn keeps_used_height_for_percentage_sized_textareas() {
     let mut node = Node {
+        disabled: false,
         path: "form>textarea".into(),
         parent: Some("form".into()),
         tag: "textarea".into(),
@@ -69,6 +71,7 @@ fn keeps_used_height_for_percentage_sized_textareas() {
 #[test]
 fn removes_sampled_height_from_intrinsic_flex_cards() {
     let mut node = Node {
+        disabled: false,
         path: "article>button".into(),
         parent: Some("article".into()),
         tag: "button".into(),
@@ -107,6 +110,7 @@ fn removes_sampled_height_from_intrinsic_flex_cards() {
 #[test]
 fn removes_sampled_height_from_a_content_sized_flex_section() {
     let mut node = Node {
+        disabled: false,
         path: "main>section".into(),
         parent: Some("main".into()),
         tag: "section".into(),
@@ -144,6 +148,7 @@ fn removes_sampled_height_from_a_content_sized_flex_section() {
 #[test]
 fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
     let mut node = Node {
+        disabled: false,
         path: "div>div".into(),
         parent: Some("div".into()),
         tag: "div".into(),
@@ -179,6 +184,7 @@ fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
 #[test]
 fn keeps_the_height_a_flex_container_authored_through_a_variable() {
     let mut node = Node {
+        disabled: false,
         path: "body>header".into(),
         parent: Some("body".into()),
         tag: "header".into(),
@@ -212,6 +218,7 @@ fn keeps_the_height_a_flex_container_authored_through_a_variable() {
 #[test]
 fn keeps_the_height_a_flex_container_authored() {
     let mut node = Node {
+        disabled: false,
         path: "main>section".into(),
         parent: Some("main".into()),
         tag: "section".into(),
@@ -243,6 +250,7 @@ fn keeps_the_height_a_flex_container_authored() {
 #[test]
 fn removes_resolved_grid_rows_without_authored_tracks() {
     let mut node = Node {
+        disabled: false,
         path: "main>section".into(),
         parent: Some("main".into()),
         tag: "section".into(),
@@ -277,6 +285,7 @@ fn removes_resolved_grid_rows_without_authored_tracks() {
 #[test]
 fn rejects_authored_layout_values_from_inactive_media_rules() {
     let mut node = Node {
+        disabled: false,
         path: "header".into(),
         parent: None,
         tag: "div".into(),
@@ -314,6 +323,7 @@ fn rejects_authored_layout_values_from_inactive_media_rules() {
 #[test]
 fn ignores_cascade_keywords_when_reading_authored_values() {
     let mut node = Node {
+        disabled: false,
         path: "div>button".into(),
         parent: Some("div".into()),
         tag: "button".into(),
@@ -357,6 +367,7 @@ fn ignores_cascade_keywords_when_reading_authored_values() {
 #[test]
 fn reads_authored_values_from_static_pseudo_class_selectors() {
     let mut node = Node {
+        disabled: false,
         path: "div>div".into(),
         parent: Some("div".into()),
         tag: "div".into(),
@@ -394,6 +405,7 @@ fn reads_authored_values_from_static_pseudo_class_selectors() {
 #[test]
 fn ignores_authored_values_the_captured_style_contradicts() {
     let mut node = Node {
+        disabled: false,
         path: "div>div".into(),
         parent: Some("div".into()),
         tag: "div".into(),
