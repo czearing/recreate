@@ -64,7 +64,7 @@ fn drops_declarations_that_only_restate_a_browser_default() {
         ("margin-top".into(), "0px".into()),
         ("padding-top".into(), "0px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
+    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
     assert_eq!(css, "display:flex;margin-top:0px;padding-top:0px;", "{css}");
 }
 
@@ -77,7 +77,7 @@ fn keeps_an_auto_inset_on_a_positioned_box() {
         ("left".into(), "auto".into()),
         ("right".into(), "20px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
+    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
     assert!(css.contains("left:auto"), "{css}");
 }
 
@@ -126,7 +126,7 @@ fn keeps_the_sampled_box_of_an_overlay_anchored_to_one_edge() {
         ("width".into(), "313.328px".into()),
         ("height".into(), "168px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
+    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
     assert!(css.contains("width:313.328px"), "{css}");
     assert!(css.contains("height:168px"), "{css}");
 }

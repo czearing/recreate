@@ -96,7 +96,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             .contains(&node.path)
             .then_some(node.rect.width);
         let signature = format!(
-            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}",
+            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}|inherited:{}",
             signatures
                 .get(&node.path)
                 .map(String::as_str)
@@ -104,7 +104,8 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             super::css_layout::role(node, parent, &base.viewport),
             flex.unwrap_or_default(),
             float.unwrap_or_default(),
-            width.map(|value| value.to_string()).unwrap_or_default()
+            width.map(|value| value.to_string()).unwrap_or_default(),
+            super::declaration_defaults::inherited_context(parent.map(|parent| &parent.style))
         );
         let class = cache
             .signature_classes
@@ -160,7 +161,7 @@ fn append_pseudo(
             css.push_str(&format!(
                 ".{class}::{pseudo}{{content:{};{}}}\n",
                 value.content,
-                super::responsive::output_declarations(&value.style, assets)
+                super::responsive::output_declarations(&value.style, Some(&node.style), assets)
             ));
         }
     }

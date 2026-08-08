@@ -39,7 +39,7 @@ pub fn base_declarations_indexed(
     super::super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     // Last, so that nothing downstream can put a sampled pixel back.
     remove_sampled_sizes(&mut styles, node, css_rules);
-    normalize(&mut styles);
+    normalize(&mut styles, parent.map(|parent| &parent.style));
     declarations(&styles, assets)
 }
 
@@ -98,18 +98,25 @@ fn is_replaced(node: &Node) -> bool {
     )
 }
 
-pub fn output_declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
+/// `parent` is the inheritance parent of the styles being emitted. For a pseudo-element
+/// that is its originating element, whose computed values it inherits.
+pub fn output_declarations(
+    styles: &Styles,
+    parent: Option<&Styles>,
+    assets: &BTreeMap<String, String>,
+) -> String {
     let mut styles = styles.clone();
-    normalize(&mut styles);
+    normalize(&mut styles, parent);
     declarations(&styles, assets)
 }
 
-fn normalize(styles: &mut Styles) {
+fn normalize(styles: &mut Styles, parent: Option<&Styles>) {
     styles.retain(|name, _| output_property(name));
     for shorthand in ["flex", "gap", "inset", "margin", "overflow", "padding"] {
         styles.remove(shorthand);
     }
-    remove_defaults(styles);
+    super::super::declaration_defaults::remove_defaults(styles, parent);
+    remove_static_insets(styles);
     for side in ["top", "right", "bottom", "left"] {
         let style = format!("border-{side}-style");
         if styles
@@ -123,86 +130,10 @@ fn normalize(styles: &mut Styles) {
     }
 }
 
-fn remove_defaults(styles: &mut Styles) {
-    for (name, value) in [
-        ("align-content", "normal"),
-        ("align-items", "normal"),
-        ("align-self", "auto"),
-        ("backdrop-filter", "none"),
-        ("background-blend-mode", "normal"),
-        ("background-clip", "border-box"),
-        ("background-image", "none"),
-        ("background-origin", "padding-box"),
-        ("background-position", "0% 0%"),
-        ("background-repeat", "repeat"),
-        ("background-size", "auto"),
-        ("border-collapse", "separate"),
-        ("border-spacing", "0px"),
-        ("box-shadow", "none"),
-        ("box-sizing", "content-box"),
-        ("clip-path", "none"),
-        ("column-gap", "normal"),
-        ("cursor", "auto"),
-        ("filter", "none"),
-        ("flex-basis", "auto"),
-        ("flex-direction", "row"),
-        ("flex-grow", "0"),
-        ("flex-shrink", "1"),
-        ("flex-wrap", "nowrap"),
-        ("float", "none"),
-        ("font-feature-settings", "normal"),
-        ("font-kerning", "auto"),
-        ("font-stretch", "100%"),
-        ("font-style", "normal"),
-        ("font-variation-settings", "normal"),
-        ("grid-auto-columns", "auto"),
-        ("grid-auto-flow", "row"),
-        ("grid-auto-rows", "auto"),
-        ("grid-column-end", "auto"),
-        ("grid-column-start", "auto"),
-        ("grid-row-end", "auto"),
-        ("grid-row-start", "auto"),
-        ("grid-template-areas", "none"),
-        ("grid-template-columns", "none"),
-        ("grid-template-rows", "none"),
-        ("justify-content", "normal"),
-        ("justify-items", "normal"),
-        ("justify-self", "auto"),
-        ("mask-image", "none"),
-        ("max-height", "none"),
-        ("max-width", "none"),
-        ("min-height", "auto"),
-        ("min-width", "auto"),
-        ("mix-blend-mode", "normal"),
-        ("object-fit", "fill"),
-        ("object-position", "50% 50%"),
-        ("opacity", "1"),
-        ("order", "0"),
-        ("overflow-x", "visible"),
-        ("overflow-y", "visible"),
-        ("pointer-events", "auto"),
-        ("position", "static"),
-        ("row-gap", "normal"),
-        ("scrollbar-color", "auto"),
-        ("scrollbar-gutter", "auto"),
-        ("scrollbar-width", "auto"),
-        ("table-layout", "auto"),
-        ("text-rendering", "auto"),
-        ("text-transform", "none"),
-        ("transform", "none"),
-        ("vertical-align", "baseline"),
-        ("visibility", "visible"),
-        ("white-space", "normal"),
-        ("word-break", "normal"),
-        ("z-index", "auto"),
-    ] {
-        if styles.get(name).is_some_and(|current| current == value) {
-            styles.remove(name);
-        }
-    }
-    // An inset only does something on a positioned box, so on a static one the sampled
-    // `auto` is noise. On a positioned box it is load-bearing: it is what stops an
-    // authored offset from applying on the other axis.
+/// An inset only does something on a positioned box, so on a static one the sampled
+/// `auto` is noise. On a positioned box it is load-bearing: it is what stops an
+/// authored offset from applying on the other axis.
+fn remove_static_insets(styles: &mut Styles) {
     if styles.get("position").is_none_or(|value| value == "static") {
         for side in ["top", "right", "bottom", "left"] {
             if styles.get(side).is_some_and(|value| value == "auto") {
@@ -211,7 +142,6 @@ fn remove_defaults(styles: &mut Styles) {
         }
     }
 }
-
 fn output_property(name: &str) -> bool {
     [
         "animation",
@@ -297,7 +227,7 @@ mod scrollbar_output_tests {
     fn render(name: &str, value: &str) -> String {
         let mut styles = Styles::new();
         styles.insert(name.into(), value.into());
-        output_declarations(&styles, &BTreeMap::new())
+        output_declarations(&styles, None, &BTreeMap::new())
     }
 
     /// A thin scrollbar is 10px where the default is 15px, so dropping it

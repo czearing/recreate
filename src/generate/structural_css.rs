@@ -14,6 +14,12 @@ pub fn class_maps(
     states
         .iter()
         .map(|state| {
+            let nodes: BTreeMap<_, _> = state
+                .nodes
+                .iter()
+                .chain(&state.startup_nodes)
+                .map(|node| (node.path.as_str(), node))
+                .collect();
             let mut classes = base.clone();
             for node in state.nodes.iter().chain(&state.startup_nodes) {
                 if node.tag == "#text"
@@ -22,8 +28,12 @@ pub fn class_maps(
                 {
                     continue;
                 }
-                let class = class_name(node, state, assets);
-                append_rule(&class, node, state, assets, css, emitted);
+                let parent = node
+                    .parent
+                    .as_deref()
+                    .and_then(|parent| nodes.get(parent).copied());
+                let class = class_name(node, parent, state, assets);
+                append_rule(&class, node, parent, state, assets, css, emitted);
                 classes.insert(node.path.clone(), class);
             }
             classes
@@ -31,16 +41,35 @@ pub fn class_maps(
         .collect()
 }
 
-fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>) -> String {
-    let mut signature =
-        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules, false);
+fn class_name(
+    node: &Node,
+    parent: Option<&Node>,
+    state: &PageState,
+    assets: &BTreeMap<String, String>,
+) -> String {
+    let mut signature = responsive::base_declarations(
+        node,
+        parent,
+        &state.viewport,
+        assets,
+        &state.css_rules,
+        false,
+    );
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
-        signature.push_str(&responsive::output_declarations(&before.style, assets));
+        signature.push_str(&responsive::output_declarations(
+            &before.style,
+            Some(&node.style),
+            assets,
+        ));
     }
     if let Some(after) = &node.after {
         signature.push_str(&after.content);
-        signature.push_str(&responsive::output_declarations(&after.style, assets));
+        signature.push_str(&responsive::output_declarations(
+            &after.style,
+            Some(&node.style),
+            assets,
+        ));
     }
     format!("s{}", &hex::encode(Sha256::digest(signature))[..10])
 }
@@ -48,6 +77,7 @@ fn class_name(node: &Node, state: &PageState, assets: &BTreeMap<String, String>)
 fn append_rule(
     class: &str,
     node: &Node,
+    parent: Option<&Node>,
     state: &PageState,
     assets: &BTreeMap<String, String>,
     css: &mut String,
@@ -58,20 +88,27 @@ fn append_rule(
     }
     css.push_str(&format!(
         ".{class}{{{}}}\n",
-        responsive::base_declarations(node, None, &state.viewport, assets, &state.css_rules, false,)
+        responsive::base_declarations(
+            node,
+            parent,
+            &state.viewport,
+            assets,
+            &state.css_rules,
+            false,
+        )
     ));
     if let Some(before) = &node.before {
         css.push_str(&format!(
             ".{class}::before{{content:{};{}}}\n",
             before.content,
-            responsive::output_declarations(&before.style, assets)
+            responsive::output_declarations(&before.style, Some(&node.style), assets)
         ));
     }
     if let Some(after) = &node.after {
         css.push_str(&format!(
             ".{class}::after{{content:{};{}}}\n",
             after.content,
-            responsive::output_declarations(&after.style, assets)
+            responsive::output_declarations(&after.style, Some(&node.style), assets)
         ));
     }
 }
