@@ -1,7 +1,26 @@
-use crate::model::{Node, Specification};
+//! Handlers for a carousel the tool never watched being used.
+//!
+//! Reconstructing a widget from what it looks like is unsound in a way that reconstructing it
+//! from what it declares is not. Two sibling controls with exactly one disabled, sitting above
+//! something that overflows horizontally, describes a form dialog with a greyed `Save` beside
+//! `Cancel` as exactly as it describes a carousel; no threshold separates them, because the
+//! two classes coincide in every dimension that can be measured. An omitted carousel is a
+//! static page — wrong, inert, and obvious to a reader. A fabricated one is a page where
+//! `Cancel` scrolls a panel, which is indistinguishable from a feature the source never had.
+//!
+//! So the admission criterion is the author's own statement. `aria-roledescription` exists
+//! only to rename a role for the user, which makes its value a declaration of intent rather
+//! than an accident of layout, and nothing but a carousel says `carousel`. Geometry is kept,
+//! but only to locate the parts of a widget already known to be one.
+
+use crate::model::{Node, PageState, Specification};
 use std::collections::BTreeMap;
 
-pub const EFFECT: &str = r#"useEffect(()=>{let previous=inferredCarousel&&document.querySelector(inferredCarousel.previous);let next=inferredCarousel&&document.querySelector(inferredCarousel.next);let target=inferredCarousel&&document.querySelector(inferredCarousel.target);let extent=inferredCarousel?.extent||0;if(!previous||!next||!target){for(const parent of document.querySelectorAll('body *')){const controls=[...parent.children].filter(child=>child.matches('button,input'));previous=controls.find(control=>control.disabled||control.getAttribute('aria-disabled')==='true');next=controls.find(control=>control!==previous&&!control.disabled&&control.getAttribute('aria-disabled')!=='true');if(!previous||!next)continue;for(let node=parent;node;node=node.parentElement){if(node.scrollWidth-node.clientWidth>20){target=node;extent=node.scrollWidth-node.clientWidth;break}}if(target)break}}if(!previous||!next||!target)return;const update=advanced=>{previous.disabled=!advanced;next.disabled=advanced;animateScroll(target,advanced?extent:0,0);if(!advanced){target.scrollTo(0,0);for(const child of target.querySelectorAll('*')){const matrix=new DOMMatrixReadOnly(getComputedStyle(child).transform);if(Math.abs(matrix.m41)>100)child.style.transform='translateX(0px)'}}};const forward=()=>update(true);const reverse=()=>update(false);next.addEventListener('click',forward);previous.addEventListener('click',reverse);return()=>{next.removeEventListener('click',forward);previous.removeEventListener('click',reverse)}},[]);"#;
+/// The value that admits an inference, per the ARIA authoring practices for the carousel
+/// pattern.
+const DECLARATION: (&str, &str) = ("aria-roledescription", "carousel");
+
+pub const EFFECT: &str = r#"useEffect(()=>{if(!inferredCarousel)return;const previous=document.querySelector(inferredCarousel.previous);const next=document.querySelector(inferredCarousel.next);const target=document.querySelector(inferredCarousel.target);if(!previous||!next||!target)return;const extent=inferredCarousel.extent;const update=advanced=>{previous.disabled=!advanced;next.disabled=advanced;animateScroll(target,advanced?extent:0,0);if(!advanced){target.scrollTo(0,0);for(const child of target.querySelectorAll('*')){const matrix=new DOMMatrixReadOnly(getComputedStyle(child).transform);if(Math.abs(matrix.m41)>100)child.style.transform='translateX(0px)'}}};const forward=()=>update(true);const reverse=()=>update(false);next.addEventListener('click',forward);previous.addEventListener('click',reverse);return()=>{next.removeEventListener('click',forward);previous.removeEventListener('click',reverse)}},[]);"#;
 
 pub fn javascript(specification: &Specification, captured: bool) -> String {
     let value = (!captured)
@@ -17,6 +36,31 @@ pub fn javascript(specification: &Specification, captured: bool) -> String {
         })
         .unwrap_or(serde_json::Value::Null);
     format!("const inferredCarousel={value};")
+}
+
+/// The nearest enclosing element that declares itself a carousel, `node` included.
+fn declared<'a>(state: &'a PageState, node: &'a Node) -> Option<&'a Node> {
+    let by_path = state
+        .nodes
+        .iter()
+        .map(|node| (node.path.as_str(), node))
+        .collect::<BTreeMap<_, _>>();
+    let mut current = Some(node);
+    while let Some(node) = current {
+        if node
+            .attributes
+            .get(DECLARATION.0)
+            .is_some_and(|value| value.trim().eq_ignore_ascii_case(DECLARATION.1))
+        {
+            return Some(node);
+        }
+        current = node
+            .parent
+            .as_deref()
+            .and_then(|path| by_path.get(path))
+            .copied();
+    }
+    None
 }
 
 fn infer(state: &crate::model::PageState) -> Option<(String, String, String, i64)> {
@@ -39,6 +83,8 @@ fn infer(state: &crate::model::PageState) -> Option<(String, String, String, i64
                 .nodes
                 .iter()
                 .find(|node| previous.parent.as_deref() == Some(node.path.as_str()))?;
+            let container = declared(state, parent)?;
+            let inside = format!("{}>", container.path);
             let target = state
                 .nodes
                 .iter()
@@ -48,11 +94,8 @@ fn infer(state: &crate::model::PageState) -> Option<(String, String, String, i64
                     let below = node.rect.y >= parent.rect.y + parent.rect.height - 1.0;
                     let aligned = node.rect.x <= parent.rect.x + parent.rect.width
                         && node.rect.x + node.rect.width >= parent.rect.x;
-                    (overflow > 20.0 && below && aligned).then_some((
-                        node,
-                        overflow,
-                        node.rect.y - parent.rect.y,
-                    ))
+                    (node.path.starts_with(&inside) && overflow > 20.0 && below && aligned)
+                        .then_some((node, overflow, node.rect.y - parent.rect.y))
                 })
                 .min_by(|left, right| left.2.total_cmp(&right.2))?;
             Some((
@@ -71,100 +114,4 @@ fn disabled(node: &Node) -> bool {
             .attributes
             .get("aria-disabled")
             .is_some_and(|value| value == "true")
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::model::{DomNode, Node, PageState, Rect, Specification, Viewport};
-    use std::collections::BTreeMap;
-
-    #[test]
-    fn infers_controls_and_nearest_horizontal_overflow() {
-        let mut state = empty_state();
-        state.nodes = vec![
-            node("html>body>section", None, "section", 10.0, 200.0),
-            node(
-                "html>body>section>button:nth-of-type(1)",
-                Some("html>body>section"),
-                "button",
-                10.0,
-                32.0,
-            ),
-            node(
-                "html>body>section>button:nth-of-type(2)",
-                Some("html>body>section"),
-                "button",
-                10.0,
-                32.0,
-            ),
-            node("html>body>div", Some("html>body"), "div", 60.0, 200.0),
-        ];
-        state.nodes[1]
-            .attributes
-            .insert("disabled".into(), String::new());
-        state.dom.insert(
-            "html>body>div".into(),
-            DomNode {
-                scroll_width: 420.0,
-                client_width: 200.0,
-                ..Default::default()
-            },
-        );
-        let specification = Specification {
-            schema_version: 1,
-            requested_url: String::new(),
-            captured_url: String::new(),
-            states: vec![state],
-            interactions: Vec::new(),
-            transitions: Vec::new(),
-        };
-        let output = super::javascript(&specification, false);
-        assert!(output.contains("\"extent\":220"));
-        assert!(output.contains("\"previous\":\"html>body>section>button:nth-of-type(1)\""));
-        assert!(output.contains("\"target\":\"html>body>div\""));
-        assert_eq!(
-            super::javascript(&specification, true),
-            "const inferredCarousel=null;"
-        );
-    }
-
-    fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node {
-        Node {
-            disabled: false,
-            path: path.into(),
-            parent: parent.map(str::to_owned),
-            tag: tag.into(),
-            text: String::new(),
-            attributes: BTreeMap::new(),
-            rect: Rect {
-                x: 0.0,
-                y,
-                width,
-                height: 32.0,
-            },
-            style: BTreeMap::new(),
-            before: None,
-            after: None,
-        }
-    }
-
-    fn empty_state() -> PageState {
-        PageState {
-            url: String::new(),
-            title: String::new(),
-            viewport: Viewport::default(),
-            nodes: Vec::new(),
-            dom: BTreeMap::new(),
-            capture_blockers: Vec::new(),
-            startup_nodes: Vec::new(),
-            startup_delay_ms: 0,
-            startup_duration_ms: 0,
-            animations: Vec::new(),
-            state_styles: Vec::new(),
-            attribute_sequences: Vec::new(),
-            css_rules: Vec::new(),
-            asset_urls: Vec::new(),
-            asset_data: BTreeMap::new(),
-        }
-    }
 }

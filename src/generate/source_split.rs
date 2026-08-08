@@ -1,6 +1,26 @@
 use anyhow::Result;
 use std::{fs, path::Path};
 
+/// The keyboard-activation helper a view needs only when it renders a control that uses it.
+const KEY_ACTIVATE: &str = "const keyActivate=(event,action)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();action(event)}};";
+
+/// A split file's preamble, carrying only the parts `segment` actually uses. A preamble written
+/// as one fixed string is right for the files that happen to use all of it and leaves the rest
+/// naming modules no code path reaches.
+fn preamble(parts: &[&str], segment: &str) -> String {
+    let kept = parts
+        .iter()
+        .filter(|part| !part.trim().is_empty())
+        .filter(|part| {
+            !part.starts_with("const ")
+                || super::source_imports::mentions(segment, part[6..].split('=').next().unwrap())
+        })
+        .copied()
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!("{kept}\n\n{segment}\n")
+}
+
 pub fn split(
     source: &Path,
     app: &mut String,
@@ -171,8 +191,14 @@ fn split_views(source: &Path, app: &mut String) -> Result<()> {
         );
         fs::write(
             directory.join(format!("Baseline{index}.jsx")),
-            format!(
-                "import React from 'react';\nimport {{createPortal}} from 'react-dom';\nimport {{moveCarousel}} from '../runtime/carousel.mjs';\n{imports}\n\nconst keyActivate=(event,action)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();action(event)}}}};\n\n{segment}\n"
+            preamble(
+                &[
+                    "import React from 'react';",
+                    "import {createPortal} from 'react-dom';",
+                    &imports,
+                    KEY_ACTIVATE,
+                ],
+                &segment,
             ),
         )?;
         view_imports.push_str(&format!(

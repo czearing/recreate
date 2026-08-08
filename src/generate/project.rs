@@ -150,6 +150,7 @@ pub async fn write_project(
     fs::write(source.join("components").join("index.js"), component_index)?;
     fs::write(source.join("states.jsx"), state_source)?;
     source_style_split::split(&source)?;
+    source_imports::prune_tree(&source)?;
     timing("sources");
     runtime_sources::write_entry(&source, &mount_source)?;
     fs::write(

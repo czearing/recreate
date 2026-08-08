@@ -180,3 +180,61 @@ async fn the_root_rule_carries_every_captured_root_declaration() {
     );
     assert!(rule.contains("margin-top:0px"), "{css}");
 }
+
+/// Nothing may be shipped into a generated project that the project never uses. A dead import
+/// is not merely noise: it names a module the reader will go and study, and it keeps a whole
+/// runtime file alive that no code path can reach. `moveCarousel` was such a case - imported
+/// into every app and every view, defined once, and called nowhere, a vestigial third copy of
+/// the carousel state rule that had lost its caller.
+#[tokio::test]
+async fn imports_nothing_a_generated_file_does_not_use() {
+    let directory = tempfile::tempdir().unwrap();
+    write_project(
+        &crate::generate::project_test_support::specification(),
+        directory.path(),
+        &[],
+    )
+    .await
+    .unwrap();
+    let mut checked = 0;
+    let mut pending = vec![directory.path().join("react/src")];
+    while let Some(path) = pending.pop() {
+        for entry in std::fs::read_dir(&path).unwrap().flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+                continue;
+            }
+            if !matches!(
+                path.extension().and_then(|value| value.to_str()),
+                Some("jsx" | "mjs" | "js")
+            ) {
+                continue;
+            }
+            let source = std::fs::read_to_string(&path).unwrap();
+            for line in source.lines().filter(|line| line.starts_with("import ")) {
+                let Some(names) = line
+                    .split_once('{')
+                    .and_then(|(_, rest)| rest.split_once('}'))
+                else {
+                    continue;
+                };
+                for name in names
+                    .0
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|name| !name.is_empty())
+                {
+                    let name = name.rsplit(" as ").next().unwrap();
+                    assert!(
+                        source.matches(name).count() > 1,
+                        "{} imports {name} and never uses it",
+                        path.display()
+                    );
+                    checked += 1;
+                }
+            }
+        }
+    }
+    assert!(checked > 0, "no named imports were examined");
+}

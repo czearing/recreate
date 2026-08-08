@@ -11,6 +11,9 @@ mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
 mod carousel_inference;
+#[cfg(test)]
+#[path = "carousel_inference_tests.rs"]
+mod carousel_inference_tests;
 mod component_identity;
 mod css;
 mod css_base;
@@ -83,6 +86,7 @@ mod source_css_compact;
 mod source_dedupe;
 mod source_dedupe_support;
 mod source_generated_blocks;
+mod source_imports;
 mod source_item_component;
 mod source_item_dedupe;
 mod source_item_name_words;

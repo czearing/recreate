@@ -1,6 +1,5 @@
 import React,{useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {createPortal} from 'react-dom';
-import {moveCarousel} from './runtime/carousel.mjs';
 import {reduceInteraction} from './runtime/interaction.mjs';
 import {startSequences} from './runtime/sequence.mjs';
 //__RECREATE_COMPONENT_IMPORT__
