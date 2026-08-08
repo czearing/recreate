@@ -69,12 +69,10 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             out: PathBuf::new(),
             viewports: String::new(),
         };
-        let (target, mut cdp) = browser::target(&capture_args).await?;
-        let result = compare_capture::state(&mut cdp, expected, trigger).await;
-        drop(cdp);
-        let close = recreate_browser::close(&args.cdp_url, &target.id).await;
+        let mut session = browser::target(&capture_args).await?;
+        let result = compare_capture::state(&mut session.cdp, expected, trigger).await;
+        session.close().await?;
         let actual = result?;
-        close?;
         let animation_state = specification
             .states
             .iter()

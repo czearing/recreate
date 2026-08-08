@@ -145,7 +145,8 @@ async fn validate_fixture(
         out: PathBuf::new(),
         viewports: String::new(),
     };
-    let (source_target, mut cdp) = browser::target(&args).await?;
+    let mut session = browser::target(&args).await?;
+    let cdp = &mut session.cdp;
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
     cdp.send(
@@ -155,12 +156,11 @@ async fn validate_fixture(
     .await?;
     let mut states = Vec::new();
     for (index, (width, height)) in selected_viewports(VIEWPORTS).into_iter().enumerate() {
-        states.push(capture::capture_state(&mut cdp, viewport(width, height), index == 0).await?);
+        states.push(capture::capture_state(cdp, viewport(width, height), index == 0).await?);
     }
     let capture_ms = capture_started.elapsed().as_millis();
-    let source_errors = collect_errors(&mut cdp);
-    drop(cdp);
-    browser::close(&args.cdp_url, &source_target.id).await?;
+    let source_errors = collect_errors(cdp);
+    session.close().await?;
     let specification = specification(states, Vec::new());
     let directory = workspace.join(name);
     crate::generate::write_project(&specification, &directory, &[]).await?;

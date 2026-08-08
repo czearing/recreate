@@ -4,6 +4,8 @@ mod backtest;
 mod behavior;
 mod blocking_overlay;
 mod browser;
+#[cfg(test)]
+mod browser_session_tests;
 mod capture;
 mod capture_settle;
 mod capture_startup;

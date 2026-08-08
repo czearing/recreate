@@ -17,7 +17,7 @@ pub const VIEWPORTS: [(u32, u32); 5] = [
     (320, 568),
 ];
 
-pub async fn connect(url: &str, endpoint: &str) -> Result<crate::cdp::Cdp> {
+pub async fn connect(url: &str, endpoint: &str) -> Result<browser::Session> {
     let args = CaptureArgs {
         url: Some(url.into()),
         reuse: false,
@@ -28,15 +28,19 @@ pub async fn connect(url: &str, endpoint: &str) -> Result<crate::cdp::Cdp> {
         out: Default::default(),
         viewports: String::new(),
     };
-    let (_, mut cdp) = browser::target(&args).await?;
-    cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
+    let mut session = browser::target(&args).await?;
+    session
+        .cdp
+        .enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
-    cdp.send(
-        "Page.addScriptToEvaluateOnNewDocument",
-        json!({"source": lifecycle_script::source()}),
-    )
-    .await?;
-    Ok(cdp)
+    session
+        .cdp
+        .send(
+            "Page.addScriptToEvaluateOnNewDocument",
+            json!({"source": lifecycle_script::source()}),
+        )
+        .await?;
+    Ok(session)
 }
 
 pub async fn capture_matrix(cdp: &mut crate::cdp::Cdp) -> Result<Vec<PageState>> {

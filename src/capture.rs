@@ -35,9 +35,28 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
         }
         None => None,
     };
+    let mut session = browser::target(&args).await?;
+    let outcome = capture_into(&mut session, &args, capture_started).await;
+    session.close().await?;
+    drop(served);
+    outcome
+}
+
+/// The tab is opened by the caller and closed by the caller, so everything that
+/// can fail lives here and reports its failure as a value rather than by
+/// unwinding past the close.
+async fn capture_into(
+    session: &mut browser::Session,
+    args: &CaptureArgs,
+    capture_started: std::time::Instant,
+) -> Result<()> {
     let viewports = probe::parse_viewports(&args.viewports)?;
     fs::create_dir_all(&args.out)?;
-    let (target, mut cdp) = browser::target(&args).await?;
+    let requested_url = args
+        .url
+        .clone()
+        .unwrap_or_else(|| session.target.url.clone());
+    let cdp = &mut session.cdp;
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
     cdp.send(
@@ -48,19 +67,18 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
     if args.reuse {
         cdp.evaluate(&lifecycle_script::source()).await?;
     }
-    set_focus(&mut cdp).await?;
-    set_motion(&mut cdp).await?;
-    let requested_url = args.url.clone().unwrap_or_else(|| target.url.clone());
+    set_focus(cdp).await?;
+    set_motion(cdp).await?;
     let mut states: Vec<PageState> = Vec::new();
     for viewport in viewports {
         let state_started = std::time::Instant::now();
         let reload = !args.reuse || args.reload;
         let state = if args.reuse && args.reload && states.is_empty() {
-            capture_state_with_startup(&mut cdp, viewport.clone(), states.is_empty()).await?
+            capture_state_with_startup(cdp, viewport.clone(), states.is_empty()).await?
         } else if !states.is_empty() {
-            capture_state_without_assets(&mut cdp, viewport.clone(), false).await?
+            capture_state_without_assets(cdp, viewport.clone(), false).await?
         } else {
-            capture_state(&mut cdp, viewport.clone(), reload && states.is_empty()).await?
+            capture_state(cdp, viewport.clone(), reload && states.is_empty()).await?
         };
         let mut state = state;
         let paths = state
@@ -121,7 +139,7 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
         );
         return Ok(());
     }
-    let cookies = browser_cookies(&mut cdp).await;
+    let cookies = browser_cookies(cdp).await;
     generate::write_project(&specification, &args.out, &cookies).await?;
     let acceptance = validate::validate(&specification, &args.out)?;
     fs::write(
@@ -136,6 +154,5 @@ pub async fn run(mut args: CaptureArgs) -> Result<()> {
         capture_started.elapsed().as_secs_f64()
     );
     println!("{}", serde_json::to_string_pretty(&acceptance)?);
-    drop(served);
     Ok(())
 }

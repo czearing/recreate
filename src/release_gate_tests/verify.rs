@@ -27,7 +27,8 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
         out: PathBuf::new(),
         viewports: String::new(),
     };
-    let (target, mut cdp) = browser::target(&args).await?;
+    let mut session = browser::target(&args).await?;
+    let cdp = &mut session.cdp;
     cdp.enable(&["Page", "Runtime", "Network", "DOM", "CSS"])
         .await?;
     cdp.send(
@@ -39,8 +40,7 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
     let mut parity_details = Vec::new();
     let mut horizontal_overflows = 0;
     for (index, expected) in spec.states.iter().enumerate() {
-        let actual =
-            capture::capture_state(&mut cdp, expected.viewport.clone(), index == 0).await?;
+        let actual = capture::capture_state(cdp, expected.viewport.clone(), index == 0).await?;
         let parity = super::support::parity(expected, &actual);
         parity_mismatches += parity.mismatches;
         if parity_details.len() < 20 {
@@ -63,10 +63,9 @@ pub async fn generated(spec: &Specification, dist: &Path, port: u16) -> Result<V
         }
     }
     let (keyboard_activation, focus_restoration, reduced_motion) =
-        verify_interaction(spec, &mut cdp).await?;
-    let (console_errors, network_errors) = collect_errors(&mut cdp);
-    drop(cdp);
-    browser::close(&args.cdp_url, &target.id).await?;
+        verify_interaction(spec, cdp).await?;
+    let (console_errors, network_errors) = collect_errors(cdp);
+    session.close().await?;
     drop(server);
     Ok(Verification {
         parity_mismatches,

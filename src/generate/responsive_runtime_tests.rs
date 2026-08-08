@@ -18,13 +18,15 @@ async fn generated_runtime_matches_five_captured_layouts() -> Result<()> {
     let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("test/fixtures/responsive-bands.html");
     let source_url = url::Url::from_file_path(fixture).unwrap().to_string();
     let mut source = connect(&source_url, &endpoint).await?;
-    let states = capture_matrix(&mut source).await?;
+    let states = capture_matrix(&mut source.cdp).await?;
     let mut runtime = connect(&runtime_url, &endpoint).await?;
-    let actual = capture_matrix(&mut runtime).await?;
+    let actual = capture_matrix(&mut runtime.cdp).await?;
     for (expected, actual) in states.iter().zip(actual.iter()) {
         assert_exact_parity(expected, actual);
     }
-    assert_clean_events(&mut runtime);
+    assert_clean_events(&mut runtime.cdp);
+    source.close().await?;
+    runtime.close().await?;
     Ok(())
 }
 
@@ -35,7 +37,7 @@ async fn generated_runtime_boundary_sweep_is_collision_free() -> Result<()> {
     let runtime_url = required("RECREATE_GENERATED_URL")?;
     let mut runtime = connect(&runtime_url, &endpoint).await?;
     capture::capture_state(
-        &mut runtime,
+        &mut runtime.cdp,
         Viewport {
             width: 1920,
             height: 1080,
@@ -45,11 +47,12 @@ async fn generated_runtime_boundary_sweep_is_collision_free() -> Result<()> {
     )
     .await?;
     for width in BOUNDARIES {
-        assert_boundary(&mut runtime, width)
+        assert_boundary(&mut runtime.cdp, width)
             .await
             .with_context(|| format!("{width}px boundary"))?;
     }
-    assert_clean_events(&mut runtime);
+    assert_clean_events(&mut runtime.cdp);
+    runtime.close().await?;
     Ok(())
 }
 

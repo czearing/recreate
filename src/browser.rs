@@ -9,6 +9,56 @@ use std::{fs, path::PathBuf, process::Command, time::Duration};
 
 pub use recreate_browser::Target;
 
+/// Which browser tab an operation must reclaim when it finishes.
+///
+/// The browser outlives this process, so a tab is not freed when the run ends:
+/// it stays open until someone closes it. Every call site therefore has to
+/// answer "is this tab mine to close?", and the answer is the same one every
+/// time — a tab we created is ours, a tab the operator prepared with
+/// `recreate open` and named through `--reuse` is not. Answering it here, once,
+/// is what stops the answer being forgotten at the next call site.
+pub struct Tab {
+    endpoint: String,
+    id: String,
+    owned: bool,
+}
+
+impl Tab {
+    pub fn new(endpoint: &str, id: &str, owned: bool) -> Self {
+        Self {
+            endpoint: endpoint.into(),
+            id: id.into(),
+            owned,
+        }
+    }
+
+    /// The tab that closing will reclaim, if any. Keeping the decision separate
+    /// from the act of closing lets the decision be proven without a browser.
+    pub fn expiring(&self) -> Option<&str> {
+        self.owned.then_some(self.id.as_str())
+    }
+
+    pub async fn close(self) -> Result<()> {
+        match self.expiring() {
+            Some(id) => recreate_browser::close(&self.endpoint, id).await,
+            None => Ok(()),
+        }
+    }
+}
+
+/// A browser tab held for one operation, together with its protocol connection.
+pub struct Session {
+    pub target: Target,
+    pub cdp: Cdp,
+    tab: Tab,
+}
+
+impl Session {
+    pub async fn close(self) -> Result<()> {
+        self.tab.close().await
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub(crate) struct OpenSession {
     pub cdp_url: String,
@@ -38,7 +88,7 @@ pub async fn open(args: OpenArgs) -> Result<()> {
     Ok(())
 }
 
-pub async fn target(args: &CaptureArgs) -> Result<(Target, Cdp)> {
+pub async fn target(args: &CaptureArgs) -> Result<Session> {
     let remembered = (args.reuse && args.target.is_none())
         .then(last_open_session)
         .transpose()?;
@@ -65,7 +115,8 @@ pub async fn target(args: &CaptureArgs) -> Result<(Target, Cdp)> {
         activate(endpoint, &target.id).await?;
     }
     let cdp = Cdp::connect(&target.websocket_url).await?;
-    Ok((target, cdp))
+    let tab = Tab::new(endpoint, &target.id, !args.reuse);
+    Ok(Session { target, cdp, tab })
 }
 
 pub(crate) fn last_open_session() -> Result<OpenSession> {
@@ -136,11 +187,6 @@ fn open_session_path() -> Result<PathBuf> {
 
 pub async fn list(endpoint: &str) -> Result<Vec<Target>> {
     recreate_browser::list(endpoint).await
-}
-
-#[cfg(test)]
-pub async fn close(endpoint: &str, id: &str) -> Result<()> {
-    recreate_browser::close(endpoint, id).await
 }
 
 async fn create(endpoint: &str, url: &str) -> Result<Target> {
