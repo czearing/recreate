@@ -46,12 +46,7 @@ pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
             return false;
         }
         let required = compound_classes(compound);
-        let tag = compound
-            .chars()
-            .take_while(|character| {
-                character.is_ascii_alphanumeric() || matches!(character, '-' | '*')
-            })
-            .collect::<String>();
+        let tag = compound_tag(compound);
         let id = compound_id(compound);
         let attributes = compound_attributes(compound);
         let constrained =
@@ -70,7 +65,9 @@ pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
     })
 }
 
-fn terminal_compound(selector: &str) -> &str {
+/// The selector parser below is the single owner of what a selector means. Both the direct
+/// matcher above and the authored-value index read compounds through these functions.
+pub(super) fn terminal_compound(selector: &str) -> &str {
     selector
         .trim()
         .rsplit(|character: char| character.is_whitespace() || matches!(character, '>' | '+' | '~'))
@@ -78,7 +75,16 @@ fn terminal_compound(selector: &str) -> &str {
         .unwrap_or_default()
 }
 
-fn compound_classes(compound: &str) -> Vec<String> {
+pub(super) fn compound_tag(compound: &str) -> &str {
+    let length = compound
+        .chars()
+        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '*'))
+        .map(char::len_utf8)
+        .sum();
+    &compound[..length]
+}
+
+pub(super) fn compound_classes(compound: &str) -> Vec<String> {
     let mut classes = Vec::new();
     let mut remaining = compound;
     while let Some(index) = remaining.find('.') {
@@ -101,7 +107,7 @@ fn compound_classes(compound: &str) -> Vec<String> {
     classes
 }
 
-fn compound_id(compound: &str) -> Option<&str> {
+pub(super) fn compound_id(compound: &str) -> Option<&str> {
     let remaining = compound.split_once('#')?.1;
     let length = remaining
         .chars()
@@ -111,7 +117,7 @@ fn compound_id(compound: &str) -> Option<&str> {
     (length > 0).then_some(&remaining[..length])
 }
 
-fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
+pub(super) fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
     let mut attributes = Vec::new();
     let mut remaining = compound;
     while let Some((_, after_open)) = remaining.split_once('[') {

@@ -2,6 +2,11 @@ use crate::model::{Node, Styles};
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap};
 
+use super::authored_css_rules::{
+    compound_attributes, compound_classes, compound_id, compound_tag, directly_targets_node,
+    terminal_compound,
+};
+
 pub struct Index<'a> {
     rules: Vec<Rule<'a>>,
     direct_by_class: HashMap<String, Vec<usize>>,
@@ -9,7 +14,6 @@ pub struct Index<'a> {
     direct_by_tag: HashMap<String, Vec<usize>>,
     direct_by_attribute: HashMap<String, Vec<usize>>,
     direct_universal: Vec<usize>,
-    terminal_by_class: HashMap<String, Vec<usize>>,
 }
 
 struct Rule<'a> {
@@ -84,7 +88,6 @@ impl<'a> Index<'a> {
             direct_by_tag: HashMap::new(),
             direct_by_attribute: HashMap::new(),
             direct_universal: Vec::new(),
-            terminal_by_class: HashMap::new(),
         };
         for rule in rules {
             let Some((selectors, declarations)) = rule.split_once('{') else {
@@ -103,15 +106,7 @@ impl<'a> Index<'a> {
                 declarations,
             });
             for selector in owned.split(',').map(str::trim) {
-                let terminal = terminal_compound(selector);
-                for class in compound_classes(terminal) {
-                    index
-                        .terminal_by_class
-                        .entry(class)
-                        .or_default()
-                        .push(rule_index);
-                }
-                if terminal != selector {
+                if terminal_compound(selector) != selector {
                     continue;
                 }
                 for class in compound_classes(selector) {
@@ -128,7 +123,7 @@ impl<'a> Index<'a> {
                         .or_default()
                         .push(rule_index);
                 }
-                for name in compound_attribute_names(selector) {
+                for (name, _) in compound_attributes(selector) {
                     index
                         .direct_by_attribute
                         .entry(name.to_string())
@@ -266,19 +261,15 @@ impl<'a> Index<'a> {
             .filter(|value| *value > 0)
     }
 
+    /// Restores the value a stylesheet actually authored for `property`, in place of the
+    /// computed value the browser baked. Selector shape decides which elements a rule reaches,
+    /// never whether a matched declaration is real, so this uses the same matcher as every
+    /// other direct lookup rather than a class-keyed one of its own.
     pub fn inherited_value(&self, node: &Node, property: &str) -> Option<String> {
-        let mut candidates = self.direct_universal.clone();
-        for class in node_classes(node) {
-            if let Some(indices) = self.terminal_by_class.get(class) {
-                candidates.extend(indices.iter().copied());
-            }
-        }
-        candidates.sort_unstable();
-        candidates.dedup();
-        let values = candidates
+        let values = self
+            .direct_indices(node)
             .into_iter()
             .map(|index| &self.rules[index])
-            .filter(|rule| directly_targets_any_class(&rule.selectors, node))
             .flat_map(|rule| parsed_declarations(rule.declarations))
             .filter(|(name, value)| *name == property && !value.contains("var("))
             .map(|(_, value)| value.to_string())
@@ -313,9 +304,7 @@ impl<'a> Index<'a> {
         }
         candidates.sort_unstable();
         candidates.dedup();
-        candidates.retain(|index| {
-            super::authored_css_rules::directly_targets_node(&self.rules[*index].selectors, node)
-        });
+        candidates.retain(|index| directly_targets_node(&self.rules[*index].selectors, node));
         candidates
     }
 }
@@ -334,90 +323,6 @@ fn node_classes(node: &Node) -> impl Iterator<Item = &str> {
         .flat_map(|value| value.split_whitespace())
 }
 
-fn terminal_compound(selector: &str) -> &str {
-    selector
-        .trim()
-        .rsplit(|character: char| character.is_whitespace() || matches!(character, '>' | '+' | '~'))
-        .find(|part| !part.is_empty())
-        .unwrap_or_default()
-}
-
-fn compound_tag(compound: &str) -> &str {
-    let length = compound
-        .chars()
-        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '*'))
-        .map(char::len_utf8)
-        .sum();
-    &compound[..length]
-}
-
-fn compound_classes(compound: &str) -> Vec<String> {
-    let mut classes = Vec::new();
-    let mut remaining = compound;
-    while let Some(index) = remaining.find('.') {
-        remaining = &remaining[index + 1..];
-        let length = remaining
-            .chars()
-            .take_while(|character| {
-                character.is_ascii_alphanumeric() || matches!(character, '-' | '_')
-            })
-            .map(char::len_utf8)
-            .sum();
-        if length == 0 {
-            break;
-        }
-        classes.push(remaining[..length].to_string());
-        remaining = &remaining[length..];
-    }
-    classes
-}
-
-fn compound_id(compound: &str) -> Option<&str> {
-    let remaining = compound.split_once('#')?.1;
-    let length = remaining
-        .chars()
-        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '_'))
-        .map(char::len_utf8)
-        .sum();
-    (length > 0).then_some(&remaining[..length])
-}
-
-fn compound_attribute_names(compound: &str) -> Vec<&str> {
-    let mut attributes = Vec::new();
-    let mut remaining = compound;
-    while let Some((_, after_open)) = remaining.split_once('[') {
-        let Some((attribute, after_close)) = after_open.split_once(']') else {
-            break;
-        };
-        let name = attribute
-            .split_once('=')
-            .map_or(attribute, |(name, _)| name)
-            .trim();
-        if !name.is_empty() {
-            attributes.push(name);
-        }
-        remaining = after_close;
-    }
-    attributes
-}
-
-fn directly_targets_any_class(selectors: &str, node: &Node) -> bool {
-    let classes = node_classes(node).collect::<Vec<_>>();
-    selectors.split(',').any(|selector| {
-        let compound = terminal_compound(selector.trim());
-        classes.iter().any(|class| {
-            let needle = format!(".{class}");
-            compound.match_indices(&needle).any(|(index, _)| {
-                compound[index + needle.len()..]
-                    .chars()
-                    .next()
-                    .is_none_or(|character| {
-                        !character.is_ascii_alphanumeric() && !matches!(character, '-' | '_')
-                    })
-            })
-        })
-    })
-}
 
 #[cfg(test)]
 mod tests {
@@ -465,14 +370,5 @@ mod tests {
         assert_eq!(index.direct_universal, vec![0]);
         assert_eq!(index.direct_indices(&node()), vec![0]);
         assert_eq!(index.declarations(&node())["width"], "40px");
-    }
-
-    #[test]
-    fn indexes_terminal_classes_for_inherited_authored_paint() {
-        let rules = vec![".parent .control{fill:currentColor;}".into()];
-        assert_eq!(
-            Index::new(&rules).inherited_value(&node(), "fill"),
-            Some("currentColor".into())
-        );
     }
 }

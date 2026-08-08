@@ -127,3 +127,6 @@ mod tests_2;
 #[cfg(test)]
 #[path = "authored_css_tests_3.rs"]
 mod tests_3;
+#[cfg(test)]
+#[path = "authored_css_tests_4.rs"]
+mod tests_4;
