@@ -161,7 +161,7 @@ pub async fn write_project(
     for component in &components.items {
         let directory = source.join("components").join(&component.name);
         fs::create_dir_all(&directory)?;
-        let component_source = jsx::component(component, &components, &assets);
+        let component_source = jsx::component(component, &components);
         fs::write(
             directory.join(format!("{}.jsx", component.name)),
             component_source,

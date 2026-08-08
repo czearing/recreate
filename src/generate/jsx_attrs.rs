@@ -1,25 +1,16 @@
-use super::jsx_attr_names;
+use super::{jsx_attr_names, jsx_host_props};
 use crate::model::Node;
 use std::collections::BTreeMap;
 
-pub fn all_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
+/// Every attribute React can honour on the element that carried it. `class` and `style` are
+/// emitted from the class map instead, `on*` handlers are re-bound by the runtime, and a
+/// relocated attribute is emitted by an ancestor rather than here.
+pub fn attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
     node.attributes
         .iter()
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
-        .map(|(key, value)| render_attribute(key, rewrite(value, assets)))
-        .collect()
-}
-
-pub fn static_attributes(_node: &Node, _assets: &BTreeMap<String, String>) -> String {
-    String::new()
-}
-
-pub fn dynamic_attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
-    node.attributes
-        .iter()
-        .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
-        .filter(|(key, _)| !key.starts_with("on"))
+        .filter(|(key, _)| !jsx_host_props::relocated(&node.tag, key))
         .map(|(key, value)| render_attribute(key, rewrite(value, assets)))
         .collect()
 }
@@ -119,7 +110,7 @@ mod tests {
         node.attributes
             .insert("aria-expanded".into(), "true".into());
         node.attributes.insert("role".into(), "button".into());
-        let output = dynamic_attributes(&node, &Default::default());
+        let output = attributes(&node, &Default::default());
         assert!(output.contains("aria-expanded={\"true\"}"));
         assert!(output.contains("role={\"button\"}"));
     }
@@ -143,6 +134,33 @@ mod tests {
             after: None,
         };
         node.attributes.insert("disabled".into(), String::new());
-        assert!(all_attributes(&node, &Default::default()).contains(" disabled={true}"));
+        assert!(attributes(&node, &Default::default()).contains(" disabled={true}"));
+    }
+
+    /// The same `boolean_attribute` arm that keeps `disabled` must drop `selected`, because
+    /// React reads selection from the parent `<select>` and ignores the prop entirely.
+    #[test]
+    fn drops_control_state_the_host_expresses_elsewhere() {
+        let mut node = crate::model::Node {
+            path: "html>body:nth-of-type(1)>select:nth-of-type(1)>option:nth-of-type(1)".into(),
+            parent: Some("html>body:nth-of-type(1)>select:nth-of-type(1)".into()),
+            tag: "option".into(),
+            text: String::new(),
+            attributes: Default::default(),
+            rect: crate::model::Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 10.0,
+                height: 10.0,
+            },
+            style: Default::default(),
+            before: None,
+            after: None,
+        };
+        node.attributes.insert("selected".into(), String::new());
+        node.attributes.insert("value".into(), "gold".into());
+        let output = attributes(&node, &Default::default());
+        assert!(!output.contains("selected"));
+        assert!(output.contains(" value={\"gold\"}"));
     }
 }

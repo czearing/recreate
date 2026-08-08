@@ -1,5 +1,6 @@
 use super::{
-    jsx_attrs::{all_attributes, dynamic_attributes, jsx_tag, quoted, static_attributes, void_tag},
+    jsx_attrs::{attributes, jsx_tag, quoted, void_tag},
+    jsx_host_props::adopted,
     jsx_render_spacing::{
         leading_placeholder, leading_placeholder_extent, needs_text_space, placeholder,
         placeholder_extent, sibling_index,
@@ -8,11 +9,7 @@ use super::{
 };
 use std::collections::BTreeMap;
 
-pub fn component(
-    component: &super::tree::Component,
-    components: &Components,
-    assets: &BTreeMap<String, String>,
-) -> String {
+pub fn component(component: &super::tree::Component, components: &Components) -> String {
     let Some(root) = component.roots.first() else {
         return String::new();
     };
@@ -20,13 +17,11 @@ pub fn component(
         return String::new();
     };
     let class = components.classes.get(root).cloned().unwrap_or_default();
-    let attributes = static_attributes(node, assets);
     format!(
-        "import React from 'react';\nexport default function {}({{children,...props}}){{return <{} className={}{} {{...props}}>{{children}}</{}>}}\n",
+        "import React from 'react';\nexport default function {}({{children,...props}}){{return <{} className={} {{...props}}>{{children}}</{}>}}\n",
         component.name,
         jsx_tag(&node.tag),
         quoted(&class),
-        attributes,
         jsx_tag(&node.tag)
     )
 }
@@ -52,7 +47,7 @@ pub(super) fn render(
     let children = render_children(path, components, assets, depth + 1, handlers);
     if allow_component && let Some(index) = components.by_root.get(path) {
         let name = &components.items[*index].name;
-        let attributes = dynamic_attributes(node, assets);
+        let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));
         return format!(
             "{indent}<{name}{attributes}{}>\n{}{indent}</{name}>\n",
             event(path, handlers),
@@ -60,7 +55,7 @@ pub(super) fn render(
         );
     }
     let class = components.classes.get(path).cloned().unwrap_or_default();
-    let attributes = all_attributes(node, assets);
+    let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));
     if void_tag(&node.tag) {
         return format!(
             "{indent}<{} className={}{}{} />\n",
