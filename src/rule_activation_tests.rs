@@ -79,7 +79,13 @@ fn scene() -> Value {
                 "conditionText": "(display: grid)",
                 "rules": [style(".wide", "gap", "8px")]
             }]
-        }
+        },
+        {
+            "prelude": "@keyframes spin",
+            "keyframes": true,
+            "rules": [style("from", "rotate", "0deg"), style("to", "rotate", "360deg")]
+        },
+        { "prelude": "@property --angle", "declarations": { "syntax": "'<angle>'" } }
     ]);
     json!({
         "elements": [
@@ -155,6 +161,33 @@ fn a_sheet_read_twice_contributes_each_authored_rule_once() {
     assert!(
         rules.iter().any(|rule| rule.starts_with(".panel")),
         "deduplication removed the rule entirely: {rules:?}"
+    );
+}
+
+/// A definition rule is not a group. `@keyframes` exposes `cssRules`, so a walk that asks
+/// "does it have children" rather than "is it a grouping rule" mistakes it for a wrapper
+/// whose contents are recorded separately — and drops it, leaving every `animation-name`
+/// that refers to it dangling. `@property` has no children and must survive alongside it.
+#[test]
+fn a_definition_rule_is_recorded_rather_than_treated_as_a_group() {
+    let rules = recorded(&walk(scene()));
+    assert!(
+        rules
+            .iter()
+            .any(|rule| rule.starts_with("@keyframes spin") && rule.contains("360deg")),
+        "dropped an authored keyframes block: {rules:?}"
+    );
+    assert!(
+        rules
+            .iter()
+            .any(|rule| rule.starts_with("@property --angle")),
+        "dropped an authored property registration: {rules:?}"
+    );
+    assert!(
+        !rules
+            .iter()
+            .any(|rule| rule.trim_start().starts_with("from")),
+        "descended into a keyframes block and recorded a keyframe as a rule: {rules:?}"
     );
 }
 

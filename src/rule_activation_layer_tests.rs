@@ -147,14 +147,31 @@ fn a_layer_wrapping_a_condition_rebuilds_the_whole_prelude_stack() {
 /// selectors, not rules the cascade resolves. Descending into one records a percentage as
 /// an authored rule and re-emits each keyframe as a stylesheet of its own, splitting one
 /// animation into several that each define a single stop.
+///
+/// The block itself must still be recorded whole. It defines a name that every
+/// `animation-name` refers to and that no computed style carries, so a walk that skips it
+/// along with its children leaves the animation named and undefined.
 #[test]
 fn a_keyframe_selector_is_not_recorded_as_an_authored_rule() {
     let rules = recorded(&walk(scene()));
     assert!(
-        !rules.iter().any(|rule| rule.starts_with("0%")
-            || rule.starts_with("100%")
-            || rule.starts_with("@keyframes")),
+        !rules
+            .iter()
+            .any(|rule| rule.starts_with("0%") || rule.starts_with("100%")),
         "walked into a block whose children are not style rules: {rules:?}"
+    );
+    let blocks: Vec<_> = rules
+        .iter()
+        .filter(|rule| rule.starts_with("@keyframes pulse"))
+        .collect();
+    assert_eq!(
+        blocks.len(),
+        1,
+        "the authored keyframes block must be recorded exactly once: {rules:?}"
+    );
+    assert!(
+        blocks[0].contains("0.25") && blocks[0].contains("100%"),
+        "recorded the keyframes block without its stops: {blocks:?}"
     );
 }
 

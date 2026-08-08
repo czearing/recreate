@@ -10,6 +10,72 @@ fn preserves_global_font_and_keyframe_rules() {
     assert!(!global_rule(".card { color: red; }"));
 }
 
+/// Every definition at-rule names an entity a computed style refers to by name and cannot
+/// carry, so the emitter keeps them all rather than the three that happened to be listed.
+/// `@counter-style` is the discriminator: an allow-list extended by one string passes the
+/// `@property` case and still fails here.
+#[test]
+fn preserves_every_at_rule_that_defines_a_name_a_computed_style_cannot_carry() {
+    assert!(global_rule(
+        "@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }"
+    ));
+    assert!(global_rule("@counter-style dashes { system: cyclic; }"));
+    assert!(global_rule(
+        "@font-feature-values Font One { @styleset { nice: 1 } }"
+    ));
+    assert!(global_rule(
+        "@font-palette-values --pal { font-family: Test; }"
+    ));
+    assert!(global_rule("@page { margin: 1cm; }"));
+}
+
+/// A grouping rule's body is style rules whose winner `getComputedStyle` already returned
+/// and the emitter already baked into a hashed class, so re-emitting one double-applies.
+#[test]
+fn discards_grouping_rules_whose_effect_the_baked_classes_already_carry() {
+    assert!(!global_rule(
+        "@media (min-width: 1px) { .dial { color: red } }"
+    ));
+    assert!(!global_rule(
+        "@supports (display: grid) { .dial { display: grid } }"
+    ));
+    assert!(!global_rule(
+        "@container (min-width: 1px) { .dial { color: red } }"
+    ));
+    assert!(!global_rule("@layer base { .dial { color: red } }"));
+    assert!(!global_rule("@scope (.a) { .dial { color: red } }"));
+    assert!(!global_rule("@starting-style { .dial { opacity: 0 } }"));
+}
+
+/// A statement at-rule has no block. Every one of them is position-constrained, and
+/// `@import` names a sheet the capture already walked and baked, so re-emitting it would
+/// refetch the sheet and apply every rule in it a second time.
+#[test]
+fn discards_statement_at_rules_that_carry_placement_rather_than_definition() {
+    assert!(!global_rule("@import url(\"palette.css\");"));
+    assert!(!global_rule("@charset \"utf-8\";"));
+    assert!(!global_rule(
+        "@namespace svg url(http://www.w3.org/2000/svg);"
+    ));
+    assert!(!global_rule("@layer base, components;"));
+}
+
+/// Layer membership is a wrapper the capture rebuilds around every rule it records, so a
+/// definition authored inside a layer must be judged by what it defines and a style rule
+/// inside one must still be discarded.
+#[test]
+fn judges_a_layered_rule_by_the_rule_the_layer_wraps() {
+    assert!(global_rule(
+        "@layer base { @font-face { font-family: Test; } }"
+    ));
+    assert!(global_rule(
+        "@layer a { @layer b { @property --x { syntax: '*'; } } }"
+    ));
+    assert!(!global_rule(
+        "@layer a { @layer b { .card { color: red } } }"
+    ));
+}
+
 #[test]
 fn interaction_paint_overrides_authored_important_rules() {
     assert_eq!(

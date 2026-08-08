@@ -15,6 +15,7 @@ fn state(target: &str, duration: f64) -> PageState {
         startup_duration_ms: 0,
         animations: vec![Animation {
             target: target.into(),
+            name: String::new(),
             keyframes: vec![
                 json!({"offset":0.0,"opacity":"0","easing":"ease-in-out"}),
                 json!({"offset":1.0,"opacity":"1","easing":"ease-in-out"}),

@@ -93,6 +93,7 @@ pub(super) fn state(width: u32) -> PageState {
         startup_duration_ms: 0,
         animations: vec![Animation {
             target: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
+            name: String::new(),
             keyframes: vec![
                 json!({"offset":0,"opacity":"0"}),
                 json!({"offset":1,"opacity":"1"}),

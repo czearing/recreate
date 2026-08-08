@@ -5,6 +5,7 @@ use serde_json::json;
 fn animation(target: &str) -> Animation {
     Animation {
         target: target.into(),
+        name: String::new(),
         keyframes: vec![json!({"opacity":"0"}), json!({"opacity":"1"})],
         timing: json!({
             "duration": 400,
@@ -37,7 +38,12 @@ fn preserves_webkit_animation_properties() {
 fn preserves_animation_timing_controls() {
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation("html>body")], &mut classes, &mut css);
+    append(
+        &[animation("html>body")],
+        &BTreeSet::new(),
+        &mut classes,
+        &mut css,
+    );
     assert!(css.contains("animation-duration:200ms"));
     assert!(css.contains("animation-iteration-count:infinite"));
     assert!(css.contains("animation-direction:reverse"));
@@ -58,7 +64,7 @@ fn rejects_sampled_layout_observations() {
     sampled.timing = json!({"delay":0,"duration":2513.4,"easing":"linear","iterations":1});
     let mut classes = BTreeMap::from([("html".into(), "base".into())]);
     let mut css = String::new();
-    append(&[sampled], &mut classes, &mut css);
+    append(&[sampled], &BTreeSet::new(), &mut classes, &mut css);
     assert_eq!(classes["html"], "base");
     assert!(!css.contains("@keyframes"));
 }
@@ -72,9 +78,59 @@ fn preserves_authored_geometry_animations() {
     ];
     let mut classes = BTreeMap::from([("html>body>aside".into(), "base".into())]);
     let mut css = String::new();
-    append(&[authored], &mut classes, &mut css);
+    append(&[authored], &BTreeSet::new(), &mut classes, &mut css);
     assert!(classes["html>body>aside"].contains(" a"));
     assert!(css.contains("width:240px"));
+}
+
+/// An animation the author declared in CSS is reproduced by the authored `@keyframes` plus
+/// the element's baked computed style, which already carries the name and every timing
+/// longhand. Rebuilding it writes a second `animation-name` over the first, so the
+/// authored block sits unused — and a paused animation samples to frames describing no
+/// change, which is what the element would then play.
+#[test]
+fn defers_to_the_authored_keyframes_an_animation_was_declared_with() {
+    let mut declared = animation("html>body>div");
+    declared.name = "spin".into();
+    let authored = crate::generate::animation_keyframes::authored_names(&[
+        "@keyframes spin{from{rotate:0deg}to{rotate:360deg}}".into(),
+    ]);
+    assert!(authored.contains("spin"));
+    let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
+    let mut css = String::new();
+    append(&[declared.clone()], &authored, &mut classes, &mut css);
+    assert_eq!(
+        classes["html>body>div"], "base",
+        "overrode the authored name"
+    );
+    assert!(css.is_empty(), "rebuilt an authored animation: {css}");
+
+    // The other direction: an animation with no authored definition must still be rebuilt,
+    // or every script-driven animation is lost.
+    let mut scripted = declared;
+    scripted.name = String::new();
+    let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
+    let mut css = String::new();
+    append(&[scripted], &authored, &mut classes, &mut css);
+    assert!(classes["html>body>div"].contains(" a"));
+    assert!(css.contains("@keyframes recreate"));
+}
+
+/// The name set is read from the rules the emitter actually re-emits, so a keyframes block
+/// the author wrote inside a layer still counts, and a rule that merely mentions the word
+/// does not.
+#[test]
+fn reads_authored_keyframe_names_from_the_rules_the_emitter_keeps() {
+    let names = crate::generate::animation_keyframes::authored_names(&[
+        "@layer motion{@keyframes drift{from{opacity:0}}}".into(),
+        "@-webkit-keyframes pulse{from{opacity:0}}".into(),
+        ".card{animation-name:spin}".into(),
+        "@media (min-width:1px){.card{animation-name:ghost}}".into(),
+    ]);
+    assert!(names.contains("drift"), "{names:?}");
+    assert!(names.contains("pulse"), "{names:?}");
+    assert!(!names.contains("spin"), "{names:?}");
+    assert!(!names.contains("ghost"), "{names:?}");
 }
 
 #[test]
@@ -89,6 +145,7 @@ fn reuses_identical_animation_output_across_targets() {
             animation("html>body>div:nth-of-type(1)"),
             animation("html>body>div:nth-of-type(2)"),
         ],
+        &BTreeSet::new(),
         &mut classes,
         &mut css,
     );
@@ -115,7 +172,7 @@ fn combines_concurrent_animations_on_one_target() {
     second.timing["playbackRate"] = json!(1);
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[first, second], &mut classes, &mut css);
+    append(&[first, second], &BTreeSet::new(), &mut classes, &mut css);
     assert_eq!(classes["html>body"].split_whitespace().count(), 2);
     assert!(css.contains("animation-name:recreate"));
     assert!(css.contains(",recreate"));
@@ -130,7 +187,7 @@ fn collapses_frames_with_the_same_css_percentage() {
         .collect();
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation], &mut classes, &mut css);
+    append(&[animation], &BTreeSet::new(), &mut classes, &mut css);
     assert_eq!(css.matches("%{").count(), 101);
 }
 
@@ -144,6 +201,6 @@ fn merged_percentage_frames_keep_complementary_properties() {
     ];
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation], &mut classes, &mut css);
+    append(&[animation], &BTreeSet::new(), &mut classes, &mut css);
     assert!(css.contains("0%{opacity:0;transform:none;}"));
 }

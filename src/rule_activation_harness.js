@@ -49,14 +49,18 @@ const buildRule = spec => {
       style: makeStyle(spec.declarations)
     };
   }
+  // A definition rule such as @property or @counter-style has a block of descriptors and
+  // no children at all, so it exposes neither `selectorText` nor `cssRules`.
+  if (!spec.rules) {
+    return { type: 12, cssText: `${spec.prelude} { ${declarationText(spec.declarations)} }` };
+  }
   const rules = spec.rules.map(buildRule);
-  const grouped = {
+    const grouped = {
     type: spec.media ? CSSRule.MEDIA_RULE : 12,
     conditionText: spec.conditionText,
     cssText: `${spec.prelude} { ${rules.map(rule => rule.cssText).join(' ')} }`,
     cssRules: rules
-  };
-  // A keyframes block exposes children without grouping style rules, which is the shape
+  };  // A keyframes block exposes children without grouping style rules, which is the shape
   // that must not be descended into.
   return spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
 };

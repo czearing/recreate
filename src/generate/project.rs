@@ -37,7 +37,8 @@ pub async fn write_project(
         None,
     );
     for (state, classes) in specification.states.iter().zip(&mut state_classes) {
-        animations::append_startup(&state.animations, classes, &mut styles.css);
+        let authored = super::animation_keyframes::authored_names(&state.css_rules);
+        animations::append_startup(&state.animations, &authored, classes, &mut styles.css);
     }
     let interaction_state_classes = specification
         .interactions

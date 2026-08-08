@@ -54,6 +54,7 @@ fn state(animated: bool) -> PageState {
         animations: animated
             .then(|| Animation {
                 target: TARGET.into(),
+                name: String::new(),
                 keyframes: vec![
                     json!({"offset":0,"opacity":"0"}),
                     json!({"offset":1,"opacity":"1"}),

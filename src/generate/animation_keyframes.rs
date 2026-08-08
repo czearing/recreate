@@ -1,6 +1,29 @@
 use crate::model::Animation;
 use serde_json::{Map, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
+
+/// The names of the `@keyframes` blocks the emitted authored CSS defines.
+///
+/// An animation the author declared in CSS is already reproduced in full by those
+/// keyframes plus the element's baked computed style, which carries the name and every
+/// timing longhand. Rebuilding it from sampled frames writes a second `animation-name`
+/// over the first, so the authored definition would sit in the output unused — and a
+/// paused or slow animation samples to frames that describe no change at all.
+pub fn authored_names(rules: &[String]) -> BTreeSet<String> {
+    rules
+        .iter()
+        .filter(|rule| super::css::global_rule(rule))
+        .filter_map(|rule| {
+            let (_, rule) = super::css_layers::peel(rule);
+            let prelude = rule.strip_prefix('@')?.split('{').next()?;
+            let (keyword, name) = prelude.trim_end().split_once(char::is_whitespace)?;
+            keyword
+                .trim_start_matches("-webkit-")
+                .eq_ignore_ascii_case("keyframes")
+                .then(|| name.trim().trim_matches(['"', '\'']).to_string())
+        })
+        .collect()
+}
 
 pub fn append(animation: &Animation, name: &str, css: &mut String) {
     let final_position = position(animation.keyframes.last());

@@ -67,7 +67,12 @@ pub(super) fn build_scoped(
     timing("responsive");
     let mut interaction_classes =
         super::css_interactions::append(specification, assets, &classes, &mut css, &timing);
-    animations::append(&base.animations, &mut classes, &mut css);
+    animations::append(
+        &base.animations,
+        &super::animation_keyframes::authored_names(&base.css_rules),
+        &mut classes,
+        &mut css,
+    );
     startup_overlays::append(&specification.states, &mut css);
     let inherited = specification
         .interactions
@@ -98,11 +103,53 @@ pub(super) fn build_scoped(
     }
 }
 
+/// The at-rules whose block holds other rules rather than a definition — the CSSOM
+/// `CSSGroupingRule` interface, enumerated in one place. Everything one of these
+/// contributes reaches an element through a selector.
+const GROUPING_AT_RULES: &[&str] = &[
+    "media",
+    "supports",
+    "container",
+    "layer",
+    "scope",
+    "starting-style",
+];
+
+/// Whether an authored rule must be re-emitted verbatim because no baked computed style
+/// can stand in for it.
+///
+/// The tool bakes each element's computed style into a hashed class, so any rule that
+/// reaches an element through a selector is already represented and re-emitting it would
+/// apply it a second time. That covers style rules and the grouping at-rules whose bodies
+/// are style rules. What a computed style cannot carry is an at-rule that *defines* a
+/// name — a font, a set of keyframes, a custom property registration, a counter style —
+/// because the computed style holds only the name and the definition lives nowhere else.
+///
+/// Stated as a rejection rather than a list of names, so a definition at-rule this tool
+/// has never seen survives instead of vanishing. The three rejected shapes are the only
+/// ones re-emission can harm: a style rule and a grouping rule double-apply, and a
+/// statement at-rule carries placement rather than definition — `@charset` must be the
+/// first byte, `@namespace` must precede every style rule, and `@import` names a sheet the
+/// capture already walked and baked, so re-emitting it refetches and double-applies.
 pub(super) fn global_rule(rule: &str) -> bool {
-    let rule = rule.trim_start();
-    rule.starts_with("@font-face")
-        || rule.starts_with("@keyframes")
-        || rule.starts_with("@-webkit-keyframes")
+    // Layer membership is a wrapper the capture rebuilds around every rule it records, so
+    // the decision is about the rule inside it. The wrapper itself stays on the emitted
+    // text, because it is the rule's cascade position.
+    let (_, rule) = super::css_layers::peel(rule);
+    let Some(prelude) = rule.strip_prefix('@') else {
+        return false;
+    };
+    // A statement at-rule has no block. Testing the closing brace rather than the opening
+    // one keeps `@import url("data:text/css,a{}")` a statement.
+    if !rule.ends_with('}') {
+        return false;
+    }
+    let name = prelude
+        .split(|character: char| character.is_whitespace() || character == '(' || character == '{')
+        .next()
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    !GROUPING_AT_RULES.contains(&name.as_str())
 }
 
 pub(super) fn rewrite_rule_assets(rule: &str, assets: &BTreeMap<String, String>) -> String {

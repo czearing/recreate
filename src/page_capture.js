@@ -187,6 +187,10 @@ __STYLE_BASELINE__
     const timing = animation.effect?.getTiming?.() || {};
     return {
       target: animation.effect?.target ? pathOf(animation.effect.target) : '',
+      // A CSSAnimation names the @keyframes block the author wrote. A script-driven
+      // animation has no such name, and that absence is what says it must be rebuilt from
+      // samples rather than deferred to.
+      name: animation.animationName || '',
       keyframes: animation.effect?.getKeyframes?.() || [],
       timing: {
         ...timing,

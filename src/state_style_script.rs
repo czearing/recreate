@@ -85,15 +85,11 @@ __RULE_ACTIVATION__
       // are emitted as entries of their own, so recording both duplicates the entire
       // stylesheet body of layers, supports and scopes. A media block is the exception:
       // its condition is authored responsive intent no flattened copy can carry.
-      const grouping =
-        !rule.selectorText &&
-        rule.cssRules &&
-        rule.cssRules.length &&
-        rule.type !== CSSRule.MEDIA_RULE;
+      const nested = grouping(rule) && rule.type !== CSSRule.MEDIA_RULE;
       // Rebuilding the prelude stack before recording is also what keys the recorded set:
       // two identical declarations in different layers are different declarations, and
       // deduplicating their bare text would collapse them past reconstruction.
-      if (!grouping && (active || rule.type === CSSRule.MEDIA_RULE)) {
+      if (!nested && (active || rule.type === CSSRule.MEDIA_RULE)) {
         recordRule(preludes.reduceRight(
           (inner, prelude) => `${prelude}{${inner}}`,
           rule.cssText

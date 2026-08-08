@@ -30,15 +30,18 @@ pub const SOURCE: &str = r#"
   // preludes drive emission, and a group contributes to exactly one of them.
   const conditional = rule =>
     typeof rule.conditionText === 'string' && !!rule.conditionText.trim();
+  // The platform's own line between a rule that groups style rules and one that merely has
+  // children. @keyframes exposes cssRules, but its children are keyframe selectors rather
+  // than rules the cascade ever resolves. Asking "does it have children" instead gets both
+  // directions wrong: descending records percentages as authored rules, and skipping
+  // records nothing, dropping the block every animation-name refers to. One owner, because
+  // the walk and the recorder each need this answer and a second copy of it drifts.
+  const grouping = rule => rule instanceof CSSGroupingRule;
   const flattenRules = (rules, media = null, conditions = [], preludes = []) => {
     const entries = [];
     for (const rule of Array.from(rules || [])) {
       entries.push({ rule, media, conditions, preludes, active: true });
-      // Only a CSSGroupingRule holds style rules that stand on their own. @keyframes also
-      // exposes cssRules, but its children are keyframe selectors rather than rules the
-      // cascade ever resolves, so descending into one records percentages as authored
-      // rules and re-emits each keyframe as a stylesheet of its own.
-      if (!(rule instanceof CSSGroupingRule)) continue;
+      if (!grouping(rule)) continue;
       const prelude = preludeOf(rule);
       const gates = conditional(rule);
       const nestedMedia = rule.type === CSSRule.MEDIA_RULE

@@ -2,11 +2,19 @@ use crate::model::Animation;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, css: &mut String) {
+pub fn append(
+    animations: &[Animation],
+    authored: &BTreeSet<String>,
+    classes: &mut BTreeMap<String, String>,
+    css: &mut String,
+) {
     let mut emitted_keyframes = BTreeSet::new();
     let mut targets: BTreeMap<&str, Vec<(String, String, &Animation)>> = BTreeMap::new();
     for animation in animations {
-        if animation.keyframes.len() < 2 || sampled_layout_observation(animation) {
+        if animation.keyframes.len() < 2
+            || sampled_layout_observation(animation)
+            || authored.contains(&animation.name)
+        {
             continue;
         }
         let digest = animation_digest(animation);
@@ -54,6 +62,7 @@ pub fn append(animations: &[Animation], classes: &mut BTreeMap<String, String>, 
 
 pub fn append_startup(
     animations: &[Animation],
+    authored: &BTreeSet<String>,
     classes: &mut BTreeMap<String, String>,
     css: &mut String,
 ) {
@@ -62,7 +71,7 @@ pub fn append_startup(
         .filter(|animation| animation.target.starts_with("startup>"))
         .cloned()
         .collect::<Vec<_>>();
-    append(&startup, classes, css);
+    append(&startup, authored, classes, css);
 }
 
 fn animation_digest(animation: &Animation) -> String {

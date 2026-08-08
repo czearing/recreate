@@ -79,6 +79,10 @@ pub struct DomNode {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Animation {
     pub target: String,
+    /// The `@keyframes` block this animation was declared with, empty for a script-driven
+    /// animation the author never named.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub name: String,
     pub keyframes: Vec<Value>,
     pub timing: Value,
 }
