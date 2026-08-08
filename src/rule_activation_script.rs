@@ -23,23 +23,32 @@ pub const SOURCE: &str = r#"
     const brace = rule.cssText.indexOf('{');
     return brace < 0 ? '' : rule.cssText.slice(0, brace).trim();
   };
-  // @layer and @scope group unconditionally and expose no conditionText, so their children
-  // are authored as written. Every conditional group carries one.
-  const conditionalPrelude = rule =>
-    typeof rule.conditionText === 'string' && rule.conditionText.trim() ? preludeOf(rule) : '';
-  const flattenRules = (rules, media = null, conditions = []) => {
+  // Conditionality answers whether a rule is active. It does not answer what wrapper the
+  // rule needs to be re-emitted inside, and one predicate cannot serve both: @layer and
+  // @scope group unconditionally, so no probe is needed, but their prelude is cascade
+  // position that no flattened copy can carry. So conditions drive activation and
+  // preludes drive emission, and a group contributes to exactly one of them.
+  const conditional = rule =>
+    typeof rule.conditionText === 'string' && !!rule.conditionText.trim();
+  const flattenRules = (rules, media = null, conditions = [], preludes = []) => {
     const entries = [];
     for (const rule of Array.from(rules || [])) {
-      entries.push({ rule, media, conditions, active: true });
-      if (!rule.cssRules) continue;
-      const prelude = conditionalPrelude(rule);
+      entries.push({ rule, media, conditions, preludes, active: true });
+      // Only a CSSGroupingRule holds style rules that stand on their own. @keyframes also
+      // exposes cssRules, but its children are keyframe selectors rather than rules the
+      // cascade ever resolves, so descending into one records percentages as authored
+      // rules and re-emits each keyframe as a stylesheet of its own.
+      if (!(rule instanceof CSSGroupingRule)) continue;
+      const prelude = preludeOf(rule);
+      const gates = conditional(rule);
       const nestedMedia = rule.type === CSSRule.MEDIA_RULE
         ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
         : media;
       entries.push(...flattenRules(
         rule.cssRules,
         nestedMedia,
-        prelude ? conditions.concat(prelude) : conditions
+        gates && prelude ? conditions.concat(prelude) : conditions,
+        !gates && prelude ? preludes.concat(prelude) : preludes
       ));
     }
     return entries;

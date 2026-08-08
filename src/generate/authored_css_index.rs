@@ -19,6 +19,7 @@ pub struct Index<'a> {
 struct Rule<'a> {
     selectors: Cow<'a, str>,
     declarations: &'a str,
+    position: super::css_layers::Position,
 }
 
 /// `:where()` and `:is()` say nothing about state: they match on structure alone, so a
@@ -89,7 +90,11 @@ impl<'a> Index<'a> {
             direct_by_attribute: HashMap::new(),
             direct_universal: Vec::new(),
         };
+        let order = super::css_layers::Order::new(rules);
         for rule in rules {
+            // A layer is cascade position, not a condition, so its wrapper is peeled and
+            // remembered rather than skipped with the conditional groups below.
+            let (layer, rule) = super::css_layers::peel(rule);
             let Some((selectors, declarations)) = rule.split_once('{') else {
                 continue;
             };
@@ -104,6 +109,7 @@ impl<'a> Index<'a> {
             index.rules.push(Rule {
                 selectors,
                 declarations,
+                position: order.position(layer.as_deref()),
             });
             for selector in owned.split(',').map(str::trim) {
                 if terminal_compound(selector) != selector {
@@ -305,6 +311,12 @@ impl<'a> Index<'a> {
         candidates.sort_unstable();
         candidates.dedup();
         candidates.retain(|index| directly_targets_node(&self.rules[*index].selectors, node));
+        // Every caller reads these as "the later candidate won", which is only true once
+        // they are in cascade order rather than sheet order: a layered declaration loses
+        // to an unlayered one whatever their specificity, and to a later layer whatever
+        // their position in the sheet. Sorting is stable, so sheet order still breaks ties
+        // within one layer, which is where it is the right answer.
+        candidates.sort_by_key(|index| self.rules[*index].position.clone());
         candidates
     }
 }
@@ -322,7 +334,6 @@ fn node_classes(node: &Node) -> impl Iterator<Item = &str> {
         .into_iter()
         .flat_map(|value| value.split_whitespace())
 }
-
 
 #[cfg(test)]
 mod tests {

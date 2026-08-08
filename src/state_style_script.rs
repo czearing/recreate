@@ -80,7 +80,7 @@ __RULE_ACTIVATION__
     cssRules.push(text);
   };
   const emitEntries = entries => {
-    for (const { rule, media, active } of entries) {
+    for (const { rule, media, active, preludes } of entries) {
       // A grouping rule's cssText already contains every rule nested inside it, and those
       // are emitted as entries of their own, so recording both duplicates the entire
       // stylesheet body of layers, supports and scopes. A media block is the exception:
@@ -90,7 +90,15 @@ __RULE_ACTIVATION__
         rule.cssRules &&
         rule.cssRules.length &&
         rule.type !== CSSRule.MEDIA_RULE;
-      if (!grouping && (active || rule.type === CSSRule.MEDIA_RULE)) recordRule(rule.cssText);
+      // Rebuilding the prelude stack before recording is also what keys the recorded set:
+      // two identical declarations in different layers are different declarations, and
+      // deduplicating their bare text would collapse them past reconstruction.
+      if (!grouping && (active || rule.type === CSSRule.MEDIA_RULE)) {
+        recordRule(preludes.reduceRight(
+          (inner, prelude) => `${prelude}{${inner}}`,
+          rule.cssText
+        ));
+      }
       // A state rule is recorded whatever its condition, because the state it describes is
       // entered later, under conditions that need not be the ones in force now.
       if (rule.selectorText && rule.style) captureStateStyles(rule, media);
