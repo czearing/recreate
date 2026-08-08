@@ -1,4 +1,4 @@
-use serde_json::Value;
+use crate::node_eval;
 
 /// One call of the shipped predicate: elapsed, time since the last change, whether anything
 /// is still running, and the longest gap in motion this page has already recovered from.
@@ -31,28 +31,13 @@ fn settled(cases: &[Case]) -> Vec<bool> {
         })
         .collect::<Vec<_>>()
         .join(",");
-    let script = format!("{}\nconsole.log(JSON.stringify([{calls}]));", super::SOURCE);
-    let directory = tempfile::tempdir().unwrap();
-    let path = directory.path().join("settle.js");
-    std::fs::write(&path, script).unwrap();
-    let output = std::process::Command::new("node")
-        .arg(&path)
-        .output()
-        .unwrap();
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    let value: Value = serde_json::from_slice(&output.stdout).unwrap();
-    value
+    node_eval::evaluate(super::SOURCE, &format!("[{calls}]"))
         .as_array()
         .unwrap()
         .iter()
         .map(|item| item.as_bool().unwrap())
         .collect()
 }
-
 /// The cost of a capture must come from the page, not from a constant. A page that never
 /// moved has shown no gap it can recover from, so one quiet frame is the whole wait — the
 /// case that used to be charged a full second.

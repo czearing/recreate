@@ -32,6 +32,7 @@ mod interaction_scroll;
 mod interactions;
 mod jsx;
 mod jsx_app;
+mod jsx_attr_names;
 mod jsx_attrs;
 mod jsx_render;
 mod jsx_render_spacing;

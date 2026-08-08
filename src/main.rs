@@ -57,3 +57,6 @@ async fn main() -> Result<()> {
         Command::Verify(args) => compare::run(args).await,
     }
 }
+
+#[cfg(test)]
+mod node_eval;

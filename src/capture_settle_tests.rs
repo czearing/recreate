@@ -1,25 +1,15 @@
+use crate::node_eval;
 use serde_json::{Value, json};
 
 const HARNESS: &str = include_str!("capture_settle_harness.js");
 
 /// Runs the shipped settle script against a scripted page and reports what it decided.
 fn settle(scene: Value, wait_for_startup: bool) -> Value {
-    let script = HARNESS
-        .replace("__SCENE__", &scene.to_string())
-        .replace("__SETTLE__", &super::source(true, wait_for_startup));
-    let directory = tempfile::tempdir().unwrap();
-    let path = directory.path().join("settle.js");
-    std::fs::write(&path, script).unwrap();
-    let output = std::process::Command::new("node")
-        .arg(&path)
-        .output()
-        .unwrap();
-    assert!(
-        output.status.success(),
-        "settle failed: {}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    serde_json::from_slice(&output.stdout).unwrap()
+    node_eval::json(
+        &HARNESS
+            .replace("__SCENE__", &scene.to_string())
+            .replace("__SETTLE__", &super::source(true, wait_for_startup)),
+    )
 }
 
 fn box_at(x: f64) -> Value {
@@ -58,6 +48,49 @@ fn a_page_that_is_already_still_settles_within_a_few_frames() {
         "settling a still page took {}ms",
         result["elapsed"]
     );
+}
+
+/// Motion a stylesheet declares never stops, so demanding geometric stillness of a page
+/// carrying a perpetual authored animation means waiting for it to happen to pause at a
+/// turning point — a wait with no upper bound short of the ceiling, and one that varied by
+/// seconds between runs of the same page. The animation is already recorded where the
+/// capture reads it, so its target's movement is not evidence the page is unfinished.
+#[test]
+fn a_page_whose_only_motion_is_a_declared_animation_settles_at_once() {
+    let result = settle(perpetual_animation(true), true);
+    assert!(resolved(&result));
+    assert!(
+        result["elapsed"].as_u64().unwrap() < 200,
+        "a declared animation held capture for {}ms",
+        result["elapsed"]
+    );
+}
+
+/// The inverse, and the reason this is a statement about where motion is recorded rather
+/// than a licence to ignore anything animated. A script-built animation still part-way
+/// through its first period is motion nothing has written down, so it must hold capture.
+#[test]
+fn a_script_built_animation_still_in_its_first_period_holds_capture_back() {
+    let result = settle(perpetual_animation(false), true);
+    assert!(
+        result["elapsed"].as_u64().unwrap() >= 8_000,
+        "undeclared motion released capture after {}ms",
+        result["elapsed"]
+    );
+}
+
+/// A page holding one still element beside one that moves under an animation forever, so
+/// only where that animation is recorded can decide whether capture may proceed.
+fn perpetual_animation(declared: bool) -> Value {
+    let step = |index: i32| {
+        json!({
+            "elements": [box_at(0.0), box_at(f64::from(index) * 3.0)],
+            "animations": [
+                { "element": 1, "declared": declared, "duration": 4000, "localTime": 10 }
+            ]
+        })
+    };
+    json!({ "steps": (0..4000).map(step).collect::<Vec<_>>() })
 }
 
 /// Quiet has to be observed, not assumed. Every DOM edit restarts the window, so a page

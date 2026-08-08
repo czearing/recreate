@@ -1,10 +1,15 @@
 const RECORDER: &str = concat!("\n", include_str!("lifecycle_script.js"));
+const MUTATIONS: &str = include_str!("lifecycle_mutations.js");
 
+/// The recorder, with the rules it defers to spliced in: when it may stop watching, and how
+/// it records the attribute and text changes that become sequences.
 pub fn source() -> String {
-    RECORDER.replace(
-        "__LIFECYCLE_SETTLE__",
-        crate::lifecycle_settle_script::SOURCE,
-    )
+    RECORDER
+        .replace(
+            "__LIFECYCLE_SETTLE__",
+            crate::lifecycle_settle_script::SOURCE,
+        )
+        .replace("__LIFECYCLE_MUTATIONS__", MUTATIONS)
 }
 
 #[cfg(test)]
@@ -45,6 +50,7 @@ mod tests {
     fn the_recording_window_is_measured_and_only_ceilinged() {
         let source = super::source();
         assert!(!source.contains("__LIFECYCLE_SETTLE__"));
+        assert!(!source.contains("__LIFECYCLE_MUTATIONS__"));
         assert!(
             source.contains("lifecycleSettled(now - start, now - lastChange, busy, longestGap)")
         );

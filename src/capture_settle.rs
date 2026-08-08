@@ -39,6 +39,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
     };
     format!(
         r#"(async () => {{
+{settle}
   const blocking = {overlay};
   const started = Date.now();
   const elapsed = () => Date.now() - started;
@@ -56,14 +57,17 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
     let shown = 0;
     let digest = 0;
     let curtain = false;
+    const described = lifecycleDescribed(document);
     for (const element of document.querySelectorAll('*')) {{
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
       const visible = rect.width > 0 && rect.height > 0 && style.display !== 'none' &&
         style.visibility !== 'hidden' && Number(style.opacity || 1) > 0;
       if (visible) {{
-        const part = [element.tagName, Math.round(rect.x), Math.round(rect.y),
-          Math.round(rect.width), Math.round(rect.height), style.display].join(':');
+        const part = described.has(element)
+          ? element.tagName + ':described'
+          : [element.tagName, Math.round(rect.x), Math.round(rect.y),
+            Math.round(rect.width), Math.round(rect.height), style.display].join(':');
         for (let index = 0; index < part.length; index++) {{
           digest = (Math.imul(digest, 31) + part.charCodeAt(index)) | 0;
         }}
@@ -99,6 +103,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
   }}
 }})()"#,
         overlay = blocking_overlay::js_predicate(),
+        settle = crate::lifecycle_settle_script::SOURCE,
     )
 }
 

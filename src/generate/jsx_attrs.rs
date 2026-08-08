@@ -1,3 +1,4 @@
+use super::jsx_attr_names;
 use crate::model::Node;
 use std::collections::BTreeMap;
 
@@ -29,7 +30,7 @@ fn render_attribute(key: &str, value: &str) -> String {
     } else {
         quoted(value)
     };
-    format!(" {}={value}", jsx_attribute(key))
+    format!(" {}={value}", jsx_attr_names::jsx_attribute(key))
 }
 
 fn boolean_attribute(key: &str) -> bool {
@@ -84,41 +85,17 @@ fn rewrite<'a>(value: &'a str, assets: &'a BTreeMap<String, String>) -> &'a str 
     assets.get(value).map(String::as_str).unwrap_or(value)
 }
 
-fn jsx_attribute(value: &str) -> String {
-    match value {
-        "for" => "htmlFor".into(),
-        "tabindex" => "tabIndex".into(),
-        "readonly" => "readOnly".into(),
-        _ if value.starts_with("aria-") || value.starts_with("data-") => value.into(),
-        _ => camel(value),
-    }
-}
-
-fn camel(value: &str) -> String {
-    let mut result = String::new();
-    let mut uppercase = false;
-    for character in value.chars() {
-        if character == '-' {
-            uppercase = true;
-        } else if uppercase {
-            result.extend(character.to_uppercase());
-            uppercase = false;
-        } else {
-            result.push(character);
-        }
-    }
-    result
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    /// Element names, unlike attribute names, are matched case-insensitively by the DOM but
+    /// must be spelled exactly for JSX to emit the SVG element rather than an unknown tag.
     #[test]
-    fn converts_svg_names_to_jsx() {
-        assert_eq!(jsx_attribute("stroke-width"), "strokeWidth");
-        assert_eq!(jsx_attribute("aria-label"), "aria-label");
+    fn converts_svg_element_names_to_jsx() {
         assert_eq!(jsx_tag("lineargradient"), "linearGradient");
+        assert_eq!(jsx_tag("foreignobject"), "foreignObject");
+        assert_eq!(jsx_tag("div"), "div");
     }
 
     #[test]

@@ -55,11 +55,35 @@ const DEFAULTS = {
   "pointer-events": "auto",
 };
 
-const element = (spec) => ({
-  tagName: (spec.tag || "div").toUpperCase(),
-  getBoundingClientRect: () => spec.rect,
-  declarations: { ...DEFAULTS, ...(spec.style || {}) },
-});
+// Element identity is keyed by position in the step, not by the step's own object, so an
+// element that moves between frames is still recognisably the same element — which is what
+// lets an animation point at one and the script match it against the scanned page.
+const cache = new Map();
+
+const element = (spec, index) => {
+  if (!cache.has(index)) cache.set(index, {});
+  const node = cache.get(index);
+  node.tagName = (spec.tag || "div").toUpperCase();
+  node.getBoundingClientRect = () => spec.rect;
+  node.declarations = { ...DEFAULTS, ...(spec.style || {}) };
+  return node;
+};
+
+const animation = (spec) =>
+  Object.assign(spec.declared ? new CSSAnimation() : {}, {
+    playState: spec.playState || "running",
+    effect: {
+      target: element((current().elements || [])[spec.element], spec.element),
+      getComputedTiming: () => ({
+        delay: spec.delay || 0,
+        duration: spec.duration || 0,
+        localTime: spec.localTime || 0,
+      }),
+    },
+  });
+
+class CSSAnimation {}
+globalThis.CSSAnimation = CSSAnimation;
 
 globalThis.innerWidth = 1000;
 globalThis.innerHeight = 1000;
@@ -85,6 +109,7 @@ globalThis.document = {
     },
   },
   querySelectorAll: () => (current().elements || []).map(element),
+  getAnimations: () => (current().animations || []).map(animation),
 };
 
 globalThis.window = globalThis;

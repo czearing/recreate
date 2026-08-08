@@ -15,8 +15,54 @@
 ///
 /// Running animations and pending loads are tracked separately as `busy`, because those are
 /// direct evidence that something is still to come rather than an inference from history.
+/// Evidence expires, though. An animation that repeats forever is running at every instant
+/// the recorder can ever ask, so counting running animations charged every such page the
+/// full ceiling and read the same motion over and over. A periodic process is described
+/// completely by one period, so an animation stops being evidence once its delay and one
+/// iteration have been watched; a finite animation reaches that point and ends there too.
+/// A pending load has no period, so it holds on its own until it lands.
+///
+/// Motion a stylesheet already declares is a further case of the same thing, reaching its
+/// expiry before it starts. A `CSSAnimation` or a `CSSTransition` exists because a rule the
+/// capture already reads called for it, so observing it re-derives what is written down;
+/// only a script-built `Animation` describes motion no stylesheet records. That is what
+/// keeps a page carrying a four-second authored loop from being watched for four seconds.
+///
+/// The same expiry has to reach the gap measurement, or a looping page never settles for a
+/// different reason: it keeps moving, so the gap since the last change never grows. A change
+/// on an element driven by an animation already watched through a full period is motion the
+/// recorder has already described, not information it lacks, so `observedTargets` names the
+/// elements whose movement no longer counts as news. Anything moving for any other reason —
+/// a script ticking, content arriving — is not in that set and still holds the recorder.
+///
+/// `lifecycleDescribed` reads that same set straight off a document, because the settle scan
+/// that decides a page has stopped moving needs it for the identical reason: a page carrying
+/// a perpetual authored animation is never geometrically still, and waiting for stillness
+/// there means waiting for the animation to happen to pause at a turning point.
 pub const SOURCE: &str = r#"
   const LIFECYCLE_CEILING_MS = 12000;
+  const animationObserved = ({ declared, playState, delay, duration, localTime }) =>
+    declared || playState === 'finished' || playState === 'idle' ||
+    !(duration > 0) || localTime >= delay + duration;
+  const lifecycleBusy = (animations, loading) =>
+    loading || animations.some(animation => !animationObserved(animation));
+  const observedTargets = animations =>
+    new Set(animations.filter(animationObserved).map(animation => animation.target));
+  const lifecycleTiming = animation => {
+    const timing = animation.effect?.getComputedTiming?.() || {};
+    return {
+      target: animation.effect?.target,
+      declared:
+        (typeof CSSAnimation !== 'undefined' && animation instanceof CSSAnimation) ||
+        (typeof CSSTransition !== 'undefined' && animation instanceof CSSTransition),
+      playState: animation.playState,
+      delay: Number(timing.delay) || 0,
+      duration: Number(timing.duration) || 0,
+      localTime: Number(timing.localTime) || 0
+    };
+  };
+  const lifecycleDescribed = root =>
+    observedTargets(root.getAnimations({ subtree: true }).map(lifecycleTiming));
   const lifecycleSettled = (elapsed, sinceChange, busy, longestGap) =>
     elapsed >= LIFECYCLE_CEILING_MS || (!busy && sinceChange > longestGap);
 "#;
@@ -24,3 +70,7 @@ pub const SOURCE: &str = r#"
 #[cfg(test)]
 #[path = "lifecycle_settle_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "lifecycle_busy_tests.rs"]
+mod busy_tests;
