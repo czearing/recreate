@@ -1,20 +1,13 @@
 use super::tree::Components;
 use crate::model::Specification;
 
-pub fn classes(specification: &Specification, components: &Components) -> (String, String, String) {
+/// The mount script assigns this to the existing `#root` element, which React takes over
+/// and would otherwise render without its captured styles.
+pub fn root_class(specification: &Specification, components: &Components) -> String {
     let Some(state) = specification.states.first() else {
-        return Default::default();
+        return String::new();
     };
-    let class = |tag: &str| {
-        state
-            .nodes
-            .iter()
-            .find(|node| node.tag == tag)
-            .and_then(|node| components.classes.get(&node.path))
-            .cloned()
-            .unwrap_or_default()
-    };
-    let root = state
+    state
         .nodes
         .iter()
         .find(|node| {
@@ -24,6 +17,5 @@ pub fn classes(specification: &Specification, components: &Components) -> (Strin
         })
         .and_then(|node| components.classes.get(&node.path))
         .cloned()
-        .unwrap_or_default();
-    (class("html"), class("body"), root)
+        .unwrap_or_default()
 }

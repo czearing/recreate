@@ -70,32 +70,7 @@ pub async fn write_project(
         &mut styles.css,
     );
     timing("state_styles");
-    let (html_class, body_class, root_class) = roots::classes(specification, &components);
-    let baseline = specification.states.first();
-    let authored_class = |tag: &str| {
-        baseline
-            .and_then(|state| state.nodes.iter().find(|node| node.tag == tag))
-            .and_then(|node| node.attributes.get("class"))
-            .is_some_and(|value| !value.is_empty())
-    };
-    let mut root_aliases = std::collections::BTreeMap::<String, Vec<&str>>::new();
-    if !authored_class("html") {
-        root_aliases
-            .entry(html_class.clone())
-            .or_default()
-            .push("html");
-    }
-    if !authored_class("body") {
-        root_aliases
-            .entry(body_class.clone())
-            .or_default()
-            .push("body");
-    }
-    root_aliases.remove("");
-    let root_aliases = root_aliases
-        .into_iter()
-        .map(|(class_name, elements)| (class_name, elements.join(",")))
-        .collect::<Vec<_>>();
+    let root_class = roots::root_class(specification, &components);
     let has_root = specification.states.first().is_some_and(|state| {
         state.nodes.iter().any(|node| {
             node.attributes
@@ -175,29 +150,7 @@ pub async fn write_project(
     fs::write(source.join("states.jsx"), state_source)?;
     source_style_split::split(&source)?;
     timing("sources");
-    fs::write(
-        source.join("main.jsx"),
-        format!(
-            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport generatedCss from './styles.css?inline';\nimport scopedStyles from './generated/scoped-styles.js';\nimport {{adoptRegisteredStyles}} from './runtime/style.mjs';\nimport App from './App.jsx';\nadoptRegisteredStyles(scopedStyles);\nconst rootAliases={};\nconst semanticCss=rootAliases.reduce((css,[className,elements])=>css.replaceAll(`.${{className}}{{`,`.${{className}},${{elements}}{{`),generatedCss);\nconst generatedSheet=new CSSStyleSheet();generatedSheet.replaceSync(semanticCss);document.adoptedStyleSheets=[...document.adoptedStyleSheets,generatedSheet];\ndocument.querySelector('script[data-recreate-entry]')?.remove();\nconst capturedBase=document.querySelector('base[data-recreate-base-href]');if(capturedBase){{capturedBase.href=capturedBase.dataset.recreateBaseHref;delete capturedBase.dataset.recreateBaseHref}}\n{}\n{}\n{mount_source}\n",
-            serde_json::to_string(&root_aliases)?,
-            if authored_class("html") {
-                format!(
-                    "document.documentElement.className={};",
-                    serde_json::to_string(&html_class)?
-                )
-            } else {
-                "document.documentElement.removeAttribute('class');".into()
-            },
-            if authored_class("body") {
-                format!(
-                    "document.body.className={};",
-                    serde_json::to_string(&body_class)?
-                )
-            } else {
-                "document.body.removeAttribute('class');".into()
-            },
-        ),
-    )?;
+    runtime_sources::write_entry(&source, &mount_source)?;
     fs::write(
         root.join("index.html"),
         document::render(specification.states.first(), mount_markup, &styles.classes),
@@ -209,11 +162,11 @@ pub async fn write_project(
     Ok(())
 }
 
-/// The generator emits class rules for elements, but the document roots carry no class,
-/// so whatever they were styled with reaches the output only through this rule. It runs
-/// the roots through the same declaration pipeline as every other node — naming a subset
-/// of properties here would silently drop the rest, which is how a reset `background`
-/// on `body` went missing while the `margin` beside it survived.
+/// Authored declarations on html and body reach the output through this rule. The roots
+/// carry their generated class like every other element, so this covers only what the
+/// authored stylesheet said about them — naming a subset of properties here would silently
+/// drop the rest, which is how a reset `background` on `body` went missing while the
+/// `margin` beside it survived.
 fn root_reset(specification: &Specification, assets: &BTreeMap<String, String>) -> String {
     let Some(state) = specification.states.first() else {
         return String::new();

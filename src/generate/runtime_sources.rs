@@ -22,6 +22,20 @@ pub fn write(source: &Path) -> Result<()> {
     Ok(())
 }
 
+/// The entry module adopts the generated stylesheet, undoes the two markers the emitted
+/// document carries for its own benefit, and mounts the app. It deliberately does not
+/// touch the document root's classes: those are serialised into `index.html`, so anything
+/// assigned here would race the markup and silently win.
+pub fn write_entry(source: &Path, mount_source: &str) -> Result<()> {
+    fs::write(
+        source.join("main.jsx"),
+        format!(
+            "import React from 'react';\nimport {{createRoot}} from 'react-dom/client';\nimport generatedCss from './styles.css?inline';\nimport scopedStyles from './generated/scoped-styles.js';\nimport {{adoptRegisteredStyles}} from './runtime/style.mjs';\nimport App from './App.jsx';\nadoptRegisteredStyles(scopedStyles);\nconst generatedSheet=new CSSStyleSheet();generatedSheet.replaceSync(generatedCss);document.adoptedStyleSheets=[...document.adoptedStyleSheets,generatedSheet];\ndocument.querySelector('script[data-recreate-entry]')?.remove();\nconst capturedBase=document.querySelector('base[data-recreate-base-href]');if(capturedBase){{capturedBase.href=capturedBase.dataset.recreateBaseHref;delete capturedBase.dataset.recreateBaseHref}}\n{mount_source}\n"
+        ),
+    )?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

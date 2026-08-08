@@ -25,6 +25,9 @@ mod css_visual;
 mod custom_properties;
 mod custom_property_diff;
 mod document;
+#[cfg(test)]
+#[path = "document_root_tests.rs"]
+mod document_root_tests;
 mod inherited_styles;
 mod initial_scroll;
 mod interaction_labels;

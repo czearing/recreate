@@ -8,15 +8,15 @@ pub fn render(
 ) -> String {
     let html = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "html"))
-        .map(attributes)
+        .map(|node| attributes(node, classes))
         .unwrap_or_default();
     let body = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "body"))
-        .map(attributes)
+        .map(|node| attributes(node, classes))
         .unwrap_or_default();
     let head_attributes = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "head"))
-        .map(|node| generated_class(node, classes))
+        .map(|node| attributes(node, classes))
         .unwrap_or_default();
     let head = state.map(|state| head(state, classes)).unwrap_or_else(|| {
         "<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
@@ -70,18 +70,7 @@ fn safe_link(relation: Option<&str>, kind: Option<&str>) -> bool {
 }
 
 fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -> String {
-    let mut attributes = node
-        .attributes
-        .iter()
-        .filter(|(name, _)| name.as_str() != "class")
-        .map(|(name, value)| {
-            if node.tag == "base" && name == "href" {
-                return format!(" data-recreate-base-href=\"{}\"", escape(value));
-            }
-            format!(" {name}=\"{}\"", escape(value))
-        })
-        .collect::<String>();
-    attributes.push_str(&generated_class(node, classes));
+    let attributes = attributes(node, classes);
     if matches!(node.tag.as_str(), "base" | "link" | "meta") {
         return format!("<{}{attributes}>", node.tag);
     }
@@ -100,19 +89,40 @@ fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -
     format!("<{}{attributes}>{text}</{}>", node.tag, node.tag)
 }
 
-fn generated_class(node: &Node, classes: &BTreeMap<String, String>) -> String {
-    classes
-        .get(&node.path)
-        .map(|class| format!(" class=\"{}\"", escape(class)))
-        .unwrap_or_default()
-}
-
-fn attributes(node: &Node) -> String {
-    node.attributes
+/// The one serialiser for every element the emitter writes by hand. `class` and `style` are
+/// rebuilt rather than copied: the inline style is replaced by the generated rules, and the
+/// authored class tokens are merged with the generated class into a single attribute.
+fn attributes(node: &Node, classes: &BTreeMap<String, String>) -> String {
+    let mut attributes = node
+        .attributes
         .iter()
         .filter(|(name, _)| !matches!(name.as_str(), "class" | "style"))
-        .map(|(name, value)| format!(" {name}=\"{}\"", escape(value)))
-        .collect()
+        .map(|(name, value)| {
+            if node.tag == "base" && name == "href" {
+                return format!(" data-recreate-base-href=\"{}\"", escape(value));
+            }
+            format!(" {name}=\"{}\"", escape(value))
+        })
+        .collect::<String>();
+    attributes.push_str(&class_attribute(node, classes));
+    attributes
+}
+
+/// The authored tokens scope the re-emitted stylesheet and the generated class carries the
+/// element's captured styles. Both are needed, and a second `class` attribute would be
+/// discarded by the parser, so they share one.
+fn class_attribute(node: &Node, classes: &BTreeMap<String, String>) -> String {
+    let authored = node.attributes.get("class").map(String::as_str);
+    let generated = classes.get(&node.path).map(String::as_str);
+    let tokens = authored
+        .into_iter()
+        .chain(generated)
+        .flat_map(str::split_whitespace)
+        .collect::<Vec<_>>();
+    if tokens.is_empty() {
+        return String::new();
+    }
+    format!(" class=\"{}\"", escape(&tokens.join(" ")))
 }
 
 fn escape(value: &str) -> String {
