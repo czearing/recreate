@@ -34,7 +34,7 @@ mod rule_activation_script;
 mod serve;
 mod skill;
 mod state_style_script;
-mod style_contract;
+mod style_baseline;
 mod updater;
 mod validate;
 

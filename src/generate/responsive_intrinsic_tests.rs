@@ -49,8 +49,14 @@ fn keeps_a_control_width_the_source_authored() {
 /// property instead buries the handful of real declarations under browser defaults.
 /// Margin and padding are excluded: the browser's own stylesheet sets those, so a `0px`
 /// there is a reset the recreation still needs.
+/// A declaration is dropped where it restates the value the element would compute with
+/// no author CSS, and that comparison is made against a measured baseline before the
+/// specification is written. By the time the emitter sees a declaration it is already
+/// known to differ from that baseline, so re-deciding here by value would be wrong: the
+/// same `normal` that is redundant on one element is an override on another whose
+/// ancestor or user-agent rule set something else.
 #[test]
-fn drops_declarations_that_only_restate_a_browser_default() {
+fn does_not_second_guess_a_value_the_capture_already_judged() {
     let styles = Styles::from([
         ("display".into(), "flex".into()),
         ("align-items".into(), "normal".into()),
@@ -64,8 +70,16 @@ fn drops_declarations_that_only_restate_a_browser_default() {
         ("margin-top".into(), "0px".into()),
         ("padding-top".into(), "0px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
-    assert_eq!(css, "display:flex;margin-top:0px;padding-top:0px;", "{css}");
+    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
+    assert_eq!(
+        css,
+        "align-items:normal;display:flex;flex-basis:auto;flex-direction:row;flex-grow:0;\
+         flex-shrink:1;flex-wrap:nowrap;justify-content:normal;margin-top:0px;padding-top:0px;",
+        "{css}"
+    );
+    // The one exception is not a value judgement but a pair: `left:auto` says nothing on
+    // a box that is not positioned.
+    assert!(!css.contains("left:auto"), "{css}");
 }
 
 /// An inset is load-bearing on a positioned box: it is what stops an authored offset on
@@ -77,7 +91,7 @@ fn keeps_an_auto_inset_on_a_positioned_box() {
         ("left".into(), "auto".into()),
         ("right".into(), "20px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
+    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
     assert!(css.contains("left:auto"), "{css}");
 }
 
@@ -126,7 +140,7 @@ fn keeps_the_sampled_box_of_an_overlay_anchored_to_one_edge() {
         ("width".into(), "313.328px".into()),
         ("height".into(), "168px".into()),
     ]);
-    let css = crate::generate::responsive::output_declarations(&styles, None, &Default::default());
+    let css = crate::generate::responsive::output_declarations(&styles, &Default::default());
     assert!(css.contains("width:313.328px"), "{css}");
     assert!(css.contains("height:168px"), "{css}");
 }

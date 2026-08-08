@@ -1,9 +1,11 @@
 
 (async () => {
   const authoredSheetTexts = __AUTHORED_SHEETS__;
-  const props = [__STYLE_PROPERTIES__];
-  const ignored = new Set(['SCRIPT','NOSCRIPT']), directionalBorders = [__DIRECTIONAL_BORDERS__];
-  const styleMap = style => { const values = Object.fromEntries(props.map(p => [p, style.getPropertyValue(p)])); if (!values.border) for (const property of directionalBorders) values[property] = style.getPropertyValue(property); return values; };
+  const ignored = new Set(['SCRIPT','NOSCRIPT']);
+__STYLE_BASELINE__
+  const skipped = element =>
+    ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup');
+  measureBaselines(document.documentElement, skipped);
   const computedStyles = new WeakMap(), computedStylePropertySet = new Set();
   const scan = element => {
     if (ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup')) return;
@@ -58,7 +60,7 @@
     const style = getComputedStyle(element, name);
     const content = style.content;
     return content && content !== 'none'
-      ? { content, style: styleMap(style) }
+      ? { content, style: authoredStyles(styleMap(style), pseudoBaselineOf(element, name)) }
       : null;
   };
   const nodes = [];
@@ -110,7 +112,7 @@
       text: '',
       attributes,
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      style: styleMap(computedStyle),
+      style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       before: pseudo(element, '::before'),
       after: pseudo(element, '::after')
     });
@@ -137,7 +139,7 @@
             x: textRect.x, y: textRect.y,
             width: textRect.width, height: textRect.height
           },
-          style: styleMap(getComputedStyle(element)),
+          style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
           before: null,
           after: null
         });
@@ -217,7 +219,7 @@ __ATTRIBUTE_SEQUENCE_CAPTURE__
     if (url) assets.add(url);
   });
   for (const node of nodes) {
-    const matches = node.style['background-image'].matchAll(/url\(["']?([^"')]+)["']?\)/g);
+    const matches = (node.style['background-image'] || '').matchAll(/url\(["']?([^"')]+)["']?\)/g);
     for (const match of matches) assets.add(new URL(match[1], location.href).href);
   }
   for (const rule of cssRules) {

@@ -66,10 +66,6 @@ fn directional_border_contract_is_captured_and_generated() {
             ("color", "rgb(216, 168, 78)"),
         ] {
             let name = format!("border-{side}-{property}");
-            assert!(
-                crate::style_contract::contains(&name),
-                "missing capture property {name}"
-            );
             styles.insert(name, value.into());
         }
     }
@@ -83,7 +79,6 @@ fn directional_border_contract_is_captured_and_generated() {
 
 #[test]
 fn float_contract_is_captured_and_generated() {
-    assert!(crate::style_contract::contains("float"));
     let styles = Styles::from([("float".into(), "right".into())]);
     assert_eq!(declarations(&styles, &BTreeMap::new()), "float:right;");
 }
@@ -95,9 +90,6 @@ fn svg_paint_contract_is_captured_and_generated() {
         ("stroke".into(), "rgba(0, 0, 0, 0.427)".into()),
         ("stroke-width".into(), "1px".into()),
     ]);
-    for name in styles.keys() {
-        assert!(crate::style_contract::contains(name));
-    }
     let css = declarations(&styles, &BTreeMap::new());
     assert!(css.contains("fill:rgb(198, 225, 255);"));
     assert!(css.contains("stroke:rgba(0, 0, 0, 0.427);"));
@@ -146,7 +138,6 @@ fn grid_item_contract_is_captured_and_generated() {
         ("grid-row-end", "auto"),
         ("justify-self", "start"),
     ] {
-        assert!(crate::style_contract::contains(name));
         styles.insert(name.into(), value.into());
     }
 

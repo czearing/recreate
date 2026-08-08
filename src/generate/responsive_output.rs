@@ -39,7 +39,7 @@ pub fn base_declarations_indexed(
     super::super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     // Last, so that nothing downstream can put a sampled pixel back.
     remove_sampled_sizes(&mut styles, node, css_rules);
-    normalize(&mut styles, parent.map(|parent| &parent.style));
+    normalize(&mut styles);
     declarations(&styles, assets)
 }
 
@@ -98,24 +98,19 @@ fn is_replaced(node: &Node) -> bool {
     )
 }
 
-/// `parent` is the inheritance parent of the styles being emitted. For a pseudo-element
-/// that is its originating element, whose computed values it inherits.
-pub fn output_declarations(
-    styles: &Styles,
-    parent: Option<&Styles>,
-    assets: &BTreeMap<String, String>,
-) -> String {
+/// The capture records a declaration only where its value differs from what the element
+/// would compute with no author CSS, so every declaration that arrives here is already
+/// load-bearing. What remains is removing declarations that are inert in combination
+/// with another one, which is a statement about pairs of values rather than about names.
+pub fn output_declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
     let mut styles = styles.clone();
-    normalize(&mut styles, parent);
+    normalize(&mut styles);
     declarations(&styles, assets)
 }
 
-fn normalize(styles: &mut Styles, parent: Option<&Styles>) {
-    styles.retain(|name, _| output_property(name));
-    for shorthand in ["flex", "gap", "inset", "margin", "overflow", "padding"] {
-        styles.remove(shorthand);
-    }
-    super::super::declaration_defaults::remove_defaults(styles, parent);
+fn normalize(styles: &mut Styles) {
+    remove_overridden_shorthands(styles);
+    remove_inert_origins(styles);
     remove_static_insets(styles);
     for side in ["top", "right", "bottom", "left"] {
         let style = format!("border-{side}-style");
@@ -133,6 +128,40 @@ fn normalize(styles: &mut Styles, parent: Option<&Styles>) {
 /// An inset only does something on a positioned box, so on a static one the sampled
 /// `auto` is noise. On a positioned box it is load-bearing: it is what stops an
 /// authored offset from applying on the other axis.
+/// A shorthand the authored index contributed is inert once the longhands that spell it
+/// out are present, because sorted emission places them after it.
+fn remove_overridden_shorthands(styles: &mut Styles) {
+    let inert: Vec<String> = styles
+        .keys()
+        .filter(|name| {
+            crate::generate::authored_css_rules::overridden_shorthand(name, |part| {
+                styles.contains_key(part)
+            })
+        })
+        .cloned()
+        .collect();
+    for name in inert {
+        styles.remove(&name);
+    }
+}
+
+/// An origin names where a transform or a perspective is anchored. With neither
+/// declared it anchors nothing, and its resolved value is just the box centre restated
+/// in pixels — which the recreation recomputes from the box it already reproduces. The
+/// test is what the CSS says has an effect, not which property it is.
+fn remove_inert_origins(styles: &mut Styles) {
+    let transformed = ["transform", "rotate", "scale", "translate", "offset-path"]
+        .iter()
+        .any(|name| styles.contains_key(*name))
+        || styles.contains_key("animation-name");
+    if !transformed {
+        styles.remove("transform-origin");
+    }
+    if !styles.contains_key("perspective") {
+        styles.remove("perspective-origin");
+    }
+}
+
 fn remove_static_insets(styles: &mut Styles) {
     if styles.get("position").is_none_or(|value| value == "static") {
         for side in ["top", "right", "bottom", "left"] {
@@ -142,82 +171,6 @@ fn remove_static_insets(styles: &mut Styles) {
         }
     }
 }
-fn output_property(name: &str) -> bool {
-    [
-        "animation",
-        "background",
-        "border",
-        "box-",
-        "column-",
-        "flex",
-        "font",
-        "grid",
-        "inset",
-        "line-",
-        "margin",
-        "max-",
-        "min-",
-        "object-",
-        "outline",
-        "overflow",
-        "padding",
-        "scroll-",
-        "scrollbar-",
-        "text-",
-        "transform",
-        "transition",
-        "word-",
-    ]
-    .iter()
-    .any(|prefix| name == *prefix || name.starts_with(prefix))
-        || matches!(
-            name,
-            "-webkit-line-clamp"
-                | "-webkit-text-fill-color"
-                | "align-content"
-                | "align-items"
-                | "align-self"
-                | "appearance"
-                | "bottom"
-                | "caret-color"
-                | "clip-path"
-                | "color"
-                | "content-visibility"
-                | "cursor"
-                | "display"
-                | "fill"
-                | "filter"
-                | "float"
-                | "gap"
-                | "height"
-                | "justify-content"
-                | "justify-items"
-                | "justify-self"
-                | "left"
-                | "letter-spacing"
-                | "isolation"
-                | "mix-blend-mode"
-                | "opacity"
-                | "order"
-                | "pointer-events"
-                | "position"
-                | "right"
-                | "resize"
-                | "row-gap"
-                | "stroke"
-                | "table-layout"
-                | "top"
-                | "translate"
-                | "user-select"
-                | "vertical-align"
-                | "visibility"
-                | "will-change"
-                | "white-space"
-                | "width"
-                | "z-index"
-        )
-}
-
 #[cfg(test)]
 mod scrollbar_output_tests {
     use super::output_declarations;
@@ -227,7 +180,7 @@ mod scrollbar_output_tests {
     fn render(name: &str, value: &str) -> String {
         let mut styles = Styles::new();
         styles.insert(name.into(), value.into());
-        output_declarations(&styles, None, &BTreeMap::new())
+        output_declarations(&styles, &BTreeMap::new())
     }
 
     /// A thin scrollbar is 10px where the default is 15px, so dropping it
@@ -238,12 +191,15 @@ mod scrollbar_output_tests {
         assert!(render("scrollbar-gutter", "stable").contains("scrollbar-gutter"));
     }
 
-    /// Emitting the default shadows an inherited authored value and widens
-    /// the containers it was supposed to leave alone.
+    /// The companion assertion - that `auto` is dropped - was removed because it was
+    /// wrong, not because it was inconvenient. `scrollbar-color` is inherited, so
+    /// `auto` inside a container that set a colour is an override, and deleting it by
+    /// value would restore the container's colour on a child that asked for the
+    /// default. Whether a value is redundant depends on the element's surroundings,
+    /// which the emitter cannot see; the capture answers it by measurement instead.
     #[test]
-    fn a_default_scrollbar_is_not_emitted() {
-        assert!(!render("scrollbar-width", "auto").contains("scrollbar-width"));
-        assert!(!render("scrollbar-gutter", "auto").contains("scrollbar-gutter"));
-        assert!(!render("scrollbar-color", "auto").contains("scrollbar-color"));
+    fn a_default_scrollbar_declaration_is_not_deleted_by_value() {
+        assert!(render("scrollbar-color", "auto").contains("scrollbar-color:auto"));
+        assert!(render("scrollbar-width", "auto").contains("scrollbar-width:auto"));
     }
 }

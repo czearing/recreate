@@ -1,17 +1,7 @@
 (async () => {
-  const props = [__STYLE_PROPERTIES__];
-  const directionalBorders = [__DIRECTIONAL_BORDERS__];
-  const styleMap = style => {
-    const values = Object.fromEntries(props.map(property =>
-      [property, style.getPropertyValue(property)]
-    ));
-    if (!values.border) {
-      for (const property of directionalBorders) {
-        values[property] = style.getPropertyValue(property);
-      }
-    }
-    return values;
-  };
+__STYLE_BASELINE__
+  const skipped = element => false;
+  measureBaselines(document.documentElement, skipped);
   const pathCache = new WeakMap([[document.documentElement, 'html']]);
   const siblingIndexes = new WeakMap();
   const pathOf = element => {
@@ -78,7 +68,7 @@ __SELECTION__
           !['style','nonce','integrity'].includes(attribute.name))
         .map(attribute => [attribute.name, attribute.value])),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      style: styleMap(getComputedStyle(element)),
+      style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
       before: null,
       after: null
     });
@@ -99,7 +89,7 @@ __SELECTION__
         text: child.textContent.replace(/\s+/g, ' '),
         attributes: {},
         rect: { x: value.x, y: value.y, width: value.width, height: value.height },
-        style: styleMap(getComputedStyle(element)),
+        style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
         before: null,
         after: null
       });
@@ -116,7 +106,7 @@ __SELECTION__
     }
   }
   for (const node of nodes) {
-    for (const match of node.style['background-image'].matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+    for (const match of (node.style['background-image'] || '').matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
       assets.add(new URL(match[1], location.href).href);
     }
   }

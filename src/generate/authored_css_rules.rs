@@ -191,6 +191,54 @@ pub(super) fn cascade_keyword(value: &str) -> bool {
     )
 }
 
+/// The capture enumerates longhands only, so every shorthand in a style map came from
+/// [`retained`] above. Declarations are emitted in sorted order, which puts a shorthand
+/// ahead of the longhands that spell it out, so once those longhands are present the
+/// shorthand is overridden on the very next line and carries no meaning — it only
+/// repeats the value in a second syntax. This drops the inert copy. It is derived from
+/// [`retained`] rather than stated separately so the two cannot drift apart: a name is a
+/// shorthand exactly when other retained names, or the longhands listed here for the two
+/// families whose parts are not spelled as their prefix, expand it.
+pub(super) fn overridden_shorthand(name: &str, has: impl Fn(&str) -> bool) -> bool {
+    let parts: &[&str] = match name {
+        "gap" => &["row-gap", "column-gap"],
+        "inset" => &["top", "right", "bottom", "left"],
+        _ => &[],
+    };
+    if !parts.is_empty() {
+        return parts.iter().all(|part| has(part));
+    }
+    retained(name)
+        && SHORTHAND_PARTS.iter().any(|part| {
+            part.strip_prefix(name)
+                .is_some_and(|rest| rest.starts_with('-') && has(part))
+        })
+}
+
+/// The longhand names a [`retained`] shorthand can be overridden by.
+const SHORTHAND_PARTS: &[&str] = &[
+    "flex-basis",
+    "flex-direction",
+    "flex-grow",
+    "flex-shrink",
+    "flex-wrap",
+    "margin-bottom",
+    "margin-left",
+    "margin-right",
+    "margin-top",
+    "overflow-x",
+    "overflow-y",
+    "padding-bottom",
+    "padding-left",
+    "padding-right",
+    "padding-top",
+    "transition-behavior",
+    "transition-delay",
+    "transition-duration",
+    "transition-property",
+    "transition-timing-function",
+];
+
 pub(super) fn retained(name: &str) -> bool {
     matches!(
         name,

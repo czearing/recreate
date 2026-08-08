@@ -33,6 +33,9 @@ pub fn append_filtered(
         let authored_rules = super::super::authored_css::Index::new(&state.css_rules);
         let shrunk_roots = shrunk_roots(&state.nodes, &base_nodes, &state_nodes);
         let mut rules = String::new();
+        // Nodes that share a class produce the same band rule, so emitting one per node
+        // repeats it verbatim once per element.
+        let mut emitted = HashSet::new();
         for node in &state.nodes {
             if paths.is_some_and(|paths| !paths.contains(&node.path)) {
                 continue;
@@ -42,7 +45,7 @@ pub fn append_filtered(
             else {
                 continue;
             };
-            rules.push_str(&append_node_rules_indexed(
+            let rule = append_node_rules_indexed(
                 base_node,
                 node,
                 node.parent
@@ -54,7 +57,10 @@ pub fn append_filtered(
                 &authored_rules,
                 fluid_heights.contains(&node.path),
                 constrained_by_flex_chain(node, &shrunk_roots, &state_nodes),
-            ));
+            );
+            if !rule.is_empty() && emitted.insert(rule.clone()) {
+                rules.push_str(&rule);
+            }
         }
         if !rules.is_empty() {
             let wider = if index == 0 {
@@ -103,7 +109,12 @@ pub(in crate::generate) fn band(
     (smaller.map(|value| value.saturating_add(1)), width)
 }
 
+/// A band with no rules in it says nothing, and four empty `@media` blocks at the foot
+/// of every stylesheet are pure artifact.
 pub(in crate::generate) fn media_rule(minimum: Option<u32>, maximum: u32, rules: &str) -> String {
+    if rules.trim().is_empty() {
+        return String::new();
+    }
     match minimum {
         Some(minimum) => {
             format!("@media(min-width:{minimum}px) and (max-width:{maximum}px){{{rules}}}\n")

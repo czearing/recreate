@@ -1,4 +1,4 @@
-use crate::{asset_script, style_contract};
+use crate::{asset_script, style_baseline};
 const CAPTURE: &str = include_str!("page_capture.js");
 
 /// The stylesheet text the page is not allowed to read for itself, injected as data so the
@@ -22,11 +22,7 @@ fn source_template() -> String {
 /// One template, so a capture stage added here cannot be missing from the asset-free form.
 fn template_with_assets(assets: &str) -> String {
     CAPTURE
-        .replace("__STYLE_PROPERTIES__", style_contract::PROPERTIES)
-        .replace(
-            "__DIRECTIONAL_BORDERS__",
-            style_contract::DIRECTIONAL_BORDERS,
-        )
+        .replace("__STYLE_BASELINE__", style_baseline::SOURCE)
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
         .replace("__RULE_ACTIVATION__", crate::rule_activation_script::SOURCE)
         .replace(

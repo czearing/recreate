@@ -1,4 +1,5 @@
 use super::{project_mount::mount, *};
+use std::collections::BTreeMap;
 
 pub async fn write_project(
     specification: &Specification,
@@ -107,7 +108,7 @@ pub async fn write_project(
         source.join("styles.css"),
         format!(
             "{}{}",
-            root_reset(specification),
+            root_reset(specification, &assets),
             source_css::dedupe_exact(&styles.css)
         ),
     )?;
@@ -208,10 +209,12 @@ pub async fn write_project(
     Ok(())
 }
 
-/// The user agent gives `body` an 8px margin and the generator emits no rule
-/// for the document roots, so a source that reset that margin loses 16px of
-/// width in the recreation. Replay the captured root box explicitly.
-fn root_reset(specification: &Specification) -> String {
+/// The generator emits class rules for elements, but the document roots carry no class,
+/// so whatever they were styled with reaches the output only through this rule. It runs
+/// the roots through the same declaration pipeline as every other node — naming a subset
+/// of properties here would silently drop the rest, which is how a reset `background`
+/// on `body` went missing while the `margin` beside it survived.
+fn root_reset(specification: &Specification, assets: &BTreeMap<String, String>) -> String {
     let Some(state) = specification.states.first() else {
         return String::new();
     };
@@ -220,17 +223,18 @@ fn root_reset(specification: &Specification) -> String {
         let Some(node) = state.nodes.iter().find(|node| node.tag == tag) else {
             continue;
         };
-        let declarations = ["margin", "padding"]
-            .into_iter()
-            .flat_map(|box_property| {
-                ["top", "right", "bottom", "left"].map(move |side| format!("{box_property}-{side}"))
-            })
-            .filter_map(|property| {
-                node.style
-                    .get(&property)
-                    .map(|value| format!("{property}:{value};"))
-            })
-            .collect::<String>();
+        let parent = node
+            .parent
+            .as_deref()
+            .and_then(|path| state.nodes.iter().find(|other| other.path == path));
+        let declarations = responsive::base_declarations(
+            node,
+            parent,
+            &state.viewport,
+            assets,
+            &state.css_rules,
+            false,
+        );
         if !declarations.is_empty() {
             css.push_str(&format!("{tag}{{{declarations}}}\n"));
         }

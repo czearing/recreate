@@ -1,21 +1,17 @@
-use crate::style_contract;
+use crate::style_baseline;
 
 const FULL_SELECTION: &str = "const selected = new Set(document.querySelectorAll('*'));";
 
 const SOURCE: &str = concat!("\n", include_str!("interaction_script.js"));
 
 pub fn source() -> String {
-    render(style_contract::PROPERTIES, FULL_SELECTION)
+    render(FULL_SELECTION)
 }
 
-fn render(properties: &str, selection: &str) -> String {
+fn render(selection: &str) -> String {
     SOURCE
-        .replace("__STYLE_PROPERTIES__", properties)
+        .replace("__STYLE_BASELINE__", style_baseline::SOURCE)
         .replace("__SELECTION__", selection)
-        .replace(
-            "__DIRECTIONAL_BORDERS__",
-            style_contract::DIRECTIONAL_BORDERS,
-        )
         .replace("__ASSET_CAPTURE__", "const assetData = {};")
 }
 

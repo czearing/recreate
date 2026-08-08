@@ -96,7 +96,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             .contains(&node.path)
             .then_some(node.rect.width);
         let signature = format!(
-            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}|inherited:{}",
+            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}",
             signatures
                 .get(&node.path)
                 .map(String::as_str)
@@ -104,8 +104,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             super::css_layout::role(node, parent, &base.viewport),
             flex.unwrap_or_default(),
             float.unwrap_or_default(),
-            width.map(|value| value.to_string()).unwrap_or_default(),
-            super::declaration_defaults::inherited_context(parent.map(|parent| &parent.style))
+            width.map(|value| value.to_string()).unwrap_or_default()
         );
         let class = cache
             .signature_classes
@@ -132,7 +131,9 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             if !include_interactions {
                 declarations = super::css_visual::important_interaction_paint(&declarations);
             }
-            css.push_str(&format!(".{class}{{{declarations}}}\n"));
+            if !declarations.is_empty() {
+                css.push_str(&format!(".{class}{{{declarations}}}\n"));
+            }
         }
         append_pseudo(node, &class, assets, &mut css);
         classes.insert(node.path.clone(), class);
@@ -161,7 +162,7 @@ fn append_pseudo(
             css.push_str(&format!(
                 ".{class}::{pseudo}{{content:{};{}}}\n",
                 value.content,
-                super::responsive::output_declarations(&value.style, Some(&node.style), assets)
+                super::responsive::output_declarations(&value.style, assets)
             ));
         }
     }

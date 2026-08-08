@@ -57,19 +57,11 @@ fn class_name(
     );
     if let Some(before) = &node.before {
         signature.push_str(&before.content);
-        signature.push_str(&responsive::output_declarations(
-            &before.style,
-            Some(&node.style),
-            assets,
-        ));
+        signature.push_str(&responsive::output_declarations(&before.style, assets));
     }
     if let Some(after) = &node.after {
         signature.push_str(&after.content);
-        signature.push_str(&responsive::output_declarations(
-            &after.style,
-            Some(&node.style),
-            assets,
-        ));
+        signature.push_str(&responsive::output_declarations(&after.style, assets));
     }
     format!("s{}", &hex::encode(Sha256::digest(signature))[..10])
 }
@@ -101,14 +93,14 @@ fn append_rule(
         css.push_str(&format!(
             ".{class}::before{{content:{};{}}}\n",
             before.content,
-            responsive::output_declarations(&before.style, Some(&node.style), assets)
+            responsive::output_declarations(&before.style, assets)
         ));
     }
     if let Some(after) = &node.after {
         css.push_str(&format!(
             ".{class}::after{{content:{};{}}}\n",
             after.content,
-            responsive::output_declarations(&after.style, Some(&node.style), assets)
+            responsive::output_declarations(&after.style, assets)
         ));
     }
 }

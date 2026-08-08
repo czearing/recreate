@@ -139,3 +139,43 @@ fn jsx_viewport_selector_matches_responsive_bands() {
     assert!(selector.contains("width>widths[index+1]"));
     assert!(!selector.contains("width>=widths[index]"));
 }
+
+/// The document roots carry no class, so the root rule is the only path their styles
+/// have to the output. Naming a subset of properties there drops the rest silently: a
+/// `background` reset on `body` disappeared while the `margin` beside it survived.
+#[tokio::test]
+async fn the_root_rule_carries_every_captured_root_declaration() {
+    let mut page = state(1200, false, false);
+    let body = page
+        .nodes
+        .iter_mut()
+        .find(|node| node.tag == "body")
+        .unwrap();
+    body.style
+        .insert("background-color".into(), "rgb(255, 255, 255)".into());
+    body.style.insert("margin-top".into(), "0px".into());
+    let specification = Specification {
+        schema_version: 1,
+        requested_url: page.url.clone(),
+        captured_url: page.url.clone(),
+        states: vec![page],
+        interactions: Vec::new(),
+        transitions: Vec::new(),
+    };
+    let directory = tempfile::tempdir().unwrap();
+    write_project(&specification, directory.path(), &[])
+        .await
+        .unwrap();
+    let css = std::fs::read_to_string(directory.path().join("react/src/styles.css")).unwrap();
+    let rule = css
+        .split("body {")
+        .nth(1)
+        .and_then(|rest| rest.split('}').next())
+        .unwrap_or_default()
+        .to_string();
+    assert!(
+        rule.contains("background-color:rgb(255, 255, 255)"),
+        "{css}"
+    );
+    assert!(rule.contains("margin-top:0px"), "{css}");
+}

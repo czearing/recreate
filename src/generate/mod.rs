@@ -24,7 +24,6 @@ mod css_values;
 mod css_visual;
 mod custom_properties;
 mod custom_property_diff;
-mod declaration_defaults;
 mod document;
 mod inherited_styles;
 mod initial_scroll;
