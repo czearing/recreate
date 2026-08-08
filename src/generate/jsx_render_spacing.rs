@@ -41,25 +41,37 @@ pub(super) fn placeholder_extent(
             .style
             .get("flex-direction")
             .is_some_and(|value| value.starts_with("row"));
+    let (origin_x, origin_y) = content_origin(parent);
     let (axis, offset) = if horizontal {
         (
             "width",
-            child.rect.x
-                - parent.rect.x
-                - pixel_style(parent, "padding-left")
-                - pixel_style(child, "margin-left"),
+            child.rect.x - origin_x - pixel_style(child, "margin-left"),
         )
     } else {
         (
             "height",
-            child.rect.y
-                - parent.rect.y
-                - pixel_style(parent, "padding-top")
-                - pixel_style(child, "margin-top"),
+            child.rect.y - origin_y - pixel_style(child, "margin-top"),
         )
     };
     let extent = offset / missing as f64;
     (extent > 0.0).then_some((axis, extent))
+}
+
+/// The offset a spacer may compensate is the residual left after everything the emitter
+/// already reproduces. Rects are border boxes, so the parent's content edge includes its
+/// border as well as its padding; charging either to a spacer reproduces it twice.
+fn content_origin(node: &crate::model::Node) -> (f64, f64) {
+    (
+        node.rect.x + pixel_style(node, "border-left-width") + pixel_style(node, "padding-left"),
+        node.rect.y + pixel_style(node, "border-top-width") + pixel_style(node, "padding-top"),
+    )
+}
+
+/// Whether rendering this sibling will itself generate a box, and so account for the space
+/// above the subject. Elements always do; a text run does only when it has non-whitespace
+/// content, since whitespace collapses and leaves no line box (CSS 2.2 §9.2.1.1).
+fn generates_box(node: &crate::model::Node) -> bool {
+    node.tag != "#text" || !node.text.trim().is_empty()
 }
 
 pub(super) fn leading_placeholder_extent(
@@ -75,30 +87,34 @@ pub(super) fn leading_placeholder_extent(
     {
         return None;
     }
-    let child = children
+    let subject = children.iter().position(|path| {
+        components
+            .nodes
+            .get(path)
+            .is_some_and(|node| node.tag != "#text")
+    })?;
+    if children[..subject]
         .iter()
         .filter_map(|path| components.nodes.get(path))
-        .find(|node| node.tag != "#text")?;
+        .any(generates_box)
+    {
+        return None;
+    }
+    let child = components.nodes.get(&children[subject])?;
     if child
         .style
         .get("display")
         .is_none_or(|value| value != "block" && value != "flex" && value != "grid")
-        || sibling_index(children.iter().find(|path| {
-            components
-                .nodes
-                .get(*path)
-                .is_some_and(|node| node.tag != "#text")
-        })?)?
-        .1 != 1
+        || sibling_index(&children[subject])?.1 != 1
         || pixel_style(child, "margin-top") != 0.0
     {
         return None;
     }
-    let expected_x = parent.rect.x + pixel_style(parent, "padding-left");
+    let (expected_x, expected_y) = content_origin(parent);
     if (child.rect.x - expected_x).abs() > 0.5 {
         return None;
     }
-    let offset = child.rect.y - parent.rect.y - pixel_style(parent, "padding-top");
+    let offset = child.rect.y - expected_y;
     (offset >= 12.0).then_some(offset)
 }
 

@@ -43,6 +43,9 @@ mod jsx_host_props;
 mod jsx_host_props_tests;
 mod jsx_render;
 mod jsx_render_spacing;
+#[cfg(test)]
+#[path = "jsx_render_spacing_tests.rs"]
+mod jsx_render_spacing_tests;
 mod jsx_state_changes;
 mod jsx_state_existing;
 mod jsx_state_generation;
