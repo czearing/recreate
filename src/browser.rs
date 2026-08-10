@@ -5,7 +5,12 @@ use crate::{
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{fs, path::PathBuf, process::Command, time::Duration};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::Command,
+    time::Duration,
+};
 
 pub use recreate_browser::Target;
 
@@ -217,6 +222,42 @@ async fn ensure_endpoint(endpoint: &str) -> Result<()> {
     bail!("browser debugging endpoint did not start: {endpoint}")
 }
 
+/// The command line the capture browser is launched with.
+///
+/// A capture must observe the page, and only the page. A browser carries software of its own
+/// into every document it opens: extensions run content scripts in the page's world, so their
+/// edits are recorded as the page's markup and their poll loops are recorded as the page's
+/// outstanding work. Neither belongs to the site under test, and neither is reproducible on
+/// another machine, so both are pure contamination of the recreation.
+///
+/// A private profile is not enough. An enterprise-managed browser force-installs extensions
+/// by policy into every profile including a brand new one, so the isolation the profile
+/// appears to give is not real on exactly the machines an agent tool runs on. Measured here,
+/// a managed remote-desktop extension added `data-rdwebrtc-ext-url` to the emitted markup of
+/// a scene that authored no attributes at all, and its poll loop held the recorder waiting
+/// for 5.5s of every capture.
+///
+/// Nothing distinguishes an extension's edit from the page's own once it has been captured,
+/// because both are written through the same interface. So the exclusion has to happen at
+/// the boundary, before the first document, rather than as a filter downstream.
+pub fn launch_args(port: u16, profile: &Path) -> Vec<String> {
+    vec![
+        format!("--remote-debugging-port={port}"),
+        format!("--user-data-dir={}", profile.display()),
+        "--no-first-run".into(),
+        "--no-default-browser-check".into(),
+        "--disable-extensions".into(),
+        "--disable-component-extensions-with-background-pages".into(),
+        // A development server usually serves an untrusted certificate. Rendering the
+        // browser's own privacy interstitial instead of the page under test compares
+        // nothing, so trust what the operator asked us to open.
+        "--ignore-certificate-errors".into(),
+        "--force-device-scale-factor=1".into(),
+        "--new-window".into(),
+        "about:blank".into(),
+    ]
+}
+
 fn launch(endpoint: &str) -> Result<()> {
     let port = endpoint
         .rsplit_once(':')
@@ -229,19 +270,7 @@ fn launch(endpoint: &str) -> Result<()> {
         .join(format!("browser-profile-{port}"));
     std::fs::create_dir_all(&profile)?;
     Command::new(executable)
-        .args([
-            format!("--remote-debugging-port={port}"),
-            format!("--user-data-dir={}", profile.display()),
-            "--no-first-run".into(),
-            "--no-default-browser-check".into(),
-            // A development server usually serves an untrusted certificate. Rendering the
-            // browser's own privacy interstitial instead of the page under test compares
-            // nothing, so trust what the operator asked us to open.
-            "--ignore-certificate-errors".into(),
-            "--force-device-scale-factor=1".into(),
-            "--new-window".into(),
-            "about:blank".into(),
-        ])
+        .args(launch_args(port, &profile))
         .spawn()
         .context("start browser")?;
     Ok(())

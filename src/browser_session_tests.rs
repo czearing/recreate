@@ -83,3 +83,37 @@ fn a_failing_capture_still_closes_its_tab() {
         "capture.rs must close the tab before propagating a failure"
     );
 }
+
+/// A capture must observe the page and nothing else. An extension's content script writes
+/// through the same DOM interface the page does, so once its edits are captured no downstream
+/// stage can tell them apart — a scene authoring no attributes at all emitted an extension's
+/// `data-rdwebrtc-ext-url`, and the extension's poll loop was read as the page's own
+/// outstanding work at a cost of 5.5s per capture.
+///
+/// A private profile does not prevent this: a managed browser force-installs by policy into
+/// every profile, including a brand new one. So the exclusion belongs in the launch.
+#[test]
+fn the_capture_browser_runs_none_of_the_machine_s_own_extensions() {
+    let args = super::browser::launch_args(9222, std::path::Path::new("profile"));
+    for flag in [
+        "--disable-extensions",
+        "--disable-component-extensions-with-background-pages",
+    ] {
+        assert!(
+            args.iter().any(|value| value == flag),
+            "capture browser must launch with {flag}"
+        );
+    }
+}
+
+/// The capture browser must keep its own profile directory. Sharing the operator's would
+/// carry their cookies, storage and session into the recreation, and would make the capture
+/// contend with a browser they are using.
+#[test]
+fn the_capture_browser_keeps_its_own_profile() {
+    let args = super::browser::launch_args(9222, std::path::Path::new("profile"));
+    assert!(
+        args.iter().any(|value| value == "--user-data-dir=profile"),
+        "capture browser must run in its own profile: {args:?}"
+    );
+}
