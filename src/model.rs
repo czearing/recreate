@@ -113,6 +113,11 @@ pub struct AttributeSequence {
     pub interval_ms: u64,
     #[serde(default)]
     pub steps: Vec<SequenceStep>,
+    /// Whether the observed values came back round, which is the only fact separating a
+    /// progression that should loop from one that should come to rest. `None` is a capture
+    /// taken before this was recorded and says nothing either way, so it keeps looping.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repeats: Option<bool>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

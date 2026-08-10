@@ -42,6 +42,22 @@ function currentValue(element, sequence) {
     : element.getAttribute?.(sequence.attribute);
 }
 
+// Replay begins at whichever value the captured DOM already holds, not at the first step, so
+// the steps before that point were observed strictly BEFORE the capture. Wrapping past the
+// end is what makes them reachable again, and reaching them does not extend the progression,
+// it rewinds history. A progression the capture watched come back round has no beginning and
+// must keep wrapping; one that never repeated stops on its last observed value, which is the
+// same shape as `animation-iteration-count: 1` with `animation-fill-mode: forwards`.
+//
+// Absence of the fact is not evidence against it: data emitted before it was recorded says
+// nothing either way, and treating silence as "does not repeat" would stop motion the tool
+// used to reproduce correctly. Only a recorded `false` terminates.
+function nextIndex(sequence, index) {
+  const next = index + 1;
+  if (next < sequence.steps.length) return next;
+  return sequence.repeats === false ? -1 : 0;
+}
+
 export function startSequence(element, sequence, clock = globalThis) {
   if (!element || sequence.steps.length < 2 || clock.__recreateFreezeSequences) {
     return () => {};
@@ -54,15 +70,20 @@ export function startSequence(element, sequence, clock = globalThis) {
   if (index < 0) index = 0;
   let timer = null;
   let stopped = false;
+  const arm = () => {
+    timer = nextIndex(sequence, index) < 0
+      ? null
+      : clock.setTimeout(advance, sequence.steps[index].delay_ms);
+  };
   const advance = () => {
     if (stopped) return;
-    index = (index + 1) % sequence.steps.length;
+    index = nextIndex(sequence, index);
     const step = sequence.steps[index];
     applySequenceValue(element, sequence, step.value);
-    timer = clock.setTimeout(advance, step.delay_ms);
+    arm();
   };
   if (capturedIndex < 0) applySequenceValue(element, sequence, sequence.steps[index].value);
-  timer = clock.setTimeout(advance, sequence.steps[index].delay_ms);
+  arm();
   return () => {
     stopped = true;
     if (timer !== null) clock.clearTimeout(timer);

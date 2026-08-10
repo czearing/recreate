@@ -54,7 +54,14 @@ pub fn javascript(specification: &Specification) -> String {
                             })
                             .collect()
                     };
+                    // Rotating so the captured value comes first is right for a cycle, which
+                    // has no beginning: any value starts it as well as any other. For a
+                    // progression that never repeated it is destructive, because it moves the
+                    // values observed BEFORE the capture to AFTER it. `Draft, Reviewing,
+                    // Final` caught at `Final` becomes `Final, Draft, Reviewing`, so even a
+                    // single forward pass rewinds history rather than continuing it.
                     if sequence.attribute == "textContent"
+                        && sequence.repeats != Some(false)
                         && let Some(captured) = captured_text(state, &sequence.target)
                         && let Some(index) = steps
                             .iter()
@@ -62,11 +69,15 @@ pub fn javascript(specification: &Specification) -> String {
                     {
                         steps.rotate_left(index);
                     }
-                    serde_json::json!({
+                    let mut emitted = serde_json::json!({
                         "target": sequence.target,
                         "attribute": sequence.attribute,
                         "steps": steps
-                    })
+                    });
+                    if sequence.repeats == Some(false) {
+                        emitted["repeats"] = serde_json::Value::Bool(false);
+                    }
+                    emitted
                 })
                 .collect::<Vec<_>>()
         })

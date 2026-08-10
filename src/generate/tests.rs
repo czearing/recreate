@@ -15,6 +15,7 @@ async fn writes_semantic_component_project() {
                 values: vec!["First".into(), "Second".into()],
                 interval_ms: 100,
                 steps: Vec::new(),
+                repeats: None,
             });
     }
 

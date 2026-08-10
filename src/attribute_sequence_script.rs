@@ -33,6 +33,11 @@ pub const SOURCE: &str = r#"
     sequenceCandidates.push({
       target: group.target,
       attribute: group.attribute,
+      // A period shorter than the run is the only evidence that the values came back round.
+      // Equal to the run means the loop found no period at all, so the progression was
+      // observed to end. This is the one fact that separates a spinner from a reveal, it is
+      // knowable only here, and truncation below destroys it.
+      repeats: cycle < group.values.length,
       values: group.values.slice(0, cycle),
       interval_ms: fallback,
       steps: group.values.slice(0, cycle).map((value, index) => ({
@@ -49,19 +54,50 @@ pub const SOURCE: &str = r#"
       sequence.target.startsWith(`${other.target}>`)
     )
   ));
-  for (const sequence of attributeSequences) {
-    if (sequence.attribute !== 'textContent') continue;
-    const captured = nodes.find(node => node.path === sequence.target)?.text
-      ?.replace(/\s+/g, ' ').trim();
-    const index = sequence.values.indexOf(captured);
-    if (index <= 0) continue;
-    sequence.values = sequence.values.slice(index).concat(sequence.values.slice(0, index));
-    sequence.steps = sequence.steps.slice(index).concat(sequence.steps.slice(0, index));
-  }
 "#;
 
 #[cfg(test)]
 mod tests {
+    use crate::node_eval;
+    use serde_json::Value;
+
+    /// Drives the shipped capture rule against recorded mutations, so the emitted candidate is
+    /// produced by the same code the browser runs.
+    fn emit(mutations: &str, captured_text: &str) -> Value {
+        node_eval::evaluate(
+            &format!(
+                "const window = {{ __recreateAttributeMutations: {mutations} }};\n\
+                 const nodes = [{{ path: 'p', text: {captured_text} }}];\n{source}",
+                source = super::SOURCE
+            ),
+            "attributeSequences",
+        )
+    }
+
+    /// Three values, each seen once. `recurringPrefix` finds no period, so the progression was
+    /// observed to end.
+    fn one_shot() -> Value {
+        emit(
+            "[{target:'p',attribute:'textContent',value:'Draft',time:0},\
+             {target:'p',attribute:'textContent',value:'Reviewing',time:300},\
+             {target:'p',attribute:'textContent',value:'Final',time:600}]",
+            "'Final'",
+        )
+    }
+
+    /// The same three values seen twice round. Identical on every axis the gates measure.
+    fn cyclic() -> Value {
+        emit(
+            "[{target:'p',attribute:'textContent',value:'Alpha',time:0},\
+             {target:'p',attribute:'textContent',value:'Bravo',time:300},\
+             {target:'p',attribute:'textContent',value:'Charlie',time:600},\
+             {target:'p',attribute:'textContent',value:'Alpha',time:900},\
+             {target:'p',attribute:'textContent',value:'Bravo',time:1200},\
+             {target:'p',attribute:'textContent',value:'Charlie',time:1500}]",
+            "'Bravo'",
+        )
+    }
+
     #[test]
     fn compresses_repeated_sequence_cycles() {
         assert!(super::SOURCE.contains("const recurringPrefix = values"));
@@ -69,7 +105,29 @@ mod tests {
         assert!(super::SOURCE.contains("group.values.slice(0, cycle)"));
         assert!(super::SOURCE.contains("Math.max(16, gaps[index])"));
         assert!(super::SOURCE.contains("sequence.target.startsWith(`${other.target}>`)"));
-        assert!(super::SOURCE.contains("nodes.find(node => node.path === sequence.target)?.text"));
-        assert!(super::SOURCE.contains("sequence.values.slice(index).concat"));
+    }
+
+    /// The discriminator is computed at the only point it is knowable and was previously used
+    /// to truncate and then discarded, so a one-shot of length 3 and a 3-cycle seen once
+    /// emitted byte-identical data.
+    #[test]
+    fn the_two_kinds_of_progression_are_distinguishable_in_the_emitted_data() {
+        assert_eq!(one_shot()[0]["repeats"], Value::Bool(false));
+        assert_eq!(cyclic()[0]["repeats"], Value::Bool(true));
+    }
+
+    /// Capture records the order it observed and nothing more. Rotation is the generator's,
+    /// which recomputes it from the captured text either way, so a second copy here could
+    /// only drift from it.
+    #[test]
+    fn capture_records_the_order_it_observed_for_both_kinds() {
+        assert_eq!(
+            one_shot()[0]["values"],
+            serde_json::json!(["Draft", "Reviewing", "Final"])
+        );
+        assert_eq!(
+            cyclic()[0]["values"],
+            serde_json::json!(["Alpha", "Bravo", "Charlie"])
+        );
     }
 }
