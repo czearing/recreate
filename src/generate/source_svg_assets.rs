@@ -56,7 +56,7 @@ pub fn extract(sources: &mut [&mut String], directory: &Path, css: &str) -> Resu
     Ok(())
 }
 
-fn encoded_svg_sources(source: &str) -> Vec<(usize, usize, String)> {
+pub(super) fn encoded_svg_sources(source: &str) -> Vec<(usize, usize, String)> {
     const MARKER: &str = "src={\"data:image/svg+xml;utf8,";
     let mut matches = Vec::new();
     let mut offset = 0;
@@ -104,17 +104,8 @@ fn image(svg: &str, filename: &str) -> String {
     format!("<img src={{\"/assets/{filename}\"}} alt={{\"\"}}{attributes} />")
 }
 
-fn document(svg: &str, css: &str) -> String {
-    let classes = classes(svg);
-    let styles = css
-        .lines()
-        .filter(|line| {
-            classes
-                .iter()
-                .any(|class_name| line.contains(&format!(".{class_name}")))
-        })
-        .collect::<Vec<_>>()
-        .join("\n");
+pub(super) fn document(svg: &str, css: &str) -> String {
+    let styles = super::css_closure::self_contained(css, &classes(svg));
     let mut svg = to_xml(svg);
     if !svg.contains("xmlns=") {
         svg = svg.replacen("<svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"", 1);
@@ -146,7 +137,7 @@ fn attribute<'a>(source: &'a str, name: &str) -> Option<&'a str> {
     Some(&source[start..end])
 }
 
-fn to_xml(source: &str) -> String {
+pub(super) fn to_xml(source: &str) -> String {
     let mut output = source
         .replace("className={\"", "class=\"")
         .replace("={\"", "=\"")
@@ -173,24 +164,4 @@ fn to_xml(source: &str) -> String {
         output.replace_range(start..=end, &format!("=\"{value}\""));
     }
     output
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn converts_jsx_svg_to_xml() {
-        let svg = super::to_xml(
-            r#"<svg className={"icon"} viewBox={"0 0 1 1"}><path strokeWidth={"1"} /></svg>"#,
-        );
-        assert!(svg.contains("class=\"icon\""));
-        assert!(svg.contains("stroke-width=\"1\""));
-    }
-
-    #[test]
-    fn decodes_svg_image_sources() {
-        let matches = super::encoded_svg_sources(
-            r#"<img src={"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22x%22%3E%3C%2Fsvg%3E"} />"#,
-        );
-        assert_eq!(matches[0].2, r#"<svg xmlns="x"></svg>"#);
-    }
 }

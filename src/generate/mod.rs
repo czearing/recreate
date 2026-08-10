@@ -21,11 +21,13 @@ mod component_identity;
 mod css;
 mod css_base;
 mod css_base_style;
+mod css_closure;
 mod css_custom_properties;
 mod css_interactions;
 mod css_layers;
 mod css_layout;
 mod css_paths;
+mod css_rule_split;
 mod css_state_helpers;
 mod css_values;
 mod css_visual;
@@ -115,6 +117,9 @@ mod source_style_shards;
 mod source_style_split;
 mod source_style_support;
 mod source_svg_assets;
+#[cfg(test)]
+#[path = "source_svg_assets_tests.rs"]
+mod source_svg_assets_tests;
 mod source_view_split;
 mod startup_overlays;
 mod state_style_maps;
