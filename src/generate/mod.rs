@@ -10,6 +10,9 @@ mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
+#[cfg(test)]
+#[path = "carousel_effect_tests.rs"]
+mod carousel_effect_tests;
 mod carousel_inference;
 #[cfg(test)]
 #[path = "carousel_inference_tests.rs"]

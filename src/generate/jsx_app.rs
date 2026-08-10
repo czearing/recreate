@@ -429,6 +429,10 @@ pub fn app(
             .unwrap()
         ),
     );
+    // Spliced in unconditionally, which is safe only because the effect stands itself down
+    // when `inferredCarousel` is null. That was the shape of the fabricated-carousel defect:
+    // an unconditional splice around a body that treated an absent guess as licence to go
+    // looking. `the_shipped_effect_binds_nothing_when_no_carousel_was_admitted` pins it.
     let output = output.replace(
         "useEffect(()=>{if(!carouselState||!carouselPrevious||!carouselNext)return;",
         &format!(

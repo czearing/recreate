@@ -5,8 +5,8 @@
 //! dialog. These tests hold both directions: the declared widget still binds, and the widget
 //! that merely resembles one does not.
 
-use super::carousel_inference::{EFFECT, javascript};
-use crate::model::{DomNode, Node, PageState, Rect, Specification, Viewport};
+use super::carousel_inference::javascript;
+use crate::model::{DomNode, Node, PageState, Rect, Specification};
 use std::collections::BTreeMap;
 
 /// The shape the filed defect fabricated from: a dialog whose action row holds a disabled
@@ -157,25 +157,6 @@ fn defers_to_a_captured_carousel() {
     );
 }
 
-/// The rule shipped twice, and the browser copy was the weaker one: it scanned every element
-/// for a disabled/enabled pair near overflow, keeping no constraint but the overflow itself,
-/// and it ran precisely when the generator had declined to guess. The effect must therefore
-/// choose nothing — every element it touches has to come from the decision already made.
-#[test]
-fn the_shipped_effect_never_chooses_a_carousel_itself() {
-    let queries = EFFECT.match_indices("document.querySelector").count();
-    assert_eq!(queries, 3, "{EFFECT}");
-    for (index, _) in EFFECT.match_indices("document.querySelector") {
-        let argument = &EFFECT[index..];
-        let argument = &argument[argument.find('(').unwrap() + 1..];
-        assert!(
-            argument.starts_with("inferredCarousel."),
-            "effect queries the document for something it was not given: {argument:.60}"
-        );
-    }
-    assert!(!EFFECT.contains("querySelectorAll('body *')"), "{EFFECT}");
-}
-
 fn specification(state: PageState) -> Specification {
     Specification {
         schema_version: 1,
@@ -208,21 +189,5 @@ fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node
 }
 
 fn empty_state() -> PageState {
-    PageState {
-        url: String::new(),
-        title: String::new(),
-        viewport: Viewport::default(),
-        nodes: Vec::new(),
-        dom: BTreeMap::new(),
-        capture_blockers: Vec::new(),
-        startup_nodes: Vec::new(),
-        startup_delay_ms: 0,
-        startup_duration_ms: 0,
-        animations: Vec::new(),
-        state_styles: Vec::new(),
-        attribute_sequences: Vec::new(),
-        css_rules: Vec::new(),
-        asset_urls: Vec::new(),
-        asset_data: BTreeMap::new(),
-    }
+    PageState::default()
 }

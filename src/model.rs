@@ -120,7 +120,7 @@ pub struct AttributeSequence {
     pub repeats: Option<bool>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct PageState {
     pub url: String,
     pub title: String,
