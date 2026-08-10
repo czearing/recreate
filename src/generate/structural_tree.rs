@@ -48,9 +48,17 @@ pub fn fragment_nodes(nodes: &[Node], classes: &BTreeMap<String, String>) -> Com
     }
 }
 
+/// A CSS-supplying element is not registered under its parent, so no render walk reaches
+/// it. Its rules are captured into `css_rules` and re-emitted through `css::global_rule`
+/// like every other authored rule, which is the single route `document::supplies_css`
+/// exists to protect: re-serialising the element would apply them a second time at their
+/// authored specificity, and a `<style>` in the body would do it just as a head one did.
 pub fn children(nodes: &[Node]) -> BTreeMap<String, Vec<String>> {
     let mut children: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for node in nodes {
+        if super::document::supplies_css(node) {
+            continue;
+        }
         if let Some(parent) = &node.parent {
             children
                 .entry(parent.clone())

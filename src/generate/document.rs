@@ -43,13 +43,36 @@ fn head(state: &PageState, classes: &BTreeMap<String, String>) -> String {
 }
 
 fn safe_head_node(node: &Node) -> bool {
+    if supplies_css(node) {
+        return false;
+    }
     if node.tag != "link" {
-        return matches!(node.tag.as_str(), "base" | "meta" | "style" | "title");
+        return matches!(node.tag.as_str(), "base" | "meta" | "title");
     }
     let relation = node.attributes.get("rel").map(String::as_str);
     let kind = node.attributes.get("as").map(String::as_str);
     let href = node.attributes.get("href").map(String::as_str);
     safe_link(relation, kind) && resolvable_link(href)
+}
+
+/// Whether an element delivers authored CSS, by any route.
+///
+/// Every authored rule already reaches the output through `css_base`, which re-emits from
+/// the captured `css_rules` under `css::global_rule` — the gate that exists because the
+/// bake already represents any rule that reached an element through a selector. Emitting
+/// a `<style>` verbatim, or leaving a stylesheet `<link>` live, routes around that gate
+/// and applies those rules a second time, at whatever specificity they were authored
+/// with. So which declaration wins would depend on how the page happened to ship it, and
+/// an authored rule the original cascade rejected can outrank the value that beat it.
+/// Rejecting the delivery instead of filtering its text keeps one owner for the decision.
+pub(super) fn supplies_css(node: &Node) -> bool {
+    node.tag == "style"
+        || (node.tag == "link"
+            && node.attributes.get("rel").is_some_and(|relation| {
+                relation
+                    .split_ascii_whitespace()
+                    .any(|token| token.eq_ignore_ascii_case("stylesheet"))
+            }))
 }
 
 /// A relative href names a file in the source site's own build output, which the
@@ -81,11 +104,7 @@ fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -
         .filter(|child| child.parent.as_deref() == Some(node.path.as_str()) && child.tag == "#text")
         .map(|child| child.text.as_str())
         .collect::<String>();
-    let text = if node.tag == "style" {
-        text.replace("</style", "<\\/style")
-    } else {
-        escape(&text)
-    };
+    let text = escape(&text);
     format!("<{}{attributes}>{text}</{}>", node.tag, node.tag)
 }
 
@@ -108,21 +127,16 @@ fn attributes(node: &Node, classes: &BTreeMap<String, String>) -> String {
     attributes
 }
 
-/// The authored tokens scope the re-emitted stylesheet and the generated class carries the
-/// element's captured styles. Both are needed, and a second `class` attribute would be
-/// discarded by the parser, so they share one.
+/// The generated class carries the element's captured styles and is the only class any
+/// emitted element needs. Authored tokens are not merged: nothing in the project selects
+/// them, because the emitted stylesheet holds only hashed classes and the definition
+/// at-rules `css::global_rule` admits, and `project.rs::root_reset` writes the roots'
+/// authored declarations as literal `html`/`body` rules rather than through a token.
 fn class_attribute(node: &Node, classes: &BTreeMap<String, String>) -> String {
-    let authored = node.attributes.get("class").map(String::as_str);
-    let generated = classes.get(&node.path).map(String::as_str);
-    let tokens = authored
-        .into_iter()
-        .chain(generated)
-        .flat_map(str::split_whitespace)
-        .collect::<Vec<_>>();
-    if tokens.is_empty() {
+    let Some(generated) = classes.get(&node.path) else {
         return String::new();
-    }
-    format!(" class=\"{}\"", escape(&tokens.join(" ")))
+    };
+    format!(" class=\"{}\"", escape(generated))
 }
 
 fn escape(value: &str) -> String {

@@ -35,6 +35,9 @@ mod custom_properties;
 mod custom_property_diff;
 mod document;
 #[cfg(test)]
+#[path = "document_css_tests.rs"]
+mod document_css_tests;
+#[cfg(test)]
 #[path = "document_root_tests.rs"]
 mod document_root_tests;
 #[cfg(test)]

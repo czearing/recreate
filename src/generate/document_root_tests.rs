@@ -54,15 +54,24 @@ fn start_tag(html: &str, tag: &str) -> String {
     html[start..=end].to_string()
 }
 
-/// The authored token qualifies every root-scoped rule in the re-emitted stylesheet, so
-/// deleting it renders those rules inert while leaving them greppable in the output.
+/// The authored token existed only to scope the re-emitted stylesheet. Nothing re-emits
+/// one now, so nothing in the project can select the token: the emitted CSS holds hashed
+/// classes and definition at-rules, and `project.rs::root_reset` writes the roots'
+/// authored declarations as literal `html`/`body` rules. Keeping it would leave an
+/// unmatched string in the markup and preserve the hook a resurrected rule needs.
 #[test]
-fn keeps_the_authored_scoping_token_on_the_document_root() {
+fn drops_the_authored_class_token_from_the_document_root() {
     let html = document::render(Some(&page(Some("dark"), Some("theme-a"))), "", &classes());
-    let root = start_tag(&html, "html");
-    assert!(root.contains("dark"), "html start tag was {root}");
-    let body = start_tag(&html, "body");
-    assert!(body.contains("theme-a"), "body start tag was {body}");
+    assert!(
+        start_tag(&html, "html").contains("class=\"rhtml\""),
+        "html start tag was {}",
+        start_tag(&html, "html")
+    );
+    assert!(
+        start_tag(&html, "body").contains("class=\"rbody\""),
+        "body start tag was {}",
+        start_tag(&html, "body")
+    );
 }
 
 /// The generated class is the document root's only route to its own captured styles,
