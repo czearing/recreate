@@ -1,4 +1,4 @@
-use super::{jsx, tree};
+use super::{jsx, startup_timeline, tree};
 use crate::model::PageState;
 use std::collections::BTreeMap;
 
@@ -48,8 +48,7 @@ pub fn selector() -> &'static str {
 pub fn fragment(
     components: &tree::Components,
     assets: &BTreeMap<String, String>,
-    _delay_ms: u64,
-    duration_ms: u64,
+    timeline: startup_timeline::Timeline,
 ) -> String {
     let handlers = BTreeMap::new();
     let roots = components
@@ -62,14 +61,12 @@ pub fn fragment(
         })
         .map(|node| jsx::render(&node.path, components, assets, 2, true, &handlers))
         .collect::<String>();
+    let variables = timeline.style_variables();
     format!(
         "<div className=\"recreateStartupOverlay recreateStartupBlocking\" \
          data-recreate-startup=\"true\" \
          onAnimationEnd={{event=>{{if(event.target===event.currentTarget)onStartupDone()}}}} \
-         style={{{{\
-         \"--recreate-startup-delay\":\"0ms\",\
-         \"--recreate-startup-duration\":\"{duration_ms}ms\"\
-         }}}}>{roots}</div>"
+         style={{{{{variables}}}}}>{roots}</div>"
     )
 }
 

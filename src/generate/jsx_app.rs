@@ -1,6 +1,6 @@
 use super::{
     attribute_sequences, interaction_scroll, interactions, jsx_variants, startup_overlays,
-    structural_tree, tree::Components,
+    startup_timeline, structural_tree, tree::Components,
 };
 use crate::model::Specification;
 use std::collections::BTreeMap;
@@ -66,8 +66,7 @@ pub fn app(
             let fragment = jsx_variants::fragment(
                 &startup,
                 assets,
-                state.startup_delay_ms,
-                state.startup_duration_ms,
+                startup_timeline::Timeline::of(state),
             );
             format!("<>{page}{{createPortal({fragment},document.body)}}</>")
         })

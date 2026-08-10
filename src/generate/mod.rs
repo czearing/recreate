@@ -127,6 +127,7 @@ mod source_svg_assets;
 mod source_svg_assets_tests;
 mod source_view_split;
 mod startup_overlays;
+mod startup_timeline;
 mod state_style_maps;
 mod state_styles;
 mod structural_css;

@@ -1,3 +1,4 @@
+use super::startup_timeline;
 use crate::model::PageState;
 
 pub fn append(states: &[PageState], css: &mut String) {
@@ -26,9 +27,9 @@ pub fn append(states: &[PageState], css: &mut String) {
 }
 
 pub fn runtime(source: String, states: &[PageState]) -> String {
-    let durations = states
+    let settles = states
         .iter()
-        .map(|state| state.startup_duration_ms.to_string())
+        .map(|state| startup_timeline::Timeline::of(state).settle_ms().to_string())
         .collect::<Vec<_>>()
         .join(",");
     let source = source.replace(
@@ -38,13 +39,13 @@ pub fn runtime(source: String, states: &[PageState]) -> String {
     let source = source.replace(
         "const activate=",
         &format!(
-            "const startupDurations=[{durations}];\
-             useLayoutEffect(()=>{{const duration=startupDurations[viewport];\
-             if(startupDone)return;if(!duration){{setStartupDone(true);return}}\
+            "const startupSettles=[{settles}];\
+             useLayoutEffect(()=>{{const settle=startupSettles[viewport];\
+             if(startupDone)return;if(!settle){{setStartupDone(true);return}}\
              if(matchMedia('(prefers-reduced-motion: reduce)').matches){{\
              setStartupDone(true);return}}document.body.classList.add('recreateStartupBody');\
              const timer=setTimeout(()=>{{document.body.classList.remove('recreateStartupBody');\
-             setStartupDone(true)}},duration+500);return()=>{{clearTimeout(timer);\
+             setStartupDone(true)}},settle);return()=>{{clearTimeout(timer);\
              document.body.classList.remove('recreateStartupBody')}}}},[viewport,startupDone]);\
              const activate="
         ),
