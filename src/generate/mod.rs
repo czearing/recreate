@@ -11,6 +11,11 @@ mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
 mod selector_list;
+mod sibling_alignment;
+#[cfg(test)]
+mod sibling_alignment_tests;
+#[cfg(test)]
+mod sibling_alignment_regression_tests;
 #[cfg(test)]
 mod selector_list_tests;
 #[cfg(test)]
@@ -144,3 +149,4 @@ pub async fn from_file(spec: &Path, out: &Path) -> Result<()> {
 }
 
 pub use project::write_project;
+

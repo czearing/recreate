@@ -2,11 +2,7 @@ pub(super) fn newly_visible_roots(
     state: &crate::model::PageState,
     baseline: &crate::model::PageState,
 ) -> std::collections::HashSet<String> {
-    let baseline_by_path = baseline
-        .nodes
-        .iter()
-        .map(|node| (node.path.as_str(), node))
-        .collect::<std::collections::HashMap<_, _>>();
+    let alignment = super::sibling_alignment::of(state, baseline);
     let nodes = state
         .nodes
         .iter()
@@ -16,7 +12,7 @@ pub(super) fn newly_visible_roots(
         .nodes
         .iter()
         .filter(|node| {
-            let baseline_node = baseline_by_path.get(node.path.as_str());
+            let baseline_node = alignment.counterpart(&node.path);
             (visible(node) && baseline_node.is_none())
                 || (visible_surface(node)
                     && baseline_node.is_none_or(|baseline_node| {
@@ -43,9 +39,8 @@ pub(super) fn newly_visible_roots(
                     root = parent;
                     break;
                 }
-                if baseline_by_path
-                    .get(parent.path.as_str())
-                    .is_some_and(|node| visible(node))
+                if alignment.counterpart(&parent.path)
+                    .is_some_and(visible)
                 {
                     break;
                 }
@@ -199,3 +194,4 @@ pub(super) fn visible(node: &crate::model::Node) -> bool {
             .and_then(|value| value.parse::<f64>().ok())
             .is_none_or(|value| value > 0.01)
 }
+

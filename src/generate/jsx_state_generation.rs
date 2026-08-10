@@ -284,6 +284,7 @@ pub fn interaction_states(
                         &Default::default(),
                         &std::collections::HashSet::from(["html".to_string()]),
                         &[],
+                        &super::sibling_alignment::of(state, baseline),
                     )
                 } else if state_control || !shared_surface && !surface_roots.is_empty() {
                     String::new()
@@ -305,6 +306,7 @@ pub fn interaction_states(
                         &Default::default(),
                         &changed,
                         &[],
+                        &super::sibling_alignment::of(state, baseline),
                     )
                 };
                 let page = if full_replacement {
@@ -362,3 +364,4 @@ pub fn interaction_states(
     output.push_str(&interactions);
     output
 }
+

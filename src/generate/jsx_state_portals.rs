@@ -35,16 +35,17 @@ pub(super) fn inserted_surfaces(
     assets: &BTreeMap<String, String>,
     handlers: &BTreeMap<String, String>,
 ) -> String {
+    let alignment = super::sibling_alignment::of(state, baseline);
     roots
         .into_iter()
         .filter_map(|node| {
             let parent = node.parent.as_ref()?;
             let rendered = jsx::render(&node.path, components, assets, 0, true, handlers);
-            let before = if shifted_insertion(&node.path, state, baseline) {
-                serde_json::to_string(&node.path).unwrap()
-            } else {
-                "null".into()
-            };
+            let before = alignment
+                .insertion(&node.path)
+                .and_then(|insertion| insertion.before.clone())
+                .map(|before| serde_json::to_string(&before).expect("anchor path should serialize"))
+                .unwrap_or_else(|| "null".into());
             let floating = node
                 .style
                 .get("position")
@@ -55,43 +56,6 @@ pub(super) fn inserted_surfaces(
                 serde_json::to_string(parent).expect("surface parent path should serialize"),
             ))
         })
-        .collect()
-}
-
-pub(super) fn shifted_insertion(
-    path: &str,
-    state: &crate::model::PageState,
-    baseline: &crate::model::PageState,
-) -> bool {
-    let Some(next) = next_sibling_path(path) else {
-        return false;
-    };
-    let baseline_node = baseline.nodes.iter().find(|node| node.path == path);
-    let shifted = state.nodes.iter().find(|node| node.path == next);
-    baseline_node
-        .zip(shifted)
-        .is_some_and(|(baseline_node, shifted)| {
-            baseline_node.tag == shifted.tag
-                && baseline_node.attributes == shifted.attributes
-                && child_signature(baseline, path) == child_signature(state, &next)
-        })
-}
-
-pub(super) fn next_sibling_path(path: &str) -> Option<String> {
-    let (prefix, suffix) = path.rsplit_once(":nth-of-type(")?;
-    let index = suffix.strip_suffix(')')?.parse::<usize>().ok()?;
-    Some(format!("{prefix}:nth-of-type({})", index + 1))
-}
-
-pub(super) fn child_signature(
-    state: &crate::model::PageState,
-    path: &str,
-) -> Vec<(String, Option<String>)> {
-    state
-        .nodes
-        .iter()
-        .filter(|node| node.parent.as_deref() == Some(path))
-        .map(|node| (node.tag.clone(), node.attributes.get("role").cloned()))
         .collect()
 }
 
@@ -131,3 +95,4 @@ pub(super) fn trigger_portals(
         .collect::<String>();
     format!("<>{portals}</>")
 }
+

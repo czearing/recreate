@@ -14,6 +14,7 @@ pub(super) fn overlay(
     render_flags: (bool, bool),
 ) -> String {
     let (include_changed_existing, preserve_mounted_controls) = render_flags;
+    let alignment = super::sibling_alignment::of(state, baseline);
     if let Some(surface_roots) = known_surface_roots {
         let baseline_paths = baseline
             .nodes
@@ -22,6 +23,13 @@ pub(super) fn overlay(
             .collect::<BTreeSet<_>>();
         let existing = surface_roots
             .iter()
+            .filter(|root| {
+                // A path present in both captures can denote two different elements, because
+                // an insertion renames every following same-tag sibling. Diffing an inserted
+                // element against whatever used to hold its path reports the insertion as a
+                // change to the displaced element.
+                alignment.insertion(root).is_none()
+            })
             .filter(|root| {
                 let state_node = state.nodes.iter().find(|node| node.path == root.as_str());
                 let baseline_node = baseline
@@ -53,15 +61,18 @@ pub(super) fn overlay(
         let replacements = structural
             .iter()
             .filter(|root| {
-                baseline_paths.contains(root.as_str()) && !shifted_insertion(root, state, baseline)
+                baseline_paths.contains(root.as_str())
+                    && alignment.insertion(root).is_none()
             })
             .cloned()
             .collect::<std::collections::HashSet<_>>();
         let mut activated = existing.clone();
         let shifted = structural
             .iter()
-            .filter(|root| shifted_insertion(root, state, baseline))
-            .filter_map(|root| next_sibling_path(root).map(|state_root| (state_root, root.clone())))
+            .filter_map(|root| {
+                let insertion = alignment.insertion(root)?;
+                Some((insertion.displaced.clone()?, root.clone()))
+            })
             .collect::<Vec<_>>();
         activated.retain(|path| {
             !shifted
@@ -87,11 +98,18 @@ pub(super) fn overlay(
             &existing,
             &delta_roots,
             &shifted,
+            &alignment,
         );
         let added = state
             .nodes
             .iter()
-            .filter(|node| structural.contains(&node.path) && !replacements.contains(&node.path))
+            .filter(|node| {
+                structural.contains(&node.path)
+                    && !replacements.contains(&node.path)
+                    // A survivor keeps its identity and its place in the static markup, so
+                    // portalling it would render the same element twice.
+                    && !shifted.iter().any(|(displaced, _)| *displaced == node.path)
+            })
             .collect();
         let added_portals = inserted_surfaces(added, state, baseline, components, assets, handlers);
         let replacement_portals =
@@ -141,3 +159,5 @@ pub(super) fn overlay(
     }
     portals(roots, components, assets, handlers)
 }
+
+

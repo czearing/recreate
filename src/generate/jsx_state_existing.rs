@@ -9,15 +9,11 @@ pub(super) fn existing_surface(
     marked_roots: &std::collections::HashSet<String>,
     delta_roots: &std::collections::HashSet<String>,
     shifted: &[(String, String)],
+    alignment: &super::sibling_alignment::Alignment,
 ) -> String {
     if roots.is_empty() && delta_roots.is_empty() {
         return String::new();
     }
-    let baseline_nodes = baseline
-        .nodes
-        .iter()
-        .map(|node| (node.path.as_str(), node))
-        .collect::<std::collections::HashMap<_, _>>();
     let entries = state
         .nodes
         .iter()
@@ -36,8 +32,8 @@ pub(super) fn existing_surface(
             })
         })
         .filter(|node| {
-            baseline_nodes
-                .get(node.path.as_str())
+            alignment
+                .counterpart(&node.path)
                 .is_some_and(|baseline| {
                     node.before != baseline.before || node.after != baseline.after
                 })
@@ -76,24 +72,13 @@ pub(super) fn existing_surface(
                     .is_some_and(|suffix| suffix.starts_with('>'))
         })
     });
-    let baseline_path = |path: &str| {
-        shifted
-            .iter()
-            .find_map(|(state_root, baseline_root)| {
-                path.strip_prefix(state_root)
-                    .filter(|suffix| suffix.is_empty() || suffix.starts_with('>'))
-                    .map(|suffix| format!("{baseline_root}{suffix}"))
-            })
-            .unwrap_or_else(|| path.to_string())
-    };
     let styles = state
         .nodes
         .iter()
         .filter(|node| node.tag != "#text" && contained_by(delta_roots, &node.path))
         .filter_map(|node| {
-            let path = baseline_path(&node.path);
-            let baseline = baseline_nodes.get(path.as_str())?;
-            let shifted_node = path != node.path;
+            let baseline = alignment.counterpart(&node.path)?;
+            let shifted_node = baseline.path != node.path;
             let changed = node
                 .style
                 .iter()
@@ -110,8 +95,7 @@ pub(super) fn existing_surface(
         .iter()
         .filter(|node| node.tag == "#text" && contained_by(delta_roots, &node.path))
         .filter_map(|node| {
-            let path = baseline_path(&node.path);
-            let baseline = baseline_nodes.get(path.as_str());
+            let baseline = alignment.counterpart(&node.path);
             (baseline.is_some_and(|baseline| node.text != baseline.text)
                 || baseline.is_none() && contained_by(marked_roots, &node.path))
             .then_some((&node.path, &node.text))
@@ -122,8 +106,7 @@ pub(super) fn existing_surface(
         .iter()
         .filter(|node| node.tag != "#text" && contained_by(delta_roots, &node.path))
         .filter_map(|node| {
-            let path = baseline_path(&node.path);
-            let baseline = baseline_nodes.get(path.as_str())?;
+            let baseline = alignment.counterpart(&node.path)?;
             let names = node
                 .attributes
                 .keys()
@@ -182,3 +165,5 @@ pub(super) fn state_sensitive_property(name: &str) -> bool {
                 | "z-index"
         )
 }
+
+
