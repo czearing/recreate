@@ -3,6 +3,7 @@ mod animation_keyframes;
 mod animation_order_tests;
 mod animation_timing;
 pub(crate) mod animations;
+mod asset_urls;
 mod assets;
 mod assets_remote;
 mod attribute_sequences;

@@ -1,4 +1,4 @@
-use super::css::{ScopeCache, global_rule, rewrite_rule_assets};
+use super::css::{ScopeCache, global_rule};
 use super::css_values::{hash, responsive_signatures_for};
 use crate::model::{PageState, Specification};
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -35,7 +35,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     if include_interactions {
         for rule in &base.css_rules {
             if global_rule(rule) {
-                css.push_str(&rewrite_rule_assets(rule, assets));
+                css.push_str(&super::asset_urls::rewrite(rule, assets));
                 css.push('\n');
             }
         }

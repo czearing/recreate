@@ -152,47 +152,6 @@ pub(super) fn global_rule(rule: &str) -> bool {
     !GROUPING_AT_RULES.contains(&name.as_str())
 }
 
-pub(super) fn rewrite_rule_assets(rule: &str, assets: &BTreeMap<String, String>) -> String {
-    let mut replacements: Vec<_> = assets.iter().collect();
-    replacements.sort_by_key(|(url, _)| std::cmp::Reverse(url.len()));
-    replacements
-        .into_iter()
-        .fold(rule.to_string(), |text, (url, local)| {
-            let text = text.replace(url, local);
-            let text = url
-                .strip_prefix("https:")
-                .map_or(text.clone(), |relative| text.replace(relative, local));
-            // A stylesheet usually writes its own origin's assets as root-relative paths.
-            // Left unrewritten those paths point at files the recreation never serves, so
-            // the browser silently falls back: a missing webfont in particular changes text
-            // metrics and rewraps every line of the page. Only the start of a url() value is
-            // matched, so a path already rewritten by an earlier entry is never hit again.
-            origin_relative_path(url)
-                .map_or(text.clone(), |path| replace_url_value(&text, path, local))
-        })
-}
-
-fn replace_url_value(text: &str, path: &str, local: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    let mut rest = text;
-    while let Some(at) = rest.find(path) {
-        let opens_value = matches!(rest[..at].chars().next_back(), Some('(' | '"' | '\''));
-        out.push_str(&rest[..at]);
-        out.push_str(if opens_value { local } else { path });
-        rest = &rest[at + path.len()..];
-    }
-    out.push_str(rest);
-    out
-}
-
-fn origin_relative_path(url: &str) -> Option<&str> {
-    let rest = url
-        .strip_prefix("https://")
-        .or_else(|| url.strip_prefix("http://"))?;
-    let start = rest.find('/')?;
-    Some(&rest[start..])
-}
-
 #[cfg(test)]
 #[path = "css_tests.rs"]
 mod tests;

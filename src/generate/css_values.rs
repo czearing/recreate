@@ -7,13 +7,7 @@ pub fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> Strin
         .iter()
         .filter(|(_, value)| !value.is_empty())
         .map(|(key, value)| {
-            let value = if value.contains("url(") {
-                assets
-                    .iter()
-                    .fold(value.clone(), |text, (url, local)| text.replace(url, local))
-            } else {
-                value.clone()
-            };
+            let value = super::asset_urls::rewrite(value, assets);
             format!("{key}:{value};")
         })
         .collect()

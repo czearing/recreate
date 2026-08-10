@@ -51,15 +51,7 @@ fn collect(
         let Some(class) = classes.get(&style.target) else {
             continue;
         };
-        let declarations = if style.declarations.contains("url(") {
-            assets
-                .iter()
-                .fold(style.declarations.clone(), |text, (url, local)| {
-                    text.replace(url, local)
-                })
-        } else {
-            style.declarations.clone()
-        };
+        let declarations = super::asset_urls::rewrite(&style.declarations, assets);
         let key = (
             style.pseudo.clone().unwrap_or_default(),
             style.media.clone(),
