@@ -35,6 +35,9 @@ mod document;
 #[cfg(test)]
 #[path = "document_root_tests.rs"]
 mod document_root_tests;
+#[cfg(test)]
+#[path = "flex_axis_tests.rs"]
+mod flex_axis_tests;
 mod inherited_styles;
 mod initial_scroll;
 mod interaction_labels;

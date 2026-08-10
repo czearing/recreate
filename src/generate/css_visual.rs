@@ -1,15 +1,20 @@
-use crate::model::Node;
-use std::collections::HashMap;
+//! Values derived from measurement rather than from capture.
+//!
+//! A recreation replays captured declarations; it does not re-derive them. The capture
+//! records every computed longhand, so a property the capture already carries can only be
+//! duplicated by an inference, or contradicted by one — and the captured value came from
+//! the engine that actually laid the page out. The invariant this module must hold is that
+//! the properties inferred here and the properties the capture records stay disjoint.
+//!
+//! A `flex-direction` reversal inferred from geometry used to live here and violated it. It
+//! compared the first and last child by position, over a child set that filtered nothing, so
+//! an absolutely positioned child — which flex layout does not lay out at all, per CSS
+//! Flexbox 4.1 — decided the main axis. Its guess was appended after the captured value in
+//! the same block, where source order let it win. Every input to the painted order of flex
+//! items (`flex-direction`, `direction`, `writing-mode`, `order`, `flex-wrap`) is captured
+//! and emitted, so the correction it could have legitimately carried was always empty.
 
-pub fn child_nodes(nodes: &[Node]) -> HashMap<&str, Vec<&Node>> {
-    let mut children = HashMap::new();
-    for node in nodes {
-        if let Some(parent) = node.parent.as_deref() {
-            children.entry(parent).or_insert_with(Vec::new).push(node);
-        }
-    }
-    children
-}
+use crate::model::Node;
 
 pub fn multiline_text_box(node: &Node) -> bool {
     node.style
@@ -45,29 +50,10 @@ pub fn important_interaction_paint(css: &str) -> String {
         .collect()
 }
 
-pub fn flex_direction(node: &Node, children: &[&Node]) -> Option<&'static str> {
-    if node
-        .style
-        .get("display")
-        .is_none_or(|value| value != "flex")
-    {
-        return None;
-    }
-    let direction = node.style.get("flex-direction")?.as_str();
-    let first = children
-        .iter()
-        .find(|child| child.rect.width > 0.0 && child.rect.height > 0.0)?;
-    let last = children
-        .iter()
-        .rev()
-        .find(|child| child.rect.width > 0.0 && child.rect.height > 0.0)?;
-    match direction {
-        "row" if first.rect.x > last.rect.x + 1.0 => Some("row-reverse"),
-        "column" if first.rect.y > last.rect.y + 1.0 => Some("column-reverse"),
-        _ => None,
-    }
-}
-
+/// `float` is a captured property, so this shares the shape the module comment warns about
+/// and is retained only because a zero-width static block at its parent's right edge is a
+/// float the capture cannot express: `getComputedStyle` reports the used value `none` for a
+/// floated box the layout has already collapsed.
 pub fn inferred_float(node: &Node, parent: Option<&Node>) -> Option<&'static str> {
     let parent = parent?;
     let missing_float = node.style.get("float").is_none_or(|value| value == "none");

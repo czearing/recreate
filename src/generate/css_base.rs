@@ -67,7 +67,6 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         .iter()
         .map(|node| (node.path.as_str(), node))
         .collect();
-    let children = super::css_visual::child_nodes(&base.nodes);
     for node in &base.nodes {
         if node.tag == "#text" {
             continue;
@@ -84,25 +83,17 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             .parent
             .as_deref()
             .and_then(|parent| nodes.get(parent).copied());
-        let flex = super::css_visual::flex_direction(
-            node,
-            children
-                .get(node.path.as_str())
-                .map(Vec::as_slice)
-                .unwrap_or_default(),
-        );
         let float = super::css_visual::inferred_float(node, parent);
         let width = contextual_widths
             .contains(&node.path)
             .then_some(node.rect.width);
         let signature = format!(
-            "{}|layout:{}|visual-flex:{}|visual-float:{}|contextual-width:{}",
+            "{}|layout:{}|visual-float:{}|contextual-width:{}",
             signatures
                 .get(&node.path)
                 .map(String::as_str)
                 .unwrap_or_default(),
             super::css_layout::role(node, parent, &base.viewport),
-            flex.unwrap_or_default(),
             float.unwrap_or_default(),
             width.map(|value| value.to_string()).unwrap_or_default()
         );
@@ -122,7 +113,6 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             );
             super::css_base_style::append_indexed(
                 node,
-                flex,
                 float,
                 width,
                 &authored_rules,

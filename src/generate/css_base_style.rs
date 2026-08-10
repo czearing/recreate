@@ -2,15 +2,11 @@ use crate::model::Node;
 
 pub fn append_indexed(
     node: &Node,
-    flex: Option<&str>,
     float: Option<&str>,
     width: Option<f64>,
     rules: &super::authored_css::Index<'_>,
     css: &mut String,
 ) {
-    if let Some(direction) = flex {
-        css.push_str(&format!("flex-direction:{direction};"));
-    }
     if let Some(value) = float {
         css.push_str(&format!("float:{value};"));
     }

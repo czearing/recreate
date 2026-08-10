@@ -14,10 +14,6 @@ pub fn changed(specification: &Specification, baselines: &[PageState]) -> HashSe
                 .flat_map(|baseline| &baseline.nodes)
                 .map(|node| (node.path.as_str(), node))
                 .collect();
-            let current_children = super::css_visual::child_nodes(&state.nodes);
-            let baseline_children = baseline
-                .map(|baseline| super::css_visual::child_nodes(&baseline.nodes))
-                .unwrap_or_default();
             let contextual = baseline
                 .map(|baseline| contextual_widths(state, baseline))
                 .unwrap_or_default();
@@ -30,19 +26,6 @@ pub fn changed(specification: &Specification, baselines: &[PageState]) -> HashSe
                             node.style != baseline.style
                                 || node.before != baseline.before
                                 || node.after != baseline.after
-                                || super::css_visual::flex_direction(
-                                    node,
-                                    current_children
-                                        .get(node.path.as_str())
-                                        .map(Vec::as_slice)
-                                        .unwrap_or_default(),
-                                ) != super::css_visual::flex_direction(
-                                    baseline,
-                                    baseline_children
-                                        .get(node.path.as_str())
-                                        .map(Vec::as_slice)
-                                        .unwrap_or_default(),
-                                )
                         })
                 })
                 .map(|node| node.path.clone())
