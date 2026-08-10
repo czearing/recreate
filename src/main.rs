@@ -44,6 +44,8 @@ mod serve;
 mod skill;
 mod state_style_script;
 mod style_baseline;
+#[cfg(test)]
+mod style_baseline_scroll_tests;
 mod updater;
 mod validate;
 

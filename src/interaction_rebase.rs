@@ -56,7 +56,15 @@ pub fn causal(state: &mut PageState, before: &PageState, affected: &[String]) {
             continue;
         }
         if let Some(original) = before.dom.get(path) {
+            // The causal scope is assembled from MutationObserver records, and scrolling an
+            // element mutates nothing: no record is emitted, so a scrolled element can never
+            // enter the scope however it is styled. Rebasing its offset here would delete the
+            // one fact only the capture can supply, so the recorded offsets are carried over
+            // while every measured field is restored.
+            let (left, top) = (value.scroll_left, value.scroll_top);
             value.clone_from(original);
+            value.scroll_left = left;
+            value.scroll_top = top;
         }
     }
 }
@@ -108,7 +116,7 @@ fn rebase_map(state: &mut Styles, fresh: &Styles, baseline: &Styles) {
 #[cfg(test)]
 mod tests {
     use super::{causal, rebase_map};
-    use crate::model::{Node, PageState, Rect, Viewport};
+    use crate::model::{DomNode, Node, PageState, Rect, Viewport};
     use std::collections::BTreeMap;
 
     #[test]
@@ -130,9 +138,8 @@ mod tests {
         assert_eq!(state["margin"], "0px");
     }
 
-    #[test]
-    fn causal_scope_restores_unrelated_nodes() {
-        let node = |path: &str, text: &str| Node {
+    fn node(path: &str, text: &str) -> Node {
+        Node {
             path: path.into(),
             parent: Some("html>body".into()),
             tag: "div".into(),
@@ -148,8 +155,11 @@ mod tests {
             before: None,
             after: None,
             disabled: false,
-        };
-        let state = |nodes| PageState {
+        }
+    }
+
+    fn state(nodes: Vec<Node>) -> PageState {
+        PageState {
             url: String::new(),
             title: String::new(),
             viewport: Viewport::default(),
@@ -165,7 +175,34 @@ mod tests {
             css_rules: Vec::new(),
             asset_urls: Vec::new(),
             asset_data: Default::default(),
+        }
+    }
+
+    /// Scrolling emits no MutationObserver record, so a scrolled element can never enter the
+    /// causal scope. Rebasing its recorded offset away is what deleted interaction scroll.
+    #[test]
+    fn causal_scope_keeps_recorded_scroll_of_unrelated_elements() {
+        let dom = |top: f64| DomNode {
+            scroll_top: top,
+            client_height: 240.0,
+            ..DomNode::default()
         };
+        let before = {
+            let mut state = state(vec![node("html>body>button", "before")]);
+            state.dom.insert("html>body>panel".into(), dom(0.0));
+            state
+        };
+        let mut after = {
+            let mut state = state(vec![node("html>body>button", "after")]);
+            state.dom.insert("html>body>panel".into(), dom(300.0));
+            state
+        };
+        causal(&mut after, &before, &["html>body>button".into()]);
+        assert_eq!(after.dom["html>body>panel"].scroll_top, 300.0);
+    }
+
+    #[test]
+    fn causal_scope_restores_unrelated_nodes() {
         let before = state(vec![
             node("html>body>button", "before"),
             node("html>body>aside", "stable"),

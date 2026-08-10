@@ -10,14 +10,6 @@ mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
-mod selector_list;
-mod sibling_alignment;
-#[cfg(test)]
-mod sibling_alignment_tests;
-#[cfg(test)]
-mod sibling_alignment_regression_tests;
-#[cfg(test)]
-mod selector_list_tests;
 #[cfg(test)]
 #[path = "carousel_effect_tests.rs"]
 mod carousel_effect_tests;
@@ -95,6 +87,17 @@ mod responsive_runtime_support;
 mod responsive_runtime_tests;
 mod roots;
 mod runtime_sources;
+mod scroll_state;
+#[cfg(test)]
+mod scroll_state_tests;
+mod selector_list;
+#[cfg(test)]
+mod selector_list_tests;
+mod sibling_alignment;
+#[cfg(test)]
+mod sibling_alignment_regression_tests;
+#[cfg(test)]
+mod sibling_alignment_tests;
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;
@@ -149,4 +152,3 @@ pub async fn from_file(spec: &Path, out: &Path) -> Result<()> {
 }
 
 pub use project::write_project;
-

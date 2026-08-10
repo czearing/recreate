@@ -68,6 +68,13 @@ const pseudoBaselineOf = (element, name) => (pseudoBaselines.get(element) || {})
    originating element does not reach it; one stylesheet reverts every pseudo at once,
    which is sound in a single pass because a pseudo inherits from an element that still
    holds its real values. */
+/* Reverting an element removes the declarations that gave it a scroll range - its size
+   and its `overflow` - so the engine clamps any offset it was holding to zero, and
+   putting the style attribute back does not restore it. The offset is the one fact only
+   this capture can observe, since it lives in neither markup nor computed style, so the
+   probe records it alongside the style attribute and puts both back. Offsets are read
+   once before any write, and written once after every restoration, so the interleaving
+   costs no extra layout. */
 const measureBaselines = (root, skip) => {
   const levels = [];
   const collect = (element, depth) => {
@@ -79,6 +86,14 @@ const measureBaselines = (root, skip) => {
     }
   };
   collect(root, 0);
+  const scrolled = [];
+  for (const level of levels) {
+    for (const element of level) {
+      const left = element.scrollLeft;
+      const top = element.scrollTop;
+      if (left || top) scrolled.push([element, left, top]);
+    }
+  }
   const sheet = document.createElement('style');
   sheet.textContent = '*::before,*::after{all:revert !important}';
   document.head.appendChild(sheet);
@@ -100,4 +115,5 @@ const measureBaselines = (root, skip) => {
       else element.setAttribute('style', saved[index]);
     });
   }
+  for (const [element, left, top] of scrolled) element.scrollTo(left, top);
 };
