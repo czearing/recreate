@@ -40,6 +40,7 @@ mod document_root_tests;
 #[cfg(test)]
 #[path = "flex_axis_tests.rs"]
 mod flex_axis_tests;
+mod generated_source;
 mod inherited_styles;
 mod initial_scroll;
 mod interaction_labels;

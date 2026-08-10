@@ -1,4 +1,7 @@
-use super::source_item_name_words::{camel, month_date, pascal};
+use super::{
+    generated_source::generated_class,
+    source_item_name_words::{camel, month_date, pascal},
+};
 use std::collections::HashMap;
 
 pub fn collection_entity(sources: &[&mut String]) -> Option<String> {
@@ -145,14 +148,6 @@ fn attribute_before(source: &str) -> Option<&str> {
     source[..equal]
         .split(|character: char| character.is_whitespace() || character == '<')
         .next_back()
-}
-
-fn generated_class(value: &str) -> bool {
-    matches!(value.as_bytes().first(), Some(b'r' | b's'))
-        && value.len() == 11
-        && value[1..]
-            .chars()
-            .all(|character| character.is_ascii_hexdigit())
 }
 
 fn element_role(source: &str) -> String {

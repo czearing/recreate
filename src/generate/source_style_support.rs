@@ -1,10 +1,3 @@
-use anyhow::Result;
-use std::{
-    collections::HashSet,
-    fs,
-    path::{Path, PathBuf},
-};
-
 pub fn format_css(source: &str) -> String {
     let mut output = String::new();
     let mut indent = 0_usize;
@@ -62,62 +55,6 @@ fn trim_end(output: &mut String) {
     output.truncate(output.trim_end().len());
 }
 
-pub fn jsx_files(source: &Path) -> Result<Vec<PathBuf>> {
-    let mut files = vec![source.join("App.jsx"), source.join("states.jsx")];
-    for directory in ["components", "states", "views"] {
-        let directory = source.join(directory);
-        if directory.exists() {
-            collect_jsx(&directory, &mut files)?;
-        }
-    }
-    files.sort();
-    Ok(files)
-}
-
-fn collect_jsx(directory: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
-    for entry in fs::read_dir(directory)?.filter_map(Result::ok) {
-        let path = entry.path();
-        if path.is_dir() {
-            collect_jsx(&path, files)?;
-        } else if path.extension().is_some_and(|extension| extension == "jsx") {
-            files.push(path);
-        }
-    }
-    Ok(())
-}
-
-pub fn jsx_classes(source: &str) -> HashSet<String> {
-    let mut classes = HashSet::new();
-    for marker in ["className={\"", "className=\""] {
-        let mut remaining = source;
-        while let Some(index) = remaining.find(marker) {
-            remaining = &remaining[index + marker.len()..];
-            let Some(end) = remaining.find('"') else {
-                break;
-            };
-            classes.extend(remaining[..end].split_whitespace().map(str::to_string));
-            remaining = &remaining[end + 1..];
-        }
-    }
-    for value in source.split('"').skip(1).step_by(2) {
-        classes.extend(
-            value
-                .split_whitespace()
-                .filter(|value| generated_class(value))
-                .map(str::to_string),
-        );
-    }
-    classes
-}
-
-fn generated_class(value: &str) -> bool {
-    matches!(value.as_bytes().first(), Some(b'r' | b's'))
-        && value.len() == 11
-        && value[1..]
-            .chars()
-            .all(|character| character.is_ascii_hexdigit())
-}
-
 pub fn css_classes(source: &str) -> Vec<&str> {
     let start = if source.starts_with('.') {
         0
@@ -160,31 +97,10 @@ pub fn brace_delta(source: &str) -> i32 {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn finds_generated_jsx_classes() {
-        let classes =
-            super::jsx_classes(r#"<div className={"r123 extra"} /><span className="s456" />"#);
-        assert!(classes.contains("r123"));
-        assert!(classes.contains("s456"));
-    }
-
-    #[test]
     fn formats_css_declarations() {
         assert_eq!(
             super::format_css(".a{color:red;background:white;}"),
             ".a {\n  color:red;\n  background:white;\n}\n"
         );
-    }
-
-    #[test]
-    fn returns_jsx_files_in_stable_path_order() {
-        let directory = tempfile::tempdir().unwrap();
-        std::fs::create_dir_all(directory.path().join("components/z")).unwrap();
-        std::fs::create_dir_all(directory.path().join("components/a")).unwrap();
-        std::fs::write(directory.path().join("App.jsx"), "").unwrap();
-        std::fs::write(directory.path().join("states.jsx"), "").unwrap();
-        std::fs::write(directory.path().join("components/z/Z.jsx"), "").unwrap();
-        std::fs::write(directory.path().join("components/a/A.jsx"), "").unwrap();
-        let files = super::jsx_files(directory.path()).unwrap();
-        assert!(files.windows(2).all(|pair| pair[0] <= pair[1]));
     }
 }

@@ -1,6 +1,7 @@
 use super::{
+    generated_source::{generated_class, jsx_classes, jsx_files},
     source_style_compact::compact_unique_generated,
-    source_style_support::{brace_delta, css_classes, format_css, jsx_classes, jsx_files},
+    source_style_support::{brace_delta, css_classes, format_css},
 };
 use anyhow::Result;
 use std::{
@@ -34,16 +35,11 @@ pub fn split(source: &Path) -> Result<()> {
             continue;
         }
         let all_classes = css_classes(line);
-        let generated = all_classes
+        let mut generated = all_classes
             .iter()
             .filter(|class_name| generated_class(class_name))
-            .copied()
-            .collect::<Vec<_>>();
-        if !generated.is_empty()
-            && generated
-                .iter()
-                .all(|class_name| !owners.contains_key(*class_name))
-        {
+            .peekable();
+        if generated.peek().is_some() && generated.all(|name| !owners.contains_key(*name)) {
             continue;
         }
         let classes = all_classes
@@ -61,14 +57,6 @@ pub fn split(source: &Path) -> Result<()> {
         } else {
             shared.push_str(line);
             shared.push('\n');
-        }
-
-        fn generated_class(class_name: &str) -> bool {
-            matches!(class_name.as_bytes().first(), Some(b'r' | b's'))
-                && class_name.len() == 11
-                && class_name[1..]
-                    .chars()
-                    .all(|character| character.is_ascii_hexdigit())
         }
     }
     write_shared(source, &css_file, &compact_unique_generated(&shared))?;
@@ -212,6 +200,45 @@ mod tests {
         assert_eq!(
             super::css_classes(".r123{content:'.s456';background:url(icon.svg)}"),
             vec!["r123"]
+        );
+    }
+
+    #[test]
+    fn keeps_a_rule_whose_class_page_text_would_otherwise_hide() {
+        let swept = |text: &str| {
+            let directory = tempfile::tempdir().unwrap();
+            std::fs::write(
+                directory.path().join("App.jsx"),
+                format!(
+                    r#"<div className={{"r1234567890"}} />{{"{text}"}}<Surface entries={{[["a","s00000000ff"]]}}/>"#
+                ),
+            )
+            .unwrap();
+            std::fs::write(directory.path().join("states.jsx"), "").unwrap();
+            std::fs::write(
+                directory.path().join("styles.css"),
+                ".r1234567890{color:red;}\n.s00000000ff{color:blue;}\n.rdeadbeef00{color:green;}\n",
+            )
+            .unwrap();
+            super::split(directory.path()).unwrap();
+            let mut css = String::new();
+            for entry in std::fs::read_dir(directory.path()).unwrap().flatten() {
+                if entry.path().extension().is_some_and(|value| value == "css") {
+                    css.push_str(&std::fs::read_to_string(entry.path()).unwrap());
+                }
+            }
+            css
+        };
+        let plain = swept("plain");
+        assert!(plain.contains(".s00000000ff"), "a bound class keeps its rule");
+        assert!(
+            !plain.contains(".rdeadbeef00"),
+            "a class no file binds is genuinely dead and its rule is swept"
+        );
+        assert_eq!(
+            swept(r#"he said \"go"#),
+            plain,
+            "a quote in page text must not decide which rules survive"
         );
     }
 
