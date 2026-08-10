@@ -98,7 +98,7 @@ fn image(svg: &str, filename: &str) -> String {
         .into_iter()
         .filter_map(|name| {
             attribute(svg, name)
-                .map(|value| format!(" {name}={{{}}}", serde_json::to_string(value).unwrap()))
+                .map(|value| format!(" {name}={{{}}}", serde_json::to_string(&value).unwrap()))
         })
         .collect::<String>();
     format!("<img src={{\"/assets/{filename}\"}} alt={{\"\"}}{attributes} />")
@@ -106,7 +106,7 @@ fn image(svg: &str, filename: &str) -> String {
 
 pub(super) fn document(svg: &str, css: &str) -> String {
     let styles = super::css_closure::self_contained(css, &classes(svg));
-    let mut svg = to_xml(svg);
+    let mut svg = super::jsx_markup::to_xml(svg);
     if !svg.contains("xmlns=") {
         svg = svg.replacen("<svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"", 1);
     }
@@ -117,51 +117,12 @@ pub(super) fn document(svg: &str, css: &str) -> String {
 }
 
 fn classes(source: &str) -> Vec<String> {
-    let mut classes = Vec::new();
-    let mut remaining = source;
-    while let Some(index) = remaining.find("className={\"") {
-        remaining = &remaining[index + 12..];
-        let Some(end) = remaining.find("\"}") else {
-            break;
-        };
-        classes.extend(remaining[..end].split_whitespace().map(str::to_string));
-        remaining = &remaining[end + 2..];
-    }
-    classes
+    super::jsx_markup::attribute_values(source, "className")
+        .iter()
+        .flat_map(|value| value.split_whitespace().map(str::to_string))
+        .collect()
 }
 
-fn attribute<'a>(source: &'a str, name: &str) -> Option<&'a str> {
-    let marker = format!("{name}={{\"");
-    let start = source.find(&marker)? + marker.len();
-    let end = source[start..].find("\"}")? + start;
-    Some(&source[start..end])
-}
-
-pub(super) fn to_xml(source: &str) -> String {
-    let mut output = source
-        .replace("className={\"", "class=\"")
-        .replace("={\"", "=\"")
-        .replace("\"}", "\"");
-    for (react, svg) in [
-        ("fillOpacity", "fill-opacity"),
-        ("strokeWidth", "stroke-width"),
-        ("strokeLinecap", "stroke-linecap"),
-        ("strokeLinejoin", "stroke-linejoin"),
-        ("stopColor", "stop-color"),
-        ("stopOpacity", "stop-opacity"),
-        ("clipPath", "clip-path"),
-        ("fillRule", "fill-rule"),
-        ("clipRule", "clip-rule"),
-    ] {
-        output = output.replace(react, svg);
-    }
-    while let Some(start) = output.find("={") {
-        let Some(relative_end) = output[start + 2..].find('}') else {
-            break;
-        };
-        let end = start + 2 + relative_end;
-        let value = output[start + 2..end].to_string();
-        output.replace_range(start..=end, &format!("=\"{value}\""));
-    }
-    output
+fn attribute(source: &str, name: &str) -> Option<String> {
+    super::jsx_markup::attribute_values(source, name).into_iter().next()
 }

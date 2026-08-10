@@ -53,11 +53,14 @@ mod interactions;
 mod jsx;
 mod jsx_app;
 mod jsx_attr_names;
+mod jsx_attr_tables;
 mod jsx_attrs;
 mod jsx_host_props;
 #[cfg(test)]
 #[path = "jsx_host_props_tests.rs"]
 mod jsx_host_props_tests;
+mod jsx_markup;
+mod jsx_markup_scan;
 mod jsx_render;
 mod jsx_render_spacing;
 #[cfg(test)]

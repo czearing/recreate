@@ -160,15 +160,6 @@ fn does_not_carry_a_definition_whose_name_is_a_substring_of_another() {
 }
 
 #[test]
-fn converts_jsx_svg_to_xml() {
-    let svg = super::source_svg_assets::to_xml(
-        r#"<svg className={"icon"} viewBox={"0 0 1 1"}><path strokeWidth={"1"} /></svg>"#,
-    );
-    assert!(svg.contains("class=\"icon\""));
-    assert!(svg.contains("stroke-width=\"1\""));
-}
-
-#[test]
 fn decodes_svg_image_sources() {
     let matches = super::source_svg_assets::encoded_svg_sources(
         r#"<img src={"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22x%22%3E%3C%2Fsvg%3E"} />"#,

@@ -16,70 +16,7 @@
 //! every entry is its own lowercase form, so the two halves cannot drift apart: adding a
 //! name adds both directions at once.
 
-/// React's canonical prop names for HTML attributes that differ from their HTML spelling
-/// only by case. Taken from the React DOM attribute reference.
-const CAMEL_CASED: &[&str] = &[
-    "acceptCharset",
-    "accessKey",
-    "allowFullScreen",
-    "autoCapitalize",
-    "autoComplete",
-    "autoCorrect",
-    "autoFocus",
-    "autoPlay",
-    "autoSave",
-    "cellPadding",
-    "cellSpacing",
-    "charSet",
-    "classID",
-    "colSpan",
-    "contentEditable",
-    "contextMenu",
-    "controlsList",
-    "crossOrigin",
-    "dateTime",
-    "encType",
-    "formAction",
-    "formEncType",
-    "formMethod",
-    "formNoValidate",
-    "formTarget",
-    "frameBorder",
-    "hrefLang",
-    "httpEquiv",
-    "imageSizes",
-    "imageSrcSet",
-    "inputMode",
-    "isMap",
-    "itemProp",
-    "itemRef",
-    "itemScope",
-    "itemType",
-    "keyParams",
-    "keyType",
-    "marginHeight",
-    "marginWidth",
-    "maxLength",
-    "mediaGroup",
-    "minLength",
-    "noModule",
-    "noValidate",
-    "playsInline",
-    "radioGroup",
-    "readOnly",
-    "referrerPolicy",
-    "rowSpan",
-    "spellCheck",
-    "srcDoc",
-    "srcLang",
-    "srcSet",
-    "tabIndex",
-    "useMap",
-];
-
-/// The two attributes React renames outright, because their HTML spelling collides with a
-/// JavaScript reserved word or with an existing DOM property.
-const RENAMED: &[(&str, &str)] = &[("class", "className"), ("for", "htmlFor")];
+use super::jsx_attr_tables::{CAMEL_CASED, HYPHENATED, RENAMED};
 
 /// Translates a captured HTML attribute name into the prop name React recognises.
 ///
@@ -99,6 +36,28 @@ pub fn jsx_attribute(name: &str) -> String {
         return (*camel).into();
     }
     hyphenated_to_camel(name)
+}
+
+/// The inverse: the document spelling of a name React writes as a prop.
+///
+/// It reads the same three lists as `jsx_attribute` rather than a table of its own, so the
+/// two directions cannot drift apart — a private second copy is how `to_xml` came to
+/// rewrite the `clipPath` element along with the `clipPath` attribute. Unknown names pass
+/// through unchanged, because the far larger family is the one both spellings share.
+pub fn document_attribute(name: &str) -> String {
+    if let Some((document, _)) = RENAMED.iter().find(|(_, jsx)| *jsx == name) {
+        return (*document).into();
+    }
+    if let Some(hyphenated) = HYPHENATED
+        .iter()
+        .find(|candidate| hyphenated_to_camel(candidate) == name)
+    {
+        return (*hyphenated).into();
+    }
+    if CAMEL_CASED.contains(&name) {
+        return name.to_ascii_lowercase();
+    }
+    name.into()
 }
 
 fn hyphenated_to_camel(value: &str) -> String {
