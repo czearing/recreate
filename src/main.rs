@@ -22,8 +22,11 @@ mod compare_node;
 #[cfg(test)]
 mod compare_tests;
 mod generate;
+mod interaction_rebase;
 mod interaction_script;
+mod interaction_state;
 mod interaction_surface;
+mod interactions;
 mod interactions_input;
 mod lifecycle_scheduled_script;
 mod lifecycle_script;

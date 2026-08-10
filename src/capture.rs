@@ -1,7 +1,7 @@
 use crate::{
     browser,
     cli::CaptureArgs,
-    generate, lifecycle_script,
+    generate, interactions, lifecycle_script,
     model::{PageState, Specification},
     probe, serve, validate,
 };
@@ -115,13 +115,28 @@ async fn capture_into(
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
+    let interaction_graph = if args.spec_only {
+        interactions::CapturedGraph {
+            interactions: Vec::new(),
+            transitions: Vec::new(),
+        }
+    } else {
+        let interactions_started = std::time::Instant::now();
+        let captured = interactions::capture_graph(cdp, &states).await?;
+        eprintln!(
+            "captured {} interactions in {:.2}s",
+            captured.interactions.len(),
+            interactions_started.elapsed().as_secs_f64()
+        );
+        captured
+    };
     let mut specification = Specification {
         schema_version: 1,
         requested_url,
         captured_url,
         states,
-        interactions: Vec::new(),
-        transitions: Vec::new(),
+        interactions: interaction_graph.interactions,
+        transitions: interaction_graph.transitions,
     };
     crate::interaction_surface::normalize(&mut specification);
     fs::write(
