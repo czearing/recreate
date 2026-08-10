@@ -65,6 +65,8 @@ pub const SOURCE: &str = r#"
     observedTargets(root.getAnimations({ subtree: true }).map(lifecycleTiming));
   const lifecycleSettled = (elapsed, sinceChange, busy, longestGap) =>
     elapsed >= LIFECYCLE_CEILING_MS || (!busy && sinceChange > longestGap);
+  const lifecycleAwaited = (soonestDue, start) =>
+    soonestDue <= start + LIFECYCLE_CEILING_MS;
 "#;
 
 #[cfg(test)]

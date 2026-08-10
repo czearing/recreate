@@ -89,3 +89,46 @@ fn a_longer_observed_gap_never_releases_the_recorder_earlier() {
         previous = current;
     }
 }
+
+fn awaited(soonest_due: &str, start: f64) -> bool {
+    node_eval::evaluate(
+        super::SOURCE,
+        &format!("lifecycleAwaited({soonest_due}, {start})"),
+    )
+    .as_bool()
+    .unwrap()
+}
+
+/// Before its first edit a page has shown no gap it can recover from, so one quiet frame
+/// satisfies the settle rule and the window shuts before anything the page scheduled has
+/// run. Work the page has scheduled is the evidence that closes that hole, and it must be
+/// awaited on exactly the same footing as a request in flight.
+#[test]
+fn work_the_page_scheduled_before_the_ceiling_is_awaited() {
+    assert!(awaited("300", 0.0));
+    assert!(awaited("11999", 0.0));
+}
+
+/// Work due after the recorder's own horizon cannot produce anything the recorder will
+/// see, so waiting for it buys nothing and costs the whole ceiling. This is what keeps a
+/// page carrying a long poll timer from being watched for twelve seconds.
+#[test]
+fn work_due_after_the_ceiling_is_not_worth_waiting_for() {
+    assert!(!awaited("12001", 0.0));
+    assert!(!awaited("30000", 0.0));
+}
+
+/// The horizon is measured from when the recorder started, not from now, so a timer stays
+/// worth waiting for as the recorder runs rather than becoming so.
+#[test]
+fn the_horizon_is_anchored_to_the_start_of_the_recording() {
+    assert!(awaited("11000", 0.0));
+    assert!(!awaited("11000", -2_000.0));
+}
+
+/// A page that has scheduled nothing reports no soonest due time at all, and must not be
+/// held open by its absence.
+#[test]
+fn a_page_that_scheduled_nothing_is_never_awaited() {
+    assert!(!awaited("Infinity", 0.0));
+}

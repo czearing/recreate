@@ -49,7 +49,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
     subtree: true, childList: true, attributes: true, characterData: true
   }});
   const frame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
-  const pause = () => new Promise(resolve => setTimeout(resolve, {RETRY_MS}));
+  const pause = () => new Promise(resolve => {timeout}(resolve, {RETRY_MS}));
   const ready = () => document.readyState === 'complete' &&
     document.fonts.status === 'loaded' && {lifecycle}
     (window.__recreatePendingRequests || 0) === 0;
@@ -104,6 +104,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
 }})()"#,
         overlay = blocking_overlay::js_predicate(),
         settle = crate::lifecycle_settle_script::SOURCE,
+        timeout = crate::lifecycle_scheduled_script::INSTRUMENT_TIMEOUT,
     )
 }
 

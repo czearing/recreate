@@ -2,6 +2,8 @@
   if (window.__recreateLifecycleInstalled) return;
   window.__recreateLifecycleInstalled = true;
 __LIFECYCLE_SETTLE__
+__LIFECYCLE_SCHEDULED__
+  const soonestScheduled = trackScheduled(window);
   window.__recreateLifecycleAnimations = [];
   window.__recreateAttributeMutations = [];
   window.__recreateLifecycleDone = false;
@@ -116,7 +118,7 @@ __LIFECYCLE_MUTATIONS__
         lastChange = now;
       }
       fullSample = false;
-      const busy = lifecycleBusy(running, loading);
+      const busy = lifecycleBusy(running, loading || lifecycleAwaited(soonestScheduled(), start));
       if (!lifecycleSettled(now - start, now - lastChange, busy, longestGap)) {
         requestAnimationFrame(sample);
       } else {

@@ -59,14 +59,9 @@ pub fn ensure_settled(state: &PageState) -> Result<()> {
     Ok(())
 }
 
-/// Waits for a startup curtain to appear and finish drawing, so the layer a page shows
-/// first can be recorded before it is replaced.
-pub async fn wait_startup(
-    cdp: &mut Cdp,
-    viewport: &Viewport,
-    started: std::time::Instant,
-) -> Result<Option<(PageState, u64)>> {
-    let source = format!(
+/// Builds the page script that waits for a startup curtain to finish drawing.
+pub fn curtain_source() -> String {
+    format!(
         "(async () => {{\
          const blocking = {predicate};\
          const overlay = Array.from(document.querySelectorAll('*')).find(blocking);\
@@ -80,11 +75,22 @@ pub async fn wait_startup(
          image.addEventListener('load', resolve, {{ once: true }});\
          image.addEventListener('error', resolve, {{ once: true }});\
          }}))),\
-         new Promise(resolve => setTimeout(resolve, {CURTAIN_IMAGE_MS}))]);\
+         new Promise(resolve => {timeout}(resolve, {CURTAIN_IMAGE_MS}))]);\
          return blocking(overlay);\
          }})()",
         predicate = js_predicate(),
-    );
+        timeout = crate::lifecycle_scheduled_script::INSTRUMENT_TIMEOUT,
+    )
+}
+
+/// Waits for a startup curtain to appear and finish drawing, so the layer a page shows
+/// first can be recorded before it is replaced.
+pub async fn wait_startup(
+    cdp: &mut Cdp,
+    viewport: &Viewport,
+    started: std::time::Instant,
+) -> Result<Option<(PageState, u64)>> {
+    let source = curtain_source();
     for _ in 0..STARTUP_ATTEMPTS {
         if cdp.evaluate(&source).await?.as_bool() == Some(true) {
             let state = read_state(cdp, viewport.clone()).await?;

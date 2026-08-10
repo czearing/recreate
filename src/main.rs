@@ -25,6 +25,7 @@ mod generate;
 mod interaction_script;
 mod interaction_surface;
 mod interactions_input;
+mod lifecycle_scheduled_script;
 mod lifecycle_script;
 mod lifecycle_settle_script;
 mod model;

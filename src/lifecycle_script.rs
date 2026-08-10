@@ -1,13 +1,18 @@
 const RECORDER: &str = concat!("\n", include_str!("lifecycle_script.js"));
 const MUTATIONS: &str = include_str!("lifecycle_mutations.js");
 
-/// The recorder, with the rules it defers to spliced in: when it may stop watching, and how
-/// it records the attribute and text changes that become sequences.
+/// The recorder, with the rules it defers to spliced in: when it may stop watching, how it
+/// learns what the page still has to do, and how it records the attribute and text changes
+/// that become sequences.
 pub fn source() -> String {
     RECORDER
         .replace(
             "__LIFECYCLE_SETTLE__",
             crate::lifecycle_settle_script::SOURCE,
+        )
+        .replace(
+            "__LIFECYCLE_SCHEDULED__",
+            crate::lifecycle_scheduled_script::SOURCE,
         )
         .replace("__LIFECYCLE_MUTATIONS__", MUTATIONS)
 }
