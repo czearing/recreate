@@ -10,6 +10,9 @@ mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
+mod selector_list;
+#[cfg(test)]
+mod selector_list_tests;
 #[cfg(test)]
 #[path = "carousel_effect_tests.rs"]
 mod carousel_effect_tests;

@@ -22,51 +22,6 @@ struct Rule<'a> {
     position: super::css_layers::Position,
 }
 
-/// `:where()` and `:is()` say nothing about state: they match on structure alone, so a
-/// rule using one applies in the base state exactly like the compound it wraps. Dropping
-/// them loses real declarations — Fluent defines `--component-card-padding` only on
-/// `.root:where(.size-medium)`, and without it every card that sizes its padding from
-/// that variable collapses to zero padding.
-///
-/// State pseudo-classes such as `:hover` and pseudo-elements such as `::before` describe
-/// a different state and must still be excluded, so this returns `None` whenever a colon
-/// survives flattening.
-fn flatten_static_pseudo_classes(selectors: &str) -> Option<Cow<'_, str>> {
-    if !selectors.contains(':') {
-        return Some(Cow::Borrowed(selectors));
-    }
-    let mut flattened = selectors.to_string();
-    for name in [":where(", ":is("] {
-        while let Some(start) = flattened.find(name) {
-            let open = start + name.len();
-            let mut depth = 1usize;
-            let mut end = None;
-            for (offset, character) in flattened[open..].char_indices() {
-                match character {
-                    '(' => depth += 1,
-                    ')' => {
-                        depth -= 1;
-                        if depth == 0 {
-                            end = Some(open + offset);
-                            break;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            let end = end?;
-            let inner = flattened[open..end].trim().to_string();
-            // A selector list inside the wrapper would have to expand into several
-            // selectors to stay correct, so it is left for the caller to skip.
-            if inner.contains(',') {
-                return None;
-            }
-            flattened.replace_range(start..=end, &inner);
-        }
-    }
-    (!flattened.contains(':')).then_some(Cow::Owned(flattened))
-}
-
 /// A value made only of absolute pixel lengths. It resolves to itself, so comparing it
 /// against the captured computed value is exact — unlike `1fr`, `auto`, or a percentage,
 /// which resolve against the layout and legitimately differ from the sample.
@@ -101,17 +56,19 @@ impl<'a> Index<'a> {
             if selectors.starts_with('@') {
                 continue;
             }
-            let Some(selectors) = flatten_static_pseudo_classes(selectors) else {
+            let statics = super::selector_list::static_members(selectors)
+                .map(Cow::into_owned)
+                .collect::<Vec<_>>();
+            if statics.is_empty() {
                 continue;
-            };
+            }
             let rule_index = index.rules.len();
-            let owned = selectors.clone();
             index.rules.push(Rule {
-                selectors,
+                selectors: Cow::Owned(statics.join(",")),
                 declarations,
                 position: order.position(layer.as_deref()),
             });
-            for selector in owned.split(',').map(str::trim) {
+            for selector in statics.iter().map(String::as_str) {
                 if terminal_compound(selector) != selector {
                     continue;
                 }

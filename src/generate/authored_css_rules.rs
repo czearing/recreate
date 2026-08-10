@@ -1,4 +1,5 @@
 use crate::model::Node;
+use super::selector_list;
 pub(super) fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
     if matches!(name, "width" | "height") && value == "auto" {
         return node
@@ -39,8 +40,7 @@ pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
         .into_iter()
         .flat_map(|value| value.split_whitespace())
         .collect::<std::collections::HashSet<_>>();
-    selectors.split(',').any(|selector| {
-        let selector = selector.trim();
+    selector_list::members(selectors).any(|selector| {
         let compound = terminal_compound(selector);
         if compound != selector {
             return false;

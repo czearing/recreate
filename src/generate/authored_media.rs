@@ -18,8 +18,8 @@ pub fn rules(node: &Node, generated_class: &str, rules: &[String]) -> Vec<String
             let Some((selector, declarations)) = child.split_once('{') else {
                 continue;
             };
-            let selector = selector.trim();
-            if selector.contains(':') || !super::authored_css::directly_targets_node(selector, node)
+            if !super::selector_list::static_members(selector)
+                .any(|member| super::authored_css::directly_targets_node(&member, node))
             {
                 continue;
             }
