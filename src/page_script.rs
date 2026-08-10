@@ -23,6 +23,7 @@ fn source_template() -> String {
 fn template_with_assets(assets: &str) -> String {
     CAPTURE
         .replace("__STYLE_BASELINE__", style_baseline::SOURCE)
+        .replace("__ASSET_ATTRIBUTES__", &crate::asset_attributes::js_source())
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
         .replace("__RULE_ACTIVATION__", crate::rule_activation_script::SOURCE)
         .replace(

@@ -1,5 +1,6 @@
 (async () => {
 __STYLE_BASELINE__
+__ASSET_ATTRIBUTES__
   const skipped = element => false;
   measureBaselines(document.documentElement, skipped);
   const pathCache = new WeakMap([[document.documentElement, 'html']]);
@@ -63,10 +64,7 @@ __SELECTION__
       parent: element.parentElement ? pathOf(element.parentElement) : null,
       tag: element.tagName.toLowerCase(),
       text: '',
-      attributes: Object.fromEntries([...element.attributes]
-        .filter(attribute => !attribute.name.startsWith('on') &&
-          !['style','nonce','integrity'].includes(attribute.name))
-        .map(attribute => [attribute.name, attribute.value])),
+      attributes: recreateAttributes(element),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
       disabled: element.matches(':disabled'),
@@ -99,18 +97,7 @@ __SELECTION__
   for (const element of document.querySelectorAll('*')) {
     if (selected.has(element)) capture(element);
   }
-  const assets = new Set();
-  for (const element of selected) {
-    if (element.matches?.('img,video,source')) {
-      const url = element.currentSrc || element.src;
-      if (url) assets.add(url);
-    }
-  }
-  for (const node of nodes) {
-    for (const match of (node.style['background-image'] || '').matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
-      assets.add(new URL(match[1], location.href).href);
-    }
-  }
+  const assets = recreateAssetUrls(nodes, []);
 __ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,

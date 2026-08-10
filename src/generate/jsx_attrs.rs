@@ -11,7 +11,7 @@ pub fn attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
         .filter(|(key, _)| !jsx_host_props::relocated(&node.tag, key))
-        .map(|(key, value)| render_attribute(key, rewrite(value, assets)))
+        .map(|(key, value)| render_attribute(key, &crate::asset_attributes::rewrite(value, assets)))
         .collect()
 }
 
@@ -70,10 +70,6 @@ pub fn void_tag(tag: &str) -> bool {
         tag,
         "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "source"
     )
-}
-
-fn rewrite<'a>(value: &'a str, assets: &'a BTreeMap<String, String>) -> &'a str {
-    assets.get(value).map(String::as_str).unwrap_or(value)
 }
 
 #[cfg(test)]

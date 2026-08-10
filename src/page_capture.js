@@ -3,6 +3,7 @@
   const authoredSheetTexts = __AUTHORED_SHEETS__;
   const ignored = new Set(['SCRIPT','NOSCRIPT']);
 __STYLE_BASELINE__
+__ASSET_ATTRIBUTES__
   const skipped = element =>
     ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup');
   measureBaselines(document.documentElement, skipped);
@@ -97,14 +98,7 @@ __STYLE_BASELINE__
     const path = pathOf(element);
     const rect = element.getBoundingClientRect();
     const computedStyle = computedStyles.get(element) || getComputedStyle(element);
-    const attributes = Object.fromEntries(
-      Array.from(element.attributes)
-        .filter(attribute =>
-          !attribute.name.startsWith('on') &&
-          !['style','nonce','integrity'].includes(attribute.name)
-        )
-        .map(attribute => [attribute.name, attribute.value])
-    );
+    const attributes = recreateAttributes(element);
     nodes.push({
       path,
       parent: element.parentElement ? pathOf(element.parentElement) : null,
@@ -218,23 +212,7 @@ __STYLE_BASELINE__
   ].filter(meaningfulTransient);
 __STATE_STYLE_CAPTURE__
 __ATTRIBUTE_SEQUENCE_CAPTURE__
-  const assets = new Set();
-  document.querySelectorAll('img,video,source').forEach(element => {
-    const url = element.currentSrc || element.src;
-    if (url) assets.add(url);
-  });
-  for (const node of nodes) {
-    const matches = (node.style['background-image'] || '').matchAll(/url\(["']?([^"')]+)["']?\)/g);
-    for (const match of matches) assets.add(new URL(match[1], location.href).href);
-  }
-  for (const rule of cssRules) {
-    for (const match of rule.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
-      try {
-        const url = new URL(match[1], location.href).href;
-        if (!url.startsWith('data:')) assets.add(url);
-      } catch {}
-    }
-  }
+  const assets = recreateAssetUrls(nodes, cssRules);
 __ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,
