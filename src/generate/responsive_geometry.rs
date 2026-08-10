@@ -18,7 +18,6 @@ pub fn normalize(
 ) {
     scroll::preserve_space(styles, node, base.map(|(node, _)| node), viewport);
     width::normalize(styles, node, parent, viewport, base);
-    super::responsive_height::normalize(styles, node, viewport);
     let authored_centering = styles
         .get("margin-left")
         .is_some_and(|value| value == "auto")

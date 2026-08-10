@@ -36,5 +36,7 @@ mod intrinsic_tests;
 mod layout_tests;
 #[path = "responsive_output_tests.rs"]
 mod output_tests;
+#[path = "responsive_provenance_tests.rs"]
+mod provenance_tests;
 #[path = "responsive_root_tests.rs"]
 mod root_tests;

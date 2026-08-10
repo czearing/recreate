@@ -68,6 +68,13 @@ const SIZE_PROPERTIES: [&str; 9] = [
 /// that sized it in the source. Replaced elements are the one exception, and not a
 /// per-site one: they have no in-flow content to reflow, and their box must be reserved
 /// or the page shifts as they load.
+///
+/// Which values are samples is decided against the capture, not against their spelling.
+/// `styles` starts as a clone of `node.style` and the stages above rewrite it, so a size
+/// still equal to the captured one is untouched and is therefore the sample. Anything a
+/// stage rewrote is emitter output and is left alone, however it happens to be spelled —
+/// `preserve_space` reserves a thin scrollbar's gutter as a plain pixel width, and a
+/// spelling test deletes it as if the capture had produced it.
 fn remove_sampled_sizes(
     styles: &mut Styles,
     node: &Node,
@@ -77,10 +84,7 @@ fn remove_sampled_sizes(
         return;
     }
     for property in SIZE_PROPERTIES {
-        if !styles
-            .get(property)
-            .is_some_and(|value| value.ends_with("px"))
-        {
+        if styles.get(property).is_none() || styles.get(property) != node.style.get(property) {
             continue;
         }
         match css_rules.authored_value(node, property) {
