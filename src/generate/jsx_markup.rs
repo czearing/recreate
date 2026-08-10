@@ -68,6 +68,36 @@ pub(super) fn attribute_values(source: &str, name: &str) -> Vec<String> {
     values
 }
 
+/// The value `name` is bound to on the **root element's own start tag**, unescaped.
+///
+/// A serialized subtree is not an element. `attribute_values` answers "anywhere in this
+/// markup", so taking its first match reads a descendant's value whenever the root omits
+/// the name — and first-in-document-order coincides with belongs-to-the-root exactly
+/// while the root declares it, which hides the divergence behind every case where the
+/// answer was never in doubt. What is wrong with a harvested value is its provenance, not
+/// its shape, so no downstream guard on the value itself can recover the distinction; the
+/// scope has to come from the tag boundary. That boundary is `Open`..`Close`, which the
+/// scanner already tracks through quoting, so a value containing `>` cannot cut the root
+/// tag short and start silently dropping the attributes the root really declared.
+pub(super) fn root_attribute(source: &str, name: &str) -> Option<String> {
+    let mut value = None;
+    let mut inside_root = false;
+    let mut root_seen = false;
+    scan(source, |token| match token {
+        Token::Open { closing: false, .. } if !root_seen => {
+            inside_root = true;
+            root_seen = true;
+        }
+        Token::Attribute {
+            name: found,
+            value: Some(Value::Literal(body)),
+        } if inside_root && found == name && value.is_none() => value = Some(unescape(body)),
+        Token::Close { .. } => inside_root = false,
+        _ => {}
+    });
+    value
+}
+
 fn unescape(body: &str) -> String {
     serde_json::from_str(&format!("\"{body}\"")).unwrap_or_else(|_| body.into())
 }
@@ -83,3 +113,7 @@ fn escape(value: &str) -> String {
 #[cfg(test)]
 #[path = "jsx_markup_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "jsx_markup_scope_tests.rs"]
+mod scope_tests;

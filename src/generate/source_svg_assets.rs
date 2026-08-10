@@ -93,11 +93,11 @@ fn percent_decode(source: &str) -> Option<String> {
     String::from_utf8(decoded).ok()
 }
 
-fn image(svg: &str, filename: &str) -> String {
+pub(super) fn image(svg: &str, filename: &str) -> String {
     let attributes = ["className", "aria-hidden", "height", "width"]
         .into_iter()
         .filter_map(|name| {
-            attribute(svg, name)
+            super::jsx_markup::root_attribute(svg, name)
                 .map(|value| format!(" {name}={{{}}}", serde_json::to_string(&value).unwrap()))
         })
         .collect::<String>();
@@ -116,13 +116,14 @@ pub(super) fn document(svg: &str, css: &str) -> String {
     svg
 }
 
+/// Every class the relocated subtree references, which is a genuinely subtree-wide
+/// question: the asset's stylesheet is carved from what the whole graphic names, so a
+/// descendant's class has to reach it. This is the one caller `attribute_values` is
+/// written for; the stand-in `<img>` asks about a single element and uses
+/// `root_attribute` instead.
 fn classes(source: &str) -> Vec<String> {
     super::jsx_markup::attribute_values(source, "className")
         .iter()
         .flat_map(|value| value.split_whitespace().map(str::to_string))
         .collect()
-}
-
-fn attribute(source: &str, name: &str) -> Option<String> {
-    super::jsx_markup::attribute_values(source, name).into_iter().next()
 }
