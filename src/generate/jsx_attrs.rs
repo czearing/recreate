@@ -1,18 +1,23 @@
-use super::{jsx_attr_names, jsx_host_props};
+use super::{jsx_attr_names, jsx_host_props, stand_in};
 use crate::model::Node;
 use std::collections::BTreeMap;
 
 /// Every attribute React can honour on the element that carried it. `class` and `style` are
 /// emitted from the class map instead, `on*` handlers are re-bound by the runtime, and a
-/// relocated attribute is emitted by an ancestor rather than here.
+/// relocated attribute is emitted by an ancestor rather than here. What the element is
+/// replaced by, and what that replacement may still assert, is `stand_in`'s question.
 pub fn attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
-    node.attributes
+    let source = stand_in::painted_source(node, assets);
+    let carried = node
+        .attributes
         .iter()
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
         .filter(|(key, _)| !jsx_host_props::relocated(&node.tag, key))
+        .filter(|(key, _)| !stand_in::suppressed(key, source))
         .map(|(key, value)| render_attribute(key, &crate::asset_attributes::rewrite(value, assets)))
-        .collect()
+        .collect::<String>();
+    format!("{carried}{}", stand_in::rendered(node, source))
 }
 
 fn render_attribute(key: &str, value: &str) -> String {

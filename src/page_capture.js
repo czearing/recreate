@@ -98,7 +98,7 @@ __ASSET_ATTRIBUTES__
     const path = pathOf(element);
     const rect = element.getBoundingClientRect();
     const computedStyle = computedStyles.get(element) || getComputedStyle(element);
-    const attributes = recreateAttributes(element);
+    const attributes = recreateAttributes(element, path);
     nodes.push({
       path,
       parent: element.parentElement ? pathOf(element.parentElement) : null,
@@ -219,9 +219,9 @@ __ASSET_CAPTURE__
     title: document.title,
     nodes,
     dom,
-    capture_blockers: unreadableSheets > 0
+    capture_blockers: (unreadableSheets > 0
       ? [`${unreadableSheets} stylesheet(s) could not be read; their authored rules are missing`]
-      : [],
+      : []).concat(recreateSurfaceBlockers()),
     animations,
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,

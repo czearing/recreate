@@ -34,7 +34,7 @@ __ASSET_ATTRIBUTES__
 // shadow children. This is the reach every stage is supposed to share.
 const nodes = [];
 const walk = node => {
-  nodes.push({ attributes: recreateAttributes(node), style: node.style });
+  nodes.push({ attributes: recreateAttributes(node, node.tag), style: node.style });
   for (const child of node.children) walk(child);
   if (node.shadowRoot) for (const child of node.shadowRoot.children) walk(child);
 };

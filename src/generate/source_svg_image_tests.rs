@@ -1,4 +1,4 @@
-use super::source_svg_stand_in::image;
+use super::stand_in::image;
 
 /// The observable form of the defect. An inline SVG is replaced by an `<img>` that stands
 /// in for it, and the stand-in may only declare what the graphic itself declared. The root

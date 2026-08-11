@@ -96,7 +96,8 @@ pub fn rewrite(value: &str, assets: &BTreeMap<String, String>) -> String {
 }
 
 /// The same rule as JavaScript, for the injected capture scripts. Defines
-/// `recreateAttributes(element)` and `recreateAssetUrls(nodes, cssRules)`.
+/// `recreateAttributes(element, path)` and `recreateAssetUrls(nodes, cssRules)`, over the
+/// surface reader it delegates an element's unaddressed content to.
 pub fn js_source() -> String {
     let quoted = |names: &[&str]| {
         names
@@ -105,11 +106,15 @@ pub fn js_source() -> String {
             .collect::<Vec<_>>()
             .join(",")
     };
-    JS_SOURCE
-        .replace("__URL_ATTRIBUTES__", &quoted(&URL_ATTRIBUTES))
-        .replace("__CANDIDATE_ATTRIBUTES__", &quoted(&CANDIDATE_ATTRIBUTES))
-        .replace("__SKIPPED_ATTRIBUTES__", &quoted(&SKIPPED_ATTRIBUTES))
-        .replace("__ASSET_SELECTOR__", ASSET_SELECTOR)
+    format!(
+        "{}{}",
+        crate::surface_content::js_source(),
+        JS_SOURCE
+            .replace("__URL_ATTRIBUTES__", &quoted(&URL_ATTRIBUTES))
+            .replace("__CANDIDATE_ATTRIBUTES__", &quoted(&CANDIDATE_ATTRIBUTES))
+            .replace("__SKIPPED_ATTRIBUTES__", &quoted(&SKIPPED_ATTRIBUTES))
+            .replace("__ASSET_SELECTOR__", ASSET_SELECTOR)
+    )
 }
 
 const JS_SOURCE: &str = include_str!("asset_attributes.js");

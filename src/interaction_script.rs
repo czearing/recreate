@@ -11,9 +11,15 @@ pub fn source() -> String {
 fn render(selection: &str) -> String {
     SOURCE
         .replace("__STYLE_BASELINE__", style_baseline::SOURCE)
-        .replace("__ASSET_ATTRIBUTES__", &crate::asset_attributes::js_source())
+        .replace(
+            "__ASSET_ATTRIBUTES__",
+            &crate::asset_attributes::js_source(),
+        )
         .replace("__SELECTION__", selection)
-        .replace("__ASSET_CAPTURE__", "const assetData = {};")
+        .replace(
+            "__ASSET_CAPTURE__",
+            &crate::asset_script::without_downloads(),
+        )
 }
 
 #[cfg(test)]

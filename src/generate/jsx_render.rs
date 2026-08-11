@@ -5,6 +5,7 @@ use super::{
         leading_placeholder, leading_placeholder_extent, needs_text_space, placeholder,
         placeholder_extent, sibling_index,
     },
+    stand_in,
     tree::Components,
 };
 use std::collections::BTreeMap;
@@ -56,23 +57,21 @@ pub(super) fn render(
     }
     let class = components.classes.get(path).cloned().unwrap_or_default();
     let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));
-    if void_tag(&node.tag) {
+    let tag = stand_in::tag(node, assets);
+    if void_tag(tag) {
         return format!(
-            "{indent}<{} className={}{}{} />\n",
-            jsx_tag(&node.tag),
+            "{indent}<{tag} className={}{}{} />\n",
             quoted(&class),
             attributes,
             event(path, handlers)
         );
     }
     format!(
-        "{indent}<{} className={}{}{}>\n{}{indent}</{}>\n",
-        jsx_tag(&node.tag),
+        "{indent}<{tag} className={}{}{}>\n{}{indent}</{tag}>\n",
         quoted(&class),
         attributes,
         event(path, handlers),
         children,
-        jsx_tag(&node.tag)
     )
 }
 

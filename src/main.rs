@@ -53,6 +53,7 @@ mod state_style_script;
 mod style_baseline;
 #[cfg(test)]
 mod style_baseline_scroll_tests;
+mod surface_content;
 mod updater;
 mod validate;
 

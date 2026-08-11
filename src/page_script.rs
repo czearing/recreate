@@ -16,7 +16,7 @@ fn with_sheets(template: &str, sheets: &[String]) -> String {
 }
 
 fn source_template() -> String {
-    template_with_assets(asset_script::SOURCE)
+    template_with_assets(&asset_script::with_downloads())
 }
 
 /// One template, so a capture stage added here cannot be missing from the asset-free form.
@@ -37,7 +37,10 @@ fn template_with_assets(assets: &str) -> String {
 }
 
 pub fn source_without_assets() -> String {
-    with_sheets(&template_with_assets("const assetData = {};"), &[])
+    with_sheets(
+        &template_with_assets(&asset_script::without_downloads()),
+        &[],
+    )
 }
 
 #[cfg(test)]

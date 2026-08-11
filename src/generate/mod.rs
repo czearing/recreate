@@ -141,8 +141,8 @@ mod source_svg_image_tests;
 #[cfg(test)]
 #[path = "source_svg_name_tests.rs"]
 mod source_svg_name_tests;
-mod source_svg_stand_in;
 mod source_view_split;
+mod stand_in;
 mod startup_overlays;
 mod startup_timeline;
 mod state_style_maps;

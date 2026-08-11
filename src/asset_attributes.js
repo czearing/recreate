@@ -48,19 +48,26 @@
   // The recorded attributes of one element. Values on an asset-bearing element are
   // resolved against the document base, so they are spelled the way the asset map is
   // keyed and the emitter's exact lookup can hit.
-  const recreateAttributes = element => {
+  //
+  // An element that paints content no attribute addresses contributes one more, read from
+  // the element itself. It is recorded here rather than beside each walk so that every
+  // traversal which records attributes records the content too, and the two cannot drift.
+  const recreateAttributes = (element, path) => {
     const localise = element.matches?.(assetSelector);
-    return Object.fromEntries(
-      Array.from(element.attributes)
-        .filter(attribute =>
-          !attribute.name.startsWith('on') && !skippedAttributes.has(attribute.name))
-        .map(attribute => [
-          attribute.name,
-          localise
-            ? mapAttributeUrls(attribute.name, attribute.value, recordAssetUrl)
-            : attribute.value
-        ])
-    );
+    return {
+      ...Object.fromEntries(
+        Array.from(element.attributes)
+          .filter(attribute =>
+            !attribute.name.startsWith('on') && !skippedAttributes.has(attribute.name))
+          .map(attribute => [
+            attribute.name,
+            localise
+              ? mapAttributeUrls(attribute.name, attribute.value, recordAssetUrl)
+              : attribute.value
+          ])
+      ),
+      ...recreateSurfaceAttributes(element, path)
+    };
   };
   // Every URL the recreation must contain bytes for: one per candidate rather than one
   // per element, plus any `url()` in a captured declaration or stylesheet rule.

@@ -1,5 +1,5 @@
 use super::source_dedupe_support::{normalize, replace_ranges, reusable_svg, svg_blocks};
-use super::source_svg_stand_in::image;
+use super::stand_in::image;
 use anyhow::Result;
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, path::Path};

@@ -64,7 +64,7 @@ __SELECTION__
       parent: element.parentElement ? pathOf(element.parentElement) : null,
       tag: element.tagName.toLowerCase(),
       text: '',
-      attributes: recreateAttributes(element),
+      attributes: recreateAttributes(element, path),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
       disabled: element.matches(':disabled'),

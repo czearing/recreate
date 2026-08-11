@@ -8,7 +8,7 @@
 //! names the graphic. Both axes must stay independently pinned, because a fix to either
 //! one can silently widen the other.
 
-use super::source_svg_stand_in::image;
+use super::stand_in::image;
 
 /// The defect. Relocation makes the name unreachable rather than merely moving it: through
 /// `<img src>` the graphic becomes an image document, whose internal `role` and `aria-*`
