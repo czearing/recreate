@@ -158,6 +158,34 @@ pub(super) fn global_rule(rule: &str) -> bool {
     !GROUPING_AT_RULES.contains(&name.as_str())
 }
 
+/// The parts of a rule worth keeping, with every grouping at-rule rebuilt around whichever
+/// of its members survive.
+///
+/// `global_rule` answers a question about one rule's kind, which is the whole answer only
+/// at the top level. A grouping at-rule is neither a definition nor a style rule: what it
+/// contributes depends on what it holds, and CSS Conditional Rules 3 allows `@font-face`
+/// and `@keyframes` inside every conditional group. Asking `keep` of the group itself
+/// therefore answers the wrong question — the members have to be asked, one at a time, at
+/// whatever depth they sit.
+///
+/// The prelude is rebuilt rather than dropped because a condition is meaning, not
+/// decoration: a definition lifted out of `@media (prefers-reduced-motion: no-preference)`
+/// animates a page the author deliberately kept still, which is worse than omitting it. A
+/// group none of whose members survive contributes nothing, so no empty condition is
+/// published.
+pub(super) fn retain(rule: &str, keep: &dyn Fn(&str) -> bool) -> Option<String> {
+    let body_start = rule.find('{')?;
+    let prelude = &rule[..body_start];
+    if !rule.ends_with('}') || !prelude.trim_start().starts_with('@') || global_rule(rule) {
+        return keep(rule).then(|| rule.to_string());
+    }
+    let members = super::css_rule_split::top_level(&rule[body_start + 1..rule.len() - 1])
+        .iter()
+        .filter_map(|member| retain(member, keep))
+        .collect::<Vec<_>>();
+    (!members.is_empty()).then(|| format!("{prelude}{{{}}}", members.join("\n")))
+}
+
 #[cfg(test)]
 #[path = "css_tests.rs"]
 mod tests;

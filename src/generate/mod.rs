@@ -146,6 +146,9 @@ mod source_svg_assets;
 #[path = "source_svg_assets_tests.rs"]
 mod source_svg_assets_tests;
 #[cfg(test)]
+#[path = "css_nested_definition_tests.rs"]
+mod css_nested_definition_tests;
+#[cfg(test)]
 #[path = "source_svg_image_tests.rs"]
 mod source_svg_image_tests;
 #[cfg(test)]

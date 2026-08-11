@@ -3,6 +3,9 @@ use serde_json::{Value, json};
 #[path = "rule_activation_layer_tests.rs"]
 mod layer;
 
+#[path = "rule_activation_definition_tests.rs"]
+mod definition;
+
 const HARNESS: &str = include_str!("rule_activation_harness.js");
 
 fn capture_source() -> String {

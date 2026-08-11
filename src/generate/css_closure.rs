@@ -33,31 +33,22 @@ use std::collections::BTreeSet;
 /// carried verbatim is text like any other and the names *it* spells are still unmet.
 pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
     let rules = super::css_rule_split::top_level(css);
-    let mut carried = rules
-        .iter()
-        .map(|rule| consumer(rule, classes))
-        .collect::<Vec<_>>();
     let mut wanted = BTreeSet::new();
     let mut inherited = String::new();
     // A carried definition can name a further one, so this runs to a fixed point rather
-    // than for one pass. It terminates because every pass either carries a rule that was
-    // not carried before, wants a name that was not wanted before, or stops.
+    // than for one pass. Selection only widens as the carried text grows, so each pass
+    // takes a superset of the last and a finite rule set forces the text to stop changing.
+    let mut carried = String::new();
     loop {
-        let declared = joined(&carried);
+        let declared = rules
+            .iter()
+            .filter_map(|rule| {
+                super::css::retain(rule, &|member| reaches(member, classes, &carried))
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
         let carried_text = join(&inherited, &declared);
-        let mut grew = false;
-        for (index, rule) in rules.iter().enumerate() {
-            if carried[index].is_some() || !global_rule(rule) {
-                continue;
-            }
-            if defined_names(rule)
-                .iter()
-                .any(|name| mentions(&carried_text, name))
-            {
-                carried[index] = Some(rule.clone());
-                grew = true;
-            }
-        }
+        let mut grew = carried_text != carried;
         if super::css_inheritance::wanted(&carried_text, &declared, &mut wanted) {
             inherited = super::css_inheritance::declarations(&rules, &wanted);
             grew = true;
@@ -65,16 +56,26 @@ pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
         if !grew {
             return carried_text;
         }
+        carried = carried_text;
     }
 }
 
-fn joined(carried: &[Option<String>]) -> String {
-    carried
+/// Whether one rule — already reduced by `retain` to something that is not a grouping
+/// at-rule — reaches the fragment.
+///
+/// The two kinds arrive by different routes and neither implies the other: a style rule by
+/// selecting an element that moved, a definition by having a name it defines mentioned in
+/// what has been taken so far. Asking both in one predicate is what lets a single walk
+/// serve both, so a group holding a style rule and a definition side by side yields each of
+/// them rather than being claimed by whichever was seen first.
+fn reaches(rule: &str, classes: &[String], carried: &str) -> bool {
+    if global_rule(rule) {
+        return defined_names(rule).iter().any(|name| mentions(carried, name));
+    }
+    let prelude = rule.split('{').next().unwrap_or_default();
+    classes
         .iter()
-        .flatten()
-        .map(String::as_str)
-        .collect::<Vec<_>>()
-        .join("\n")
+        .any(|class_name| mentions(prelude, &format!(".{class_name}")))
 }
 
 /// Inherited values are placed first so a rule the fragment carries for itself, which is a
@@ -84,34 +85,6 @@ fn join(inherited: &str, declared: &str) -> String {
         true => declared.to_string(),
         false => format!("{inherited}\n{declared}"),
     }
-}
-
-/// The rule as it should be carried, if it reaches the fragment at all.
-///
-/// A grouping at-rule is descended into and rebuilt around only the members that reach the
-/// fragment, preserving the group's condition without dragging in rules for elements that
-/// stayed behind. Definitions are not selected here: they reach the fragment by being
-/// named, not by matching it.
-fn consumer(rule: &str, classes: &[String]) -> Option<String> {
-    let body_start = rule.find('{')?;
-    if !rule.ends_with('}') {
-        return None;
-    }
-    let prelude = &rule[..body_start];
-    if !prelude.trim_start().starts_with('@') {
-        return classes
-            .iter()
-            .any(|class_name| mentions(prelude, &format!(".{class_name}")))
-            .then(|| rule.to_string());
-    }
-    if global_rule(rule) {
-        return None;
-    }
-    let members = super::css_rule_split::top_level(&rule[body_start + 1..rule.len() - 1])
-        .iter()
-        .filter_map(|member| consumer(member, classes))
-        .collect::<Vec<_>>();
-    (!members.is_empty()).then(|| format!("{prelude}{{{}}}", members.join("\n")))
 }
 
 /// The names a definition rule introduces.

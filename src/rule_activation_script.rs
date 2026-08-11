@@ -37,10 +37,10 @@ pub const SOURCE: &str = r#"
   // records nothing, dropping the block every animation-name refers to. One owner, because
   // the walk and the recorder each need this answer and a second copy of it drifts.
   const grouping = rule => rule instanceof CSSGroupingRule;
-  const flattenRules = (rules, media = null, conditions = [], preludes = []) => {
+  const flattenRules = (rules, media = null, conditions = [], preludes = [], whole = false) => {
     const entries = [];
     for (const rule of Array.from(rules || [])) {
-      entries.push({ rule, media, conditions, preludes, active: true });
+      entries.push({ rule, media, conditions, preludes, active: true, whole });
       if (!grouping(rule)) continue;
       const prelude = preludeOf(rule);
       const gates = conditional(rule);
@@ -51,7 +51,8 @@ pub const SOURCE: &str = r#"
         rule.cssRules,
         nestedMedia,
         gates && prelude ? conditions.concat(prelude) : conditions,
-        !gates && prelude ? preludes.concat(prelude) : preludes
+        !gates && prelude ? preludes.concat(prelude) : preludes,
+        whole || rule.type === CSSRule.MEDIA_RULE
       ));
     }
     return entries;
