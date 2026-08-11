@@ -18,8 +18,8 @@ pub fn append(
             continue;
         }
         let digest = animation_digest(animation);
-        let name = format!("recreate{}", &digest[..10]);
-        if emitted_keyframes.insert(digest.clone()) {
+        let name = format!("recreate{}", &digest_of(&animation.keyframes)[..10]);
+        if emitted_keyframes.insert(name.clone()) {
             super::animation_keyframes::append(animation, &name, css);
         }
         targets
@@ -74,10 +74,20 @@ pub fn append_startup(
     append(&startup, authored, classes, css);
 }
 
+/// Names a `@keyframes` block by the frames it is built from, because that is all
+/// `animation_keyframes::append` reads. Two elements playing one movement at different
+/// speeds share the block and differ only in the timing longhands that describe the
+/// difference.
+fn digest_of(value: &impl serde::Serialize) -> String {
+    hex::encode(Sha256::digest(
+        serde_json::to_vec(value).unwrap_or_default(),
+    ))
+}
+
+/// Names the timed rule, which two elements share only when the movement *and* the way it is
+/// played both agree.
 fn animation_digest(animation: &Animation) -> String {
-    let signature =
-        serde_json::to_vec(&(&animation.keyframes, &animation.timing)).unwrap_or_default();
-    hex::encode(Sha256::digest(signature))
+    digest_of(&(&animation.keyframes, &animation.timing))
 }
 
 pub(crate) fn sampled_layout_observation(animation: &Animation) -> bool {

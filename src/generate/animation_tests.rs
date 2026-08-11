@@ -159,6 +159,56 @@ fn reuses_identical_animation_output_across_targets() {
     assert_eq!(first, second);
 }
 
+/// A `@keyframes` block is built from the frames alone — `append` never consults the timing —
+/// so naming it by a digest that also covered the timing guaranteed a duplicate whenever two
+/// elements shared a movement but played it differently. Two identical blocks under two names
+/// is output the source never contained, and the rule that decides how often a page emits one
+/// is how often its content actually differs.
+#[test]
+fn writes_one_keyframes_block_per_distinct_movement() {
+    let mut fast = animation("html>body>div:nth-of-type(1)");
+    let mut slow = animation("html>body>div:nth-of-type(2)");
+    slow.timing["playbackRate"] = json!(-1);
+    slow.timing["duration"] = json!(900);
+    assert_eq!(fast.keyframes, slow.keyframes);
+
+    let mut classes = BTreeMap::from([
+        ("html>body>div:nth-of-type(1)".into(), "first".into()),
+        ("html>body>div:nth-of-type(2)".into(), "second".into()),
+    ]);
+    let mut css = String::new();
+    append(
+        &[fast.clone(), slow],
+        &BTreeSet::new(),
+        &mut classes,
+        &mut css,
+    );
+    assert_eq!(
+        css.matches("@keyframes").count(),
+        1,
+        "emitted the same movement twice: {css}"
+    );
+    assert_ne!(
+        classes["html>body>div:nth-of-type(1)"], classes["html>body>div:nth-of-type(2)"],
+        "collapsed two different timings onto one class"
+    );
+    assert!(css.contains("animation-duration:200ms"), "{css}");
+    assert!(css.contains("animation-duration:900ms"), "{css}");
+
+    // The other direction: sharing a name is a claim the frames are the same, so a different
+    // movement must still get its own block.
+    fast.keyframes = vec![json!({"opacity":"0"}), json!({"opacity":"0.5"})];
+    let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
+    let mut css = String::new();
+    append(
+        &[fast, animation("html>body")],
+        &BTreeSet::new(),
+        &mut classes,
+        &mut css,
+    );
+    assert_eq!(css.matches("@keyframes").count(), 2, "{css}");
+}
+
 #[test]
 fn combines_concurrent_animations_on_one_target() {
     let mut first = animation("html>body");
