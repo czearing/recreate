@@ -31,7 +31,13 @@ mod css_interactions;
 mod css_layers;
 mod css_layout;
 mod css_paths;
+mod css_pseudo;
+#[cfg(test)]
+mod css_pseudo_identity_tests;
+#[cfg(test)]
+mod css_pseudo_rule_tests;
 mod css_rule_split;
+mod css_signature;
 mod css_state_helpers;
 mod css_values;
 mod css_visual;

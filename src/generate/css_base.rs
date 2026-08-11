@@ -124,8 +124,8 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
             if !declarations.is_empty() {
                 css.push_str(&format!(".{class}{{{declarations}}}\n"));
             }
+            super::css_pseudo::append(node, &class, assets, &mut css);
         }
-        append_pseudo(node, &class, assets, &mut css);
         classes.insert(node.path.clone(), class);
     }
     timing("base");
@@ -139,23 +139,6 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     );
     append_authored_media(base, &classes, &mut css);
     Output { css, classes }
-}
-
-fn append_pseudo(
-    node: &crate::model::Node,
-    class: &str,
-    assets: &BTreeMap<String, String>,
-    css: &mut String,
-) {
-    for (pseudo, value) in [("before", &node.before), ("after", &node.after)] {
-        if let Some(value) = value {
-            css.push_str(&format!(
-                ".{class}::{pseudo}{{content:{};{}}}\n",
-                value.content,
-                super::responsive::output_declarations(&value.style, assets)
-            ));
-        }
-    }
 }
 
 fn append_authored_media(base: &PageState, classes: &BTreeMap<String, String>, css: &mut String) {

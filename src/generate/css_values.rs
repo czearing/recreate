@@ -1,3 +1,4 @@
+use super::css_signature::Signature;
 use crate::model::{Pseudo, Specification, Styles};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashSet};
@@ -17,38 +18,31 @@ pub fn responsive_signatures_for(
     specification: &Specification,
     paths: Option<&HashSet<String>>,
 ) -> BTreeMap<String, String> {
-    let mut signatures = BTreeMap::<String, Sha256>::new();
+    let mut signatures = BTreeMap::<String, Signature>::new();
     for state in &specification.states {
         for node in &state.nodes {
             if paths.is_some_and(|paths| !paths.contains(&node.path)) {
                 continue;
             }
             let signature = signatures.entry(node.path.clone()).or_default();
-            append_styles(signature, &node.style);
+            signature.styles(&node.style);
             append_pseudo(signature, node.before.as_ref());
             append_pseudo(signature, node.after.as_ref());
         }
     }
     signatures
         .into_iter()
-        .map(|(path, signature)| (path, hex::encode(signature.finalize())))
+        .map(|(path, signature)| (path, signature.finish()))
         .collect()
 }
 
-fn append_styles(signature: &mut Sha256, styles: &Styles) {
-    for (key, value) in styles {
-        signature.update(key.as_bytes());
-        signature.update([0]);
-        signature.update(value.as_bytes());
-        signature.update([0xff]);
-    }
-}
-
-fn append_pseudo(signature: &mut Sha256, pseudo: Option<&Pseudo>) {
-    signature.update([0xfe]);
+/// Writes the slot marker whether or not the pseudo exists, so an element with no generated box
+/// is not encoded as the same bytes as one whose box is empty.
+fn append_pseudo(signature: &mut Signature, pseudo: Option<&Pseudo>) {
+    signature.slot();
     if let Some(pseudo) = pseudo {
-        signature.update(pseudo.content.as_bytes());
-        append_styles(signature, &pseudo.style);
+        signature.value(&pseudo.content);
+        signature.styles(&pseudo.style);
     }
 }
 

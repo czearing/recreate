@@ -1,6 +1,6 @@
+use super::css_signature::Signature;
 use super::responsive;
 use crate::model::{Node, PageState};
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashSet};
 
 pub fn class_maps(
@@ -32,8 +32,9 @@ pub fn class_maps(
                     .parent
                     .as_deref()
                     .and_then(|parent| nodes.get(parent).copied());
-                let class = class_name(node, parent, state, assets);
-                append_rule(&class, node, parent, state, assets, css, emitted);
+                let rule = rule_parts(node, parent, state, assets);
+                let class = class_name(&rule);
+                append_rule(&class, &rule, css, emitted);
                 classes.insert(node.path.clone(), class);
             }
             classes
@@ -41,45 +42,20 @@ pub fn class_maps(
         .collect()
 }
 
-fn class_name(
-    node: &Node,
-    parent: Option<&Node>,
-    state: &PageState,
+/// The rule set an element receives: a selector suffix and the declarations that follow it. The
+/// empty suffix is the element's own rule; the others are the boxes it generates.
+///
+/// Built once and used for both the name and the output, so the two cannot describe different
+/// elements. Reading the parts twice was also how the same declarations came to be computed
+/// twice per element.
+fn rule_parts<'a>(
+    node: &'a Node,
+    parent: Option<&'a Node>,
+    state: &'a PageState,
     assets: &BTreeMap<String, String>,
-) -> String {
-    let mut signature = responsive::base_declarations(
-        node,
-        parent,
-        &state.viewport,
-        assets,
-        &state.css_rules,
-        false,
-    );
-    if let Some(before) = &node.before {
-        signature.push_str(&before.content);
-        signature.push_str(&responsive::output_declarations(&before.style, assets));
-    }
-    if let Some(after) = &node.after {
-        signature.push_str(&after.content);
-        signature.push_str(&responsive::output_declarations(&after.style, assets));
-    }
-    format!("s{}", &hex::encode(Sha256::digest(signature))[..10])
-}
-
-fn append_rule(
-    class: &str,
-    node: &Node,
-    parent: Option<&Node>,
-    state: &PageState,
-    assets: &BTreeMap<String, String>,
-    css: &mut String,
-    emitted: &mut HashSet<String>,
-) {
-    if !emitted.insert(class.to_string()) {
-        return;
-    }
-    css.push_str(&format!(
-        ".{class}{{{}}}\n",
+) -> Vec<(&'static str, String)> {
+    let mut parts = vec![(
+        "",
         responsive::base_declarations(
             node,
             parent,
@@ -87,20 +63,43 @@ fn append_rule(
             assets,
             &state.css_rules,
             false,
-        )
-    ));
-    if let Some(before) = &node.before {
-        css.push_str(&format!(
-            ".{class}::before{{content:{};{}}}\n",
-            before.content,
-            responsive::output_declarations(&before.style, assets)
-        ));
+        ),
+    )];
+    for (suffix, pseudo) in super::css_pseudo::slots(node) {
+        if let Some(pseudo) = pseudo {
+            parts.push((suffix, super::css_pseudo::declarations(pseudo, assets)));
+        }
     }
-    if let Some(after) = &node.after {
-        css.push_str(&format!(
-            ".{class}::after{{content:{};{}}}\n",
-            after.content,
-            responsive::output_declarations(&after.style, assets)
-        ));
+    parts
+}
+
+/// Names an element by the rule set it will receive, so two elements share a class exactly when
+/// they would be given the same rules.
+///
+/// The selector suffix is part of what is folded in, which is what keeps an element decorated
+/// before its content distinct from one decorated after it. Hashing only the payloads, pasted
+/// end to end, let those two produce identical bytes; [`append_rule`] writes once per class, so
+/// the second element kept the class, was skipped, and rendered the first one's decoration on
+/// the wrong side of its content.
+fn class_name(parts: &[(&'static str, String)]) -> String {
+    let mut signature = Signature::new();
+    for (suffix, declarations) in parts {
+        signature.slot();
+        signature.pair(suffix, declarations);
+    }
+    format!("s{}", &signature.finish()[..10])
+}
+
+fn append_rule(
+    class: &str,
+    parts: &[(&'static str, String)],
+    css: &mut String,
+    emitted: &mut HashSet<String>,
+) {
+    if !emitted.insert(class.to_string()) {
+        return;
+    }
+    for (suffix, declarations) in parts {
+        css.push_str(&format!(".{class}{suffix}{{{declarations}}}\n"));
     }
 }
