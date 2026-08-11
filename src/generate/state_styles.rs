@@ -1,3 +1,4 @@
+use super::css_rule_groups::Groups;
 use crate::model::StateStyle;
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -7,7 +8,7 @@ pub fn append(
     assets: &BTreeMap<String, String>,
     css: &mut String,
 ) {
-    let mut groups = Vec::new();
+    let mut groups = Groups::default();
     collect(styles, classes, assets, &BTreeSet::new(), &mut groups);
     emit(groups, css);
 }
@@ -19,7 +20,7 @@ pub fn append_inherited(
     assets: &BTreeMap<String, String>,
     css: &mut String,
 ) {
-    let mut groups = Vec::new();
+    let mut groups = Groups::default();
     collect(styles, base, assets, &BTreeSet::new(), &mut groups);
     for (overrides, classes) in interactions {
         let overrides = overrides.iter().map(style_key).collect();
@@ -28,7 +29,6 @@ pub fn append_inherited(
     emit(groups, css);
 }
 
-type RuleKey = (String, Option<String>, String);
 type StyleKey<'a> = (
     &'a str,
     Option<&'a str>,
@@ -42,7 +42,7 @@ fn collect(
     classes: &BTreeMap<String, String>,
     assets: &BTreeMap<String, String>,
     overrides: &BTreeSet<StyleKey<'_>>,
-    groups: &mut Vec<(RuleKey, BTreeSet<String>)>,
+    groups: &mut Groups,
 ) {
     for style in styles {
         if overrides.contains(&style_key(style)) {
@@ -70,11 +70,7 @@ fn collect(
             ),
             None => format!("{target}{}", style.pseudo.as_deref().unwrap_or_default()),
         };
-        if let Some((_, selectors)) = groups.iter_mut().find(|(current, _)| current == &key) {
-            selectors.insert(selector);
-        } else {
-            groups.push((key, BTreeSet::from([selector])));
-        }
+        groups.add(key, selector);
     }
 }
 
@@ -95,7 +91,7 @@ fn selector(class: &str) -> String {
         .collect()
 }
 
-fn emit(groups: Vec<(RuleKey, BTreeSet<String>)>, css: &mut String) {
+fn emit(groups: Groups, css: &mut String) {
     for ((_, media, declarations), selectors) in groups {
         let rule = format!(
             "{}{{{declarations}}}",
@@ -111,3 +107,7 @@ fn emit(groups: Vec<(RuleKey, BTreeSet<String>)>, css: &mut String) {
 #[cfg(test)]
 #[path = "state_style_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "state_order_tests.rs"]
+mod order_tests;

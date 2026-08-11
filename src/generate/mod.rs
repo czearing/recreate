@@ -25,6 +25,7 @@ mod css_base;
 mod css_base_style;
 mod css_closure;
 mod css_custom_properties;
+mod css_declaration;
 mod css_identifiers;
 mod css_inheritance;
 mod css_interactions;
@@ -36,6 +37,7 @@ mod css_pseudo;
 mod css_pseudo_identity_tests;
 #[cfg(test)]
 mod css_pseudo_rule_tests;
+mod css_rule_groups;
 mod css_rule_split;
 mod css_signature;
 mod css_state_helpers;

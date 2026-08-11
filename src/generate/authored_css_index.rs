@@ -279,10 +279,7 @@ impl<'a> Index<'a> {
 }
 
 fn parsed_declarations(declarations: &str) -> impl DoubleEndedIterator<Item = (&str, &str)> {
-    declarations
-        .split(';')
-        .filter_map(|declaration| declaration.split_once(':'))
-        .map(|(name, value)| (name.trim(), value.trim()))
+    super::css_declaration::parsed(declarations)
 }
 
 fn node_classes(node: &Node) -> impl Iterator<Item = &str> {
