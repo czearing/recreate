@@ -5,8 +5,12 @@
 //! document spelling of a name from drifting apart.
 /// React's canonical prop names for HTML attributes that differ from their HTML spelling
 /// only by case. Taken from the React DOM attribute reference.
+///
+/// Only by case: an entry whose document spelling also carries a hyphen does not belong
+/// here, because `document_attribute` restores an entry by lowercasing it and would emit a
+/// name that never existed. `accept-charset` and `http-equiv` are React's only two such
+/// names, and they live in `HYPHENATED` with the rest of the hyphenated family.
 pub(super) const CAMEL_CASED: &[&str] = &[
-    "acceptCharset",
     "accessKey",
     "allowFullScreen",
     "autoCapitalize",
@@ -33,7 +37,6 @@ pub(super) const CAMEL_CASED: &[&str] = &[
     "formTarget",
     "frameBorder",
     "hrefLang",
-    "httpEquiv",
     "imageSizes",
     "imageSrcSet",
     "inputMode",
@@ -68,18 +71,25 @@ pub(super) const CAMEL_CASED: &[&str] = &[
 /// JavaScript reserved word or with an existing DOM property.
 pub(super) const RENAMED: &[(&str, &str)] = &[("class", "className"), ("for", "htmlFor")];
 
-/// The SVG attributes whose document spelling is hyphenated.
+/// The attributes whose document spelling is hyphenated and whose JSX spelling is not.
 ///
 /// SVG spells a large family of its own attributes in camelCase — `viewBox`,
 /// `gradientUnits`, `stdDeviation` — so hyphenating a camelCase prop by rule would corrupt
 /// every one of them, and `hyphenated_to_camel` is not injective anyway: `view-box` and
 /// `viewBox` both camel-case to `viewBox`. Only a list can separate the two families.
 ///
-/// The list is not "the names seen so far". It is closed and derivable: a presentation
-/// attribute is by definition an SVG attribute that is also a CSS property, so the
-/// hyphenated family is exactly the multi-word presentation attributes. Anything absent
-/// falls through to identity, which is what preserves `viewBox`.
+/// The list does not have to be complete, and cannot be. A presentation attribute is
+/// defined by reference to the CSS property set, so the family grows with each revision of
+/// the styling module, and a list transcribed from a current reference simultaneously
+/// misses everything the previous revision defined and browsers still parse —
+/// `color-rendering` and `enable-background` among them. Both directions read this list, so
+/// a name it does not hold keeps its captured spelling on the way out and on the way back,
+/// and an omission costs nothing rather than costing the name.
 pub(super) const HYPHENATED: &[&str] = &[
+    // React's only two hyphenated HTML attributes. They belong to the same family as the
+    // SVG names below: hyphenated in the document, camelCase as a prop.
+    "accept-charset",
+    "http-equiv",
     "alignment-baseline",
     "baseline-shift",
     "clip-path",
@@ -130,4 +140,3 @@ pub(super) const HYPHENATED: &[&str] = &[
     "word-spacing",
     "writing-mode",
 ];
-

@@ -15,13 +15,26 @@
 //! It is written as one list of canonical React names, not as pairs. The HTML spelling of
 //! every entry is its own lowercase form, so the two halves cannot drift apart: adding a
 //! name adds both directions at once.
+//!
+//! The same has to be true of the hyphenated family, and it was not. Converting to JSX
+//! ended in a rule that answered for every name ever presented, while converting back was
+//! a search bounded by `HYPHENATED`, so a name the list did not hold was camel-cased on the
+//! way out and never restored on the way back — silently, since both halves succeeded. The
+//! list cannot be completed: a presentation attribute is defined by reference to the CSS
+//! property set, so the family grows with the styling module and any list transcribed today
+//! is short tomorrow. Both directions therefore consult the list and an unknown name is
+//! identity in both, which costs nothing where the two spellings already agree and makes an
+//! omission harmless where they do not.
 
 use super::jsx_attr_tables::{CAMEL_CASED, HYPHENATED, RENAMED};
 
 /// Translates a captured HTML attribute name into the prop name React recognises.
 ///
 /// `aria-` and `data-` attributes are passed through verbatim: React accepts those exactly
-/// as authored, and camel-casing them would emit a prop no renderer knows.
+/// as authored, and camel-casing them would emit a prop no renderer knows. Every other
+/// unrecognised hyphenated name is passed through for the same reason — React writes a
+/// hyphenated prop it does not know straight to the DOM, while an unrecognised camelCase
+/// prop it drops, so the conversion is the lossy direction rather than the safe one.
 pub fn jsx_attribute(name: &str) -> String {
     if name.starts_with("aria-") || name.starts_with("data-") {
         return name.into();
@@ -35,7 +48,10 @@ pub fn jsx_attribute(name: &str) -> String {
     {
         return (*camel).into();
     }
-    hyphenated_to_camel(name)
+    if HYPHENATED.contains(&name) {
+        return hyphenated_to_camel(name);
+    }
+    name.into()
 }
 
 /// The inverse: the document spelling of a name React writes as a prop.

@@ -1,4 +1,50 @@
-use super::{CAMEL_CASED, jsx_attribute};
+use super::{CAMEL_CASED, HYPHENATED, RENAMED, document_attribute, jsx_attribute};
+
+/// The property the two directions exist to satisfy, stated over arbitrary names rather
+/// than over the tables' own contents.
+///
+/// One direction used to be a rule with unbounded domain and the other a search bounded by
+/// `HYPHENATED`, so the round trip held inside the list and failed silently outside it: a
+/// name absent from the list was camel-cased on the way out and never restored on the way
+/// back, and both halves reported success. The list cannot be the fix — a presentation
+/// attribute is defined by reference to the CSS property set, so the family grows with the
+/// styling module and any list transcribed today is short tomorrow. Sharing one domain is
+/// what makes an omission cost nothing.
+#[test]
+fn every_name_survives_the_trip_out_to_jsx_and_back_to_the_document() {
+    let mut names: Vec<String> = HYPHENATED
+        .iter()
+        .chain(RENAMED.iter().map(|(document, _)| document))
+        .map(|name| (*name).to_owned())
+        .collect();
+    names.extend(CAMEL_CASED.iter().map(|name| name.to_ascii_lowercase()));
+    names.extend(
+        [
+            // Multi-word SVG presentation attributes the list does not name. Both are real
+            // and still parsed; they are here as absences, so replacing them with whatever
+            // the list gains next would defeat the test.
+            "color-rendering",
+            "enable-background",
+            // Hyphenated names no specification will ever add, which is what proves the rule
+            // holds beyond any list rather than beyond the current one.
+            "author-invented-attribute",
+            "x-two-word",
+            // SVG's own camelCase spellings, which no inverse may touch.
+            "viewBox",
+            "preserveAspectRatio",
+            "gradientTransform",
+            "stdDeviation",
+        ]
+        .map(str::to_owned),
+    );
+    for name in names {
+        assert_eq!(
+            document_attribute(&jsx_attribute(&name)),
+            name,
+            "{name} did not survive the round trip"
+        );
+    }
+}
 
 /// The defect that prompted the table: a `<time datetime="…">` was emitted as
 /// `datetime={…}`, which React does not recognise. `datetime` contains no hyphen, so the
@@ -55,6 +101,20 @@ fn attributes_that_are_already_correct_are_left_alone() {
     ] {
         assert_eq!(jsx_attribute(name), name);
     }
+}
+
+/// The two hyphenated HTML attributes, which sat in the case-only table until this was
+/// written. The backward direction restores an entry of that table by lowercasing it, so it
+/// emitted `acceptcharset` and `httpequiv` — names no parser knows — while the forward
+/// direction happened to be right only because the case-insensitive lookup could never match
+/// across a hyphen and the total rule downstream rescued it. Removing that rule is what
+/// exposed them, and the family they actually belong to is the hyphenated one.
+#[test]
+fn the_two_hyphenated_html_attributes_translate_in_both_directions() {
+    assert_eq!(jsx_attribute("accept-charset"), "acceptCharset");
+    assert_eq!(jsx_attribute("http-equiv"), "httpEquiv");
+    assert_eq!(document_attribute("acceptCharset"), "accept-charset");
+    assert_eq!(document_attribute("httpEquiv"), "http-equiv");
 }
 
 /// The table is a list of canonical names whose HTML spelling is its own lowercase form.

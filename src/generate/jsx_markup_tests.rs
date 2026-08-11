@@ -1,4 +1,46 @@
 use super::{attribute_values, to_xml};
+use crate::generate::jsx_attr_names::jsx_attribute;
+
+/// The relocation path end to end: names as the capture recorded them, through the JSX
+/// spelling, into a standalone document with no renderer downstream to repair them.
+///
+/// The two stages used to disagree about their domain — the outbound conversion was a rule
+/// that answered for every name, the inbound one a search over a fixed list — so a name the
+/// list did not hold arrived here camel-cased and stayed that way. XML matches attribute
+/// names case-sensitively, so `colorRendering` is not `color-rendering`; it is an unknown
+/// attribute. Nothing was dropped and nothing errored, and the rendered page was correct
+/// either way because React repairs the same name at render time, which is why this has to
+/// be asserted on the emitted document rather than on the page.
+///
+/// Whole-tag equality rather than a search for one name, so the check also fails if a fix
+/// over-corrects and hyphenates the camelCase spellings SVG owns.
+#[test]
+fn a_relocated_document_carries_the_names_the_capture_recorded() {
+    let captured = [
+        // SVG's own camelCase spelling, which no inverse may touch.
+        ("viewBox", "0 0 100 100"),
+        ("aria-hidden", "true"),
+        // In the list, so it was always restored: the control.
+        ("stroke-width", "6"),
+        // Real multi-word presentation attributes the list does not name.
+        ("color-rendering", "optimizeSpeed"),
+        ("enable-background", "new 0 0 100 100"),
+        // A name no specification will add, which is what proves the rule needs no list.
+        ("author-invented", "kept"),
+    ];
+    let jsx: String = captured
+        .iter()
+        .map(|(name, value)| format!(" {}={{\"{value}\"}}", jsx_attribute(name)))
+        .collect();
+    let expected: String = captured
+        .iter()
+        .map(|(name, value)| format!(" {name}=\"{value}\""))
+        .collect();
+    assert_eq!(
+        to_xml(&format!("<circle{jsx} />")),
+        format!("<circle{expected} />")
+    );
+}
 
 /// The defect this module exists to close: `clipPath` is both an SVG element name and a
 /// React attribute name, so a rename folded over the flat string rewrote the element as
@@ -126,7 +168,8 @@ fn preserves_self_closing_elements() {
 
 #[test]
 fn converts_jsx_svg_to_xml() {
-    let xml = to_xml(r#"<svg className={"icon"} viewBox={"0 0 1 1"}><path strokeWidth={"1"} /></svg>"#);
+    let xml =
+        to_xml(r#"<svg className={"icon"} viewBox={"0 0 1 1"}><path strokeWidth={"1"} /></svg>"#);
     assert!(xml.contains("class=\"icon\""), "{xml}");
     assert!(xml.contains("stroke-width=\"1\""), "{xml}");
     assert!(xml.contains("viewBox=\"0 0 1 1\""), "{xml}");
