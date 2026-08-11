@@ -111,6 +111,9 @@ mod responsive_runtime_tests;
 mod root_reset;
 mod roots;
 mod runtime_sources;
+#[cfg(test)]
+#[path = "scroll_position_tests.rs"]
+mod scroll_position_tests;
 mod scroll_state;
 #[cfg(test)]
 mod scroll_state_tests;

@@ -1,4 +1,4 @@
-use super::scroll_state::{changed, resting, scrolls_document};
+use super::scroll_state::{moved, resting, scrolls_document};
 use crate::model::{DomNode, Node, PageState, Rect, Viewport};
 
 pub(super) fn node(path: &str, tag: &str) -> Node {
@@ -64,14 +64,14 @@ fn credits_a_hidden_overflow_panel_the_same_as_an_auto_one() {
     let baseline = state(&[("auto", 0.0, 0.0), ("hidden", 0.0, 0.0)]);
     let after_auto = state(&[("auto", 0.0, 300.0), ("hidden", 0.0, 0.0)]);
     let after_hidden = state(&[("auto", 0.0, 0.0), ("hidden", 0.0, 300.0)]);
-    let auto = changed(&baseline, &after_auto);
-    let hidden = changed(&baseline, &after_hidden);
+    let auto = moved(&baseline, &after_auto);
+    let hidden = moved(&baseline, &after_hidden);
     assert_eq!(auto.len(), 1);
-    assert_eq!(auto[0].path, "auto");
-    assert_eq!(auto[0].top, 300);
+    assert_eq!(auto[0].path(), "auto");
+    assert_eq!(auto[0].top(), 300);
     assert_eq!(hidden.len(), 1);
-    assert_eq!(hidden[0].path, "hidden");
-    assert_eq!(hidden[0].top, 300);
+    assert_eq!(hidden[0].path(), "hidden");
+    assert_eq!(hidden[0].top(), 300);
 }
 
 /// `overflow: clip` forbids scrolling through any mechanism, so it can never report a changed
@@ -80,9 +80,9 @@ fn credits_a_hidden_overflow_panel_the_same_as_an_auto_one() {
 fn never_credits_an_element_that_did_not_move() {
     let baseline = state(&[("clip", 0.0, 0.0), ("panel", 0.0, 0.0)]);
     let after = state(&[("clip", 0.0, 0.0), ("panel", 0.0, 300.0)]);
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 1);
-    assert_eq!(scrolled[0].path, "panel");
+    assert_eq!(scrolled[0].path(), "panel");
 }
 
 /// The old ancestor walk stopped at the first container taller than 1.2x the viewport and
@@ -91,9 +91,9 @@ fn never_credits_an_element_that_did_not_move() {
 fn credits_a_container_taller_than_the_viewport() {
     let baseline = state(&[("tall", 0.0, 0.0)]);
     let after = state(&[("tall", 0.0, 900.0)]);
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 1);
-    assert_eq!(scrolled[0].top, 900);
+    assert_eq!(scrolled[0].top(), 900);
 }
 
 /// The old anchor picked a single largest node per state, so only one scroll was ever
@@ -102,14 +102,18 @@ fn credits_a_container_taller_than_the_viewport() {
 fn credits_every_panel_scrolled_in_one_state() {
     let baseline = state(&[("first", 0.0, 0.0), ("second", 0.0, 0.0)]);
     let after = state(&[("first", 0.0, 120.0), ("second", 0.0, 340.0)]);
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 2);
     assert_eq!(
-        scrolled.iter().find(|s| s.path == "first").unwrap().top,
+        scrolled.iter().find(|s| s.path() == "first").unwrap().top(),
         120
     );
     assert_eq!(
-        scrolled.iter().find(|s| s.path == "second").unwrap().top,
+        scrolled
+            .iter()
+            .find(|s| s.path() == "second")
+            .unwrap()
+            .top(),
         340
     );
 }
@@ -127,22 +131,28 @@ fn identifies_the_document_scrolling_element() {
             ..DomNode::default()
         },
     );
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 1);
-    assert!(scrolls_document(&after, scrolled[0].path));
-    assert_eq!(scrolled[0].top, 640);
+    assert!(scrolls_document(&after, scrolled[0].path()));
+    assert_eq!(scrolled[0].top(), 640);
     assert!(!scrolls_document(&after, "html>body>main"));
 }
 
 /// A panel restored to the top is a real change and must be emitted, or the recreation keeps
-/// the previous state's offset.
+/// the previous state's offset. It is emitted as the position it now holds — zero.
+///
+/// This assertion previously read `-300`, the distance travelled. That was wrong on the
+/// carrier's own contract ("the offsets it was holding") and survived only because
+/// `Element.scrollTo` clamps a negative target to zero per CSSOM View, so the wrong kind
+/// replayed to the right place. The clamp does not rescue an element that rests at a non-zero
+/// offset and then moves further, which lands short by exactly its resting offset.
 #[test]
 fn credits_a_return_to_the_top_as_a_change() {
     let baseline = state(&[("panel", 0.0, 300.0)]);
     let after = state(&[("panel", 0.0, 0.0)]);
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 1);
-    assert_eq!(scrolled[0].top, -300);
+    assert_eq!(scrolled[0].top(), 0);
 }
 
 /// Both axes come from the same recorded pair, so they cannot disagree the way the two
@@ -151,9 +161,9 @@ fn credits_a_return_to_the_top_as_a_change() {
 fn reports_both_axes_from_one_record() {
     let baseline = state(&[("pane", 0.0, 0.0)]);
     let after = state(&[("pane", 48.0, 300.0)]);
-    let scrolled = changed(&baseline, &after);
+    let scrolled = moved(&baseline, &after);
     assert_eq!(scrolled.len(), 1);
-    assert_eq!((scrolled[0].left, scrolled[0].top), (48, 300));
+    assert_eq!((scrolled[0].left(), scrolled[0].top()), (48, 300));
 }
 
 #[test]
@@ -161,8 +171,8 @@ fn resting_reports_offsets_held_at_capture() {
     let captured = state(&[("pane", 0.0, 160.0), ("still", 0.0, 0.0)]);
     let held = resting(&captured);
     assert_eq!(held.len(), 1);
-    assert_eq!(held[0].path, "pane");
-    assert_eq!(held[0].top, 160);
+    assert_eq!(held[0].path(), "pane");
+    assert_eq!(held[0].top(), 160);
 }
 
 /// Sub-pixel noise from device pixel ratio rounding must not be emitted as a scroll.
@@ -170,5 +180,5 @@ fn resting_reports_offsets_held_at_capture() {
 fn ignores_sub_pixel_drift() {
     let baseline = state(&[("pane", 0.0, 0.0)]);
     let after = state(&[("pane", 0.4, 0.6)]);
-    assert!(changed(&baseline, &after).is_empty());
+    assert!(moved(&baseline, &after).is_empty());
 }

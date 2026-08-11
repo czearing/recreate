@@ -15,6 +15,6 @@ pub fn targets(specification: &Specification) -> String {
 fn snapshot(state: &PageState) -> Vec<(&str, i64, i64)> {
     scroll_state::resting(state)
         .into_iter()
-        .map(|scrolled| (scrolled.path, scrolled.left, scrolled.top))
+        .map(|scrolled| (scrolled.path(), scrolled.left(), scrolled.top()))
         .collect()
 }
