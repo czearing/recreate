@@ -1,5 +1,29 @@
 use crate::model::PageState;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
+
+/// The names this layer owns: every custom property some captured state gives a
+/// value to. It states each one per viewport condition, so any producer that
+/// writes an unguarded fallback must leave these alone -- restating one both
+/// duplicates the rule and reasserts, below a breakpoint, a value the source may
+/// have declared only above it.
+pub fn declared_names(states: &[PageState]) -> BTreeSet<String> {
+    states
+        .iter()
+        .filter_map(|state| state.dom.get("html"))
+        .flat_map(|root| {
+            root.computed_style_properties
+                .iter()
+                .zip(&root.computed_style_values)
+                .filter(|(property, _)| property.starts_with("--"))
+                .filter(|(_, value)| {
+                    root.computed_style_dictionary
+                        .get(**value as usize)
+                        .is_some_and(|value| !value.trim().is_empty())
+                })
+                .map(|(property, _)| property.clone())
+        })
+        .collect()
+}
 
 pub fn append_responsive(
     states: &[PageState],
@@ -130,5 +154,38 @@ mod tests {
             super::render(&properties, &dictionary, &values),
             "--brand:#6264a7;--spacing:8px;"
         );
+    }
+
+    /// A name is owned by this layer only where it has a value to state. One
+    /// that is empty in every state is never emitted here, so claiming it would
+    /// silence the authored fallback and leave the property undeclared.
+    #[test]
+    fn names_only_the_custom_properties_some_state_declares() {
+        let mut narrow = state(&["--changed", "--blank", "color"], &["12px", "", "red"]);
+        let wide = state(
+            &["--changed", "--dropped", "color"],
+            &["24px", "37px", "red"],
+        );
+        narrow.viewport.width = 320;
+
+        let names = super::declared_names(&[wide, narrow]);
+
+        assert!(names.contains("--changed"));
+        assert!(names.contains("--dropped"));
+        assert!(!names.contains("--blank"), "{names:?}");
+        assert!(!names.contains("color"), "{names:?}");
+    }
+
+    fn state(properties: &[&str], values: &[&str]) -> crate::model::PageState {
+        let mut state = crate::model::PageState::default();
+        let mut node = crate::model::DomNode {
+            node_type: 1,
+            ..Default::default()
+        };
+        node.computed_style_properties = properties.iter().map(|name| (*name).into()).collect();
+        node.computed_style_dictionary = values.iter().map(|value| (*value).into()).collect();
+        node.computed_style_values = (0..values.len() as u32).collect();
+        state.dom.insert("html".into(), node);
+        state
     }
 }

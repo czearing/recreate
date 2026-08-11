@@ -1,4 +1,5 @@
 use super::*;
+use std::collections::BTreeSet;
 
 #[test]
 fn preserves_global_font_and_keyframe_rules() {
@@ -186,6 +187,7 @@ fn emits_unique_custom_properties_used_by_state_rules() {
             ".provider{--brand:#242424;--focus:#0f6cbd;}".into(),
             ".other{--brand:#242424;}".into(),
         ],
+        &BTreeSet::new(),
         &mut css,
     );
     assert!(css.contains(":root{--brand:#242424;--focus:#0f6cbd;}"));
@@ -199,9 +201,38 @@ fn rejects_ambiguous_custom_property_fallbacks() {
             ".light{--brand:#fff;}".into(),
             ".dark{--brand:#000;}".into(),
         ],
+        &BTreeSet::new(),
         &mut css,
     );
     assert!(!css.contains(":root"));
+}
+
+/// The captured layer states a name once per viewport condition. Restating it
+/// unconditionally duplicates the rule and reasserts, below a breakpoint, a
+/// value the source declared only above it.
+#[test]
+fn leaves_a_captured_custom_property_to_the_captured_layer() {
+    let mut css = ".card{width:var(--gap);height:var(--edge);}".to_string();
+    append_custom_property_fallbacks(
+        &[".provider{--gap:8px;--edge:2px;}".into()],
+        &BTreeSet::from(["--gap".to_string()]),
+        &mut css,
+    );
+    assert!(css.contains(":root{--edge:2px;}"), "{css}");
+    assert!(!css.contains("--gap:"), "{css}");
+}
+
+/// Inverse guard: owning every referenced name must not silence the fallback
+/// entirely, and owning none must leave it exactly as it was.
+#[test]
+fn keeps_every_fallback_the_captured_layer_never_declares() {
+    let mut css = ".card{width:var(--gap);}".to_string();
+    append_custom_property_fallbacks(
+        &[".provider{--gap:8px;}".into()],
+        &BTreeSet::new(),
+        &mut css,
+    );
+    assert!(css.contains(":root{--gap:8px;}"), "{css}");
 }
 
 #[test]

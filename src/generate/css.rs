@@ -90,7 +90,13 @@ pub(super) fn build_scoped(
         })
         .collect::<Vec<_>>();
     state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
-    super::css_custom_properties::append_for_spec(specification, &base.css_rules, &mut css);
+    let declared = super::custom_properties::declared_names(&specification.states);
+    super::css_custom_properties::append_for_spec(
+        specification,
+        &base.css_rules,
+        &declared,
+        &mut css,
+    );
     super::custom_properties::append_responsive(&specification.states, &classes, &mut css);
     timing("states");
     if !include_interactions {
