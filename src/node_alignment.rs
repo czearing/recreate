@@ -1,14 +1,32 @@
 use crate::model::{Node, PageState};
+use crate::node_alignment_walk::align;
 use std::collections::HashMap;
 
 /// A state child with no counterpart in the baseline.
-pub(super) struct Insertion {
+pub(crate) struct Insertion {
     /// Baseline path of the first surviving element after it, or `None` when it was
     /// appended last. `None` therefore means "genuinely at the end", never "unknown".
     pub before: Option<String>,
     /// Where that survivor lives in the state, which is what says a path is aliased
     /// rather than replaced.
     pub displaced: Option<String>,
+}
+
+/// A baseline child the interaction removed.
+///
+/// The alignment must be total on both sides. A result with one slot per state child can
+/// only ever say "this child is that baseline child" or "this child is new", so a baseline
+/// child that left has no representation at all and the changed-in-place fallback claims
+/// its neighbour instead.
+pub(crate) struct Removal {
+    /// Baseline path of the element that left, which is the path it still answers to in
+    /// the statically rendered recreation.
+    pub path: String,
+    /// State path of the parent it left, which is where the edit is scoped.
+    pub parent: String,
+    /// Carried so a consumer that can only address elements can drop text departures
+    /// without re-parsing the path.
+    pub tag: String,
 }
 
 /// Which element of the baseline each element of the state is, and which are new.
@@ -23,9 +41,10 @@ pub(super) struct Insertion {
 /// order, so a parent's children are recorded in the order the page laid them out. What
 /// must be recovered is the correspondence between the two child lists, and the position
 /// follows from it.
-pub(super) struct Alignment<'s, 'b> {
+pub(crate) struct Alignment<'s, 'b> {
     counterparts: HashMap<&'s str, &'b Node>,
     insertions: HashMap<&'s str, Insertion>,
+    removals: Vec<Removal>,
 }
 
 impl<'b> Alignment<'_, 'b> {
@@ -38,10 +57,15 @@ impl<'b> Alignment<'_, 'b> {
     pub fn insertion(&self, path: &str) -> Option<&Insertion> {
         self.insertions.get(path)
     }
+
+    /// Every baseline element the interaction removed.
+    pub fn removals(&self) -> &[Removal] {
+        &self.removals
+    }
 }
 
 /// Aligns the two captures, parent by parent, in a single pre-order pass.
-pub(super) fn of<'s, 'b>(state: &'s PageState, baseline: &'b PageState) -> Alignment<'s, 'b> {
+pub(crate) fn of<'s, 'b>(state: &'s PageState, baseline: &'b PageState) -> Alignment<'s, 'b> {
     let state_children = index(state);
     let baseline_children = index(baseline);
     let mut counterparts = HashMap::new();
@@ -52,28 +76,36 @@ pub(super) fn of<'s, 'b>(state: &'s PageState, baseline: &'b PageState) -> Align
         }
     }
     // The capture walks the tree depth-first, so a parent is always resolved before the
-    // children whose alignment depends on it.
-    let mut aligned = std::collections::HashSet::new();
+    // children whose alignment depends on it. Every node is asked, not only those that
+    // still have children: a parent the interaction emptied has no state children to name
+    // it, and its departures would otherwise never be reached.
     let empty = Vec::new();
-    for parent in state.nodes.iter().filter_map(|node| node.parent.as_deref()) {
-        if !aligned.insert(parent) {
+    let mut removals = Vec::new();
+    for node in &state.nodes {
+        let children = state_children
+            .get(node.path.as_str())
+            .cloned()
+            .unwrap_or_default();
+        let previous = counterparts
+            .get(node.path.as_str())
+            .and_then(|previous| baseline_children.get(previous.path.as_str()))
+            .unwrap_or(&empty);
+        if children.is_empty() && previous.is_empty() {
             continue;
         }
-        let Some(children) = state_children.get(parent) else {
-            continue;
-        };
-        let previous = counterparts
-            .get(parent)
-            .and_then(|parent| baseline_children.get(parent.path.as_str()))
-            .unwrap_or(&empty);
-        let pairs = align(children, previous, state, baseline);
+        let (pairs, departed) = align(&children, previous, state, baseline);
+        removals.extend(departed.into_iter().map(|departed| Removal {
+            path: departed.path.clone(),
+            parent: node.path.clone(),
+            tag: departed.tag.clone(),
+        }));
         for (index, child) in children.iter().enumerate() {
             match pairs[index] {
                 Some(previous) => {
                     counterparts.insert(child.path.as_str(), previous);
                 }
                 None => {
-                    insertions.insert(child.path.as_str(), placement(children, &pairs, index));
+                    insertions.insert(child.path.as_str(), placement(&children, &pairs, index));
                 }
             }
         }
@@ -81,6 +113,7 @@ pub(super) fn of<'s, 'b>(state: &'s PageState, baseline: &'b PageState) -> Align
     Alignment {
         counterparts,
         insertions,
+        removals,
     }
 }
 
@@ -113,64 +146,4 @@ fn index(state: &PageState) -> HashMap<&str, Vec<&Node>> {
         }
     }
     children
-}
-
-/// Pairs each state child with the baseline child it is, or `None` when it is new.
-///
-/// One left-to-right walk with lookahead, the alignment underneath every virtual-DOM diff:
-/// pair identical children; otherwise look ahead for the baseline child, and everything
-/// skipped over is new; otherwise, if the tags agree, pair them anyway, because a child
-/// that appears nowhere ahead is the same element with different attributes. That last
-/// step is what keeps a sibling the interaction also annotated from reading as a second
-/// insertion, and requiring the tag to agree is what stops it swallowing a genuine
-/// insertion of a different element type.
-fn align<'b>(
-    children: &[&Node],
-    previous: &[&'b Node],
-    state: &PageState,
-    baseline: &PageState,
-) -> Vec<Option<&'b Node>> {
-    let mut pairs = vec![None; children.len()];
-    let mut candidate_index = 0;
-    let mut index = 0;
-    while index < children.len() {
-        let Some(candidate) = previous.get(candidate_index) else {
-            break;
-        };
-        if same(candidate, children[index], baseline, state) {
-            pairs[index] = Some(*candidate);
-            candidate_index += 1;
-            index += 1;
-        } else if let Some(later) = (index + 1..children.len())
-            .find(|later| same(candidate, children[*later], baseline, state))
-        {
-            pairs[later] = Some(*candidate);
-            candidate_index += 1;
-            index = later + 1;
-        } else if candidate.tag == children[index].tag {
-            pairs[index] = Some(*candidate);
-            candidate_index += 1;
-            index += 1;
-        } else {
-            index += 1;
-        }
-    }
-    pairs
-}
-
-/// Whether two captured nodes are the same element seen twice.
-fn same(baseline_node: &Node, state_node: &Node, baseline: &PageState, state: &PageState) -> bool {
-    baseline_node.tag == state_node.tag
-        && baseline_node.text == state_node.text
-        && baseline_node.attributes == state_node.attributes
-        && child_signature(baseline, &baseline_node.path) == child_signature(state, &state_node.path)
-}
-
-fn child_signature(state: &PageState, path: &str) -> Vec<(String, Option<String>)> {
-    state
-        .nodes
-        .iter()
-        .filter(|node| node.parent.as_deref() == Some(path))
-        .map(|node| (node.tag.clone(), node.attributes.get("role").cloned()))
-        .collect()
 }

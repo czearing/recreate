@@ -109,11 +109,6 @@ mod scroll_state_tests;
 mod selector_list;
 #[cfg(test)]
 mod selector_list_tests;
-mod sibling_alignment;
-#[cfg(test)]
-mod sibling_alignment_regression_tests;
-#[cfg(test)]
-mod sibling_alignment_tests;
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;

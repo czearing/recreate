@@ -278,18 +278,18 @@ pub fn interaction_states(
                 } else if interactions::text_entry_interaction(interaction) {
                     existing_surface(
                         state,
-                        baseline,
                         &components,
                         &Default::default(),
                         &Default::default(),
                         &std::collections::HashSet::from(["html".to_string()]),
                         &[],
-                        &super::sibling_alignment::of(state, baseline),
+                        &crate::node_alignment::of(state, baseline),
                     )
                 } else if state_control || !shared_surface && !surface_roots.is_empty() {
                     String::new()
                 } else {
-                    let mut changed = changed_existing_paths(state, baseline, &surface_roots);
+                    let alignment = crate::node_alignment::of(state, baseline);
+                    let mut changed = changed_existing_paths(state, &alignment, &surface_roots);
                     if state_control
                         && let Some((trigger_parent, _)) =
                             interaction.trigger_path.rsplit_once('>')
@@ -300,13 +300,12 @@ pub fn interaction_states(
                     }
                     existing_surface(
                         state,
-                        baseline,
                         &components,
                         &changed,
                         &Default::default(),
                         &changed,
                         &[],
-                        &super::sibling_alignment::of(state, baseline),
+                        &crate::node_alignment::of(state, baseline),
                     )
                 };
                 let page = if full_replacement {
@@ -364,4 +363,3 @@ pub fn interaction_states(
     output.push_str(&interactions);
     output
 }
-

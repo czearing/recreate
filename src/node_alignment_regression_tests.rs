@@ -1,6 +1,6 @@
 //! The four regression cases the filed item required alongside the fix. They share the
 //! fixtures of the primary suite because they exercise the same predicate.
-use super::sibling_alignment_tests::{division, insertion_of, paragraph, state, PARENT};
+use crate::node_alignment_tests::{division, insertion_of, paragraph, state, PARENT};
 
 /// Regression 1: inserted between two unlike siblings, not at the front.
 #[test]
@@ -63,7 +63,11 @@ fn anchors_both_of_two_elements_inserted_before_one_sibling() {
     for ordinal in [1, 2] {
         let inserted = format!("{PARENT}>div:nth-of-type({ordinal})");
         let insertion = insertion_of(&inserted, &subject, &baseline).expect("both are insertions");
-        assert_eq!(insertion.before.as_deref(), Some(anchor.as_str()), "{inserted}");
+        assert_eq!(
+            insertion.before.as_deref(),
+            Some(anchor.as_str()),
+            "{inserted}"
+        );
     }
 }
 
@@ -92,4 +96,3 @@ fn reports_no_insertion_when_the_children_are_unchanged() {
 
     assert!(insertion_of(&format!("{PARENT}>p:nth-of-type(1)"), &same, &baseline).is_none());
 }
-

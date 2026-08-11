@@ -35,7 +35,7 @@ pub(super) fn inserted_surfaces(
     assets: &BTreeMap<String, String>,
     handlers: &BTreeMap<String, String>,
 ) -> String {
-    let alignment = super::sibling_alignment::of(state, baseline);
+    let alignment = crate::node_alignment::of(state, baseline);
     roots
         .into_iter()
         .filter_map(|node| {
@@ -95,4 +95,3 @@ pub(super) fn trigger_portals(
         .collect::<String>();
     format!("<>{portals}</>")
 }
-

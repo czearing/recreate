@@ -24,6 +24,9 @@ mod compare_node;
 mod compare_tests;
 mod generate;
 mod interaction_rebase;
+mod interaction_rebase_node;
+#[cfg(test)]
+mod interaction_rebase_tests;
 mod interaction_script;
 mod interaction_state;
 mod interaction_surface;
@@ -33,6 +36,14 @@ mod lifecycle_scheduled_script;
 mod lifecycle_script;
 mod lifecycle_settle_script;
 mod model;
+mod node_alignment;
+#[cfg(test)]
+mod node_alignment_regression_tests;
+#[cfg(test)]
+mod node_alignment_tests;
+mod node_alignment_walk;
+#[cfg(test)]
+mod node_removal_tests;
 mod page_script;
 mod probe;
 #[cfg(test)]

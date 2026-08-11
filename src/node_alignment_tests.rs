@@ -1,10 +1,14 @@
-use super::sibling_alignment::{self, Insertion};
 use crate::model::{Attributes, Node, PageState, Rect};
+use crate::node_alignment::{self as node_alignment, Insertion};
 
 /// Queries the one alignment the pipeline builds per state, keeping each test a single
 /// call against the behaviour under test.
-pub(super) fn insertion_of(path: &str, state: &PageState, baseline: &PageState) -> Option<Insertion> {
-    let alignment = sibling_alignment::of(state, baseline);
+pub(super) fn insertion_of(
+    path: &str,
+    state: &PageState,
+    baseline: &PageState,
+) -> Option<Insertion> {
+    let alignment = node_alignment::of(state, baseline);
     let insertion = alignment.insertion(path)?;
     Some(Insertion {
         before: insertion.before.clone(),
@@ -31,7 +35,8 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
             y: 0.0,
             width: 10.0,
             height: 10.0,
-        },        style: Default::default(),
+        },
+        style: Default::default(),
         before: None,
         after: None,
     }
@@ -50,6 +55,18 @@ pub(super) fn paragraph(ordinal: usize, text: &str, class: &str) -> Vec<Node> {
 
 pub(super) fn division(ordinal: usize, text: &str, class: &str) -> Vec<Node> {
     element("div", ordinal, text, class)
+}
+
+/// A bare text child, as a parent that mixes text with markup records it. A text node has
+/// no children of its own, so its own value is the only thing that can identify it.
+pub(super) fn text_child(ordinal: usize, value: &str) -> Vec<Node> {
+    vec![node(
+        &format!("{PARENT}>#text({ordinal})"),
+        Some(PARENT),
+        "#text",
+        value,
+        "",
+    )]
 }
 
 /// A capture is rooted at `html` and every node names its parent, so the alignment can
@@ -125,5 +142,3 @@ fn does_not_report_the_displaced_survivor_as_an_insertion() {
 
     assert!(insertion_of(&survivor, &control, &baseline).is_none());
 }
-
-

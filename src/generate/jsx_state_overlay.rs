@@ -14,7 +14,7 @@ pub(super) fn overlay(
     render_flags: (bool, bool),
 ) -> String {
     let (include_changed_existing, preserve_mounted_controls) = render_flags;
-    let alignment = super::sibling_alignment::of(state, baseline);
+    let alignment = crate::node_alignment::of(state, baseline);
     if let Some(surface_roots) = known_surface_roots {
         let baseline_paths = baseline
             .nodes
@@ -61,8 +61,7 @@ pub(super) fn overlay(
         let replacements = structural
             .iter()
             .filter(|root| {
-                baseline_paths.contains(root.as_str())
-                    && alignment.insertion(root).is_none()
+                baseline_paths.contains(root.as_str()) && alignment.insertion(root).is_none()
             })
             .cloned()
             .collect::<std::collections::HashSet<_>>();
@@ -80,7 +79,7 @@ pub(super) fn overlay(
                 .any(|(state_root, _)| path == state_root || descendant_of(path, state_root))
         });
         if include_changed_existing {
-            let mut changed = changed_existing_paths(state, baseline, &structural);
+            let mut changed = changed_existing_paths(state, &alignment, &structural);
             changed.retain(|path| {
                 !shifted
                     .iter()
@@ -92,7 +91,6 @@ pub(super) fn overlay(
         delta_roots.extend(shifted.iter().map(|(state_root, _)| state_root.clone()));
         let activation = existing_surface(
             state,
-            baseline,
             components,
             &activated,
             &existing,
@@ -159,5 +157,3 @@ pub(super) fn overlay(
     }
     portals(roots, components, assets, handlers)
 }
-
-

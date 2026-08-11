@@ -146,7 +146,15 @@ async fn text_entry_state_preserves_the_mounted_control() {
     assert!(states.contains("<InsertedSurface"));
     assert!(states.contains("hidden={"));
     assert!(states.contains("attributes={"));
-    assert!(states.contains("detach={true}"));
+    // This case used to assert `detach={true}`, the flag that asked for a real detach on the
+    // one surface kind where hiding was not enough. The flag is gone because the answer is
+    // now unconditional: `hidden` names the elements the interaction removed, and a removed
+    // element must leave the document rather than keep its place with `display:none`, which
+    // leaves it counted by `querySelectorAll` and matched by `:nth-child`. Asserting the
+    // fallback no longer exists is strictly stronger than asserting one surface opted out.
+    assert!(states.contains("element.remove()"), "{states}");
+    assert!(!states.contains("style.display='none'"), "{states}");
+    assert!(!states.contains("detach"), "{states}");
     assert!(!states.contains("SuppressPortals"));
     assert!(!states.contains("<ReplacementSurface path={\"html>body:nth-of-type(1)>div:nth-of-type(1)>div:nth-of-type(1)>textarea"));
 }

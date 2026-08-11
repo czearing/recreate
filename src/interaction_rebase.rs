@@ -1,5 +1,6 @@
-use crate::model::{Node, PageState, Pseudo, Styles};
-use std::collections::{BTreeMap, BTreeSet};
+use crate::interaction_rebase_node::rebase_node;
+use crate::model::{Node, PageState};
+use std::collections::BTreeMap;
 
 pub fn unchanged(state: &mut PageState, fresh: &PageState, baseline: &PageState) {
     let fresh: BTreeMap<_, _> = fresh
@@ -7,16 +8,22 @@ pub fn unchanged(state: &mut PageState, fresh: &PageState, baseline: &PageState)
         .iter()
         .map(|node| (node.path.as_str(), node))
         .collect();
-    let baseline: BTreeMap<_, _> = baseline
-        .nodes
-        .iter()
-        .map(|node| (node.path.as_str(), node))
-        .collect();
-    for node in &mut state.nodes {
-        let Some(fresh) = fresh.get(node.path.as_str()) else {
-            continue;
-        };
-        let Some(baseline) = baseline.get(node.path.as_str()) else {
+    // A path is a chain of `:nth-of-type()` ordinals, so a departed sibling shifts every
+    // following same-tag path up one and the same path names a different element in the
+    // two captures. The alignment is the single owner of "which baseline node is this",
+    // and asking it here keeps the rebase from writing the departed sibling's values over
+    // its successor. A node with no counterpart is one the interaction introduced, and an
+    // introduced node has no baseline value to be restored to.
+    let counterparts: Vec<Option<&Node>> = {
+        let alignment = crate::node_alignment::of(state, baseline);
+        state
+            .nodes
+            .iter()
+            .map(|node| alignment.counterpart(&node.path))
+            .collect()
+    };
+    for (node, baseline) in state.nodes.iter_mut().zip(counterparts) {
+        let (Some(fresh), Some(baseline)) = (fresh.get(node.path.as_str()), baseline) else {
             continue;
         };
         rebase_node(node, fresh, baseline);
@@ -69,53 +76,10 @@ pub fn causal(state: &mut PageState, before: &PageState, affected: &[String]) {
     }
 }
 
-fn rebase_node(state: &mut Node, fresh: &Node, baseline: &Node) {
-    if state.text == fresh.text {
-        state.text.clone_from(&baseline.text);
-    }
-    if state.rect == fresh.rect {
-        state.rect.clone_from(&baseline.rect);
-    }
-    rebase_map(
-        &mut state.attributes,
-        &fresh.attributes,
-        &baseline.attributes,
-    );
-    rebase_map(&mut state.style, &fresh.style, &baseline.style);
-    rebase_pseudo(&mut state.before, &fresh.before, &baseline.before);
-    rebase_pseudo(&mut state.after, &fresh.after, &baseline.after);
-}
-
-fn rebase_pseudo(state: &mut Option<Pseudo>, fresh: &Option<Pseudo>, baseline: &Option<Pseudo>) {
-    let (Some(state), Some(fresh), Some(baseline)) = (state, fresh, baseline) else {
-        return;
-    };
-    if state.content == fresh.content {
-        state.content.clone_from(&baseline.content);
-    }
-    rebase_map(&mut state.style, &fresh.style, &baseline.style);
-}
-
-fn rebase_map(state: &mut Styles, fresh: &Styles, baseline: &Styles) {
-    let keys: BTreeSet<_> = state.keys().chain(fresh.keys()).cloned().collect();
-    for key in keys {
-        if state.get(&key) != fresh.get(&key) {
-            continue;
-        }
-        match baseline.get(&key) {
-            Some(value) => {
-                state.insert(key, value.clone());
-            }
-            None => {
-                state.remove(&key);
-            }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{causal, rebase_map};
+    use super::causal;
+    use crate::interaction_rebase_node::rebase_map;
     use crate::model::{DomNode, Node, PageState, Rect, Viewport};
     use std::collections::BTreeMap;
 

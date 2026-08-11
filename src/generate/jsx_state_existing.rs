@@ -3,13 +3,12 @@ use std::collections::BTreeSet;
 
 pub(super) fn existing_surface(
     state: &crate::model::PageState,
-    baseline: &crate::model::PageState,
     components: &tree::Components,
     roots: &std::collections::HashSet<String>,
     marked_roots: &std::collections::HashSet<String>,
     delta_roots: &std::collections::HashSet<String>,
     shifted: &[(String, String)],
-    alignment: &super::sibling_alignment::Alignment,
+    alignment: &crate::node_alignment::Alignment,
 ) -> String {
     if roots.is_empty() && delta_roots.is_empty() {
         return String::new();
@@ -32,11 +31,9 @@ pub(super) fn existing_surface(
             })
         })
         .filter(|node| {
-            alignment
-                .counterpart(&node.path)
-                .is_some_and(|baseline| {
-                    node.before != baseline.before || node.after != baseline.after
-                })
+            alignment.counterpart(&node.path).is_some_and(|baseline| {
+                node.before != baseline.before || node.after != baseline.after
+            })
         })
         .filter_map(|node| {
             components
@@ -45,23 +42,20 @@ pub(super) fn existing_surface(
                 .map(|class| (&node.path, class))
         })
         .collect::<Vec<_>>();
-    let state_paths = state
-        .nodes
+    let mut hidden = alignment
+        .removals()
         .iter()
-        .map(|node| node.path.as_str())
-        .collect::<BTreeSet<_>>();
-    let mut hidden = baseline
-        .nodes
-        .iter()
-        .filter(|node| node.tag != "#text" && !state_paths.contains(node.path.as_str()))
-        .filter(|node| {
-            marked_roots.iter().any(|root| {
-                node.path
-                    .strip_prefix(root)
-                    .is_some_and(|suffix| suffix.starts_with('>'))
-            })
+        .filter(|removal| removal.tag != "#text")
+        .filter(|removal| {
+            contained_by(delta_roots, &removal.parent)
+                || marked_roots.iter().any(|root| {
+                    removal
+                        .path
+                        .strip_prefix(root)
+                        .is_some_and(|suffix| suffix.starts_with('>'))
+                })
         })
-        .map(|node| node.path.clone())
+        .map(|removal| removal.path.clone())
         .collect::<BTreeSet<_>>();
     let hidden_paths = hidden.clone();
     hidden.retain(|path| {
@@ -121,14 +115,8 @@ pub(super) fn existing_surface(
             (!changed.is_empty()).then_some((&node.path, changed))
         })
         .collect::<Vec<_>>();
-    let detach = marked_roots.iter().chain(delta_roots).any(|root| {
-        state.nodes.iter().any(|node| {
-            matches!(node.tag.as_str(), "textarea" | "input")
-                && (node.path == *root || descendant_of(&node.path, root))
-        })
-    });
     format!(
-        "<ExistingSurface entries={{{}}} roots={{{}}} hidden={{{}}} styles={{{}}} texts={{{}}} attributes={{{}}} detach={{{detach}}}/>",
+        "<ExistingSurface entries={{{}}} roots={{{}}} hidden={{{}}} styles={{{}}} texts={{{}}} attributes={{{}}}/>",
         serde_json::to_string(&entries).expect("surface classes should serialize"),
         serde_json::to_string(marked_roots).expect("surface roots should serialize"),
         serde_json::to_string(&hidden).expect("hidden paths should serialize"),
@@ -165,5 +153,3 @@ pub(super) fn state_sensitive_property(name: &str) -> bool {
                 | "z-index"
         )
 }
-
-
