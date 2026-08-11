@@ -17,6 +17,23 @@ use super::{
     jsx_attr_names::document_attribute,
     jsx_markup_scan::{Token, Value, scan},
 };
+use std::collections::BTreeSet;
+
+/// The qualified names `to_xml` writes, split by the two scopes a reader can need.
+///
+/// Whether a name is *used* is a question about the whole graphic, because a declaration on
+/// the root has to cover every descendant. Whether a name is already *declared* is a
+/// question about one element, because a declaration belongs to the tag that writes it.
+/// Collapsing the two is what lets a descendant answer for its ancestor.
+#[derive(Default)]
+pub(super) struct Names {
+    /// Every element and attribute name in the subtree, in the document's spelling.
+    pub used: BTreeSet<String>,
+    /// The attribute names on the root element's own start tag.
+    pub root: BTreeSet<String>,
+    /// The root element's own name, which is what a caller needs to close it.
+    pub root_element: String,
+}
 
 /// The XML spelling of generated JSX markup: element names verbatim, attribute names
 /// translated back to the document spelling, and serialized values unwrapped.
@@ -50,6 +67,31 @@ pub(super) fn to_xml(source: &str) -> String {
     output
 }
 
+/// The names `to_xml` will write, by scope. Reading them from the emitted XML instead would
+/// mean a second parser for a second grammar, and the two would drift; reading them from the
+/// same source through the same scanner and the same `document_attribute` makes them the
+/// names that are actually emitted, by construction.
+pub(super) fn qualified_names(source: &str) -> Names {
+    let mut names = Names::default();
+    scan_scoped(source, |token, root| match token {
+        Token::Open { name, .. } => {
+            if root && names.root_element.is_empty() {
+                names.root_element = name.into();
+            }
+            names.used.insert(name.into());
+        }
+        Token::Attribute { name, .. } => {
+            let name = document_attribute(name);
+            if root {
+                names.root.insert(name.clone());
+            }
+            names.used.insert(name);
+        }
+        _ => {}
+    });
+    names
+}
+
 /// Every value bound to `name` as an attribute, in document order, unescaped. Reading
 /// these by searching for `name={"` would also match the letters wherever they appear in
 /// page content, inventing bindings the document never carried.
@@ -81,21 +123,38 @@ pub(super) fn attribute_values(source: &str, name: &str) -> Vec<String> {
 /// tag short and start silently dropping the attributes the root really declared.
 pub(super) fn root_attribute(source: &str, name: &str) -> Option<String> {
     let mut value = None;
+    scan_scoped(source, |token, root| {
+        if let Token::Attribute {
+            name: found,
+            value: Some(Value::Literal(body)),
+        } = token
+            && root
+            && found == name
+            && value.is_none()
+        {
+            value = Some(unescape(body));
+        }
+    });
+    value
+}
+
+/// The single owner of that boundary: every token, paired with whether it belongs to the
+/// root element's own start tag. Two readers now ask the question, and a scope rule written
+/// twice is a scope rule that will be corrected once.
+fn scan_scoped<'a>(source: &'a str, mut emit: impl FnMut(Token<'a>, bool)) {
     let mut inside_root = false;
     let mut root_seen = false;
-    scan(source, |token| match token {
-        Token::Open { closing: false, .. } if !root_seen => {
+    scan(source, |token| {
+        if !root_seen && matches!(token, Token::Open { closing: false, .. }) {
             inside_root = true;
             root_seen = true;
         }
-        Token::Attribute {
-            name: found,
-            value: Some(Value::Literal(body)),
-        } if inside_root && found == name && value.is_none() => value = Some(unescape(body)),
-        Token::Close { .. } => inside_root = false,
-        _ => {}
+        let root = inside_root;
+        if matches!(token, Token::Close { .. }) {
+            inside_root = false;
+        }
+        emit(token, root);
     });
-    value
 }
 
 fn unescape(body: &str) -> String {

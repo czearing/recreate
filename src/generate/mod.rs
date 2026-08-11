@@ -92,13 +92,13 @@ mod project_test_support;
 #[cfg(test)]
 mod project_text_entry_support;
 mod responsive;
-mod root_reset;
 mod responsive_attributes;
 mod responsive_geometry;
 #[cfg(test)]
 mod responsive_runtime_support;
 #[cfg(test)]
 mod responsive_runtime_tests;
+mod root_reset;
 mod roots;
 mod runtime_sources;
 mod scroll_state;
@@ -148,6 +148,10 @@ mod structural_tree;
 #[cfg(test)]
 mod tests;
 mod tree;
+mod xml_namespaces;
+#[cfg(test)]
+#[path = "xml_namespaces_tests.rs"]
+mod xml_namespaces_tests;
 
 use crate::model::{BrowserCookie, Specification};
 use anyhow::Result;

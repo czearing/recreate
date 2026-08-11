@@ -104,16 +104,38 @@ pub(super) fn image(svg: &str, filename: &str) -> String {
     format!("<img src={{\"/assets/{filename}\"}} alt={{\"\"}}{attributes} />")
 }
 
+/// The relocated graphic as a standalone document: the stylesheet it needs carried in, and
+/// every namespace its own names use bound on its root.
 pub(super) fn document(svg: &str, css: &str) -> String {
     let styles = super::css_closure::self_contained(css, &classes(svg));
-    let mut svg = super::jsx_markup::to_xml(svg);
-    if !svg.contains("xmlns=") {
-        svg = svg.replacen("<svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"", 1);
+    let names = super::jsx_markup::qualified_names(svg);
+    let xml = super::xml_namespaces::declare(super::jsx_markup::to_xml(svg), &names);
+    first_child(
+        xml,
+        &format!("<style>{styles}</style>"),
+        &names.root_element,
+    )
+}
+
+/// Inserts `child` as the root's first child. Inserting after the first `>` is only that
+/// while the root has a content model: a self-closing root ends at `/>`, so the same offset
+/// puts the stylesheet *beside* the root and produces a document with two top-level
+/// elements, which no XML parser accepts. Giving the root a body is what makes it a parent.
+fn first_child(mut xml: String, child: &str, element: &str) -> String {
+    let Some(index) = xml.find('>') else {
+        return xml;
+    };
+    match xml[..index].ends_with('/') {
+        true => {
+            let cut = xml[..index].trim_end_matches(['/', ' ']).len();
+            xml.replace_range(cut..=index, &format!(">{child}</{element}>"));
+            xml
+        }
+        false => {
+            xml.insert_str(index + 1, child);
+            xml
+        }
     }
-    if let Some(index) = svg.find('>') {
-        svg.insert_str(index + 1, &format!("<style>{styles}</style>"));
-    }
-    svg
 }
 
 /// Every class the relocated subtree references, which is a genuinely subtree-wide
