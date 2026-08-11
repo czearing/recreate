@@ -12,6 +12,17 @@
 //! The two collectors had already drifted from each other as well: the interaction pass
 //! scanned only `background-image`, the baseline pass scanned stylesheet text too.
 //!
+//! A selector states two things in one syntax — which nodes match, and which tree is
+//! searched — and naming the first once said nothing about the second. The gate below was
+//! read by a `matches` test on an element the walk already held, which inherits the walk's
+//! reach into shadow roots, and by a `document.querySelectorAll`, which is confined to one
+//! node tree. The two agreed on the light tree and disagreed everywhere else, so a shadow
+//! `<img>` had its `src` resolved against the page base and its bytes never fetched: the
+//! artifact shipped a live address on the capture rig's ephemeral port, dead after the run
+//! and different on the next one. So collection is no longer a query at all. Resolving a
+//! reference and recording it are one statement, made where the walk holds the element,
+//! and reach stops being a decision this module makes: it is whatever traversal called in.
+//!
 //! So the table of URL-bearing attributes, the element selector, and the candidate-list
 //! grammar are named once here and rendered twice, the way `blocking_overlay` renders its
 //! predicate. The page rendering resolves each URL against the document base before
@@ -110,3 +121,7 @@ mod tests;
 #[cfg(test)]
 #[path = "asset_attributes_gate_tests.rs"]
 mod gate_tests;
+
+#[cfg(test)]
+#[path = "asset_attributes_reach_tests.rs"]
+mod reach_tests;

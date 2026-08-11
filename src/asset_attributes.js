@@ -35,6 +35,16 @@
     }
     return output;
   };
+  // Every URL a walked element referenced. Resolving a reference and recording it are one
+  // decision made in one place, so the set is reached by whatever traversal reached the
+  // element. A query of its own would be a second traversal with its own scope, and the
+  // two would answer differently for anything the walk found inside a shadow root.
+  const assetUrls = new Set();
+  const recordAssetUrl = url => {
+    const resolved = resolveUrl(url);
+    assetUrls.add(resolved);
+    return resolved;
+  };
   // The recorded attributes of one element. Values on an asset-bearing element are
   // resolved against the document base, so they are spelled the way the asset map is
   // keyed and the emitter's exact lookup can hit.
@@ -47,7 +57,7 @@
         .map(attribute => [
           attribute.name,
           localise
-            ? mapAttributeUrls(attribute.name, attribute.value, resolveUrl)
+            ? mapAttributeUrls(attribute.name, attribute.value, recordAssetUrl)
             : attribute.value
         ])
     );
@@ -55,15 +65,7 @@
   // Every URL the recreation must contain bytes for: one per candidate rather than one
   // per element, plus any `url()` in a captured declaration or stylesheet rule.
   const recreateAssetUrls = (nodes, cssRules) => {
-    const assets = new Set();
-    for (const element of document.querySelectorAll(assetSelector)) {
-      for (const attribute of element.attributes) {
-        mapAttributeUrls(attribute.name, attribute.value, url => {
-          assets.add(resolveUrl(url));
-          return url;
-        });
-      }
-    }
+    const assets = new Set(assetUrls);
     for (const node of nodes) {
       for (const style of [node.style, node.before?.style, node.after?.style]) {
         for (const value of Object.values(style || {})) {
