@@ -1,3 +1,17 @@
+//! Emitting the recorded value progressions and marking the elements they write to.
+//!
+//! Phase — which point of a cycle the page was at when it was captured — is not decided
+//! here. It used to be, for `textContent` and for nothing else, by rotating the emitted
+//! steps until the captured text came first. That was a second answer to a question the
+//! replay runtime already answers for every kind of value at once, by reading back what the
+//! element actually holds. Two owners meant the emitted data drifted from the replay: two
+//! channels the page drove from one tick with one string serialised as different arrays,
+//! which is a false statement about what was observed, and the list of kinds the rotation
+//! knew about could only ever fall behind the list of kinds the recorder watches.
+//!
+//! So this module emits the order the page was observed in and nothing else, and
+//! `runtime/sequence.mjs` resumes from whatever the captured DOM holds.
+
 use crate::model::{PageState, Specification};
 use std::collections::BTreeMap;
 
@@ -31,7 +45,7 @@ pub fn javascript(specification: &Specification) -> String {
                 .attribute_sequences
                 .iter()
                 .map(|sequence| {
-                    let mut steps: Vec<serde_json::Value> = if sequence.steps.is_empty() {
+                    let steps: Vec<serde_json::Value> = if sequence.steps.is_empty() {
                         sequence
                             .values
                             .iter()
@@ -54,21 +68,6 @@ pub fn javascript(specification: &Specification) -> String {
                             })
                             .collect()
                     };
-                    // Rotating so the captured value comes first is right for a cycle, which
-                    // has no beginning: any value starts it as well as any other. For a
-                    // progression that never repeated it is destructive, because it moves the
-                    // values observed BEFORE the capture to AFTER it. `Draft, Reviewing,
-                    // Final` caught at `Final` becomes `Final, Draft, Reviewing`, so even a
-                    // single forward pass rewinds history rather than continuing it.
-                    if sequence.attribute == "textContent"
-                        && sequence.repeats != Some(false)
-                        && let Some(captured) = captured_text(state, &sequence.target)
-                        && let Some(index) = steps
-                            .iter()
-                            .position(|step| step["value"].as_str() == Some(captured.as_str()))
-                    {
-                        steps.rotate_left(index);
-                    }
                     let mut emitted = serde_json::json!({
                         "target": sequence.target,
                         "attribute": sequence.attribute,
@@ -83,27 +82,6 @@ pub fn javascript(specification: &Specification) -> String {
         })
         .collect::<Vec<_>>();
     serde_json::to_string(&sequences).unwrap()
-}
-
-fn captured_text(state: &PageState, target: &str) -> Option<String> {
-    let direct = state
-        .nodes
-        .iter()
-        .find(|node| node.path == target)
-        .map(|node| node.text.trim())
-        .filter(|text| !text.is_empty());
-    let value = direct.map(str::to_string).unwrap_or_else(|| {
-        let prefix = format!("{target}>");
-        state
-            .nodes
-            .iter()
-            .filter(|node| node.path.starts_with(&prefix))
-            .map(|node| node.text.trim())
-            .filter(|text| !text.is_empty())
-            .collect::<Vec<_>>()
-            .join(" ")
-    });
-    (!value.is_empty()).then(|| value.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 pub fn runtime(source: String) -> String {

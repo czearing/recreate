@@ -10,18 +10,27 @@ const scene = __SCENE__;
 const FRAME_MS = 16;
 
 globalThis.window = globalThis;
-window.__recreateAttributeMutations = [];
+// What the recorder had already written when it handed over. The observer never attaches at
+// a page's first change — the recorder starts at document start and runs until it settles —
+// so a timeline with nothing behind it describes a page nothing has happened on yet, and the
+// mid-gap attach that every real capture makes could not be expressed at all.
+const history = __HISTORY__;
+window.__recreateAttributeMutations = history;
+// The recorder stamps every change and records where its own clock started, and the observer
+// reads both, so a harness that omitted them would exercise a rule the browser never runs.
+window.__recreateLifecycleStart = 0;
 
-let now = 0;
+let now = history.reduce((latest, event) => Math.max(latest, event.time), 0);
 let frames = 0;
 
 Date.now = () => now;
+globalThis.performance = { now: () => now };
 
 globalThis.requestAnimationFrame = (callback) => {
   queueMicrotask(() => {
     now += FRAME_MS;
     for (const event of scene[frames] || []) {
-      window.__recreateAttributeMutations.push(event);
+      window.__recreateAttributeMutations.push({ time: now, ...event });
     }
     frames++;
     callback(now);

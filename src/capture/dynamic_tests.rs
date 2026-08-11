@@ -1,30 +1,5 @@
-use crate::node_eval;
-use serde_json::{Value, json};
-
-const HARNESS: &str = include_str!("dynamic_harness.js");
-/// The horizon the settle rule owns, past which any page is released.
-const CEILING_MS: u64 = 12_000;
-/// One virtual animation frame, matching the harness clock.
-const FRAME_MS: u64 = 16;
-
-/// One attribute change on one element, as the lifecycle recorder writes it.
-fn change(target: &str, value: &str) -> Value {
-    json!({ "target": target, "attribute": "title", "value": value })
-}
-
-/// A frame that appends nothing, so the page is simply still.
-fn quiet(count: usize) -> Vec<Vec<Value>> {
-    vec![vec![]; count]
-}
-
-/// Runs the real shipped script over a scripted timeline and reports the virtual
-/// milliseconds it watched the page for before letting go.
-fn observed(scene: Vec<Vec<Value>>) -> u64 {
-    let script = HARNESS
-        .replace("__SCENE__", &serde_json::to_string(&scene).unwrap())
-        .replace("__SCRIPT__", super::source().trim());
-    node_eval::json(&script)["elapsed"].as_u64().unwrap()
-}
+use super::fixture::*;
+use serde_json::Value;
 
 /// The defect this rewrite removes. A page with no attribute behaviour at all used to be
 /// held for a four-second floor before anything could look at it, and the floor was charged
@@ -50,8 +25,14 @@ fn a_sequence_that_never_repeats_is_watched_to_the_ceiling() {
 }
 
 /// The point of watching at all. A cycle is only proven once the values repeat, so the
-/// recorder must stay past the first two readings and still let go long before the ceiling
-/// once the page has gone quiet for longer than its own longest gap.
+/// recorder must stay until the repeat arrives — here on the fourth change — and still let
+/// go long before the ceiling once the page has gone quiet for longer than its own longest
+/// gap.
+///
+/// This used to assert the recorder outlasted the whole scripted scene, which is a claim
+/// about the fixture rather than about the rule, and a claim no page that cycles forever can
+/// satisfy: measured against a live `setInterval` it cost the full 12s ceiling and a 14.85s
+/// capture. The proof point is what the rule names, so that is what is asserted.
 #[test]
 fn a_proven_cycle_releases_the_recorder_well_before_the_ceiling() {
     let target = "html>div:nth-of-type(1)";
@@ -66,12 +47,37 @@ fn a_proven_cycle_releases_the_recorder_well_before_the_ceiling() {
     scene.extend(quiet(900));
     let elapsed = observed(scene);
     assert!(
-        elapsed > 60 * FRAME_MS,
-        "released before the cycle was shown"
+        elapsed > 30 * FRAME_MS,
+        "released before the fourth change proved the cycle"
     );
     assert!(
         elapsed < CEILING_MS,
         "a proven cycle still paid the ceiling"
+    );
+}
+
+/// The defect the wiring exposed. A page driven by `setInterval` never stops changing, so
+/// counting every recorded change as a reason to keep watching left it un-quiet at every
+/// instant and released it only at the ceiling. Changes belonging to a group that has
+/// already proven its cycle are motion the recorder has described, not information it
+/// lacks, so they must not hold it open.
+#[test]
+fn a_cycle_that_never_stops_is_still_released_once_it_is_proven() {
+    let target = "html>div:nth-of-type(1)";
+    let rotation = ["Alpha", "Bravo", "Charlie"];
+    let scene = (0..900)
+        .map(|index| {
+            if index % 10 == 0 {
+                vec![change(target, rotation[(index / 10) % rotation.len()])]
+            } else {
+                vec![]
+            }
+        })
+        .collect();
+    let elapsed = observed(scene);
+    assert!(
+        elapsed < CEILING_MS,
+        "a page cycling forever was watched to the ceiling"
     );
 }
 
@@ -101,23 +107,66 @@ fn a_page_with_wider_gaps_between_changes_is_watched_for_longer() {
     );
 }
 
-/// The whole reason this module no longer decides for itself: the rule it applies is the one
-/// `lifecycle_settle_script` owns, inlined rather than restated, so the two cannot drift.
+/// The cost of treating an unproven group as a promise. A progression of three values that
+/// came to an end has proven no cycle and never will, so counting it as unfinished held the
+/// recorder to the full ceiling: measured on a real scene it turned a 2.7s capture into a
+/// 16.7s one. Absence of proof is not evidence, so the page's own quiet ends it.
 #[test]
-fn the_script_carries_the_owning_modules_rule_rather_than_a_copy() {
-    let source = super::source();
-    assert!(source.contains(crate::lifecycle_settle_script::SOURCE));
-    assert!(!source.contains("__LIFECYCLE_SETTLE__"));
-    assert!(source.contains("lifecycleSettled("));
+fn a_progression_that_came_to_an_end_releases_the_recorder_once_the_page_is_quiet() {
+    let target = "html>div:nth-of-type(1)";
+    let mut scene: Vec<Vec<Value>> = Vec::new();
+    for value in ["Draft", "Reviewing", "Final"] {
+        scene.push(vec![change(target, value)]);
+        scene.extend(quiet(18));
+    }
+    scene.extend(quiet(900));
+    let elapsed = observed(scene);
+    assert!(
+        elapsed < CEILING_MS,
+        "a progression that stopped was watched to the ceiling"
+    );
 }
 
-/// Grouping must stay identical to what the sequence capture applies afterwards, or the
-/// recorder would judge a cycle proven that the consumer then reads as unfinished.
+/// Equality is not proof of silence. A page that keeps writing hands the observer a longest
+/// gap that is the length of one of its own steps, so a window of exactly that width is a
+/// race against the next step — and the observer attaches partway into a gap, so it starts
+/// the race already behind. Measured on a live 300ms interval it lost: the run was cut off
+/// after four values and the consumer, which folds a cycle only out of whole rounds, emitted
+/// a genuine three-value loop as a one-shot progression of four.
 #[test]
-fn the_reading_groups_changes_the_way_sequence_capture_does() {
-    let source = super::source();
-    assert!(source.contains("__recreateAttributeMutations"));
-    assert!(source.contains("values.at(-1) !== event.value"));
-    assert!(source.contains("value === values[index % size]"));
-    assert!(source.contains("values.length < 3 || cycle === values.length"));
+fn a_cycle_is_watched_until_the_consumer_can_see_it_repeat() {
+    let target = "html>div:nth-of-type(1)";
+    let history = vec![
+        recorded(target, "Alpha", 300),
+        recorded(target, "Bravo", 600),
+        recorded(target, "Charlie", 900),
+    ];
+    // A live step slightly wider than the ones already recorded, which is what any real timer
+    // produces and what leaves room for a window of exactly the recorded width to expire.
+    let step = 20;
+    let mut scene: Vec<Vec<Value>> = Vec::new();
+    for value in ["Alpha", "Bravo", "Charlie"] {
+        scene.extend(quiet(step - 1));
+        scene.push(vec![change(target, value)]);
+    }
+    scene.extend(quiet(900));
+    // The third live value completes the second round and is the first that proves the cycle.
+    let proof = 3 * step as u64 * FRAME_MS;
+    assert!(
+        observed_after(history, scene) >= proof,
+        "a steady cadence was cut off before its cycle could repeat"
+    );
+}
+
+/// A page that has changed only once has shown no cadence at all, so its single observed gap
+/// must not be read as the whole truth about how fast it moves.
+#[test]
+fn a_page_that_has_changed_once_is_not_finished_on_its_own_first_gap() {
+    let target = "html>div:nth-of-type(1)";
+    let mut scene: Vec<Vec<Value>> = vec![vec![change(target, "first")]];
+    scene.extend(quiet(900));
+    assert!(
+        observed(scene) >= crate::attribute_sequence_script::STABLE_GAP_MS as u64,
+        "a page that changed once was declared finished on its own first gap"
+    );
 }

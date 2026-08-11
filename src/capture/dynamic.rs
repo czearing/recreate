@@ -20,10 +20,15 @@ const OBSERVE: &str = include_str!("dynamic_observe.js");
 /// The page script that resolves once no unfinished sequence remains and the page has been
 /// quiet for longer than any gap in change it has already recovered from.
 pub(super) fn source() -> String {
-    OBSERVE.replace(
-        "__LIFECYCLE_SETTLE__",
-        crate::lifecycle_settle_script::SOURCE,
-    )
+    OBSERVE
+        .replace(
+            "__LIFECYCLE_SETTLE__",
+            crate::lifecycle_settle_script::SOURCE,
+        )
+        .replace(
+            "__STABLE_GAP_MS__",
+            &crate::attribute_sequence_script::STABLE_GAP_MS.to_string(),
+        )
 }
 
 /// Watches the page until its attribute behaviour has finished arriving.
@@ -33,5 +38,13 @@ pub(super) async fn observe(cdp: &mut crate::cdp::Cdp) -> Result<()> {
 }
 
 #[cfg(test)]
+#[path = "dynamic_fixture.rs"]
+mod fixture;
+
+#[cfg(test)]
 #[path = "dynamic_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "dynamic_contract_tests.rs"]
+mod contract_tests;

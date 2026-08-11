@@ -39,6 +39,12 @@ mod probe;
 mod release_gate_tests;
 mod rule_activation_script;
 #[cfg(test)]
+#[path = "sequence_phase_tests.rs"]
+mod sequence_phase_tests;
+#[cfg(test)]
+#[path = "sequence_replay.rs"]
+mod sequence_replay;
+#[cfg(test)]
 #[path = "sequence_termination_tests.rs"]
 mod sequence_termination_tests;
 mod serve;

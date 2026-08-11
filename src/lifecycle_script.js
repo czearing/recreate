@@ -5,8 +5,7 @@ __LIFECYCLE_SETTLE__
 __LIFECYCLE_SCHEDULED__
   const soonestScheduled = trackScheduled(window);
   window.__recreateLifecycleAnimations = [];
-  window.__recreateAttributeMutations = [];
-  window.__recreateLifecycleDone = false;
+  window.__recreateAttributeMutations = [];  window.__recreateLifecycleDone = false;
   window.__recreatePendingRequests = 0;
   const originalFetch = window.fetch;
   window.fetch = async (...args) => {
@@ -31,6 +30,10 @@ __LIFECYCLE_SCHEDULED__
   };
   const record = () => {
     const start = performance.now();
+    // Every change this recorder writes is stamped against `start`, so anything that reads
+    // those stamps has to be able to reach the same origin or it is measuring a different
+    // clock and calling the difference a gap.
+    window.__recreateLifecycleStart = start;
     let lastChange = start;
     let longestGap = 0;
     const previous = new WeakMap();

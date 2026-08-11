@@ -74,7 +74,7 @@ async fn capture_into(
         let state_started = std::time::Instant::now();
         let reload = !args.reuse || args.reload;
         let state = if args.reuse && args.reload && states.is_empty() {
-            capture_state_with_startup(cdp, viewport.clone(), states.is_empty()).await?
+            capture_state_with_startup(cdp, viewport.clone()).await?
         } else if !states.is_empty() {
             capture_state_without_assets(cdp, viewport.clone(), false).await?
         } else {

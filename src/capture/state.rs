@@ -48,7 +48,19 @@ pub async fn prepare_state(
     reload: bool,
 ) -> Result<()> {
     prepare(cdp, viewport, reload).await?;
-    wait_ready(cdp, true).await
+    wait_ready(cdp, true).await?;
+    observe_dynamic(cdp, reload).await
+}
+
+/// A page's timed progression happens once, from a fresh load, so the recorder watches for
+/// it exactly when the page was just loaded. A viewport change that reuses the page it has
+/// already watched has nothing further to observe, and a page with no timed behaviour is
+/// released within a frame, so the guard costs a static page nothing.
+async fn observe_dynamic(cdp: &mut crate::cdp::Cdp, reload: bool) -> Result<()> {
+    if reload {
+        super::dynamic::observe(cdp).await?;
+    }
+    Ok(())
 }
 
 pub async fn prepare_interaction_state(
@@ -72,7 +84,6 @@ async fn prepare(cdp: &mut crate::cdp::Cdp, viewport: &Viewport, reload: bool) -
 pub(super) async fn capture_state_with_startup(
     cdp: &mut crate::cdp::Cdp,
     viewport: Viewport,
-    observe_dynamic: bool,
 ) -> Result<PageState> {
     browser::set_viewport(cdp, viewport.width, viewport.height).await?;
     let started = std::time::Instant::now();
@@ -82,9 +93,7 @@ pub(super) async fn capture_state_with_startup(
     let startup = wait_startup(cdp, &viewport, started).await?;
     wait_ready(cdp, startup.is_some()).await?;
     let startup_elapsed = started.elapsed().as_millis() as u64;
-    if observe_dynamic {
-        super::dynamic::observe(cdp).await?;
-    }
+    observe_dynamic(cdp, true).await?;
     let mut state = read_state(cdp, viewport).await?;
     ensure_settled(&state)?;
     if let Some((startup_state, delay)) = startup {

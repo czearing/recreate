@@ -1,4 +1,18 @@
-pub const SOURCE: &str = r#"
+/// The shortest gap between two values that can still be a value sequence.
+///
+/// Anything tighter is a burst rather than a cadence, and the gate below discards it. The
+/// observation loop needs the same number for the mirror-image question — how long a page
+/// must be quiet before an unfinished progression counts as finished — because waiting less
+/// than this could only ever end a progression the gate was going to discard anyway.
+pub const STABLE_GAP_MS: u32 = 250;
+
+/// The capture rule, with the gate threshold spliced in so no copy of it can drift.
+pub fn source() -> String {
+    TEMPLATE.replace("__STABLE_GAP_MS__", &STABLE_GAP_MS.to_string())
+}
+
+const TEMPLATE: &str = r#"
+
   const attributeSequences = [];
   const sequenceCandidates = [];
   const mutationGroups = new Map();
@@ -24,7 +38,7 @@ pub const SOURCE: &str = r#"
     const gaps = group.times.slice(1).map((time, index) =>
       Math.max(0, time - group.times[index])
     );
-    const stableGaps = gaps.filter(value => value >= 250);
+    const stableGaps = gaps.filter(value => value >= __STABLE_GAP_MS__);
     if (!stableGaps.length) continue;
     const fallback = Math.round(
       stableGaps.reduce((sum, value) => sum + value, 0) / stableGaps.length
@@ -68,7 +82,7 @@ mod tests {
             &format!(
                 "const window = {{ __recreateAttributeMutations: {mutations} }};\n\
                  const nodes = [{{ path: 'p', text: {captured_text} }}];\n{source}",
-                source = super::SOURCE
+                source = super::source()
             ),
             "attributeSequences",
         )
@@ -100,11 +114,11 @@ mod tests {
 
     #[test]
     fn compresses_repeated_sequence_cycles() {
-        assert!(super::SOURCE.contains("const recurringPrefix = values"));
-        assert!(super::SOURCE.contains("value === values[index % size]"));
-        assert!(super::SOURCE.contains("group.values.slice(0, cycle)"));
-        assert!(super::SOURCE.contains("Math.max(16, gaps[index])"));
-        assert!(super::SOURCE.contains("sequence.target.startsWith(`${other.target}>`)"));
+        assert!(super::source().contains("const recurringPrefix = values"));
+        assert!(super::source().contains("value === values[index % size]"));
+        assert!(super::source().contains("group.values.slice(0, cycle)"));
+        assert!(super::source().contains("Math.max(16, gaps[index])"));
+        assert!(super::source().contains("sequence.target.startsWith(`${other.target}>`)"));
     }
 
     /// The discriminator is computed at the only point it is knowable and was previously used

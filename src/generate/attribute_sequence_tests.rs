@@ -64,9 +64,10 @@ fn serializes_irregular_steps_without_averaging() {
     assert!(output.contains(r#""delay_ms":2750"#));
 }
 
-/// Emits the app's sequence data for a text progression whose element was captured holding
-/// `captured`, so the tests below differ in nothing but the recorded repetition fact.
-fn text_sequence(values: &[&str], captured: &str, repeats: Option<bool>) -> String {
+/// Emits the app's sequence data for a progression on `attribute` whose element was captured
+/// holding `captured`, so the tests below differ in nothing but the kind of value written
+/// and the recorded repetition fact.
+fn sequence(attribute: &str, values: &[&str], captured: &str, repeats: Option<bool>) -> String {
     let mut specification = crate::generate::project_test_support::specification();
     let target = specification.states[0].nodes[3].path.clone();
     specification.states[0].nodes[3].text = captured.into();
@@ -74,7 +75,7 @@ fn text_sequence(values: &[&str], captured: &str, repeats: Option<bool>) -> Stri
         .attribute_sequences
         .push(AttributeSequence {
             target,
-            attribute: "textContent".into(),
+            attribute: attribute.into(),
             values: values.iter().map(|value| (*value).into()).collect(),
             interval_ms: 100,
             steps: values
@@ -96,28 +97,57 @@ fn order(output: &str, values: &[&str]) -> Vec<usize> {
         .collect()
 }
 
+/// The emitted data is a record of what the page did, so it says the same thing about two
+/// channels the page drove identically. Rotating one of them to the captured value and not
+/// the other made the record disagree with itself: `aria-label` began at the first value
+/// ever seen while `textContent` began at the captured one, though one tick wrote both with
+/// one string. Phase belongs to the replay runtime, which recovers it for every kind at
+/// once from the element itself.
 #[test]
-fn text_sequences_start_from_the_captured_phrase() {
-    let output = text_sequence(&["Partial", "Complete phrase"], "Complete phrase", None);
-    assert!(output.find("Complete phrase").unwrap() < output.find("Partial").unwrap());
-}
-
-/// A cycle has no beginning, so starting it where the capture caught it is correct and must
-/// survive the termination fix — this is its positive control.
-#[test]
-fn a_repeating_progression_still_starts_where_capture_caught_it() {
-    let output = text_sequence(&["Alpha", "Bravo", "Charlie"], "Bravo", Some(true));
-    let places = order(&output, &["Bravo", "Charlie", "Alpha"]);
+fn a_progression_is_emitted_in_the_order_it_was_observed_whatever_kind_it_writes() {
+    let values = ["Alpha", "Bravo", "Charlie"];
+    let steps = |attribute| {
+        let output = sequence(attribute, &values, "Bravo", Some(true));
+        let emitted: serde_json::Value = serde_json::from_str(&output).unwrap();
+        emitted[0][0]["steps"].clone()
+    };
+    assert_eq!(
+        steps("textContent"),
+        steps("aria-label"),
+        "one kind was rotated and the other was not"
+    );
+    let places = order(
+        &sequence("textContent", &values, "Bravo", Some(true)),
+        &values,
+    );
     assert!(places[0] < places[1] && places[1] < places[2]);
-    assert!(!output.contains("\"repeats\""));
 }
 
-/// Rotation relocates the values observed BEFORE the capture to after it, which is what turns
-/// a finished progression into one that rewinds rather than merely repeating.
+/// Rotation relocated the values observed BEFORE the capture to after it, which is what
+/// turned a finished progression into one that rewinds rather than merely repeating. The
+/// recorded termination fact still reaches the runtime, which is what stops the rewind.
 #[test]
 fn a_progression_that_never_repeated_keeps_the_order_it_was_observed_in() {
-    let output = text_sequence(&["Draft", "Reviewing", "Final"], "Final", Some(false));
+    let output = sequence(
+        "textContent",
+        &["Draft", "Reviewing", "Final"],
+        "Final",
+        Some(false),
+    );
     let places = order(&output, &["Draft", "Reviewing", "Final"]);
     assert!(places[0] < places[1] && places[1] < places[2]);
     assert!(output.contains(r#""repeats":false"#));
+}
+
+/// A cycle carries no termination fact, and the absence must stay an absence: the runtime
+/// treats a recorded `false` as the only reason to stop.
+#[test]
+fn a_repeating_progression_carries_no_termination_fact() {
+    let output = sequence(
+        "textContent",
+        &["Alpha", "Bravo", "Charlie"],
+        "Bravo",
+        Some(true),
+    );
+    assert!(!output.contains("\"repeats\""));
 }
