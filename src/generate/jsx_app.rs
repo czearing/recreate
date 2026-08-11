@@ -137,7 +137,9 @@ pub fn app(
     };
     let state_overlay = (1..=specification.interactions.len())
         .map(|index| {
-            format!("state==={index}?<Interaction{index} width={{width}} onReset={{reset}}/>:")
+            format!(
+                "state==={index}?<Interaction{index} width={{viewportWidths[viewport]}} onReset={{reset}}/>:"
+            )
         })
         .collect::<String>()
         + "null";

@@ -13,6 +13,11 @@ mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
 #[cfg(test)]
+mod binding_check;
+#[cfg(test)]
+#[path = "binding_project_tests.rs"]
+mod binding_project_tests;
+#[cfg(test)]
 #[path = "carousel_effect_tests.rs"]
 mod carousel_effect_tests;
 mod carousel_inference;
