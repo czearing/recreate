@@ -6,7 +6,9 @@
 //! attributes to keep but which ones are still *true*. The replaced element is gone: an
 //! attribute describing **it** is now a claim about nothing, while an attribute describing
 //! the content it showed, or the box it occupied, is still true of the stand-in, which
-//! shows the same graphic in the same place.
+//! shows the same graphic in the same place. Truth is not sufficient on its own: an
+//! attribute two elements spell the same way they may still read differently, so a claim
+//! still true of the stand-in has to be one the destination's grammar can hold whole.
 //!
 //! Neither list shape states that, which is why this is not one. An allow-list drops the
 //! names nobody recalled — it carried `aria-hidden`, the one accessibility attribute whose
@@ -28,21 +30,46 @@ use std::collections::BTreeMap;
 /// box, which the substitution does not move.
 const BOX_ATTRIBUTES: [&str; 3] = ["className", "height", "width"];
 
+/// The two whose subject survives but whose grammar does not. SVG sizes its root with a CSS
+/// `<length>`, so `2em` is valid where it was read; HTML's dimension attributes admit only a
+/// valid non-negative integer and reject nothing, error-recovering instead by keeping the
+/// leading digit run and discarding the unit, so the stand-in silently paints two pixels.
+const DIMENSION_ATTRIBUTES: [&str; 2] = ["height", "width"];
+
 /// The stand-in for a graphic relocated to `filename`.
 pub(super) fn image(svg: &str, filename: &str) -> String {
     let root = root_attributes(svg);
     let attributes = root
         .iter()
-        .filter(|(found, _)| carried(found))
+        .filter(|(found, value)| carried(found, value))
         .map(|(name, value)| format!(" {name}={}", literal(value)))
         .collect::<String>();
     format!(
-        "<img src={} alt={}{attributes} />",
+        "<img src={} alt={}{attributes}{} />",
         literal(&format!("/assets/{filename}")),
         literal(&name(
             root.iter().map(|(name, value)| (name.as_str(), value))
-        ))
+        )),
+        sizing(&root),
     )
+}
+
+/// The dimensions the attribute grammar could not hold, written in the one that can. CSS is
+/// where the unit was always meaningful, and it is the safe destination for a second reason:
+/// a declaration it cannot parse is discarded, where HTML's dimension parser keeps the
+/// leading digits and paints the truncation. It also has to be the *host's* CSS — inside the
+/// relocated asset the same `em` would resolve against that file's own font size rather than
+/// against the context the author wrote it in.
+fn sizing(root: &[(String, String)]) -> String {
+    let declarations = root
+        .iter()
+        .filter(|(name, value)| relocated(name, value))
+        .map(|(name, value)| format!("{name}:{}", serde_json::to_string(value).unwrap()))
+        .collect::<Vec<_>>();
+    match declarations.is_empty() {
+        true => String::new(),
+        false => format!(" style={{{{{}}}}}", declarations.join(",")),
+    }
 }
 
 /// Where the element's painted content ended up, for an element that had some and whose
@@ -102,8 +129,22 @@ pub(super) fn rendered(node: &Node, source: Option<&String>) -> String {
 /// `role` falls outside by construction rather than by exclusion: it names the semantics of
 /// the element that no longer exists, an `<img>` already asserts the image role, and a
 /// copied `presentation` would contradict a name on the same tag.
-fn carried(name: &str) -> bool {
-    (name.starts_with("aria-") && name != "aria-label") || BOX_ATTRIBUTES.contains(&name)
+fn carried(name: &str, value: &str) -> bool {
+    (!DIMENSION_ATTRIBUTES.contains(&name) || whole_number(value))
+        && ((name.starts_with("aria-") && name != "aria-label") || BOX_ATTRIBUTES.contains(&name))
+}
+
+/// Whether a dimension has to change grammar to survive. Sharing a spelling is not sharing a
+/// value space, and a length the destination cannot express is not carried across but
+/// silently reinterpreted — the one loss no assertion on the emitted bytes can see, because
+/// they match what was captured.
+fn relocated(name: &str, value: &str) -> bool {
+    DIMENSION_ATTRIBUTES.contains(&name) && !value.is_empty() && !whole_number(value)
+}
+
+/// HTML's valid non-negative integer: the whole of what a dimension attribute can hold.
+fn whole_number(value: &str) -> bool {
+    !value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit())
 }
 
 /// The one name the stand-in still exposes, taken from the one the replaced element
