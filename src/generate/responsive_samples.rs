@@ -38,7 +38,7 @@ const ORIGIN_PROPERTIES: [&str; 2] = ["transform-origin", "perspective-origin"];
 ///
 /// Replaced elements are the one exception, and not a per-site one: they have no in-flow
 /// content to reflow, and their box must be reserved or the page shifts as they load.
-pub(super) fn remove_sampled_sizes(
+pub(in crate::generate) fn remove_sampled_sizes(
     styles: &mut Styles,
     node: &Node,
     css_rules: &crate::generate::authored_css::Index<'_>,
@@ -54,6 +54,21 @@ pub(super) fn remove_sampled_sizes(
             Some(authored) => styles.insert(property.into(), authored),
             None => styles.remove(property),
         };
+    }
+}
+
+/// The same properties, asked a different question: what may a later state withdraw?
+///
+/// Nothing, in either case. A size the source authored is re-emitted from the author's
+/// own spelling, so it already says the right thing at every viewport and in every state,
+/// and withdrawing it would replace an authored width with whatever the flow produces at
+/// one edge of a band. A size the source did not author was never emitted as a
+/// declaration at all, so there is nothing to withdraw. The same holds for the box a
+/// replaced element reserves, which is a measurement the emitter keeps to stop the page
+/// shifting rather than a statement the page made.
+pub(in crate::generate) fn remove_resettable_sizes(styles: &mut Styles) {
+    for property in SIZE_PROPERTIES {
+        styles.remove(property);
     }
 }
 
@@ -76,7 +91,7 @@ pub(super) fn remove_sampled_sizes(
 /// On the pseudo-element path no authored stage runs, because the authored index holds no
 /// pseudo-element rules. Every origin there is therefore a measurement, and `sample` is
 /// the map itself so that each one tests as one.
-pub(super) fn remove_sampled_origins(styles: &mut Styles, sample: &Styles) {
+pub(in crate::generate) fn remove_sampled_origins(styles: &mut Styles, sample: &Styles) {
     for property in ORIGIN_PROPERTIES {
         if is_sample(styles, sample, property) {
             styles.remove(property);

@@ -7,16 +7,18 @@ mod output;
 #[path = "responsive_rules.rs"]
 mod rules;
 #[path = "responsive_samples.rs"]
-mod samples;
+pub(in crate::generate) mod samples;
 
 pub use output::{base_declarations, base_declarations_indexed, output_declarations};
 pub use rules::append_filtered;
 pub(super) use rules::{band, media_rule};
 
 #[cfg(test)]
+pub(super) use super::style_delta::changed_styles;
+#[cfg(test)]
 pub(super) use flex::{constrained_by_flex_chain, shrunk_flex_item};
 #[cfg(test)]
-pub(super) use node_rules::changed_styles;
+pub(super) use node_rules::append_node_rules;
 
 #[cfg(test)]
 fn normalize_viewport_width(

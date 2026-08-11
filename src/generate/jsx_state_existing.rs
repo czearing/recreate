@@ -72,6 +72,7 @@ pub(super) fn existing_surface(
         .filter(|node| node.tag != "#text" && contained_by(delta_roots, &node.path))
         .filter_map(|node| {
             let baseline = alignment.counterpart(&node.path)?;
+            let declared = super::style_delta::declared(&baseline.style);
             let shifted_node = baseline.path != node.path;
             let changed = node
                 .style
@@ -80,6 +81,12 @@ pub(super) fn existing_surface(
                     baseline.style.get(*name) != Some(*value)
                         || shifted_node && state_sensitive_property(name)
                 })
+                .map(|(name, value)| (name, value.as_str()))
+                .chain(
+                    super::style_delta::reverted(&baseline.style, &node.style)
+                        .filter(|name| declared.contains_key(*name))
+                        .map(|name| (name, super::style_delta::REVERTED)),
+                )
                 .collect::<Vec<_>>();
             (!changed.is_empty()).then_some((&node.path, changed))
         })

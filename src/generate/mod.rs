@@ -148,11 +148,18 @@ mod source_view_split;
 mod stand_in;
 mod startup_overlays;
 mod startup_timeline;
+#[cfg(test)]
+#[path = "state_reversion_tests.rs"]
+mod state_reversion_tests;
 mod state_style_maps;
 mod state_styles;
 mod structural_css;
 #[cfg(test)]
 mod structural_tests;
+mod style_delta;
+#[cfg(test)]
+#[path = "style_reversion_tests.rs"]
+mod style_reversion_tests;
 
 #[cfg(test)]
 mod artifact_hermeticity_tests;
