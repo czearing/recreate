@@ -5,20 +5,23 @@ pub fn render(
     state: Option<&PageState>,
     mount: &str,
     classes: &BTreeMap<String, String>,
+    assets: &BTreeMap<String, String>,
 ) -> String {
     let html = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "html"))
-        .map(|node| attributes(node, classes))
+        .map(|node| attributes(node, classes, assets))
         .unwrap_or_default();
     let body = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "body"))
-        .map(|node| attributes(node, classes))
+        .map(|node| attributes(node, classes, assets))
         .unwrap_or_default();
     let head_attributes = state
         .and_then(|state| state.nodes.iter().find(|node| node.tag == "head"))
-        .map(|node| attributes(node, classes))
+        .map(|node| attributes(node, classes, assets))
         .unwrap_or_default();
-    let head = state.map(|state| head(state, classes)).unwrap_or_else(|| {
+    let head = state
+        .map(|state| head(state, classes, assets))
+        .unwrap_or_else(|| {
         "<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
          <link rel=\"icon\" href=\"data:,\"><title>Recreate</title>"
             .into()
@@ -29,7 +32,11 @@ pub fn render(
     )
 }
 
-fn head(state: &PageState, classes: &BTreeMap<String, String>) -> String {
+fn head(
+    state: &PageState,
+    classes: &BTreeMap<String, String>,
+    assets: &BTreeMap<String, String>,
+) -> String {
     let Some(head) = state.nodes.iter().find(|node| node.tag == "head") else {
         return format!("<title>{}</title>", escape(&state.title));
     };
@@ -38,7 +45,7 @@ fn head(state: &PageState, classes: &BTreeMap<String, String>) -> String {
         .iter()
         .filter(|node| node.parent.as_deref() == Some(head.path.as_str()))
         .filter(|node| safe_head_node(node))
-        .map(|node| element(node, state, classes))
+        .map(|node| element(node, state, classes, assets))
         .collect()
 }
 
@@ -92,8 +99,13 @@ fn safe_link(relation: Option<&str>, kind: Option<&str>) -> bool {
     relation != Some("modulepreload") && !(relation == Some("preload") && kind == Some("script"))
 }
 
-fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -> String {
-    let attributes = attributes(node, classes);
+fn element(
+    node: &Node,
+    state: &PageState,
+    classes: &BTreeMap<String, String>,
+    assets: &BTreeMap<String, String>,
+) -> String {
+    let attributes = attributes(node, classes, assets);
     if matches!(node.tag.as_str(), "base" | "link" | "meta") {
         return format!("<{}{attributes}>", node.tag);
     }
@@ -111,16 +123,26 @@ fn element(node: &Node, state: &PageState, classes: &BTreeMap<String, String>) -
 /// The one serialiser for every element the emitter writes by hand. `class` and `style` are
 /// rebuilt rather than copied: the inline style is replaced by the generated rules, and the
 /// authored class tokens are merged with the generated class into a single attribute.
-fn attributes(node: &Node, classes: &BTreeMap<String, String>) -> String {
+///
+/// Every remaining value goes through `asset_attributes::rewrite`, the same call the JSX
+/// emitter makes. The shell is the second place captured attributes are written out, so a
+/// reference it emits is a reference the artifact advertises; localising here rather than
+/// re-deciding which of these attributes name assets keeps that judgement in one owner.
+fn attributes(
+    node: &Node,
+    classes: &BTreeMap<String, String>,
+    assets: &BTreeMap<String, String>,
+) -> String {
     let mut attributes = node
         .attributes
         .iter()
         .filter(|(name, _)| !matches!(name.as_str(), "class" | "style"))
         .map(|(name, value)| {
+            let value = escape(&crate::asset_attributes::rewrite(value, assets));
             if node.tag == "base" && name == "href" {
-                return format!(" data-recreate-base-href=\"{}\"", escape(value));
+                return format!(" data-recreate-base-href=\"{value}\"");
             }
-            format!(" {name}=\"{}\"", escape(value))
+            format!(" {name}=\"{value}\"")
         })
         .collect::<String>();
     attributes.push_str(&class_attribute(node, classes));
@@ -148,32 +170,5 @@ fn escape(value: &str) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::{resolvable_link, safe_link};
-
-    #[test]
-    fn excludes_executable_source_preloads() {
-        assert!(!safe_link(Some("modulepreload"), None));
-        assert!(!safe_link(Some("preload"), Some("script")));
-        assert!(safe_link(Some("stylesheet"), None));
-        assert!(safe_link(Some("icon"), None));
-    }
-
-    /// A relative href names the source site's build output, so the recreation
-    /// would request a file it never generates and the browser logs a 404.
-    #[test]
-    fn excludes_links_to_the_source_projects_own_files() {
-        assert!(!resolvable_link(Some("./assets/index-BIZnfT4P.css")));
-        assert!(!resolvable_link(Some("./onenote-favicon.svg")));
-        assert!(!resolvable_link(Some("/static/app.css")));
-        assert!(!resolvable_link(None));
-    }
-
-    #[test]
-    fn keeps_links_that_still_resolve() {
-        assert!(resolvable_link(Some("https://fonts.example.com/font.css")));
-        assert!(resolvable_link(Some("http://cdn.example.com/a.css")));
-        assert!(resolvable_link(Some("//cdn.example.com/a.css")));
-        assert!(resolvable_link(Some("data:,")));
-    }
-}
+#[path = "document_link_tests.rs"]
+mod tests;

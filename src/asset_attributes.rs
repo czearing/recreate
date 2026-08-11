@@ -21,13 +21,27 @@
 
 use std::collections::BTreeMap;
 
-/// Attributes whose entire value is one URL.
-const URL_ATTRIBUTES: [&str; 2] = ["src", "poster"];
+/// Attributes whose entire value is one URL. `href` is here for the SVG raster and the
+/// icon/preload `<link>`; content authored against SVG 1.1 spells the same attribute
+/// `xlink:href`, in the XLink namespace. Namespacing is handled here rather than in the
+/// gate below, where a `[xlink:href]` qualifier would not be a valid selector at all.
+const URL_ATTRIBUTES: [&str; 4] = ["src", "poster", "href", "xlink:href"];
 /// Attributes whose value is a list of candidates, each a URL followed by descriptors.
 const CANDIDATE_ATTRIBUTES: [&str; 2] = ["srcset", "imagesrcset"];
-/// The elements whose URL attributes name a subresource the artifact must contain. A
-/// document reference such as `<a href>` or `<iframe src>` is a different question.
-const ASSET_SELECTOR: &str = "img,video,audio,source,link[imagesrcset]";
+/// The references whose bytes the artifact must contain, derived from Fetch's destination
+/// table rather than collected as tags. A destination governed by `img-src` (`image`) or
+/// `media-src` (`audio`, `video`, `track`) is painted into *this* document, so the artifact
+/// is not self-contained without it. A destination governed by `child-src` (`iframe`) or
+/// `object-src` (`object`, `embed`) loads *another* document, as does an `<a href>`, which
+/// reaches no destination at all until it is activated; those stay out, because rewriting
+/// them would change what the reference means rather than make the page self-contained.
+///
+/// Every name is lower-case and no qualifier is namespaced, both deliberately: a foreign
+/// element such as SVG's `<image>` is matched case-sensitively by local name, and an
+/// invalid qualifier would throw where this string is used, aborting collection for the
+/// whole page instead of for one element.
+const ASSET_SELECTOR: &str = "img,image,input[type=image i],video,audio,source,track,\
+                              link[rel*=icon],link[imagesrcset]";
 /// Attributes the recreation re-derives, so recording them would fight the generator.
 const SKIPPED_ATTRIBUTES: [&str; 3] = ["style", "nonce", "integrity"];
 
@@ -92,3 +106,7 @@ const JS_SOURCE: &str = include_str!("asset_attributes.js");
 #[cfg(test)]
 #[path = "asset_attributes_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "asset_attributes_gate_tests.rs"]
+mod gate_tests;

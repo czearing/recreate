@@ -17,6 +17,6 @@ fn preserves_an_existing_root_element() {
 
 #[test]
 fn generated_document_avoids_implicit_favicon_requests() {
-    let html = document::render(None, "", &Default::default());
+    let html = document::render(None, "", &Default::default(), &Default::default());
     assert!(html.contains("<link rel=\"icon\" href=\"data:,\">"));
 }

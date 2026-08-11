@@ -33,7 +33,10 @@ fn localises_every_candidate_in_a_descriptor_list() {
 #[test]
 fn keeps_descriptors_and_authored_spacing_beside_the_localised_urls() {
     let value = format!("{ORIGIN}small.png   2x,{ORIGIN}large.png");
-    assert_eq!(rewrite(&value, &assets()), "/assets/11.png   2x,/assets/22.png");
+    assert_eq!(
+        rewrite(&value, &assets()),
+        "/assets/11.png   2x,/assets/22.png"
+    );
 }
 
 /// `sizes` shares the comma-separated shape of `srcset` but carries lengths and media
@@ -53,14 +56,20 @@ fn treats_a_comma_inside_a_url_as_part_of_the_url() {
     let comma_url = format!("{ORIGIN}chart.png?series=red,blue");
     assets.insert(comma_url.clone(), "/assets/99.png".into());
     let value = format!("{comma_url} 1x, {ORIGIN}large.png 2x");
-    assert_eq!(rewrite(&value, &assets), "/assets/99.png 1x, /assets/22.png 2x");
+    assert_eq!(
+        rewrite(&value, &assets),
+        "/assets/99.png 1x, /assets/22.png 2x"
+    );
 }
 
 /// A single-URL attribute such as `src` is one token, so the same rule must still localise
 /// it. This is the path that already worked and must keep working.
 #[test]
 fn localises_a_lone_url() {
-    assert_eq!(rewrite(&format!("{ORIGIN}plain.png"), &assets()), "/assets/33.png");
+    assert_eq!(
+        rewrite(&format!("{ORIGIN}plain.png"), &assets()),
+        "/assets/33.png"
+    );
 }
 
 /// A candidate that was never downloaded has no key, so it must survive rather than be

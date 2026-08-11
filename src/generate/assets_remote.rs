@@ -51,7 +51,11 @@ pub async fn download(
     let mut map = BTreeMap::new();
     for (url, parsed, content_type, bytes) in results {
         let hash = hex::encode(Sha256::digest(&bytes));
-        let filename = format!("{}.{}", &hash[..20], extension(&parsed, &content_type));
+        let filename = format!(
+            "{}.{}",
+            &hash[..20],
+            super::asset_extension::resolve(&content_type, parsed.path())
+        );
         fs::write(directory.join(&filename), bytes)?;
         map.insert(url, format!("/assets/{filename}"));
     }
@@ -81,25 +85,4 @@ pub(super) fn cookie_header(url: &Url, cookies: &[BrowserCookie]) -> String {
         .map(|cookie| format!("{}={}", cookie.name, cookie.value))
         .collect::<Vec<_>>()
         .join("; ")
-}
-
-fn extension(url: &Url, content_type: &str) -> &'static str {
-    match content_type.split(';').next().unwrap_or_default() {
-        "image/svg+xml" => "svg",
-        "image/png" => "png",
-        "image/webp" => "webp",
-        "image/gif" => "gif",
-        "image/avif" => "avif",
-        "video/mp4" => "mp4",
-        "font/woff2" => "woff2",
-        "font/woff" => "woff",
-        "font/ttf" => "ttf",
-        _ if url.path().ends_with(".svg") => "svg",
-        _ if url.path().ends_with(".png") => "png",
-        _ if url.path().ends_with(".webp") => "webp",
-        _ if url.path().ends_with(".woff2") => "woff2",
-        _ if url.path().ends_with(".woff") => "woff",
-        _ if url.path().ends_with(".ttf") => "ttf",
-        _ => "bin",
-    }
 }

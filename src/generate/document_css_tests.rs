@@ -21,7 +21,12 @@ fn page(delivery: Delivery) -> PageState {
     let mut nodes = vec![
         element("html", "", "html", serde_json::json!({"lang": "en"})),
         element(head, "html", "head", serde_json::json!({})),
-        element("html>body:nth-of-type(1)", "html", "body", serde_json::json!({})),
+        element(
+            "html>body:nth-of-type(1)",
+            "html",
+            "body",
+            serde_json::json!({}),
+        ),
     ];
     let sheet = "#hero{color:rgb(200,0,0)}";
     match delivery {
@@ -50,12 +55,7 @@ fn page(delivery: Delivery) -> PageState {
             ));
         }
     }
-    nodes.push(element(
-        "title",
-        head,
-        "title",
-        serde_json::json!({}),
-    ));
+    nodes.push(element("title", head, "title", serde_json::json!({})));
     nodes.push(serde_json::json!({
         "path": "title>text", "parent": "title", "tag": "#text", "text": "Scene",
         "attributes": {}, "rect": {"x": 0.0, "y": 0.0, "width": 0.0, "height": 0.0}, "style": {},
@@ -79,7 +79,12 @@ enum Delivery {
 }
 
 fn render(delivery: Delivery) -> String {
-    document::render(Some(&page(delivery)), "", &BTreeMap::new())
+    document::render(
+        Some(&page(delivery)),
+        "",
+        &BTreeMap::new(),
+        &Default::default(),
+    )
 }
 
 /// The tool bakes each element's computed style into one class, so an authored rule the

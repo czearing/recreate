@@ -19,7 +19,8 @@ pub async fn download(
         if let Some((metadata, encoded)) = data.split_once(',') {
             let bytes = base64::engine::general_purpose::STANDARD.decode(encoded)?;
             let hash = hex::encode(Sha256::digest(&bytes));
-            let extension = data_extension(metadata);
+            let extension =
+                super::asset_extension::resolve(metadata.trim_start_matches("data:"), url);
             let filename = format!("{}.{}", &hash[..20], extension);
             fs::write(directory.join(&filename), bytes)?;
             map.insert(url.clone(), format!("/assets/{filename}"));
@@ -41,28 +42,6 @@ fn states(specification: &Specification) -> impl Iterator<Item = &crate::model::
             .iter()
             .flat_map(|interaction| interaction.states.iter()),
     )
-}
-
-fn data_extension(metadata: &str) -> &'static str {
-    if metadata.contains("image/png") {
-        "png"
-    } else if metadata.contains("image/jpeg") {
-        "jpg"
-    } else if metadata.contains("image/webp") {
-        "webp"
-    } else if metadata.contains("image/svg+xml") {
-        "svg"
-    } else if metadata.contains("font/woff2") || metadata.contains("application/font-woff2") {
-        "woff2"
-    } else if metadata.contains("font/woff") || metadata.contains("application/font-woff") {
-        "woff"
-    } else if metadata.contains("font/ttf") || metadata.contains("font/truetype") {
-        "ttf"
-    } else if metadata.contains("font/otf") || metadata.contains("font/opentype") {
-        "otf"
-    } else {
-        "bin"
-    }
 }
 
 #[cfg(test)]
@@ -113,11 +92,25 @@ mod tests {
         assert_eq!(states(&specification).count(), 2);
     }
 
+    /// A `data:` URL's metadata is its media type behind the scheme, so it reaches the
+    /// extension table only once the scheme is removed; and an origin that declares
+    /// `application/octet-stream` for a format it does not know leaves the URL as the only
+    /// evidence, which is why the URL is passed alongside it rather than discarded.
     #[test]
-    fn names_an_inline_webfont_by_its_real_format() {
-        assert_eq!(data_extension("data:font/woff2;base64"), "woff2");
-        assert_eq!(data_extension("data:font/woff;base64"), "woff");
-        assert_eq!(data_extension("data:image/png;base64"), "png");
+    fn names_an_inline_asset_by_its_real_format() {
+        let extension = |metadata: &str, url: &str| {
+            super::super::asset_extension::resolve(metadata.trim_start_matches("data:"), url)
+        };
+        assert_eq!(extension("data:font/woff2;base64", ""), "woff2");
+        assert_eq!(extension("data:font/woff;base64", ""), "woff");
+        assert_eq!(extension("data:image/png;base64", ""), "png");
+        assert_eq!(
+            extension(
+                "data:application/octet-stream;base64",
+                "http://example.test/captions.vtt"
+            ),
+            "vtt"
+        );
     }
 
     #[test]

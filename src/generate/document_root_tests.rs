@@ -61,7 +61,12 @@ fn start_tag(html: &str, tag: &str) -> String {
 /// unmatched string in the markup and preserve the hook a resurrected rule needs.
 #[test]
 fn drops_the_authored_class_token_from_the_document_root() {
-    let html = document::render(Some(&page(Some("dark"), Some("theme-a"))), "", &classes());
+    let html = document::render(
+        Some(&page(Some("dark"), Some("theme-a"))),
+        "",
+        &classes(),
+        &Default::default(),
+    );
     assert!(
         start_tag(&html, "html").contains("class=\"rhtml\""),
         "html start tag was {}",
@@ -78,7 +83,12 @@ fn drops_the_authored_class_token_from_the_document_root() {
 /// because html and body are never rendered as components.
 #[test]
 fn binds_the_generated_class_to_the_document_root() {
-    let html = document::render(Some(&page(Some("dark"), None)), "", &classes());
+    let html = document::render(
+        Some(&page(Some("dark"), None)),
+        "",
+        &classes(),
+        &Default::default(),
+    );
     assert!(start_tag(&html, "html").contains("rhtml"));
     assert!(start_tag(&html, "body").contains("rbody"));
 }
@@ -87,7 +97,12 @@ fn binds_the_generated_class_to_the_document_root() {
 /// so the authored tokens and the generated class must share a single attribute.
 #[test]
 fn emits_exactly_one_class_attribute_per_root_tag() {
-    let html = document::render(Some(&page(Some("dark"), Some("theme-a"))), "", &classes());
+    let html = document::render(
+        Some(&page(Some("dark"), Some("theme-a"))),
+        "",
+        &classes(),
+        &Default::default(),
+    );
     for tag in ["html", "body"] {
         assert_eq!(
             start_tag(&html, tag).matches("class=").count(),
@@ -102,7 +117,7 @@ fn emits_exactly_one_class_attribute_per_root_tag() {
 /// runtime selector-rewrite used to do.
 #[test]
 fn binds_the_generated_class_when_nothing_was_authored() {
-    let html = document::render(Some(&page(None, None)), "", &classes());
+    let html = document::render(Some(&page(None, None)), "", &classes(), &Default::default());
     assert!(start_tag(&html, "html").contains("class=\"rhtml\""));
     assert!(start_tag(&html, "body").contains("class=\"rbody\""));
 }
@@ -111,7 +126,12 @@ fn binds_the_generated_class_when_nothing_was_authored() {
 /// through untouched, while the inline style is still replaced by the generated rules.
 #[test]
 fn passes_other_root_attributes_through_and_still_drops_inline_style() {
-    let html = document::render(Some(&page(Some("dark"), None)), "", &classes());
+    let html = document::render(
+        Some(&page(Some("dark"), None)),
+        "",
+        &classes(),
+        &Default::default(),
+    );
     let root = start_tag(&html, "html");
     assert!(root.contains("data-theme=\"dark\""), "was {root}");
     assert!(root.contains("lang=\"en\""), "was {root}");

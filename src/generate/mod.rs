@@ -3,6 +3,7 @@ mod animation_keyframes;
 mod animation_order_tests;
 mod animation_timing;
 pub(crate) mod animations;
+mod asset_extension;
 mod asset_urls;
 mod assets;
 mod assets_remote;
@@ -35,6 +36,9 @@ mod css_visual;
 mod custom_properties;
 mod custom_property_diff;
 mod document;
+#[cfg(test)]
+#[path = "document_asset_tests.rs"]
+mod document_asset_tests;
 #[cfg(test)]
 #[path = "document_css_tests.rs"]
 mod document_css_tests;
@@ -88,6 +92,7 @@ mod project_test_support;
 #[cfg(test)]
 mod project_text_entry_support;
 mod responsive;
+mod root_reset;
 mod responsive_attributes;
 mod responsive_geometry;
 #[cfg(test)]
