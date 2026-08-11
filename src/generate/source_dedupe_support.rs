@@ -65,36 +65,13 @@ pub fn reusable_svg(svg: &str) -> bool {
         && !svg.contains("onKeyDown=")
 }
 
+/// A block this stage relocates lands in a module that re-establishes nothing, so it may name
+/// nothing it does not bind. The trigger attribute is a separate hazard: it is a document-scoped
+/// value rather than a free name, and duplicating it would point two elements at one identity.
 pub fn reusable_block(block: &str) -> bool {
     (1_000..=100_000).contains(&block.len())
         && !block.contains("data-recreate-trigger")
-        && !block.contains("onClick=")
-        && !block.contains("onKeyDown=")
-        && !block.contains("onReset=")
-        && !block.contains("ref=")
-        && uppercase_tags(block)
-            .into_iter()
-            .all(|name| name.starts_with("GeneratedSvg"))
-}
-
-pub fn uppercase_tags(source: &str) -> Vec<String> {
-    let mut tags = Vec::new();
-    let bytes = source.as_bytes();
-    let mut index = 0;
-    while index + 1 < bytes.len() {
-        if bytes[index] == b'<' && bytes[index + 1].is_ascii_uppercase() {
-            let start = index + 1;
-            let mut end = start;
-            while end < bytes.len() && (bytes[end].is_ascii_alphanumeric() || bytes[end] == b'_') {
-                end += 1;
-            }
-            tags.push(source[start..end].to_string());
-            index = end;
-        } else {
-            index += 1;
-        }
-    }
-    tags
+        && super::source_free_names::free_names(block).is_empty()
 }
 
 pub fn normalize(source: &str) -> String {

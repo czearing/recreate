@@ -6,7 +6,10 @@ pub struct GeneratedItem {
     pub source: String,
 }
 
-pub fn extract(sources: &mut [&mut String], reserved: &BTreeSet<String>) -> Vec<GeneratedItem> {
+/// `components` is what the destination package exports: the set a lifted item may render, and
+/// the set its own generated name must not shadow. One set answers both, because a name the
+/// destination exports is exactly a name it would collide with.
+pub fn extract(sources: &mut [&mut String], components: &BTreeSet<String>) -> Vec<GeneratedItem> {
     let entity = super::source_item_names::collection_entity(sources);
     let mut groups = HashMap::<String, Vec<Occurrence>>::new();
     for (source_index, source) in sources.iter().enumerate() {
@@ -49,6 +52,13 @@ pub fn extract(sources: &mut [&mut String], reserved: &BTreeSet<String>) -> Vec<
         if varying.is_empty() {
             continue;
         }
+        let fields =
+            super::source_item_names::prop_fields(&signature, &available[0].values, &varying);
+        let props = super::source_item_names::prop_names(&signature, &available[0].values, &fields);
+        let template = template(&signature, &available[0].values, &props);
+        if !super::source_item_component::unresolved("", &template, &props, components).is_empty() {
+            continue;
+        }
         let base = super::source_item_names::item_name(
             &signature,
             &available[0].values,
@@ -61,14 +71,10 @@ pub fn extract(sources: &mut [&mut String], reserved: &BTreeSet<String>) -> Vec<
         } else {
             format!("{base}Variant{variant}")
         };
-        while reserved.contains(&name) {
+        while components.contains(&name) {
             *variant += 1;
             name = format!("{base}Variant{variant}");
         }
-        let fields =
-            super::source_item_names::prop_fields(&signature, &available[0].values, &varying);
-        let props = super::source_item_names::prop_names(&signature, &available[0].values, &fields);
-        let template = template(&signature, &available[0].values, &props);
         for item in available {
             occupied[item.source].push((item.start, item.end));
             replacements[item.source].push((
@@ -78,7 +84,7 @@ pub fn extract(sources: &mut [&mut String], reserved: &BTreeSet<String>) -> Vec<
             ));
         }
         generated.push(GeneratedItem {
-            source: super::source_item_component::render(&name, &template, &props),
+            source: super::source_item_component::render(&name, &template, &props, components),
             name,
         });
     }
@@ -102,13 +108,12 @@ struct Occurrence {
     values: Vec<String>,
 }
 
+/// The cheap shape gate: a fragment worth naming as a collection item. Whether it can be lifted
+/// soundly is a separate question, answered once the props are known, since a name this module
+/// cannot resolve is only unbound relative to what the destination re-establishes.
 pub(super) fn reusable(block: &str) -> bool {
     let root = block.lines().next().unwrap_or_default();
     (160..=60_000).contains(&block.len())
-        && !block.contains("<ReplacementSurface")
-        && !block.contains("<InsertedSurface")
-        && !block.contains("<ExistingSurface")
-        && !block.contains("onReset=")
         && (root.contains("data-testid=") || root.contains("role={\"button\"}"))
 }
 

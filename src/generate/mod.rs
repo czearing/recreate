@@ -121,8 +121,12 @@ mod source_css;
 mod source_css_compact;
 mod source_dedupe;
 mod source_dedupe_support;
+mod source_free_names;
 mod source_generated_blocks;
 mod source_imports;
+#[cfg(test)]
+#[path = "source_item_binding_tests.rs"]
+mod source_item_binding_tests;
 mod source_item_component;
 mod source_item_dedupe;
 mod source_item_name_words;
