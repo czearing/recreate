@@ -4,6 +4,8 @@ use crate::{
 };
 use std::collections::BTreeMap;
 
+use super::samples::{remove_sampled_origins, remove_sampled_sizes};
+
 pub fn base_declarations(
     node: &Node,
     parent: Option<&Node>,
@@ -39,67 +41,9 @@ pub fn base_declarations_indexed(
     super::super::responsive_geometry::normalize(&mut styles, node, parent, viewport, None);
     // Last, so that nothing downstream can put a sampled pixel back.
     remove_sampled_sizes(&mut styles, node, css_rules);
+    remove_sampled_origins(&mut styles, &node.style);
     normalize(&mut styles);
     declarations(&styles, assets)
-}
-
-/// The size properties, in the two axes plus the shorthands that resolve to them.
-const SIZE_PROPERTIES: [&str; 9] = [
-    "width",
-    "height",
-    "min-width",
-    "min-height",
-    "max-width",
-    "max-height",
-    "flex-basis",
-    "grid-template-columns",
-    "grid-template-rows",
-];
-
-/// A captured style is a *used* value: `getComputedStyle` resolves `width: 50%`,
-/// `flex: 1`, `clamp()`, `var()`, and `grid-template-columns: 1fr 2fr` to the pixels they
-/// happened to occupy at the captured viewport. Emitting that pixel back out produces a
-/// page that is correct at exactly one width and wrong everywhere else, and no amount of
-/// per-tag guessing at "is this pixel real?" can recover the authored intent, because the
-/// intent was destroyed before the emitter ever saw the value.
-///
-/// So the emitter never invents a size. If the source authored a size, the authored value
-/// is used verbatim; otherwise nothing is emitted and the box is sized by the same flow
-/// that sized it in the source. Replaced elements are the one exception, and not a
-/// per-site one: they have no in-flow content to reflow, and their box must be reserved
-/// or the page shifts as they load.
-///
-/// Which values are samples is decided against the capture, not against their spelling.
-/// `styles` starts as a clone of `node.style` and the stages above rewrite it, so a size
-/// still equal to the captured one is untouched and is therefore the sample. Anything a
-/// stage rewrote is emitter output and is left alone, however it happens to be spelled —
-/// `preserve_space` reserves a thin scrollbar's gutter as a plain pixel width, and a
-/// spelling test deletes it as if the capture had produced it.
-fn remove_sampled_sizes(
-    styles: &mut Styles,
-    node: &Node,
-    css_rules: &super::super::authored_css::Index<'_>,
-) {
-    if is_replaced(node) {
-        return;
-    }
-    for property in SIZE_PROPERTIES {
-        if styles.get(property).is_none() || styles.get(property) != node.style.get(property) {
-            continue;
-        }
-        match css_rules.authored_value(node, property) {
-            Some(authored) => styles.insert(property.into(), authored),
-            None => styles.remove(property),
-        };
-    }
-}
-
-/// Replaced elements are sized by their own intrinsic content rather than by the flow.
-fn is_replaced(node: &Node) -> bool {
-    matches!(
-        node.tag.as_str(),
-        "img" | "svg" | "video" | "canvas" | "iframe" | "embed" | "object"
-    )
 }
 
 /// The capture records a declaration only where its value differs from what the element
@@ -107,14 +51,14 @@ fn is_replaced(node: &Node) -> bool {
 /// load-bearing. What remains is removing declarations that are inert in combination
 /// with another one, which is a statement about pairs of values rather than about names.
 pub fn output_declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> String {
-    let mut styles = styles.clone();
-    normalize(&mut styles);
-    declarations(&styles, assets)
+    let mut normalized = styles.clone();
+    remove_sampled_origins(&mut normalized, styles);
+    normalize(&mut normalized);
+    declarations(&normalized, assets)
 }
 
 fn normalize(styles: &mut Styles) {
     remove_overridden_shorthands(styles);
-    remove_inert_origins(styles);
     remove_static_insets(styles);
     for side in ["top", "right", "bottom", "left"] {
         let style = format!("border-{side}-style");
@@ -146,23 +90,6 @@ fn remove_overridden_shorthands(styles: &mut Styles) {
         .collect();
     for name in inert {
         styles.remove(&name);
-    }
-}
-
-/// An origin names where a transform or a perspective is anchored. With neither
-/// declared it anchors nothing, and its resolved value is just the box centre restated
-/// in pixels — which the recreation recomputes from the box it already reproduces. The
-/// test is what the CSS says has an effect, not which property it is.
-fn remove_inert_origins(styles: &mut Styles) {
-    let transformed = ["transform", "rotate", "scale", "translate", "offset-path"]
-        .iter()
-        .any(|name| styles.contains_key(*name))
-        || styles.contains_key("animation-name");
-    if !transformed {
-        styles.remove("transform-origin");
-    }
-    if !styles.contains_key("perspective") {
-        styles.remove("perspective-origin");
     }
 }
 

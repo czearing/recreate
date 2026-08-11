@@ -1,5 +1,5 @@
-use crate::model::Node;
 use super::selector_list;
+use crate::model::Node;
 pub(super) fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
     if matches!(name, "width" | "height") && value == "auto" {
         return node
@@ -296,6 +296,7 @@ pub(super) fn retained(name: &str) -> bool {
             | "padding-left"
             | "padding-right"
             | "padding-top"
+            | "perspective-origin"
             | "position"
             | "right"
             | "row-gap"

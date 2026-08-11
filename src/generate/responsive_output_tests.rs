@@ -126,10 +126,17 @@ fn a_longhand_sharing_a_prefix_is_not_treated_as_a_shorthand() {
     assert!(css.contains("color:rgb(17, 17, 17)"), "{css}");
 }
 
-/// An origin with nothing to anchor is the box centre restated in pixels, which the
-/// recreation recomputes from the box it already reproduces.
+/// An origin's computed value is always the used pixel pair, because percentages resolve
+/// against the border box — so on this path, where nothing above replaced the capture
+/// with an authored spelling, every origin is a measurement of a box the recreation
+/// already reproduces. Emitting it anchors correctly at exactly one viewport.
+///
+/// This used to be decided by whether anything was transformed, which asked the wrong
+/// question in two directions at once: it emitted the measurement whenever something was
+/// (below), and it deleted an authored anchor whose transform arrives in another state
+/// (see `responsive_anchor_tests`).
 #[test]
-fn an_origin_with_nothing_to_anchor_is_not_emitted() {
+fn a_sampled_origin_is_not_emitted() {
     let css = render(&[
         ("transform-origin", "295.281px 20px"),
         ("perspective-origin", "295.281px 20px"),
@@ -138,10 +145,9 @@ fn an_origin_with_nothing_to_anchor_is_not_emitted() {
     assert!(!css.contains("origin"), "{css}");
 }
 
-/// The rule is about effect, not about the property name. Once something anchors to the
-/// origin, moving it changes the rendering and it must survive.
+/// And no route to a transform rescues it. Each of these once did.
 #[test]
-fn an_origin_that_anchors_a_transform_is_emitted() {
+fn no_anchor_makes_a_sampled_origin_emittable() {
     for anchor in [
         ("transform", "rotate(3deg)"),
         ("rotate", "3deg"),
@@ -150,14 +156,10 @@ fn an_origin_that_anchors_a_transform_is_emitted() {
         ("animation-name", "spin"),
     ] {
         let css = render(&[("transform-origin", "0px 0px"), anchor]);
-        assert!(
-            css.contains("transform-origin:0px 0px"),
-            "{} {css}",
-            anchor.0
-        );
+        assert!(!css.contains("transform-origin"), "{} {css}", anchor.0);
     }
     let css = render(&[("perspective-origin", "0px 0px"), ("perspective", "800px")]);
-    assert!(css.contains("perspective-origin:0px 0px"), "{css}");
+    assert!(!css.contains("perspective-origin"), "{css}");
 }
 
 /// A band with nothing in it is four empty `@media` blocks at the foot of the sheet.

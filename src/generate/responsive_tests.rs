@@ -26,6 +26,8 @@ pub(super) fn node(tag: &str, x: f64, width: f64) -> Node {
     }
 }
 
+#[path = "responsive_anchor_tests.rs"]
+mod anchor_tests;
 #[path = "responsive_box_tests.rs"]
 mod box_tests;
 #[path = "responsive_flex_tests.rs"]

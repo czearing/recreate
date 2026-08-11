@@ -6,6 +6,8 @@ mod node_rules;
 mod output;
 #[path = "responsive_rules.rs"]
 mod rules;
+#[path = "responsive_samples.rs"]
+mod samples;
 
 pub use output::{base_declarations, base_declarations_indexed, output_declarations};
 pub use rules::append_filtered;
