@@ -2,7 +2,7 @@ use super::{
     interactions_activate::activate,
     interactions_evidence::{candidate_relevant, overlay_state},
     interactions_graph::{candidate, edge, edge_candidate, same_edge, state_matches},
-    interactions_runtime::{restoration_requires_reload, settle},
+    interactions_runtime::{RestingStates, restoration_requires_reload, settle},
     interactions_scope::{begin_scope, reach, take_scope},
     interactions_scripts::{CANDIDATES, Candidate},
 };
@@ -17,6 +17,7 @@ use anyhow::Result;
 
 pub(super) async fn discover_transitions(
     cdp: &mut Cdp,
+    rest: &mut RestingStates,
     baselines: &[PageState],
     interactions: &mut Vec<Interaction>,
 ) -> Result<Vec<InteractionTransition>> {
@@ -38,7 +39,7 @@ pub(super) async fn discover_transitions(
     let mut state_index = 0;
     while state_index < prefixes.len() && state_index < 12 && transitions.len() < 128 {
         let prefix = prefixes[state_index].clone();
-        let Some((entry, reached)) = reach(cdp, baseline, &prefix).await? else {
+        let Some((entry, reached)) = reach(cdp, rest, baseline, &prefix).await? else {
             state_index += 1;
             continue;
         };
@@ -81,7 +82,7 @@ pub(super) async fn discover_transitions(
             cdp.take_events();
             let fresh = match standing.take() {
                 Some(state) => state,
-                None => match reach(cdp, baseline, &prefix).await? {
+                None => match reach(cdp, rest, baseline, &prefix).await? {
                     Some((fresh, _)) => fresh,
                     None => continue,
                 },

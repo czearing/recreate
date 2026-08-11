@@ -5,7 +5,7 @@ use super::{
         InteractionAlias, action_family, deduplicate, responsive_baselines, surface_backed,
     },
     interactions_graph::edge,
-    interactions_runtime::{close, restore, settle},
+    interactions_runtime::{RestingStates, close, restore, settle},
     interactions_scope::{begin_scope, take_scope},
     interactions_scripts::{CANDIDATES, Candidate, PREFLIGHT},
 };
@@ -24,24 +24,26 @@ pub struct CapturedGraph {
 }
 
 pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<CapturedGraph> {
-    let (mut interactions, aliases) = capture_states(cdp, baselines).await?;
+    let mut rest = RestingStates::default();
+    let (mut interactions, aliases) = capture_states(cdp, &mut rest, baselines).await?;
     deduplicate(&mut interactions);
     let base_states = interactions.len();
-    let mut transitions = match discover_transitions(cdp, baselines, &mut interactions).await {
-        Ok(transitions) => transitions,
-        Err(error) => {
-            if recreate_browser::transport_lost(&error) {
-                return Err(error.context("lost the browser during transition expansion"));
+    let mut transitions =
+        match discover_transitions(cdp, &mut rest, baselines, &mut interactions).await {
+            Ok(transitions) => transitions,
+            Err(error) => {
+                if recreate_browser::transport_lost(&error) {
+                    return Err(error.context("lost the browser during transition expansion"));
+                }
+                eprintln!("stopped optional transition expansion: {error:#}");
+                interactions.truncate(base_states);
+                interactions
+                    .iter()
+                    .enumerate()
+                    .map(|(index, interaction)| edge(0, index + 1, interaction))
+                    .collect()
             }
-            eprintln!("stopped optional transition expansion: {error:#}");
-            interactions.truncate(base_states);
-            interactions
-                .iter()
-                .enumerate()
-                .map(|(index, interaction)| edge(0, index + 1, interaction))
-                .collect()
-        }
-    };
+        };
     for alias in aliases {
         let Some(destination) = interactions.iter().position(|interaction| {
             interaction.trigger_path == alias.template_path
@@ -64,12 +66,13 @@ pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Cap
 
 pub(super) async fn capture_states(
     cdp: &mut Cdp,
+    rest: &mut RestingStates,
     baselines: &[PageState],
 ) -> Result<(Vec<Interaction>, Vec<InteractionAlias>)> {
     let Some(first) = baselines.first() else {
         return Ok((Vec::new(), Vec::new()));
     };
-    let mut initial = Some(restore(cdp, first, false).await?);
+    let mut initial = Some(restore(cdp, rest, first, false).await?);
     let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
     let mut interactions = Vec::new();
     let mut aliases = Vec::new();
@@ -109,7 +112,7 @@ pub(super) async fn capture_states(
         let candidate_started = std::time::Instant::now();
         let fresh = match initial.take() {
             Some(state) => state,
-            None => match restore(cdp, first, false).await {
+            None => match restore(cdp, rest, first, false).await {
                 Ok(state) => state,
                 Err(error) => {
                     if recreate_browser::transport_lost(&error) {
@@ -155,7 +158,7 @@ pub(super) async fn capture_states(
         );
         let mut states = vec![state];
         for baseline in responsive {
-            let fresh = restore(cdp, baseline, false).await?;
+            let fresh = restore(cdp, rest, baseline, false).await?;
             begin_scope(cdp, &candidate.path).await?;
             let aimed = aim(cdp, candidate).await?;
             let Some(before) = fire(cdp, aimed).await? else {

@@ -24,8 +24,14 @@ const FLOW_RELATIVE = ['inline', 'block', 'start', 'end'];
    baseline therefore differs for a reason no stylesheet can express, and recording it
    would write the attribute a second time in a syntax nothing reads. */
 const DERIVED_FROM_ATTRIBUTE = '-webkit-locale';
+/* `all` does not reach custom properties, so a reverted element reports the same ones it
+   reports live and every comparison against the baseline already discards them. Skipping
+   them changes nothing that is recorded and removes the largest variable-sized part of the
+   enumeration, because a design system declares its whole palette on one inherited root. */
+const CUSTOM_PROPERTY = '--';
 const redundantProperty = property => {
   if (property === DERIVED_FROM_ATTRIBUTE) return true;
+  if (property.startsWith(CUSTOM_PROPERTY)) return true;
   const segments = property.split('-');
   return FLOW_RELATIVE.some(segment => segments.includes(segment));
 };
@@ -56,6 +62,23 @@ const authoredStyles = (live, baseline) => {
     }
   }
   return values;
+};
+/* A pseudo-element is recorded only when it generates a box, and `content` alone decides
+   that: with no content there is nothing to draw and nothing to describe, so the reading
+   is discarded. Asking for that one property costs a single lookup where measuring the
+   baseline costs a whole enumeration under a revert sheet, and the answer is the same
+   value the consumer already tests, so skipping the measurement removes work that could
+   never have reached the output. Almost no element on a page carries generated content,
+   which is why this is where the enumeration count falls rather than a micro-saving.
+   The test has to be taken on the restored page, after the element pass has put every
+   style attribute back, because that is the page the consumer tests. Reverting an element
+   drops its `animation` and `transition` declarations, and restoring them starts both
+   over, so a value read before the pass and a value read after it are different pages -
+   which is why nothing read here is carried forward to stand in for a later reading. */
+const PSEUDO_NAMES = ['::before', '::after'];
+const hasContent = style => {
+  const content = style.content;
+  return Boolean(content) && content !== 'none';
 };
 const elementBaselines = new WeakMap();
 const pseudoBaselines = new WeakMap();
@@ -94,18 +117,6 @@ const measureBaselines = (root, skip) => {
       if (left || top) scrolled.push([element, left, top]);
     }
   }
-  const sheet = document.createElement('style');
-  sheet.textContent = '*::before,*::after{all:revert !important}';
-  document.head.appendChild(sheet);
-  for (const level of levels) {
-    for (const element of level) {
-      pseudoBaselines.set(element, {
-        '::before': styleMap(getComputedStyle(element, '::before')),
-        '::after': styleMap(getComputedStyle(element, '::after'))
-      });
-    }
-  }
-  sheet.remove();
   for (const level of levels) {
     const saved = level.map(element => element.getAttribute('style'));
     for (const element of level) element.style.setProperty('all', 'revert', 'important');
@@ -114,6 +125,25 @@ const measureBaselines = (root, skip) => {
       if (saved[index] === null) element.removeAttribute('style');
       else element.setAttribute('style', saved[index]);
     });
+  }
+  const pseudoPending = [];
+  for (const level of levels) {
+    for (const element of level) {
+      for (const name of PSEUDO_NAMES) {
+        if (hasContent(getComputedStyle(element, name))) pseudoPending.push([element, name]);
+      }
+    }
+  }
+  if (pseudoPending.length) {
+    const sheet = document.createElement('style');
+    sheet.textContent = '*::before,*::after{all:revert !important}';
+    document.head.appendChild(sheet);
+    for (const [element, name] of pseudoPending) {
+      const measured = pseudoBaselines.get(element) || {};
+      measured[name] = styleMap(getComputedStyle(element, name));
+      pseudoBaselines.set(element, measured);
+    }
+    sheet.remove();
   }
   for (const [element, left, top] of scrolled) element.scrollTo(left, top);
 };

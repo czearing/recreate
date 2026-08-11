@@ -33,7 +33,8 @@ mod tests {
     /// the inherited value. Depth batching is what keeps inherited values pruned.
     #[test]
     fn reverts_one_depth_level_at_a_time() {
-        assert!(SOURCE.contains("collect(root, 0)"));
+        assert!(SOURCE.contains("collect(root, 0"));
+        assert!(SOURCE.contains("levels[depth] = levels[depth] || []"));
         assert!(SOURCE.contains("for (const level of levels)"));
         assert!(!SOURCE.contains("querySelectorAll('*')"));
     }

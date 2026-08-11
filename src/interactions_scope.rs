@@ -1,6 +1,6 @@
 use super::{
     interactions_activate::activate,
-    interactions_runtime::{restore, settle},
+    interactions_runtime::{RestingStates, restore, settle},
     interactions_scripts::{ACTION_SCOPE, Candidate, TAKE_SCOPE},
 };
 use crate::{capture, cdp::Cdp, model::PageState};
@@ -23,10 +23,11 @@ pub(super) async fn take_scope(cdp: &mut Cdp) -> Result<Vec<String>> {
 
 pub(super) async fn reach(
     cdp: &mut Cdp,
+    rest: &mut RestingStates,
     baseline: &PageState,
     prefix: &[Candidate],
 ) -> Result<Option<(PageState, PageState)>> {
-    let fresh = restore(cdp, baseline, false).await?;
+    let fresh = restore(cdp, rest, baseline, false).await?;
     for action in prefix {
         if !activate(cdp, action).await? {
             return Ok(None);

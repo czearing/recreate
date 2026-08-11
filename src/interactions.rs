@@ -26,5 +26,9 @@ mod test_support;
 mod evidence_tests;
 
 #[cfg(test)]
+#[path = "interactions_resting_tests.rs"]
+mod resting_tests;
+
+#[cfg(test)]
 #[path = "interactions_tests.rs"]
 mod tests;
