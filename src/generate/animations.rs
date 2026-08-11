@@ -126,3 +126,7 @@ fn append_class(value: &mut String, class: &str) {
 #[cfg(test)]
 #[path = "animation_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "animation_offset_tests.rs"]
+mod offset_tests;

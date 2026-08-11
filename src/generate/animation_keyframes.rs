@@ -30,9 +30,7 @@ pub fn append(animation: &Animation, name: &str, css: &mut String) {
     css.push_str(&format!("@keyframes {name}{{"));
     let mut frames: BTreeMap<i32, Map<String, Value>> = BTreeMap::new();
     for (index, frame) in animation.keyframes.iter().enumerate() {
-        let offset = frame["offset"]
-            .as_f64()
-            .unwrap_or(index as f64 / (animation.keyframes.len() - 1) as f64);
+        let offset = recorded_offset(frame, index, animation.keyframes.len());
         if let Some(values) = frame.as_object() {
             frames
                 .entry((offset * 100.0).round() as i32)
@@ -47,6 +45,21 @@ pub fn append(animation: &Animation, name: &str, css: &mut String) {
         ));
     }
     css.push_str("}\n");
+}
+
+/// The place on the timeline the browser recorded for this frame.
+///
+/// `getKeyframes()` reports `offset` only where the author stated one and `computedOffset`
+/// for every frame, so the recorded place is the computed one. Spacing by index is a last
+/// resort for records carrying neither: it spreads frames evenly across the whole list,
+/// which is what the browser computes only when no interior frame is anchored. Anchor one
+/// and the two disagree, and since places are rounded to a whole percentage and merged by
+/// key, a guess landing on a recorded place overwrites that frame rather than mistiming it.
+fn recorded_offset(frame: &Value, index: usize, count: usize) -> f64 {
+    frame["computedOffset"]
+        .as_f64()
+        .or_else(|| frame["offset"].as_f64())
+        .unwrap_or(index as f64 / count.saturating_sub(1).max(1) as f64)
 }
 
 fn position(frame: Option<&Value>) -> (f64, f64) {
