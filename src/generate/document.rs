@@ -44,59 +44,9 @@ fn head(
         .nodes
         .iter()
         .filter(|node| node.parent.as_deref() == Some(head.path.as_str()))
-        .filter(|node| safe_head_node(node))
+        .filter(|node| super::reemission::safe_head_node(node))
         .map(|node| element(node, state, classes, assets))
         .collect()
-}
-
-fn safe_head_node(node: &Node) -> bool {
-    if supplies_css(node) {
-        return false;
-    }
-    if node.tag != "link" {
-        return matches!(node.tag.as_str(), "base" | "meta" | "title");
-    }
-    let relation = node.attributes.get("rel").map(String::as_str);
-    let kind = node.attributes.get("as").map(String::as_str);
-    let href = node.attributes.get("href").map(String::as_str);
-    safe_link(relation, kind) && resolvable_link(href)
-}
-
-/// Whether an element delivers authored CSS, by any route.
-///
-/// Every authored rule already reaches the output through `css_base`, which re-emits from
-/// the captured `css_rules` under `css::global_rule` — the gate that exists because the
-/// bake already represents any rule that reached an element through a selector. Emitting
-/// a `<style>` verbatim, or leaving a stylesheet `<link>` live, routes around that gate
-/// and applies those rules a second time, at whatever specificity they were authored
-/// with. So which declaration wins would depend on how the page happened to ship it, and
-/// an authored rule the original cascade rejected can outrank the value that beat it.
-/// Rejecting the delivery instead of filtering its text keeps one owner for the decision.
-pub(super) fn supplies_css(node: &Node) -> bool {
-    node.tag == "style"
-        || (node.tag == "link"
-            && node.attributes.get("rel").is_some_and(|relation| {
-                relation
-                    .split_ascii_whitespace()
-                    .any(|token| token.eq_ignore_ascii_case("stylesheet"))
-            }))
-}
-
-/// A relative href names a file in the source site's own build output, which the
-/// recreation never produces, so keeping it only yields a guaranteed 404. Absolute
-/// and data hrefs still resolve, so they are kept.
-fn resolvable_link(href: Option<&str>) -> bool {
-    let Some(href) = href.map(str::trim) else {
-        return false;
-    };
-    href.starts_with("data:") || href.starts_with("//") || {
-        let scheme = href.split_once("://").map(|(scheme, _)| scheme);
-        matches!(scheme, Some("http") | Some("https"))
-    }
-}
-
-fn safe_link(relation: Option<&str>, kind: Option<&str>) -> bool {
-    relation != Some("modulepreload") && !(relation == Some("preload") && kind == Some("script"))
 }
 
 fn element(
@@ -168,7 +118,3 @@ fn escape(value: &str) -> String {
         .replace('<', "&lt;")
         .replace('>', "&gt;")
 }
-
-#[cfg(test)]
-#[path = "document_link_tests.rs"]
-mod tests;

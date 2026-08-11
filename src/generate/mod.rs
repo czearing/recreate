@@ -156,6 +156,7 @@ mod structural_tests;
 
 #[cfg(test)]
 mod artifact_hermeticity_tests;
+mod reemission;
 mod structural_tree;
 #[cfg(test)]
 mod tests;
