@@ -110,7 +110,6 @@ impl<'a> Index<'a> {
 
     pub fn declarations(&self, node: &Node) -> Styles {
         let mut values: BTreeMap<String, Vec<String>> = BTreeMap::new();
-        let mut references: BTreeMap<String, Vec<String>> = BTreeMap::new();
         for index in self.direct_indices(node) {
             let rule = &self.rules[index];
             for (name, value) in parsed_declarations(rule.declarations)
@@ -123,12 +122,9 @@ impl<'a> Index<'a> {
                         && !super::authored_css_rules::cascade_keyword(value)
                 })
             {
-                if value.contains("var(") && !super::authored_css_rules::fluid_authored_value(value)
+                if super::authored_css_rules::deferred_binding(value)
+                    && !super::authored_css_rules::fluid_authored_value(value)
                 {
-                    references
-                        .entry(name.into())
-                        .or_default()
-                        .push(value.into());
                     continue;
                 }
                 values.entry(name.into()).or_default().push(value.into());
@@ -228,21 +224,38 @@ impl<'a> Index<'a> {
     /// computed value the browser baked. Selector shape decides which elements a rule reaches,
     /// never whether a matched declaration is real, so this uses the same matcher as every
     /// other direct lookup rather than a class-keyed one of its own.
+    ///
+    /// A candidate whose binding is deferred disqualifies the answer instead of leaving the
+    /// ballot. Excluding it does not make the agreement test cautious, it makes it blind: the
+    /// test can only weigh what it is handed, so removing the dissenting candidate manufactures
+    /// the unanimity it looks for and certifies the declaration that candidate defeated.
+    ///
+    /// Agreement is the whole test because this index sorts candidates by cascade layer and
+    /// models neither specificity nor importance, so where candidates disagree no position in
+    /// the list names the winner. Abstaining costs nothing: the engine already resolved the
+    /// cascade and the capture holds its answer, which the caller then leaves in place.
     pub fn inherited_value(&self, node: &Node, property: &str) -> Option<String> {
         let values = self
             .direct_indices(node)
             .into_iter()
             .map(|index| &self.rules[index])
             .flat_map(|rule| parsed_declarations(rule.declarations))
-            .filter(|(name, value)| *name == property && !value.contains("var("))
-            .map(|(_, value)| value.to_string())
+            .filter(|(name, _)| *name == property)
+            .map(|(_, value)| value)
             .collect::<Vec<_>>();
-        values.first().and_then(|first| {
-            values
-                .iter()
-                .all(|value| value == first)
-                .then(|| first.clone())
-        })
+        if values
+            .iter()
+            .any(|value| super::authored_css_rules::deferred_binding(value))
+        {
+            return None;
+        }
+        // Every candidate equals the first, so which end is read is immaterial by construction
+        // rather than by convention.
+        let first = values.first()?;
+        values
+            .iter()
+            .all(|value| value == first)
+            .then(|| (*first).to_string())
     }
 
     fn direct_indices(&self, node: &Node) -> Vec<usize> {
@@ -281,6 +294,10 @@ impl<'a> Index<'a> {
 fn parsed_declarations(declarations: &str) -> impl DoubleEndedIterator<Item = (&str, &str)> {
     super::css_declaration::parsed(declarations)
 }
+
+#[cfg(test)]
+#[path = "inherited_vote_tests.rs"]
+mod vote_tests;
 
 fn node_classes(node: &Node) -> impl Iterator<Item = &str> {
     node.attributes

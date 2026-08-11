@@ -145,6 +145,16 @@ pub(super) fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
     attributes
 }
 
+/// A value whose binding is deferred past parse time. `var()` is substituted at computed-value
+/// time, after the cascade has already chosen a winner, so a reference competes with a literal
+/// on equal terms — this index simply cannot evaluate it. Callers must treat such a value as
+/// unknown rather than as absent: a themed override written as `var(--token)` is normally the
+/// higher-precedence declaration authored to beat a base literal, so dropping it from a
+/// comparison leaves the field to the declaration it defeated.
+pub(super) fn deferred_binding(value: &str) -> bool {
+    value.contains("var(")
+}
+
 /// An authored value that references a custom property is normally dropped in favour of the
 /// sampled computed value, which is safe for a colour or a spacing but destroys layout that
 /// responds to the viewport: a track list like
