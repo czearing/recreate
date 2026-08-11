@@ -121,21 +121,25 @@ pub(super) fn attribute_values(source: &str, name: &str) -> Vec<String> {
 /// scope has to come from the tag boundary. That boundary is `Open`..`Close`, which the
 /// scanner already tracks through quoting, so a value containing `>` cannot cut the root
 /// tag short and start silently dropping the attributes the root really declared.
-pub(super) fn root_attribute(source: &str, name: &str) -> Option<String> {
-    let mut value = None;
+/// Every attribute bound on the root element's own start tag, in document order.
+///
+/// A reader that answers one name at a time can only be consulted by a caller that already
+/// knows every name it wants, which is an allow-list however it is spelled. Answering with
+/// the whole tag lets a caller state a criterion instead.
+pub(super) fn root_attributes(source: &str) -> Vec<(String, String)> {
+    let mut attributes = Vec::new();
     scan_scoped(source, |token, root| {
         if let Token::Attribute {
-            name: found,
+            name,
             value: Some(Value::Literal(body)),
         } = token
             && root
-            && found == name
-            && value.is_none()
+            && !attributes.iter().any(|(found, _)| found == name)
         {
-            value = Some(unescape(body));
+            attributes.push((name.to_string(), unescape(body)));
         }
     });
-    value
+    attributes
 }
 
 /// The single owner of that boundary: every token, paired with whether it belongs to the

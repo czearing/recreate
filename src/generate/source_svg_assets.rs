@@ -1,4 +1,5 @@
 use super::source_dedupe_support::{normalize, replace_ranges, reusable_svg, svg_blocks};
+use super::source_svg_stand_in::image;
 use anyhow::Result;
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, path::Path};
@@ -91,17 +92,6 @@ fn percent_decode(source: &str) -> Option<String> {
         }
     }
     String::from_utf8(decoded).ok()
-}
-
-pub(super) fn image(svg: &str, filename: &str) -> String {
-    let attributes = ["className", "aria-hidden", "height", "width"]
-        .into_iter()
-        .filter_map(|name| {
-            super::jsx_markup::root_attribute(svg, name)
-                .map(|value| format!(" {name}={{{}}}", serde_json::to_string(&value).unwrap()))
-        })
-        .collect::<String>();
-    format!("<img src={{\"/assets/{filename}\"}} alt={{\"\"}}{attributes} />")
 }
 
 /// The relocated graphic as a standalone document: the stylesheet it needs carried in, and

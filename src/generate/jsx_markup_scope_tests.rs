@@ -1,4 +1,14 @@
-use super::{attribute_values, root_attribute};
+use super::{attribute_values, root_attributes};
+
+/// The scope question asked of one name. `root_attributes` answers with the whole start
+/// tag so its caller can state a criterion instead of a list; these tests interrogate that
+/// answer name by name, which is what the boundary rule is about.
+fn root_attribute(source: &str, name: &str) -> Option<String> {
+    root_attributes(source)
+        .into_iter()
+        .find(|(found, _)| found == name)
+        .map(|(_, value)| value)
+}
 
 /// The defect `root_attribute` exists to close. An attribute belongs to the element that
 /// declares it, but the reader was handed the whole serialized subtree and took the first
