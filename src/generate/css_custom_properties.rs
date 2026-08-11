@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 
 #[cfg(test)]
 pub fn append(rules: &[String], declared: &BTreeSet<String>, css: &mut String) {
-    let references = references(css);
+    let references = super::css_identifiers::references(css);
     append_values(rules, references, declared, css);
 }
 
@@ -13,11 +13,11 @@ pub fn append_for_spec(
     declared: &BTreeSet<String>,
     css: &mut String,
 ) {
-    let mut references = references(css);
+    let mut references = super::css_identifiers::references(css);
     for state in &specification.states {
         for node in state.nodes.iter().chain(&state.startup_nodes) {
             for value in node.attributes.values() {
-                references.extend(self::references(value));
+                references.extend(super::css_identifiers::references(value));
             }
         }
     }
@@ -25,7 +25,7 @@ pub fn append_for_spec(
         for state in &interaction.states {
             for node in state.nodes.iter().chain(&state.startup_nodes) {
                 for value in node.attributes.values() {
-                    references.extend(self::references(value));
+                    references.extend(super::css_identifiers::references(value));
                 }
             }
         }
@@ -47,7 +47,7 @@ fn append_values(
     for name in references.difference(declared) {
         let values = rules
             .iter()
-            .filter_map(|rule| value(rule, name))
+            .filter_map(|rule| super::css_identifiers::declared_value(rule, name))
             .collect::<BTreeSet<_>>();
         if values.len() == 1 {
             let value = values.into_iter().next().unwrap();
@@ -62,31 +62,4 @@ fn append_values(
     if !declarations.is_empty() {
         css.push_str(&format!(":root{{{declarations}}}\n"));
     }
-}
-
-fn references(css: &str) -> BTreeSet<String> {
-    let mut references = BTreeSet::new();
-    let mut remaining = css;
-    while let Some(index) = remaining.find("var(--") {
-        remaining = &remaining[index + 4..];
-        let end = remaining
-            .find([',', ')', ' ', '\t'])
-            .unwrap_or(remaining.len());
-        references.insert(remaining[..end].to_string());
-        remaining = &remaining[end..];
-    }
-    references
-}
-
-fn value(rule: &str, name: &str) -> Option<String> {
-    let mut remaining = rule;
-    while let Some(index) = remaining.find(name) {
-        remaining = &remaining[index + name.len()..];
-        let candidate = remaining.trim_start();
-        if let Some(value) = candidate.strip_prefix(':') {
-            let end = value.find([';', '}']).unwrap_or(value.len());
-            return Some(value[..end].trim().to_string());
-        }
-    }
-    None
 }

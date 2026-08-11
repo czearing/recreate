@@ -1,4 +1,6 @@
 use super::css::global_rule;
+use super::css_identifiers::mentions;
+use std::collections::BTreeSet;
 
 /// Builds the stylesheet a fragment needs to render on its own, once it has been moved
 /// into a document the page's CSS cannot reach.
@@ -23,17 +25,26 @@ use super::css::global_rule;
 /// covers fonts, counter styles and palettes at no extra cost. The loose direction is the
 /// safe one: a definition nothing names is inert, while a name with no definition silently
 /// renders nothing.
+///
+/// Carrying is not the same act for every kind of definition, and the difference is where
+/// the definition lives rather than what names it. A self-naming one travels as text; one
+/// that reaches its user by inheritance travels as a value re-declared on an ancestor the
+/// fragment keeps, which `css_inheritance` owns. Both feed the same loop, because a block
+/// carried verbatim is text like any other and the names *it* spells are still unmet.
 pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
     let rules = super::css_rule_split::top_level(css);
     let mut carried = rules
         .iter()
         .map(|rule| consumer(rule, classes))
         .collect::<Vec<_>>();
+    let mut wanted = BTreeSet::new();
+    let mut inherited = String::new();
     // A carried definition can name a further one, so this runs to a fixed point rather
     // than for one pass. It terminates because every pass either carries a rule that was
-    // not carried before or stops.
+    // not carried before, wants a name that was not wanted before, or stops.
     loop {
-        let carried_text = joined(&carried);
+        let declared = joined(&carried);
+        let carried_text = join(&inherited, &declared);
         let mut grew = false;
         for (index, rule) in rules.iter().enumerate() {
             if carried[index].is_some() || !global_rule(rule) {
@@ -46,6 +57,10 @@ pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
                 carried[index] = Some(rule.clone());
                 grew = true;
             }
+        }
+        if super::css_inheritance::wanted(&carried_text, &declared, &mut wanted) {
+            inherited = super::css_inheritance::declarations(&rules, &wanted);
+            grew = true;
         }
         if !grew {
             return carried_text;
@@ -60,6 +75,15 @@ fn joined(carried: &[Option<String>]) -> String {
         .map(String::as_str)
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+/// Inherited values are placed first so a rule the fragment carries for itself, which is a
+/// nearer scope, still wins.
+fn join(inherited: &str, declared: &str) -> String {
+    match inherited.is_empty() {
+        true => declared.to_string(),
+        false => format!("{inherited}\n{declared}"),
+    }
 }
 
 /// The rule as it should be carried, if it reaches the fragment at all.
@@ -120,7 +144,7 @@ fn defined_names(rule: &str) -> Vec<String> {
 }
 
 fn descriptor(body: &str, name: &str) -> Option<String> {
-    let start = mention_index(body, name)? + name.len();
+    let start = super::css_identifiers::mention_index(body, name)? + name.len();
     let value = body[start..].trim_start().strip_prefix(':')?;
     let end = value.find([';', '}']).unwrap_or(value.len());
     Some(unquote(&value[..end])).filter(|value| !value.is_empty())
@@ -130,30 +154,6 @@ fn unquote(value: &str) -> String {
     value.trim().trim_matches(['"', '\'']).trim().to_string()
 }
 
-/// Whether `name` occurs as a whole identifier rather than inside a longer one, so that
-/// `spin` is not read out of `arcspin`.
-fn mentions(text: &str, name: &str) -> bool {
-    mention_index(text, name).is_some()
-}
-
-fn mention_index(text: &str, name: &str) -> Option<usize> {
-    if name.is_empty() {
-        return None;
-    }
-    let mut from = 0;
-    while let Some(relative) = text[from..].find(name) {
-        let start = from + relative;
-        let end = start + name.len();
-        let before = text[..start].chars().next_back();
-        let after = text[end..].chars().next();
-        if !before.is_some_and(identifier_character) && !after.is_some_and(identifier_character) {
-            return Some(start);
-        }
-        from = end;
-    }
-    None
-}
-
-fn identifier_character(character: char) -> bool {
-    character.is_alphanumeric() || character == '-' || character == '_'
-}
+#[cfg(test)]
+#[path = "css_closure_tests.rs"]
+mod tests;

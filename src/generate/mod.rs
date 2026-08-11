@@ -25,6 +25,8 @@ mod css_base;
 mod css_base_style;
 mod css_closure;
 mod css_custom_properties;
+mod css_identifiers;
+mod css_inheritance;
 mod css_interactions;
 mod css_layers;
 mod css_layout;
