@@ -9,6 +9,9 @@ struct Running {
     duration: u64,
     local_time: u64,
     declared: bool,
+    /// The speed the animation's local time advances at. Zero freezes it exactly as a pause
+    /// does, which is why the rule cannot decide this by reading the play state alone.
+    rate: f64,
 }
 
 fn running(play_state: &'static str, delay: u64, duration: u64, local_time: u64) -> Running {
@@ -18,6 +21,7 @@ fn running(play_state: &'static str, delay: u64, duration: u64, local_time: u64)
         duration,
         local_time,
         declared: false,
+        rate: 1.0,
     }
 }
 
@@ -34,13 +38,14 @@ fn list(animations: &[Running]) -> String {
         .iter()
         .map(|entry| {
             format!(
-                "{{target:'t{}',playState:'{}',delay:{},duration:{},localTime:{},declared:{}}}",
+                "{{target:'t{}',playState:'{}',delay:{},duration:{},localTime:{},declared:{},rate:{}}}",
                 entry.local_time,
                 entry.play_state,
                 entry.delay,
                 entry.duration,
                 entry.local_time,
-                entry.declared
+                entry.declared,
+                entry.rate
             )
         })
         .collect::<Vec<_>>()
@@ -76,6 +81,46 @@ fn an_endlessly_repeating_animation_stops_counting_as_busy_after_one_period() {
 fn a_delayed_animation_is_watched_for_its_delay_and_then_its_period() {
     assert!(busy(&[running("running", 300, 600, 899)], false));
     assert!(!busy(&[running("running", 300, 600, 900)], false));
+}
+
+/// The defect the play-state list conceals. The rule waits for an animation's local time to
+/// reach the end of one period, so it is only worth waiting on while that time is still
+/// moving. A paused animation's local time is frozen: the point being waited for will never
+/// arrive, and the recorder holds every such page open to the full ceiling — twelve seconds
+/// bought in exchange for nothing. Listing `finished` and `idle` answered the question for
+/// the two states someone met, and `paused` is the third answer to a question the predicate
+/// never asked.
+#[test]
+fn a_frozen_animation_is_not_something_left_to_wait_for() {
+    assert!(!busy(&[running("paused", 0, 600, 0)], false));
+    assert!(!busy(&[running("paused", 2_000, 4_000, 0)], false));
+}
+
+/// The same freeze reached by the other route, and the reason a state list cannot close
+/// this. A playback rate of zero stops local time advancing while the play state stays
+/// `running`, so an enumeration of states waits out the whole ceiling on an animation that
+/// is every bit as motionless as a paused one.
+#[test]
+fn an_animation_whose_clock_is_stopped_is_not_waited_for_either() {
+    let stopped = Running {
+        rate: 0.0,
+        ..running("running", 0, 600, 0)
+    };
+    assert!(!busy(&[stopped], false));
+}
+
+/// The inverse guard. Freezing is the only thing being excused, so an animation whose clock
+/// runs backwards, or slower than real time, is still moving toward an unwatched point and
+/// must still hold the recorder open.
+#[test]
+fn an_animation_playing_at_any_nonzero_speed_is_still_watched() {
+    for rate in [0.25, -1.0, 2.0] {
+        let playing = Running {
+            rate,
+            ..running("running", 0, 600, 100)
+        };
+        assert!(busy(&[playing], false), "stopped watching at rate {rate}");
+    }
 }
 
 /// Busy is evidence that something is still to come, so any one unobserved animation is

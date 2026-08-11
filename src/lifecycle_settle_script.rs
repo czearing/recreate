@@ -22,6 +22,14 @@
 /// iteration have been watched; a finite animation reaches that point and ends there too.
 /// A pending load has no period, so it holds on its own until it lands.
 ///
+/// Waiting for that point only makes sense while the animation is still travelling towards
+/// it. Local time advances at the playback rate, and only while the animation is running, so
+/// a paused animation and one whose rate is zero are both stopped short of a point that will
+/// never arrive — indistinguishable from each other and from a finished one in every way the
+/// recorder cares about. Asking whether the clock is moving covers `finished` and `idle` as
+/// the same case rather than as named exceptions, which is what keeps a third frozen state
+/// from costing the full ceiling again.
+///
 /// Motion a stylesheet already declares is a further case of the same thing, reaching its
 /// expiry before it starts. A `CSSAnimation` or a `CSSTransition` exists because a rule the
 /// capture already reads called for it, so observing it re-derives what is written down;
@@ -41,8 +49,8 @@
 /// there means waiting for the animation to happen to pause at a turning point.
 pub const SOURCE: &str = r#"
   const LIFECYCLE_CEILING_MS = 12000;
-  const animationObserved = ({ declared, playState, delay, duration, localTime }) =>
-    declared || playState === 'finished' || playState === 'idle' ||
+  const animationObserved = ({ declared, playState, rate, delay, duration, localTime }) =>
+    declared || playState !== 'running' || !rate ||
     !(duration > 0) || localTime >= delay + duration;
   const lifecycleBusy = (animations, loading) =>
     loading || animations.some(animation => !animationObserved(animation));
@@ -56,6 +64,7 @@ pub const SOURCE: &str = r#"
         (typeof CSSAnimation !== 'undefined' && animation instanceof CSSAnimation) ||
         (typeof CSSTransition !== 'undefined' && animation instanceof CSSTransition),
       playState: animation.playState,
+      rate: animation.playbackRate ?? 1,
       delay: Number(timing.delay) || 0,
       duration: Number(timing.duration) || 0,
       localTime: Number(timing.localTime) || 0
