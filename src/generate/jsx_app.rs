@@ -37,6 +37,18 @@ pub(super) fn fill(template: &str, holes: &[(&str, &str)]) -> String {
 
 /// Splice snippets are stored with a trailing newline so they are ordinary text
 /// files; that newline is never part of the emitted JavaScript.
+/// How the recreation namespaces the state it hands back to itself across a reload.
+///
+/// This had been the captured URL, which is the one address the artifact must never carry:
+/// a capture serves the scene from an ephemeral loopback port, so the key differed on every
+/// run of the same static page and two identical captures emitted different bytes. That
+/// turns a fidelity question into a reproducibility one, where a maintainer diffing output
+/// can no longer tell a repair from noise. The recreation is a different document at a
+/// different address, so where it came from never identified it; where it *is* does, and
+/// the platform already scopes session storage to the origin, leaving the path to separate
+/// two recreations served side by side.
+const RETURN_STORAGE_KEY: &str = "`recreateReturnState:${location.pathname}`";
+
 fn snippet(text: &str) -> &str {
     text.trim_end_matches('\n')
 }
@@ -63,11 +75,8 @@ pub fn app(
                 return page;
             }
             let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
-            let fragment = jsx_variants::fragment(
-                &startup,
-                assets,
-                startup_timeline::Timeline::of(state),
-            );
+            let fragment =
+                jsx_variants::fragment(&startup, assets, startup_timeline::Timeline::of(state));
             format!("<>{page}{{createPortal({fragment},document.body)}}</>")
         })
         .collect::<Vec<_>>();
@@ -419,13 +428,8 @@ pub fn app(
     let output = output.replace(
         "const viewportWidths=",
         &format!(
-            "{inferred_carousel}\nconst transitionGraph={};\nconst transitionEdges={transition_edges};\nconst controlStyles={control_styles};\nconst baselineSelectedTokens={baseline_selected_tokens};\nconst baselineSelectedState={baseline_selected_state};\nconst baselinePressedTokens={baseline_pressed_tokens};\nconst returnStorageKey={};\nconst viewportWidths=",
-            !specification.transitions.is_empty(),
-            serde_json::to_string(&format!(
-                "recreateReturnState:{}",
-                specification.captured_url
-            ))
-            .unwrap()
+            "{inferred_carousel}\nconst transitionGraph={};\nconst transitionEdges={transition_edges};\nconst controlStyles={control_styles};\nconst baselineSelectedTokens={baseline_selected_tokens};\nconst baselineSelectedState={baseline_selected_state};\nconst baselinePressedTokens={baseline_pressed_tokens};\nconst returnStorageKey={RETURN_STORAGE_KEY};\nconst viewportWidths=",
+            !specification.transitions.is_empty()
         ),
     );
     // Spliced in unconditionally, which is safe only because the effect stands itself down

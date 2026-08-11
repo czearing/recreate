@@ -144,6 +144,9 @@ mod state_styles;
 mod structural_css;
 #[cfg(test)]
 mod structural_tests;
+
+#[cfg(test)]
+mod artifact_hermeticity_tests;
 mod structural_tree;
 #[cfg(test)]
 mod tests;
