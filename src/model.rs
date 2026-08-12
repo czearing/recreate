@@ -3,8 +3,10 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 
 mod interaction;
+mod logical;
 mod writing_mode;
 pub use interaction::{Interaction, InteractionAction, InteractionTransition};
+pub use logical::{Physical, physical_property};
 pub use writing_mode::WritingMode;
 
 pub type Styles = BTreeMap<String, String>;

@@ -51,6 +51,35 @@ impl WritingMode {
         *self == Self::HorizontalTb
     }
 
+    /// The physical edges the block axis starts and ends on.
+    ///
+    /// `direction` is not an input. It chooses which end of the INLINE axis is its start
+    /// and says nothing about block flow, which the writing mode fixes on its own.
+    pub fn block_edges(&self) -> (&'static str, &'static str) {
+        match self {
+            Self::HorizontalTb => ("top", "bottom"),
+            Self::VerticalRl | Self::SidewaysRl => ("right", "left"),
+            Self::VerticalLr | Self::SidewaysLr => ("left", "right"),
+        }
+    }
+
+    /// The physical edges the inline axis starts and ends on, given the direction in force.
+    ///
+    /// `sideways-lr` is the reason this cannot be derived from [`Self::horizontal`] or from
+    /// the sizing table. Its inline flow runs bottom to top, while `vertical-lr` runs top to
+    /// bottom, so the two agree on the axis and disagree on which end starts it. The sizing
+    /// table is right to group them — both make the inline axis vertical, so `inline-size`
+    /// is the height either way — and reusing that grouping for edges would mirror every
+    /// box on a `sideways-lr` page.
+    pub fn inline_edges(&self, rtl: bool) -> (&'static str, &'static str) {
+        let (start, end) = match self {
+            Self::HorizontalTb => ("left", "right"),
+            Self::VerticalRl | Self::VerticalLr | Self::SidewaysRl => ("top", "bottom"),
+            Self::SidewaysLr => ("bottom", "top"),
+        };
+        if rtl { (end, start) } else { (start, end) }
+    }
+
     /// The physical dimension a logical sizing property names at this element, or an empty
     /// string for a property that is not one.
     ///

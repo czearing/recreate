@@ -70,7 +70,11 @@ fn the_inline_axis_follows_direction() {
     );
     // `inset-inline-start` is `right` in RTL, so the derived edge is `left`.
     assert!(!styles.contains_key("left"));
-    assert_eq!(styles["right"], "432px");
+    // And the anchor that survives is the author's own percentage, not the pixel sampled
+    // beside it. A logical name reaches the physical edge it stands for, so `right` is
+    // authored here in every sense that matters; asserting `432px` would be asserting that
+    // the authored value was thrown away.
+    assert_eq!(styles["right"], "30%");
 }
 
 /// A shorthand re-states every edge it covers, so removing the longhand while leaving
@@ -178,4 +182,25 @@ fn only_a_sampled_pixel_is_removed() {
         &[".marker{position:absolute;right:30%;}".into()],
     );
     assert_eq!(styles["left"], "auto");
+}
+
+/// A logical shorthand anchors both edges of its axis, and it has no single physical name
+/// to be renamed to. A resolver that reported only renameable names would answer "not
+/// authored" to a query for inset-inline — and the edge the author reset with it, then
+/// overrode on one side, would be judged engine-derived and deleted.
+#[test]
+fn a_logical_shorthand_still_answers_a_query_for_itself() {
+    let mut node = node("marker", "absolute");
+    let mut styles = Styles::new();
+    styles.insert("position".into(), "absolute".into());
+    styles.insert("left".into(), "648px".into());
+    styles.insert("right".into(), "432px".into());
+    node.style.extend(styles.clone());
+    normalize(
+        &mut styles,
+        &node,
+        &[".marker{position:absolute;inset-inline:0px;left:30%;}".into()],
+    );
+    assert_eq!(styles["left"], "30%");
+    assert_eq!(styles["right"], "432px");
 }

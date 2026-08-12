@@ -1,4 +1,4 @@
-use crate::model::Node;
+use crate::model::{Node, Physical};
 pub(super) fn resolved_matches(node: &Node, name: &str, value: &str) -> bool {
     if matches!(name, "width" | "height") && value == "auto" {
         return node
@@ -55,17 +55,17 @@ pub(super) fn fluid_authored_value(value: &str) -> bool {
         .any(|token| value.contains(token))
 }
 
-/// Authored stylesheets commonly size boxes with logical properties, while the
+/// Authored stylesheets commonly write boxes with logical properties, while the
 /// generator reasons in physical ones. Without this mapping the authored value
-/// is discarded and a sampled pixel width freezes the layout.
+/// is discarded and a sampled pixel freezes the layout.
 ///
-/// Which physical dimension a logical one names is decided by the writing mode in force
-/// at the element, which is a recorded fact rather than a declaration: `writing-mode` is
-/// inherited, so the element's own authored map is empty on every page that declares it
-/// on a wrapper, and a guard reading that map takes the horizontal branch for a vertical
-/// box. See [`crate::model::WritingMode`].
-pub(super) fn physical_property(node: &Node, name: &str) -> &'static str {
-    node.writing_mode.physical_size(name)
+/// Which physical name a logical one stands for is decided by the writing mode and
+/// direction in force at the element, both recorded facts rather than declarations: they
+/// are inherited, so a page declares them on a wrapper and the element's own authored map
+/// is empty, which makes a guard reading that map take the horizontal, left-to-right
+/// branch for a box that is neither. See [`crate::model::physical_property`].
+pub(super) fn physical_property(node: &Node, name: &str) -> Physical {
+    crate::model::physical_property(node.writing_mode, node.rtl, name)
 }
 
 /// A CSS-wide keyword is a cascade instruction, not a value. `all: unset` says

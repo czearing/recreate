@@ -64,15 +64,14 @@ pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
     // an authored minimum height, which is a floor the author expects content
     // to grow past. The authored map drops custom-property values, so ask the
     // rules directly: a size written as a variable is still one the author meant.
-    let authored_height = ["height", "block-size"]
-        .iter()
-        .any(|property| rules.has_property(node, property));
+    // A logical spelling needs no second lookup — the rules resolve `block-size`
+    // against the writing mode before answering, which is also the only reading
+    // that stays correct under a vertical mode, where `block-size` is the width.
+    let authored_height = rules.has_property(node, "height");
     let content_sized = matches!(
         authored.get("display").map(String::as_str),
         Some("flex" | "inline-flex" | "grid" | "inline-grid")
-    ) || ["min-height", "min-block-size"]
-        .iter()
-        .any(|property| rules.has_property(node, property));
+    ) || rules.has_property(node, "min-height");
     if !authored_height && content_sized {
         styles.remove("height");
     }

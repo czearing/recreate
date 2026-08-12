@@ -113,9 +113,9 @@ impl<'a> Index<'a> {
         for index in self.direct_indices(node) {
             let rule = &self.rules[index];
             for (name, value) in parsed_declarations(rule.declarations)
-                .map(|(name, value)| {
+                .filter_map(|(name, value)| {
                     let physical = super::authored_css_rules::physical_property(node, name);
-                    (if physical.is_empty() { name } else { physical }, value)
+                    physical.into_name(name).map(|name| (name, value))
                 })
                 .filter(|(name, value)| {
                     super::authored_css_rules::retained(name)
@@ -127,7 +127,7 @@ impl<'a> Index<'a> {
                 {
                     continue;
                 }
-                values.entry(name.into()).or_default().push(value.into());
+                values.entry(name).or_default().push(value.into());
             }
         }
         values
@@ -183,8 +183,7 @@ impl<'a> Index<'a> {
             .into_iter()
             .flat_map(|index| parsed_declarations(self.rules[index].declarations))
             .filter(|(name, _)| {
-                let physical = super::authored_css_rules::physical_property(node, name);
-                (if physical.is_empty() { *name } else { physical }) == property
+                super::authored_css_rules::physical_property(node, name).answers(name, property)
             })
             .map(|(_, value)| value.trim().trim_end_matches('}').trim().to_string())
             .filter(|value| !value.is_empty() && !super::authored_css_rules::cascade_keyword(value))

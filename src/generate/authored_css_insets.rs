@@ -1,8 +1,5 @@
 use super::Index;
-use crate::model::{Node, Styles};
-
-/// The two inset pairs, inline axis first.
-const INSET_AXES: [(&str, &str); 2] = [("left", "right"), ("top", "bottom")];
+use crate::model::{Node, Styles, WritingMode};
 
 /// An absolutely positioned box whose `left`, `width` and `right` are all non-auto is
 /// over-constrained, and CSS 2.1 10.3.7 resolves that by re-solving `right` as `auto` in
@@ -35,11 +32,10 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
         return;
     }
     // The physical edge a logical inset names depends on both `writing-mode` and
-    // `direction`. Every part of the arbitration below is written for horizontal text —
-    // `INSET_AXES` puts the inline pair first, `expand_inset_shorthands` binds
-    // `inset-inline` to left and right, and `authored_inset` reads `inset-block-start` as
-    // `top` — so under a vertical mode it would arbitrate the wrong axis and delete a real
-    // anchor. Declining leaves such pages exactly as before.
+    // `direction`. The arbitration below resolves both through the shared owner, but the
+    // over-constraint rule it implements is CSS 2.1 10.3.7, which is written for
+    // horizontal text and re-solves a different edge under a vertical mode. Arbitrating
+    // the wrong edge here deletes a real anchor rather than a derived pixel, so decline.
     //
     // The mode is read from the engine's answer rather than from the node's authored
     // declarations. `writing-mode` is inherited, so a page declares it on a wrapper and
@@ -48,16 +44,16 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
     if !node.writing_mode.horizontal() {
         return;
     }
-    let rtl = node.rtl;
+    let (mode, rtl) = (node.writing_mode, node.rtl);
     // A shorthand re-states every edge it covers, so removing a longhand while leaving
     // `inset: 0 432px 48px 648px` beside it removes nothing. Split it into the edges it
     // stands for first; the two forms carry the same values, so this is a rewrite of one
     // declaration into four and cannot change the rendered box on its own.
-    expand_inset_shorthands(styles, rtl);
-    for (start, end) in INSET_AXES {
+    expand_inset_shorthands(styles, mode, rtl);
+    for (start, end) in [mode.inline_edges(rtl), mode.block_edges()] {
         let anchored = (
-            authored_inset(node, rules, start, rtl),
-            authored_inset(node, rules, end, rtl),
+            authored_inset(node, rules, start),
+            authored_inset(node, rules, end),
         );
         let derived = match anchored {
             (true, false) => end,
@@ -76,12 +72,13 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
 /// Rewrite `inset`, `inset-block` and `inset-inline` into the physical longhands they
 /// stand for. A longhand already in the map came from the same sample and is at least as
 /// specific, so it is left alone.
-fn expand_inset_shorthands(styles: &mut Styles, rtl: bool) {
-    let (inline_start, inline_end) = if rtl {
-        ("right", "left")
-    } else {
-        ("left", "right")
-    };
+///
+/// Which edges the two axis shorthands cover is asked of the shared owner rather than
+/// written out here. A second copy of that table is a second place for a writing mode to
+/// be handled wrongly, and the copy that is not exercised is the one that rots.
+fn expand_inset_shorthands(styles: &mut Styles, mode: WritingMode, rtl: bool) {
+    let (inline_start, inline_end) = mode.inline_edges(rtl);
+    let (block_start, block_end) = mode.block_edges();
     for shorthand in ["inset", "inset-block", "inset-inline"] {
         let Some(value) = styles.get(shorthand).cloned() else {
             continue;
@@ -115,8 +112,8 @@ fn expand_inset_shorthands(styles: &mut Styles, rtl: bool) {
                 ("bottom", *bottom),
                 ("left", *left),
             ],
-            ("inset-block", [all]) => vec![("top", *all), ("bottom", *all)],
-            ("inset-block", [start, end]) => vec![("top", *start), ("bottom", *end)],
+            ("inset-block", [all]) => vec![(block_start, *all), (block_end, *all)],
+            ("inset-block", [start, end]) => vec![(block_start, *start), (block_end, *end)],
             ("inset-inline", [all]) => vec![(inline_start, *all), (inline_end, *all)],
             ("inset-inline", [start, end]) => {
                 vec![(inline_start, *start), (inline_end, *end)]
@@ -135,15 +132,21 @@ fn expand_inset_shorthands(styles: &mut Styles, rtl: bool) {
 /// Whether the author anchored one physical edge, under any name that reaches it.
 /// A lookup for the physical longhand alone reports `inset-inline-end: 30%` as
 /// unauthored, which is the same as having no anchor and leaves the frozen pixel in
-/// place — so the logical longhands and the `inset` shorthands are anchors too.
-fn authored_inset(node: &Node, rules: &Index<'_>, edge: &str, rtl: bool) -> bool {
-    let logical = match (edge, rtl) {
-        ("left", false) | ("right", true) => ["inset-inline-start", "inset-inline"],
-        ("left", true) | ("right", false) => ["inset-inline-end", "inset-inline"],
-        ("top", _) => ["inset-block-start", "inset-block"],
-        _ => ["inset-block-end", "inset-block"],
+/// place — so the logical spellings are anchors too.
+///
+/// The logical longhands need no listing: the rules resolve a logical name to the
+/// physical edge it stands for before answering, so asking for `left` already finds
+/// `inset-inline-start`. The shorthands do, because they cover two edges and cannot be
+/// resolved to one name — which is why the axis each belongs to is asked of the shared
+/// owner rather than assumed.
+fn authored_inset(node: &Node, rules: &Index<'_>, edge: &str) -> bool {
+    let (inline_start, inline_end) = node.writing_mode.inline_edges(node.rtl);
+    let axis = if edge == inline_start || edge == inline_end {
+        "inset-inline"
+    } else {
+        "inset-block"
     };
-    [edge, logical[0], logical[1], "inset"]
+    [edge, axis, "inset"]
         .into_iter()
         .any(|name| rules.has_property(node, name))
 }
