@@ -29,7 +29,11 @@ pub fn append(states: &[PageState], css: &mut String) {
 pub fn runtime(source: String, states: &[PageState]) -> String {
     let settles = states
         .iter()
-        .map(|state| startup_timeline::Timeline::of(state).settle_ms().to_string())
+        .map(|state| {
+            startup_timeline::Timeline::of(state)
+                .settle_ms()
+                .to_string()
+        })
         .collect::<Vec<_>>()
         .join(",");
     let source = source.replace(
@@ -65,6 +69,7 @@ mod tests {
     #[test]
     fn marks_captured_startup_root() {
         let root = Node {
+            writing_mode: Default::default(),
             disabled: false,
             rtl: false,
             path: "startup".into(),

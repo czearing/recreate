@@ -73,6 +73,7 @@ fn state(animated: bool) -> PageState {
 
 fn node(path: &str, parent: Option<&str>, style: Styles) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

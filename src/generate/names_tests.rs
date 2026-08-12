@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 #[test]
 fn creates_semantic_component_names() {
     let mut node = Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: "a".into(),
@@ -31,6 +32,7 @@ fn creates_semantic_component_names() {
 #[test]
 fn prefers_the_source_component_name_over_page_copy() {
     let mut node = Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: "a".into(),

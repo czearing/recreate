@@ -7,7 +7,10 @@ use std::collections::BTreeMap;
 /// authored stylesheet said about them — naming a subset of properties here would silently
 /// drop the rest, which is how a reset `background` on `body` went missing while the
 /// `margin` beside it survived.
-pub(super) fn root_reset(specification: &Specification, assets: &BTreeMap<String, String>) -> String {
+pub(super) fn root_reset(
+    specification: &Specification,
+    assets: &BTreeMap<String, String>,
+) -> String {
     let Some(state) = specification.states.first() else {
         return String::new();
     };

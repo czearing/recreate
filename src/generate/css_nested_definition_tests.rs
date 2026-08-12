@@ -100,7 +100,10 @@ fn carries_a_definition_two_groups_deep_in_either_order() {
         ".r_arc{font-family:Vorplish;}\n",
     );
     let styles = style_block(&document(SVG, layer_inside));
-    assert!(styles.contains("@font-face"), "layer inside media: {styles}");
+    assert!(
+        styles.contains("@font-face"),
+        "layer inside media: {styles}"
+    );
     assert!(balanced(&styles));
 
     let media_inside = concat!(
@@ -108,7 +111,10 @@ fn carries_a_definition_two_groups_deep_in_either_order() {
         ".r_arc{font-family:Quazitic;}\n",
     );
     let styles = style_block(&document(SVG, media_inside));
-    assert!(styles.contains("@font-face"), "media inside layer: {styles}");
+    assert!(
+        styles.contains("@font-face"),
+        "media inside layer: {styles}"
+    );
     assert!(balanced(&styles));
 }
 

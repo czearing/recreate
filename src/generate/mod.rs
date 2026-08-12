@@ -11,6 +11,9 @@ mod attribute_sequences;
 mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
+#[cfg(test)]
+#[path = "authored_css_writing_mode_tests.rs"]
+mod authored_css_writing_mode_tests;
 mod authored_media;
 pub(crate) mod before_change;
 #[cfg(test)]

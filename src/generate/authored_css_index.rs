@@ -313,6 +313,7 @@ mod tests {
 
     fn node() -> Node {
         let mut node = Node {
+            writing_mode: Default::default(),
             disabled: false,
             rtl: false,
             path: "button".into(),

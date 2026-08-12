@@ -117,7 +117,8 @@ mod tests {
 
     #[test]
     fn class_discovery_does_not_depend_on_escaped_characters_in_text() {
-        let template = r#"<Surface texts={[["a","TEXT"]]}/><Surface entries={[["b","s0000000004"]]}/>"#;
+        let template =
+            r#"<Surface texts={[["a","TEXT"]]}/><Surface entries={[["b","s0000000004"]]}/>"#;
         let plain = jsx_classes(&template.replace("TEXT", "plain"));
         assert!(plain.contains("s0000000004"));
         for payload in [

@@ -107,6 +107,7 @@ __ASSET_ATTRIBUTES__
       attributes,
       disabled: element.matches(':disabled'),
       rtl: computedStyle.direction === 'rtl',
+      writing_mode: computedStyle.writingMode,
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       before: pseudo(element, '::before'),

@@ -42,7 +42,8 @@ pub(super) fn rewrite(text: &str, assets: &BTreeMap<String, String>) -> String {
 
 /// `//host/path`, which resolves under whichever scheme the page was served over.
 fn scheme_relative(url: &str) -> Option<&str> {
-    url.strip_prefix("https:").or_else(|| url.strip_prefix("http:"))
+    url.strip_prefix("https:")
+        .or_else(|| url.strip_prefix("http:"))
 }
 
 fn replace_url_value(text: &str, path: &str, local: &str) -> String {

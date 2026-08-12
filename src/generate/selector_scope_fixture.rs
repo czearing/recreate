@@ -36,6 +36,7 @@ pub(super) fn tree() -> (Vec<Node>, BTreeMap<String, String>) {
 
 fn element(path: &str, parent: Option<&str>, class: &str) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

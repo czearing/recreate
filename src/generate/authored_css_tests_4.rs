@@ -10,6 +10,7 @@ use crate::model::{Node, Rect, Styles};
 /// emitter's computed-signature dedupe cannot collapse them and mask a difference.
 fn icon(class: Option<&str>, id: Option<&str>, attribute: Option<&str>) -> Node {
     let mut node = Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: "html>body>main>svg".into(),

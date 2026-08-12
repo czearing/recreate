@@ -125,7 +125,10 @@ fn brace(source: &str, open: usize) -> (usize, &str) {
         }
         index += 1;
     }
-    (index, &source[open + 1..index.saturating_sub(1).max(open + 1)])
+    (
+        index,
+        &source[open + 1..index.saturating_sub(1).max(open + 1)],
+    )
 }
 
 /// The extent of a `serde_json` string literal, whose escaping this shares with

@@ -8,6 +8,7 @@ pub(super) fn node(tag: &str, x: f64, width: f64) -> Node {
         attributes.insert("id".into(), "root".into());
     }
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: tag.into(),

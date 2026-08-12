@@ -24,6 +24,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
         attributes.insert("class".into(), class.into());
     }
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

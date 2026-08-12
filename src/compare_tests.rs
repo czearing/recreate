@@ -5,6 +5,7 @@ use crate::{
 
 fn node(path: &str, x: f64) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

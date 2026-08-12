@@ -58,23 +58,14 @@ pub(super) fn fluid_authored_value(value: &str) -> bool {
 /// Authored stylesheets commonly size boxes with logical properties, while the
 /// generator reasons in physical ones. Without this mapping the authored value
 /// is discarded and a sampled pixel width freezes the layout.
+///
+/// Which physical dimension a logical one names is decided by the writing mode in force
+/// at the element, which is a recorded fact rather than a declaration: `writing-mode` is
+/// inherited, so the element's own authored map is empty on every page that declares it
+/// on a wrapper, and a guard reading that map takes the horizontal branch for a vertical
+/// box. See [`crate::model::WritingMode`].
 pub(super) fn physical_property(node: &Node, name: &str) -> &'static str {
-    let horizontal = node
-        .style
-        .get("writing-mode")
-        .is_none_or(|mode| mode.starts_with("horizontal"));
-    if !horizontal {
-        return "";
-    }
-    match name {
-        "inline-size" => "width",
-        "min-inline-size" => "min-width",
-        "max-inline-size" => "max-width",
-        "block-size" => "height",
-        "min-block-size" => "min-height",
-        "max-block-size" => "max-height",
-        _ => "",
-    }
+    node.writing_mode.physical_size(name)
 }
 
 /// A CSS-wide keyword is a cascade instruction, not a value. `all: unset` says

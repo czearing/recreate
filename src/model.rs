@@ -3,7 +3,9 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 
 mod interaction;
+mod writing_mode;
 pub use interaction::{Interaction, InteractionAction, InteractionTransition};
+pub use writing_mode::WritingMode;
 
 pub type Styles = BTreeMap<String, String>;
 pub type Attributes = BTreeMap<String, String>;
@@ -62,6 +64,14 @@ pub struct Node {
     /// element rather than a declaration, and is never emitted as CSS.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub rtl: bool,
+    /// The writing mode in force at the element when the page was read.
+    ///
+    /// Recorded for the same reason as `rtl` above and read from the same computed style:
+    /// `writing-mode` is inherited, so a page declares it once on a wrapper and the box
+    /// whose logical size has to be resolved carries no declaration of its own. See
+    /// [`WritingMode`] for why the resolved keyword is kept rather than an axis flag.
+    #[serde(default, skip_serializing_if = "WritingMode::horizontal")]
+    pub writing_mode: WritingMode,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

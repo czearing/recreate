@@ -8,6 +8,7 @@ use std::collections::{BTreeMap, BTreeSet};
 /// only record of where it starts is the authored `@starting-style` rule.
 fn panel() -> Node {
     Node {
+        writing_mode: Default::default(),
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
         parent: Some("html>body:nth-of-type(1)".into()),
         tag: "div".into(),

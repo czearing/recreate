@@ -55,6 +55,7 @@ mod tests {
     #[test]
     fn remaps_direct_authored_media_rules_to_generated_classes() {
         let node = Node {
+            writing_mode: Default::default(),
             disabled: false,
             rtl: false,
             path: String::new(),

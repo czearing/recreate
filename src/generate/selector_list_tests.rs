@@ -3,6 +3,7 @@ use crate::model::{Attributes, Node, Rect};
 
 fn node(classes: &str) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: String::new(),

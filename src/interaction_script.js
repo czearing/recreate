@@ -70,6 +70,7 @@ __SELECTION__
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       disabled: element.matches(':disabled'),
       rtl: computedStyle.direction === 'rtl',
+      writing_mode: computedStyle.writingMode,
       before: null,
       after: null
     });

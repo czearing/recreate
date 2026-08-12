@@ -11,8 +11,11 @@
 //! an absolutely positioned child — which flex layout does not lay out at all, per CSS
 //! Flexbox 4.1 — decided the main axis. Its guess was appended after the captured value in
 //! the same block, where source order let it win. Every input to the painted order of flex
-//! items (`flex-direction`, `direction`, `writing-mode`, `order`, `flex-wrap`) is captured
-//! and emitted, so the correction it could have legitimately carried was always empty.
+//! items is recovered by the recreation: `flex-direction`, `order` and `flex-wrap` are
+//! captured as declarations, while `direction` and `writing-mode` are inherited and so are
+//! captured as declarations on the element that declared them and as resolved per-node
+//! facts everywhere else. The correction it could have legitimately carried was always
+//! empty.
 
 use crate::model::Node;
 

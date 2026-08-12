@@ -104,6 +104,7 @@ mod tests {
 
     fn node(path: &str, text: &str) -> Node {
         Node {
+            writing_mode: Default::default(),
             path: path.into(),
             parent: Some("html>body".into()),
             tag: "div".into(),

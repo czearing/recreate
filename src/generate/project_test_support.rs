@@ -13,6 +13,7 @@ pub(super) fn node(path: &str, parent: Option<&str>, text: &str, test_id: Option
     style.insert("display".into(), "block".into());
     style.insert("width".into(), "100px".into());
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

@@ -70,7 +70,9 @@ pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
 /// them rather than being claimed by whichever was seen first.
 fn reaches(rule: &str, classes: &[String], carried: &str) -> bool {
     if global_rule(rule) {
-        return defined_names(rule).iter().any(|name| mentions(carried, name));
+        return defined_names(rule)
+            .iter()
+            .any(|name| mentions(carried, name));
     }
     let prelude = rule.split('{').next().unwrap_or_default();
     classes

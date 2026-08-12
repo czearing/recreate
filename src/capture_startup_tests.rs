@@ -52,6 +52,7 @@ fn state() -> PageState {
 
 fn node(path: &str) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

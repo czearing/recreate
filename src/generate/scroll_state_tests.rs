@@ -3,6 +3,7 @@ use crate::model::{DomNode, Node, PageState, Rect, Viewport};
 
 pub(super) fn node(path: &str, tag: &str) -> Node {
     Node {
+        writing_mode: Default::default(),
         path: path.into(),
         parent: Some("html>body".into()),
         tag: tag.into(),

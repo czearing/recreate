@@ -30,6 +30,7 @@ fn duplicate_path_evidence_keeps_the_richest_state() {
     let mut rich = sparse.clone();
     rich.trigger_occurrence = Some(7);
     rich.states[0].nodes.push(crate::model::Node {
+        writing_mode: Default::default(),
         path: "menu".into(),
         parent: None,
         tag: "div".into(),
@@ -77,6 +78,7 @@ pub(super) fn state_with_paths(paths: &[&str]) -> crate::model::PageState {
     state.nodes = paths
         .iter()
         .map(|path| crate::model::Node {
+            writing_mode: Default::default(),
             path: (*path).into(),
             parent: None,
             tag: "div".into(),

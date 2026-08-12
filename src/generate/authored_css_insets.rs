@@ -35,14 +35,17 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
         return;
     }
     // The physical edge a logical inset names depends on both `writing-mode` and
-    // `direction`. Under a vertical writing mode the inline axis is the vertical one, so
-    // a mapping written for horizontal text would arbitrate the wrong axis and could
-    // delete a real anchor. Declining to act there leaves such pages exactly as before.
-    if !node
-        .style
-        .get("writing-mode")
-        .is_none_or(|mode| mode.starts_with("horizontal"))
-    {
+    // `direction`. Every part of the arbitration below is written for horizontal text —
+    // `INSET_AXES` puts the inline pair first, `expand_inset_shorthands` binds
+    // `inset-inline` to left and right, and `authored_inset` reads `inset-block-start` as
+    // `top` — so under a vertical mode it would arbitrate the wrong axis and delete a real
+    // anchor. Declining leaves such pages exactly as before.
+    //
+    // The mode is read from the engine's answer rather than from the node's authored
+    // declarations. `writing-mode` is inherited, so a page declares it on a wrapper and
+    // the positioned box carries none of its own; a lookup in the box's own style map
+    // reports every such page as horizontal and this guard could never fire.
+    if !node.writing_mode.horizontal() {
         return;
     }
     let rtl = node.rtl;

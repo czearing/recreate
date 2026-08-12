@@ -16,6 +16,7 @@ const KEY: &str = "recreate-surface:html>body>canvas:nth-of-type(1)";
 
 fn surface(attributes: &[(&str, &str)]) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: "html>body:nth-of-type(1)>canvas:nth-of-type(1)".into(),

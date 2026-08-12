@@ -5,6 +5,7 @@ use crate::model::{Node, Pseudo, Rect, Viewport};
 
 pub(super) fn box_node(path: &str, style: &[(&str, &str)]) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: path.into(),

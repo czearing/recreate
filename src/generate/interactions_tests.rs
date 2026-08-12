@@ -16,6 +16,7 @@ fn interaction_layers_do_not_substitute_extreme_z_indexes_for_dom_hierarchy() {
 
 pub(super) fn node(tag: &str) -> Node {
     Node {
+        writing_mode: Default::default(),
         disabled: false,
         rtl: false,
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),

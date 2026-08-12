@@ -89,6 +89,18 @@ fn records_the_effective_direction_in_every_node_record() {
     }
 }
 
+/// The other inherited axis, recorded for the same reason from the same computed style.
+/// `direction` chooses which end of the inline axis is its start; `writing-mode` chooses
+/// which physical axis is inline at all, so a logical size resolves against it and lands
+/// on the wrong dimension without it. Both producers are asserted together because a fix
+/// applied to one leaves the arbiter behaving differently by state for no authored reason.
+#[test]
+fn records_the_effective_writing_mode_in_every_node_record() {
+    for script in [source(), crate::interaction_script::source()] {
+        assert!(script.contains("writing_mode: computedStyle.writingMode"));
+    }
+}
+
 #[test]
 fn generated_capture_script_parses() {
     let script = super::source_without_assets();

@@ -23,6 +23,7 @@ fn specification() -> Specification {
         .iter()
         .enumerate()
         .map(|(index, path)| Node {
+            writing_mode: Default::default(),
             disabled: false,
             rtl: false,
             path: (*path).to_string(),

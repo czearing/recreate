@@ -230,7 +230,10 @@ mod tests {
             css
         };
         let plain = swept("plain");
-        assert!(plain.contains(".s00000000ff"), "a bound class keeps its rule");
+        assert!(
+            plain.contains(".s00000000ff"),
+            "a bound class keeps its rule"
+        );
         assert!(
             !plain.contains(".rdeadbeef00"),
             "a class no file binds is genuinely dead and its rule is swept"
