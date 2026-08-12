@@ -121,7 +121,7 @@ fn css_value(key: &str, value: &Value) -> Option<String> {
     })
 }
 
-fn kebab(value: &str) -> String {
+pub(super) fn kebab(value: &str) -> String {
     let result = value.chars().fold(String::new(), |mut result, character| {
         if character.is_uppercase() {
             result.push('-');

@@ -1,3 +1,4 @@
+use super::before_change;
 use crate::model::Animation;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -5,12 +6,14 @@ use std::collections::{BTreeMap, BTreeSet};
 pub fn append(
     animations: &[Animation],
     authored: &BTreeSet<String>,
+    starting: &before_change::BeforeChange,
     classes: &mut BTreeMap<String, String>,
     css: &mut String,
 ) {
+    let animations = starting.seed(animations);
     let mut emitted_keyframes = BTreeSet::new();
     let mut targets: BTreeMap<&str, Vec<(String, String, &Animation)>> = BTreeMap::new();
-    for animation in animations {
+    for animation in &animations {
         if animation.keyframes.len() < 2
             || sampled_layout_observation(animation)
             || authored.contains(&animation.name)
@@ -63,6 +66,7 @@ pub fn append(
 pub fn append_startup(
     animations: &[Animation],
     authored: &BTreeSet<String>,
+    starting: &before_change::BeforeChange,
     classes: &mut BTreeMap<String, String>,
     css: &mut String,
 ) {
@@ -71,7 +75,7 @@ pub fn append_startup(
         .filter(|animation| animation.target.starts_with("startup>"))
         .cloned()
         .collect::<Vec<_>>();
-    append(&startup, authored, classes, css);
+    append(&startup, authored, starting, classes, css);
 }
 
 /// Names a `@keyframes` block by the frames it is built from, because that is all

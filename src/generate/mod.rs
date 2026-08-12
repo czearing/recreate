@@ -12,6 +12,7 @@ mod authored_css;
 mod authored_css_index;
 mod authored_css_rules;
 mod authored_media;
+pub(crate) mod before_change;
 #[cfg(test)]
 mod binding_check;
 #[cfg(test)]
@@ -36,6 +37,9 @@ mod css_inheritance;
 mod css_interactions;
 mod css_layers;
 mod css_layout;
+#[cfg(test)]
+#[path = "css_nested_definition_tests.rs"]
+mod css_nested_definition_tests;
 mod css_paths;
 mod css_pseudo;
 #[cfg(test)]
@@ -150,9 +154,6 @@ mod source_svg_assets;
 #[cfg(test)]
 #[path = "source_svg_assets_tests.rs"]
 mod source_svg_assets_tests;
-#[cfg(test)]
-#[path = "css_nested_definition_tests.rs"]
-mod css_nested_definition_tests;
 #[cfg(test)]
 #[path = "source_svg_image_tests.rs"]
 mod source_svg_image_tests;

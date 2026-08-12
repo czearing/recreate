@@ -1,4 +1,5 @@
 use super::*;
+use crate::generate::before_change::BeforeChange;
 use serde_json::json;
 
 fn scripted(keyframes: Vec<serde_json::Value>) -> Animation {
@@ -13,7 +14,13 @@ fn scripted(keyframes: Vec<serde_json::Value>) -> Animation {
 fn emit(animation: Animation) -> String {
     let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[animation],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     css
 }
 

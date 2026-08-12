@@ -1,5 +1,6 @@
 use super::*;
 use crate::generate::animation_keyframes::declarations;
+use crate::generate::before_change::BeforeChange;
 use serde_json::json;
 
 fn animation(target: &str) -> Animation {
@@ -41,6 +42,7 @@ fn preserves_animation_timing_controls() {
     append(
         &[animation("html>body")],
         &BTreeSet::new(),
+        &BeforeChange::default(),
         &mut classes,
         &mut css,
     );
@@ -64,7 +66,13 @@ fn rejects_sampled_layout_observations() {
     sampled.timing = json!({"delay":0,"duration":2513.4,"easing":"linear","iterations":1});
     let mut classes = BTreeMap::from([("html".into(), "base".into())]);
     let mut css = String::new();
-    append(&[sampled], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[sampled],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert_eq!(classes["html"], "base");
     assert!(!css.contains("@keyframes"));
 }
@@ -78,7 +86,13 @@ fn preserves_authored_geometry_animations() {
     ];
     let mut classes = BTreeMap::from([("html>body>aside".into(), "base".into())]);
     let mut css = String::new();
-    append(&[authored], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[authored],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert!(classes["html>body>aside"].contains(" a"));
     assert!(css.contains("width:240px"));
 }
@@ -98,7 +112,13 @@ fn defers_to_the_authored_keyframes_an_animation_was_declared_with() {
     assert!(authored.contains("spin"));
     let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
     let mut css = String::new();
-    append(&[declared.clone()], &authored, &mut classes, &mut css);
+    append(
+        &[declared.clone()],
+        &authored,
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert_eq!(
         classes["html>body>div"], "base",
         "overrode the authored name"
@@ -111,7 +131,13 @@ fn defers_to_the_authored_keyframes_an_animation_was_declared_with() {
     scripted.name = String::new();
     let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
     let mut css = String::new();
-    append(&[scripted], &authored, &mut classes, &mut css);
+    append(
+        &[scripted],
+        &authored,
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert!(classes["html>body>div"].contains(" a"));
     assert!(css.contains("@keyframes recreate"));
 }
@@ -146,6 +172,7 @@ fn reuses_identical_animation_output_across_targets() {
             animation("html>body>div:nth-of-type(2)"),
         ],
         &BTreeSet::new(),
+        &BeforeChange::default(),
         &mut classes,
         &mut css,
     );
@@ -180,6 +207,7 @@ fn writes_one_keyframes_block_per_distinct_movement() {
     append(
         &[fast.clone(), slow],
         &BTreeSet::new(),
+        &BeforeChange::default(),
         &mut classes,
         &mut css,
     );
@@ -203,6 +231,7 @@ fn writes_one_keyframes_block_per_distinct_movement() {
     append(
         &[fast, animation("html>body")],
         &BTreeSet::new(),
+        &BeforeChange::default(),
         &mut classes,
         &mut css,
     );
@@ -222,7 +251,13 @@ fn combines_concurrent_animations_on_one_target() {
     second.timing["playbackRate"] = json!(1);
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[first, second], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[first, second],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert_eq!(classes["html>body"].split_whitespace().count(), 2);
     assert!(css.contains("animation-name:recreate"));
     assert!(css.contains(",recreate"));
@@ -237,7 +272,13 @@ fn collapses_frames_with_the_same_css_percentage() {
         .collect();
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[animation],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert_eq!(css.matches("%{").count(), 101);
 }
 
@@ -251,6 +292,12 @@ fn merged_percentage_frames_keep_complementary_properties() {
     ];
     let mut classes = BTreeMap::from([("html>body".into(), "base".into())]);
     let mut css = String::new();
-    append(&[animation], &BTreeSet::new(), &mut classes, &mut css);
+    append(
+        &[animation],
+        &BTreeSet::new(),
+        &BeforeChange::default(),
+        &mut classes,
+        &mut css,
+    );
     assert!(css.contains("0%{opacity:0;transform:none;}"));
 }

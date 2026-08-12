@@ -70,6 +70,7 @@ pub(super) fn build_scoped(
     animations::append(
         &base.animations,
         &super::animation_keyframes::authored_names(&base.css_rules),
+        &super::before_change::BeforeChange::new(&base.css_rules, &base.nodes),
         &mut classes,
         &mut css,
     );
