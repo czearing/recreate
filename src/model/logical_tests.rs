@@ -113,35 +113,6 @@ fn a_logical_corner_is_ordered_by_the_edge_rather_than_by_the_axis() {
     );
 }
 
-/// The case the empty-string sentinel used to hide. A logical shorthand carries one or two
-/// values across both edges of an axis, so it cannot be renamed into a single physical
-/// declaration. Reporting it as already-physical hands an unimplementable name to the
-/// allow-list, which rejects it without a word; reporting it as unsupported is a condition
-/// this test can hold.
-#[test]
-fn a_logical_shorthand_over_both_edges_is_reported_rather_than_renamed() {
-    for name in [
-        "margin-inline",
-        "margin-block",
-        "padding-inline",
-        "inset-block",
-        "border-inline",
-        "border-block-width",
-        "border-inline-color",
-    ] {
-        assert_eq!(
-            physical_property(WritingMode::default(), false, name),
-            Physical::Unsupported,
-            "{name}"
-        );
-        assert_eq!(
-            physical_property(WritingMode::default(), false, name).into_name(name),
-            None,
-            "{name}"
-        );
-    }
-}
-
 /// A page authoring only physical properties must come out byte-identical, which means no
 /// name that merely resembles a logical one may be rewritten.
 #[test]
@@ -163,8 +134,8 @@ fn a_name_that_is_not_logical_stands_for_itself() {
                 "{name}"
             );
             assert_eq!(
-                physical_property(mode, true, name).into_name(name),
-                Some(name.to_string()),
+                physical_property(mode, true, name).into_declarations(name, "4px"),
+                vec![(name.to_string(), "4px".to_string())],
                 "{name}"
             );
         }

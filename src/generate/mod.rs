@@ -9,6 +9,9 @@ mod assets;
 mod assets_remote;
 mod attribute_sequences;
 mod authored_css;
+#[cfg(test)]
+#[path = "authored_css_axis_tests.rs"]
+mod authored_css_axis_tests;
 mod authored_css_index;
 mod authored_css_rules;
 #[cfg(test)]

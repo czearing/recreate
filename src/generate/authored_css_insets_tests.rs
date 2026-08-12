@@ -1,7 +1,7 @@
 use super::super::normalize;
 use crate::model::{Node, Rect, Styles};
 
-fn node(class: &str, position: &str) -> Node {
+pub(super) fn node(class: &str, position: &str) -> Node {
     let mut node = Node {
         writing_mode: Default::default(),
         disabled: false,
@@ -75,44 +75,6 @@ fn the_inline_axis_follows_direction() {
     // authored here in every sense that matters; asserting `432px` would be asserting that
     // the authored value was thrown away.
     assert_eq!(styles["right"], "30%");
-}
-
-/// A shorthand re-states every edge it covers, so removing the longhand while leaving
-/// `inset` beside it removes nothing. The media-band rules carry exactly this shape.
-#[test]
-fn a_shorthand_cannot_smuggle_the_derived_edge_back() {
-    let mut node = node("marker", "absolute");
-    let mut styles = Styles::new();
-    styles.insert("position".into(), "absolute".into());
-    styles.insert("inset".into(), "0px 432px 48px 648px".into());
-    node.style = styles.clone();
-    normalize(
-        &mut styles,
-        &node,
-        &[".marker{position:absolute;right:30%;top:0;width:25%;}".into()],
-    );
-    assert!(!styles.contains_key("inset"));
-    assert!(!styles.contains_key("left"));
-    assert!(!styles.contains_key("bottom"));
-    assert_eq!(styles["right"], "30%");
-    assert_eq!(styles["top"], "0");
-}
-
-/// Splitting on whitespace would tear `calc(100% - 10px)` into three values that mean
-/// something else entirely, so a shorthand carrying a function is left intact.
-#[test]
-fn a_shorthand_containing_a_function_is_left_alone() {
-    let mut node = node("marker", "absolute");
-    let mut styles = Styles::new();
-    styles.insert("position".into(), "absolute".into());
-    styles.insert("inset".into(), "0px calc(100% - 10px) 0px 5px".into());
-    node.style = styles.clone();
-    normalize(
-        &mut styles,
-        &node,
-        &[".marker{position:absolute;right:30%;}".into()],
-    );
-    assert_eq!(styles["inset"], "0px calc(100% - 10px) 0px 5px");
 }
 
 /// Where the author anchored both edges the cascade is entirely theirs, so there is no

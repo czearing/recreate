@@ -73,57 +73,48 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
 /// stand for. A longhand already in the map came from the same sample and is at least as
 /// specific, so it is left alone.
 ///
-/// Which edges the two axis shorthands cover is asked of the shared owner rather than
-/// written out here. A second copy of that table is a second place for a writing mode to
-/// be handled wrongly, and the copy that is not exercised is the one that rots.
+/// Only the physical `inset` is decomposed here. Its 1-to-4 value pattern is unconditional
+/// — writing mode and direction do not move it — so it is a fact about this shorthand and
+/// nowhere else. The two logical axis names are the opposite: which edges they cover is
+/// exactly the question [`physical_property`] answers, so they are asked of it. A second
+/// copy of that table is a second place for a writing mode to be handled wrongly, and the
+/// copy that is not exercised is the one that rots.
 fn expand_inset_shorthands(styles: &mut Styles, mode: WritingMode, rtl: bool) {
-    let (inline_start, inline_end) = mode.inline_edges(rtl);
-    let (block_start, block_end) = mode.block_edges();
     for shorthand in ["inset", "inset-block", "inset-inline"] {
         let Some(value) = styles.get(shorthand).cloned() else {
             continue;
         };
-        // A component may itself contain spaces inside `calc(...)`, which a plain
-        // whitespace split would tear apart into values that mean something else.
-        if value.contains('(') {
-            continue;
-        }
-        let parts: Vec<&str> = value.split_whitespace().collect();
-        let edges: Vec<(&str, &str)> = match (shorthand, parts.as_slice()) {
-            ("inset", [all]) => ["top", "right", "bottom", "left"]
+        let parts = crate::model::value_components(&value);
+        let edges: Vec<(String, String)> = match parts.as_slice() {
+            [all] if shorthand == "inset" => ["top", "right", "bottom", "left"]
                 .into_iter()
-                .map(|edge| (edge, *all))
+                .map(|edge| (edge.to_string(), (*all).to_string()))
                 .collect(),
-            ("inset", [block, inline]) => vec![
-                ("top", *block),
-                ("bottom", *block),
-                ("left", *inline),
-                ("right", *inline),
-            ],
-            ("inset", [top, inline, bottom]) => vec![
-                ("top", *top),
-                ("bottom", *bottom),
-                ("left", *inline),
-                ("right", *inline),
-            ],
-            ("inset", [top, right, bottom, left]) => vec![
-                ("top", *top),
-                ("right", *right),
-                ("bottom", *bottom),
-                ("left", *left),
-            ],
-            ("inset-block", [all]) => vec![(block_start, *all), (block_end, *all)],
-            ("inset-block", [start, end]) => vec![(block_start, *start), (block_end, *end)],
-            ("inset-inline", [all]) => vec![(inline_start, *all), (inline_end, *all)],
-            ("inset-inline", [start, end]) => {
-                vec![(inline_start, *start), (inline_end, *end)]
+            [block, inline] if shorthand == "inset" => ["top", "bottom", "left", "right"]
+                .into_iter()
+                .zip([block, inline, inline, block])
+                .map(|(edge, value)| (edge.to_string(), (*value).to_string()))
+                .collect(),
+            [top, inline, bottom] if shorthand == "inset" => ["top", "bottom", "left", "right"]
+                .into_iter()
+                .zip([top, bottom, inline, inline])
+                .map(|(edge, value)| (edge.to_string(), (*value).to_string()))
+                .collect(),
+            [top, right, bottom, left] if shorthand == "inset" => {
+                ["top", "right", "bottom", "left"]
+                    .into_iter()
+                    .zip([top, right, bottom, left])
+                    .map(|(edge, value)| (edge.to_string(), (*value).to_string()))
+                    .collect()
+            }
+            [_] | [_, _] if shorthand != "inset" => {
+                crate::model::physical_property(mode, rtl, shorthand)
+                    .into_declarations(shorthand, &value)
             }
             _ => continue,
         };
         for (edge, edge_value) in edges {
-            if !styles.contains_key(edge) {
-                styles.insert(edge.into(), edge_value.into());
-            }
+            styles.entry(edge).or_insert(edge_value);
         }
         styles.remove(shorthand);
     }
@@ -154,3 +145,7 @@ fn authored_inset(node: &Node, rules: &Index<'_>, edge: &str) -> bool {
 #[cfg(test)]
 #[path = "authored_css_insets_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "authored_css_insets_shorthand_tests.rs"]
+mod shorthand_tests;

@@ -2,9 +2,11 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
 
+mod css_value;
 mod interaction;
 mod logical;
 mod writing_mode;
+pub use css_value::components as value_components;
 pub use interaction::{Interaction, InteractionAction, InteractionTransition};
 pub use logical::{Physical, physical_property};
 pub use writing_mode::WritingMode;

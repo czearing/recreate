@@ -113,21 +113,21 @@ impl<'a> Index<'a> {
         for index in self.direct_indices(node) {
             let rule = &self.rules[index];
             for (name, value) in parsed_declarations(rule.declarations)
-                .filter_map(|(name, value)| {
-                    let physical = super::authored_css_rules::physical_property(node, name);
-                    physical.into_name(name).map(|name| (name, value))
+                .flat_map(|(name, value)| {
+                    super::authored_css_rules::physical_property(node, name)
+                        .into_declarations(name, value)
                 })
                 .filter(|(name, value)| {
                     super::authored_css_rules::retained(name)
                         && !super::authored_css_rules::cascade_keyword(value)
                 })
             {
-                if super::authored_css_rules::deferred_binding(value)
-                    && !super::authored_css_rules::fluid_authored_value(value)
+                if super::authored_css_rules::deferred_binding(&value)
+                    && !super::authored_css_rules::fluid_authored_value(&value)
                 {
                     continue;
                 }
-                values.entry(name).or_default().push(value.into());
+                values.entry(name).or_default().push(value);
             }
         }
         values

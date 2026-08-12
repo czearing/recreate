@@ -3,12 +3,10 @@ use super::WritingMode;
 /// What a property name resolves to once the writing mode and direction in force are
 /// applied to it.
 ///
-/// The three cases exist because two of them used to share one empty-string answer, and a
-/// caller cannot act correctly on the pair. "Already physical" is safe to pass on to an
-/// allow-list of physical names; "logical, and this build has no single physical name for
-/// it" is guaranteed to be rejected there, so passing it on drops the declaration and
-/// substitutes whatever value was sampled. Spelling the second case out turns a silent
-/// loss into a condition a test can name.
+/// Resolution is not a rename, so the cases differ in how MANY declarations they stand for
+/// rather than only in which name. An axis names both of its edges, and a variant carrying
+/// one name could not say so: the only answer left to it would be "nothing", which every
+/// caller reads as a declaration to drop.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Physical {
     /// The name is not logical and stands for itself.
@@ -16,33 +14,45 @@ pub enum Physical {
     /// A logical name that this element's writing mode and direction resolve to one
     /// physical name carrying the same value.
     Named(String),
-    /// A logical name with no single physical equivalent. Every such name is a shorthand
-    /// over both edges of an axis, so honouring it means splitting one declaration into
-    /// two rather than renaming it.
-    Unsupported,
+    /// A logical name covering both edges of an axis, resolved to the physical name of each
+    /// edge in start-then-end order. `margin-inline` is `margin-left` and `margin-right`
+    /// under a horizontal left-to-right mode, and the pair reverses with the mode.
+    Axis(String, String),
 }
 
 impl Physical {
-    /// The physical name to emit `name` under, or `None` when the declaration cannot be
-    /// carried across as a single one.
-    pub fn into_name(self, name: &str) -> Option<String> {
-        match self {
-            Self::Same => Some(name.to_string()),
-            Self::Named(physical) => Some(physical),
-            Self::Unsupported => None,
-        }
+    /// The physical declarations that `name: value` stands for.
+    ///
+    /// An axis shorthand takes one component or two: two name the edges in start-then-end
+    /// order, and one names both. Any other count belongs to a family whose shorthand
+    /// applies its whole value to each edge rather than dividing it — `border-inline: 1px
+    /// solid red` draws that border on both edges — so the value is passed on intact. That
+    /// is a reading of the value's arity, not a list of the names it may be spelled with.
+    pub fn into_declarations(self, name: &str, value: &str) -> Vec<(String, String)> {
+        let (start, end) = match self {
+            Self::Same => return vec![(name.to_string(), value.to_string())],
+            Self::Named(physical) => return vec![(physical, value.to_string())],
+            Self::Axis(start, end) => (start, end),
+        };
+        let components = super::css_value::components(value);
+        let (first, last) = match components.as_slice() {
+            [first, last] => (*first, *last),
+            _ => (value, value),
+        };
+        vec![(start, first.to_string()), (end, last.to_string())]
     }
 
     /// Whether an authored declaration spelled `name` answers a query for `property`.
     ///
-    /// This is a different question from [`Self::into_name`] and the two part company on the
-    /// unsupported case. Emitting is a rename and a shorthand has no single name to be
-    /// renamed to, so nothing is emitted; a query names the declaration it is looking for,
-    /// and a shorthand is still the declaration that is there.
+    /// This is a different question from [`Self::into_declarations`] and the two part
+    /// company on the axis case. Emission asks what the declaration resolves to, and an
+    /// axis resolves to both of its edges; a query names the declaration it is looking for,
+    /// and a shorthand is still the declaration that is there under the name it was
+    /// written with.
     pub fn answers(&self, name: &str, property: &str) -> bool {
         match self {
             Self::Named(physical) => physical == property,
-            Self::Same | Self::Unsupported => name == property,
+            Self::Same | Self::Axis(..) => name == property,
         }
     }
 }
@@ -82,30 +92,43 @@ fn edge(mode: WritingMode, rtl: bool, axis: &str, side: &str) -> Option<&'static
 
 /// `margin-inline-start`, `padding-block-end`, `border-inline-start-width`,
 /// `scroll-padding-block-start` — one family, one axis, one edge, and any suffix the
-/// family carries.
+/// family carries. Where no edge token follows the axis, the name covers both edges of it.
 fn edge_property(mode: WritingMode, rtl: bool, parts: &[&str]) -> Physical {
     let Some(axis_at) = parts.iter().position(|p| matches!(*p, "block" | "inline")) else {
         return Physical::Same;
     };
-    // `margin-inline` and `border-block-width` name both edges of an axis and carry one or
-    // two values. Renaming either would assign a pair to a single edge.
-    let Some(side) = parts.get(axis_at + 1) else {
-        return Physical::Unsupported;
+    let axis = parts[axis_at];
+    if let Some(side) = parts.get(axis_at + 1)
+        && let Some(edge) = edge(mode, rtl, axis, side)
+    {
+        return Physical::Named(composed(parts, axis_at, edge, &parts[axis_at + 2..]));
+    }
+    // `margin-inline` and `border-block-width` name both edges of an axis. The token after
+    // the axis is a suffix the family carries rather than a side, so it is kept on both.
+    let suffix = &parts[axis_at + 1..];
+    let (Some(start), Some(end)) = (edge(mode, rtl, axis, "start"), edge(mode, rtl, axis, "end"))
+    else {
+        return Physical::Same;
     };
-    let Some(edge) = edge(mode, rtl, parts[axis_at], side) else {
-        return Physical::Unsupported;
-    };
-    // `inset-inline-start` names `left`, not `inset-left`: this family drops its prefix
-    // instead of keeping it, which is the one place the grammar is irregular.
+    Physical::Axis(
+        composed(parts, axis_at, start, suffix),
+        composed(parts, axis_at, end, suffix),
+    )
+}
+
+/// The physical name a family, an edge and a suffix spell together.
+///
+/// `inset-inline-start` names `left`, not `inset-left`: this family drops its prefix
+/// instead of keeping it, which is the one place the grammar is irregular.
+fn composed(parts: &[&str], axis_at: usize, edge: &str, suffix: &[&str]) -> String {
     let family = &parts[..axis_at];
     let head: &[&str] = if family == ["inset"] { &[] } else { family };
-    let resolved: Vec<&str> = head
-        .iter()
+    head.iter()
         .copied()
         .chain([edge])
-        .chain(parts[axis_at + 2..].iter().copied())
-        .collect();
-    Physical::Named(resolved.join("-"))
+        .chain(suffix.iter().copied())
+        .collect::<Vec<_>>()
+        .join("-")
 }
 
 /// `border-start-start-radius` names a corner, so it composes one edge from each axis
@@ -133,3 +156,7 @@ fn corner_radius(mode: WritingMode, rtl: bool, parts: &[&str]) -> Option<Physica
 #[cfg(test)]
 #[path = "logical_tests.rs"]
 mod logical_tests;
+
+#[cfg(test)]
+#[path = "logical_axis_tests.rs"]
+mod logical_axis_tests;
