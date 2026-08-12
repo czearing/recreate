@@ -2,7 +2,7 @@ use crate::model::{Node, Styles};
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap};
 
-use super::authored_css_rules::{
+use super::compound::{
     compound_attributes, compound_classes, compound_id, compound_tag, directly_targets_node,
     terminal_compound,
 };

@@ -1,7 +1,8 @@
+use super::selector_scope::Scope;
 use crate::model::Node;
 use std::collections::HashSet;
 
-pub fn rules(node: &Node, generated_class: &str, rules: &[String]) -> Vec<String> {
+pub fn rules(node: &Node, scope: &Scope<'_>, rules: &[String]) -> Vec<String> {
     let mut output = Vec::new();
     let mut seen = HashSet::new();
     for rule in rules {
@@ -15,18 +16,15 @@ pub fn rules(node: &Node, generated_class: &str, rules: &[String]) -> Vec<String
         let condition = prefix.trim_start_matches("@media").trim();
         let body = body.trim_end().trim_end_matches('}');
         for child in body.split('}') {
-            let Some((selector, declarations)) = child.split_once('{') else {
+            let Some((selectors, declarations)) = child.split_once('{') else {
                 continue;
             };
-            if !super::selector_list::static_members(selector)
-                .any(|member| super::authored_css::directly_targets_node(&member, node))
-            {
+            let Some(scoped) = super::selector_list::static_members(selectors)
+                .find_map(|member| scope.rewrite(&member, node))
+            else {
                 continue;
-            }
-            let rule = format!(
-                "@media {condition}{{.{generated_class}{{{}}}}}",
-                declarations.trim()
-            );
+            };
+            let rule = format!("@media {condition}{{{scoped}{{{}}}}}", declarations.trim());
             if seen.insert(rule.clone()) {
                 output.push(rule);
             }
@@ -65,7 +63,12 @@ mod tests {
             "@media (max-width: 479px) { .card:hover { color: red; } }".into(),
         ];
 
-        let rules = rules(&node, "generated", &captured);
+        let rules = {
+            let nodes = [node.clone()];
+            let classes =
+                std::collections::BTreeMap::from([(node.path.clone(), "generated".to_string())]);
+            rules(&node, &Scope::new(&nodes, &classes), &captured)
+        };
 
         assert_eq!(rules.len(), 2);
         assert!(rules[0].contains(".generated"));

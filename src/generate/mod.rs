@@ -26,6 +26,7 @@ mod carousel_inference;
 #[path = "carousel_inference_tests.rs"]
 mod carousel_inference_tests;
 mod component_identity;
+mod compound;
 mod css;
 mod css_base;
 mod css_base_style;
@@ -129,6 +130,9 @@ mod scroll_state_tests;
 mod selector_list;
 #[cfg(test)]
 mod selector_list_tests;
+mod selector_scope;
+#[cfg(test)]
+mod selector_scope_tests;
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;

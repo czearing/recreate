@@ -113,7 +113,7 @@ fn flexible(styles: &Styles) -> bool {
         .is_some_and(|value| value > 0.0)
 }
 
-pub(super) use super::authored_css_rules::directly_targets_node;
+pub(super) use super::compound::directly_targets_node;
 
 #[path = "authored_css_insets.rs"]
 mod insets;

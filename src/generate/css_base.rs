@@ -143,11 +143,12 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
 
 fn append_authored_media(base: &PageState, classes: &BTreeMap<String, String>, css: &mut String) {
     let mut emitted = HashSet::new();
+    let scope = super::selector_scope::Scope::new(&base.nodes, classes);
     for node in &base.nodes {
-        let Some(class) = classes.get(&node.path) else {
+        if classes.get(&node.path).is_none() {
             continue;
         };
-        for rule in super::authored_media::rules(node, class, &base.css_rules) {
+        for rule in super::authored_media::rules(node, &scope, &base.css_rules) {
             if emitted.insert(rule.clone()) {
                 css.push_str(&rule);
                 css.push('\n');

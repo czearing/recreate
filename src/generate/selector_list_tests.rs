@@ -22,8 +22,17 @@ fn node(classes: &str) -> Node {
 }
 
 fn media(node: &Node, rules: &[&str]) -> Vec<String> {
-    let rules = rules.iter().map(|rule| (*rule).to_string()).collect::<Vec<_>>();
-    super::authored_media::rules(node, "generated", &rules)
+    let rules = rules
+        .iter()
+        .map(|rule| (*rule).to_string())
+        .collect::<Vec<_>>();
+    let nodes = [node.clone()];
+    let classes = std::collections::BTreeMap::from([(node.path.clone(), "generated".to_string())]);
+    super::authored_media::rules(
+        node,
+        &super::selector_scope::Scope::new(&nodes, &classes),
+        &rules,
+    )
 }
 
 /// A selector list is a logical OR of independent selectors, so a member that carries no
@@ -36,9 +45,10 @@ fn keeps_the_static_member_of_a_list_that_also_carries_state() {
         &["@media (max-width: 733px) { .dropped, .dropped:hover { padding-left: 40px; } }"],
     );
 
-    assert_eq!(rules, vec![
-        "@media (max-width: 733px){.generated{padding-left: 40px;}}".to_string()
-    ]);
+    assert_eq!(
+        rules,
+        vec!["@media (max-width: 733px){.generated{padding-left: 40px;}}".to_string()]
+    );
 }
 
 /// The stateful member belongs to the state pipeline. Emitting it here would apply a hover
@@ -73,7 +83,9 @@ fn discards_structural_pseudo_classes_and_pseudo_elements() {
     for selector in [".card:first-child", ".card:not(.wide)", ".card::before"] {
         let rules = media(
             &node("card"),
-            &[&format!("@media (max-width: 733px) {{ {selector} {{ color: red; }} }}")],
+            &[&format!(
+                "@media (max-width: 733px) {{ {selector} {{ color: red; }} }}"
+            )],
         );
 
         assert!(rules.is_empty(), "{selector} -> {rules:?}");
@@ -89,9 +101,10 @@ fn keeps_a_member_wrapped_in_a_forgiving_pseudo_class() {
         &["@media (max-width: 733px) { .root:where(.size-medium) { padding: 4px; } }"],
     );
 
-    assert_eq!(rules, vec![
-        "@media (max-width: 733px){.generated{padding: 4px;}}".to_string()
-    ]);
+    assert_eq!(
+        rules,
+        vec!["@media (max-width: 733px){.generated{padding: 4px;}}".to_string()]
+    );
 }
 
 /// A selector list is separated by top-level commas only. Cutting a comma inside `:is()`
@@ -126,8 +139,7 @@ fn refuses_to_flatten_a_wrapper_holding_a_list() {
 #[test]
 fn indexes_the_static_member_of_a_mixed_list() {
     let mut node = node("card");
-    node.style
-        .insert("padding".into(), "12px".into());
+    node.style.insert("padding".into(), "12px".into());
     let rules = [".card, .card:hover { padding: 12px; }".to_string()];
 
     let index = crate::generate::authored_css_index::Index::new(&rules);
