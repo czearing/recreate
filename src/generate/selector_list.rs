@@ -1,4 +1,4 @@
-use super::selector_scan::{grammatical, unquoted};
+use super::css_scan::{grammatical, unquoted};
 use std::borrow::Cow;
 
 /// The members of a selector list.

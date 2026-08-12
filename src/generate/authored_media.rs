@@ -15,7 +15,7 @@ pub fn rules(
     let mut output = Vec::new();
     let mut seen = HashSet::new();
     for rule in rules {
-        let Some((prefix, body)) = rule.split_once('{') else {
+        let Some((prefix, mut body, _)) = super::css_scan::block(rule) else {
             continue;
         };
         let prefix = prefix.trim();
@@ -23,11 +23,8 @@ pub fn rules(
             continue;
         }
         let condition = prefix.trim_start_matches("@media").trim();
-        let body = body.trim_end().trim_end_matches('}');
-        for child in body.split('}') {
-            let Some((selectors, declarations)) = child.split_once('{') else {
-                continue;
-            };
+        while let Some((selectors, declarations, rest)) = super::css_scan::block(body) {
+            body = rest;
             let Some(scoped) = super::selector_list::static_members(selectors)
                 .find_map(|member| scope.rewrite(&member, node))
             else {
@@ -48,56 +45,5 @@ pub fn rules(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::model::{Attributes, Rect};
-
-    #[test]
-    fn remaps_direct_authored_media_rules_to_generated_classes() {
-        let node = Node {
-            writing_mode: Default::default(),
-            disabled: false,
-            rtl: false,
-            path: String::new(),
-            parent: None,
-            tag: "div".into(),
-            text: String::new(),
-            attributes: Attributes::from([("class".into(), "rail card".into())]),
-            rect: Rect {
-                x: 0.0,
-                y: 0.0,
-                width: 100.0,
-                height: 20.0,
-            },
-            style: Default::default(),
-            before: None,
-            after: None,
-        };
-        let captured = vec![
-            "@media (max-width: 1023px) { .rail { padding: 0 40px; } }".into(),
-            "@media (max-width: 479px) { .card { grid-template-columns: 1fr; } }".into(),
-            "@media (max-width: 479px) { .card:hover { color: red; } }".into(),
-        ];
-
-        let rules = {
-            let nodes = [node.clone()];
-            let classes =
-                std::collections::BTreeMap::from([(node.path.clone(), "generated".to_string())]);
-            rules(
-                &node,
-                &Scope::new(&nodes, &classes, "r"),
-                &captured,
-                &mut BTreeSet::new(),
-            )
-        };
-
-        assert_eq!(rules.len(), 2);
-        assert!(rules[0].contains(".generated"));
-        assert!(rules.iter().any(|rule| rule.contains("padding: 0 40px")));
-        assert!(
-            rules
-                .iter()
-                .any(|rule| rule.contains("grid-template-columns: 1fr"))
-        );
-    }
-}
+#[path = "authored_media_tests.rs"]
+mod tests;

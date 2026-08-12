@@ -5,8 +5,8 @@
 //! reads an authored selector resolves it through here, so a compound means the same thing
 //! whether it names the subject of a rule or an ancestor of it.
 
+use super::css_scan::{grammatical, name, unquote_value, unquoted};
 use super::selector_list;
-use super::selector_scan::{grammatical, name, unquote_value, unquoted};
 use crate::model::Node;
 
 pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {

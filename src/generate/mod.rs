@@ -55,6 +55,7 @@ mod css_pseudo_identity_tests;
 mod css_pseudo_rule_tests;
 mod css_rule_groups;
 mod css_rule_split;
+mod css_scan;
 mod css_signature;
 mod css_state_helpers;
 mod css_values;
@@ -145,7 +146,6 @@ mod selector_marker_tests;
 #[cfg(test)]
 #[path = "selector_quoting_tests.rs"]
 mod selector_quoting_tests;
-mod selector_scan;
 mod selector_scope;
 #[cfg(test)]
 mod selector_scope_fixture;
