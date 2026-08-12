@@ -109,6 +109,66 @@ pub(super) fn unquote_value(value: &str) -> &str {
     }
 }
 
+/// The unit of every dimension and percentage token in `text`, with quoted regions skipped.
+///
+/// A unit only means a unit as part of a token. `<dimension-token>` is a number immediately
+/// followed by an identifier, so `30vw` carries a unit while `--vwrap`, a font named `Vwide`
+/// and a `url(a%20b.png)` path merely spell the letters. Reading the number first is the only
+/// thing that separates them, and is why a caller can ask about a unit here without the
+/// over-matching that stops a substring scan from ever naming one.
+///
+/// A number is only a number where an identifier is not already running: the `2` in
+/// `Roboto2Wide` continues an identifier and starts nothing, and a digit already consumed as
+/// part of an earlier number cannot start a second one. Adjacency is decided by byte offset,
+/// so a quoted region breaks a token rather than joining its neighbours.
+pub(super) fn units(text: &str) -> Vec<&str> {
+    let mut units = Vec::new();
+    let mut previous: Option<(usize, char)> = None;
+    let mut consumed = 0usize;
+    for (offset, character, _) in unquoted(text) {
+        let joined = previous.is_some_and(|(at, last)| at + last.len_utf8() == offset);
+        let continues = previous.is_some_and(|(_, last)| identifier(last));
+        if character.is_ascii_digit() && offset >= consumed && !(joined && continues) {
+            let rest = number(&text[offset..]);
+            let unit = if rest.starts_with('%') {
+                "%"
+            } else {
+                name(rest)
+            };
+            consumed = text.len() - rest.len() + unit.len();
+            if !unit.is_empty() {
+                units.push(unit);
+            }
+        }
+        previous = Some((offset, character));
+    }
+    units
+}
+
+/// The text following the numeric token that begins `text`.
+///
+/// A fractional part needs no handling of its own: its digits begin a numeric token in their
+/// own right, carrying the same unit, so reading `12.5vw` as one number or as two yields the
+/// same unit either way. An exponent does need it — without it `1e3vw` reads its unit as
+/// `e3vw`, which is a unit the value never spelled.
+fn number(text: &str) -> &str {
+    let rest = digits(text);
+    rest.strip_prefix(['e', 'E'])
+        .map(|rest| rest.strip_prefix(['+', '-']).unwrap_or(rest))
+        .filter(|rest| rest.starts_with(|character: char| character.is_ascii_digit()))
+        .map_or(rest, digits)
+}
+
+/// The text following a run of decimal digits.
+fn digits(text: &str) -> &str {
+    text.trim_start_matches(|character: char| character.is_ascii_digit())
+}
+
+/// Whether a character continues an identifier that has already started.
+fn identifier(character: char) -> bool {
+    character.is_ascii_alphanumeric() || matches!(character, '-' | '_')
+}
+
 /// The run of characters that spells one identifier, starting at the beginning of `text`.
 ///
 /// A class, an id and a tag are all read this way, so the set of characters that continues
@@ -118,7 +178,7 @@ pub(super) fn unquote_value(value: &str) -> &str {
 pub(super) fn name(text: &str) -> &str {
     let length = text
         .chars()
-        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '_'))
+        .take_while(|character| identifier(*character))
         .map(char::len_utf8)
         .sum();
     &text[..length]
@@ -131,3 +191,7 @@ mod css_scan_tests;
 #[cfg(test)]
 #[path = "css_scan_block_tests.rs"]
 mod css_scan_block_tests;
+
+#[cfg(test)]
+#[path = "css_scan_unit_tests.rs"]
+mod css_scan_unit_tests;

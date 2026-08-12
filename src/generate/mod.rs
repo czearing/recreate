@@ -12,6 +12,9 @@ mod authored_css;
 #[cfg(test)]
 #[path = "authored_css_axis_tests.rs"]
 mod authored_css_axis_tests;
+#[cfg(test)]
+#[path = "authored_css_fluid_tests.rs"]
+mod authored_css_fluid_tests;
 mod authored_css_index;
 mod authored_css_rules;
 #[cfg(test)]
@@ -75,6 +78,7 @@ mod document_root_tests;
 #[cfg(test)]
 #[path = "flex_axis_tests.rs"]
 mod flex_axis_tests;
+mod fluid_value;
 mod generated_source;
 mod inherited_styles;
 mod initial_scroll;

@@ -123,7 +123,7 @@ impl<'a> Index<'a> {
                 })
             {
                 if super::authored_css_rules::deferred_binding(&value)
-                    && !super::authored_css_rules::fluid_authored_value(&value)
+                    && !super::fluid_value::fluid(&value)
                 {
                     continue;
                 }

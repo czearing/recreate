@@ -42,19 +42,6 @@ pub(super) fn deferred_binding(value: &str) -> bool {
     value.contains("var(")
 }
 
-/// An authored value that references a custom property is normally dropped in favour of the
-/// sampled computed value, which is safe for a colour or a spacing but destroys layout that
-/// responds to the viewport: a track list like
-/// `repeat(auto-fit, minmax(min(var(--min-col), 100%), 1fr))` samples as `230px 230px 230px
-/// 230px`, freezing the column count at every width. Custom properties are re-emitted per
-/// element with their resolved values, so such a value still resolves in the recreation and
-/// is kept instead.
-pub(super) fn fluid_authored_value(value: &str) -> bool {
-    ["repeat(", "minmax(", "auto-fit", "auto-fill", "clamp(", "%"]
-        .into_iter()
-        .any(|token| value.contains(token))
-}
-
 /// Authored stylesheets commonly write boxes with logical properties, while the
 /// generator reasons in physical ones. Without this mapping the authored value
 /// is discarded and a sampled pixel freezes the layout.
