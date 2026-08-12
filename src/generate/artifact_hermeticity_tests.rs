@@ -24,6 +24,7 @@ fn specification() -> Specification {
         .enumerate()
         .map(|(index, path)| Node {
             disabled: false,
+            rtl: false,
             path: (*path).to_string(),
             parent: (index > 0).then(|| ["html", body][index - 1].to_string()),
             tag: ["html", "body", "div"][index].into(),

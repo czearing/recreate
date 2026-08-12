@@ -26,6 +26,7 @@ fn state(nodes: usize) -> PageState {
                 before: None,
                 after: None,
                 disabled: false,
+                rtl: false,
             })
             .collect(),
         startup_nodes: Vec::new(),
@@ -179,6 +180,7 @@ fn ignores_replaced_text_inside_absolute_content() {
         before: None,
         after: None,
         disabled: false,
+        rtl: false,
     });
 
     assert!(!surface_differs(

@@ -18,6 +18,7 @@ pub(super) fn node(path: &str, tag: &str) -> Node {
         before: None,
         after: None,
         disabled: false,
+        rtl: false,
     }
 }
 

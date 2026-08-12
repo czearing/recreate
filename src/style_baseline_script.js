@@ -9,8 +9,18 @@
    entirely. Only `revert` lands on the origin the recreation also runs under.
    The style attribute is author origin and outranks author stylesheet rules of equal
    importance, so an important inline declaration beats even an authored `!important`.
-   `all` does not cover `direction`, `unicode-bidi` or custom properties; those compare
-   equal to themselves and are pruned. Custom properties are owned elsewhere. */
+   Custom properties are owned elsewhere. */
+/* `all` is specified to leave these two alone, because mass-resetting bidi would silently
+   break right-to-left text. A baseline taken under the shorthand alone therefore reports
+   the element's own live value back for them, so the comparison equates them with
+   themselves and prunes them at every value - `rtl` is discarded exactly as surely as
+   `ltr`, and no authored value can make the property reappear. That is not the pruning
+   this module performs, which drops a value the recreation recomputes for free; it is a
+   measurement the shorthand never took. `revert` is a CSS-wide keyword valid on any
+   property, so applying it to the omitted longhands beside the shorthand puts them under
+   the same measurement as everything else, and each is then recorded on exactly the
+   element that declared it. */
+const EXCLUDED_FROM_ALL = ['direction', 'unicode-bidi'];
 /* The engine enumerates a logical alias beside every physical longhand it resolves to -
    `padding-inline-start` next to `padding-left`, `inline-size` next to `width`,
    `border-end-end-radius` next to `border-bottom-right-radius` - so recording both
@@ -119,7 +129,12 @@ const measureBaselines = (root, skip) => {
   }
   for (const level of levels) {
     const saved = level.map(element => element.getAttribute('style'));
-    for (const element of level) element.style.setProperty('all', 'revert', 'important');
+    for (const element of level) {
+      element.style.setProperty('all', 'revert', 'important');
+      for (const property of EXCLUDED_FROM_ALL) {
+        element.style.setProperty(property, 'revert', 'important');
+      }
+    }
     for (const element of level) elementBaselines.set(element, styleMap(getComputedStyle(element)));
     level.forEach((element, index) => {
       if (saved[index] === null) element.removeAttribute('style');
@@ -136,7 +151,9 @@ const measureBaselines = (root, skip) => {
   }
   if (pseudoPending.length) {
     const sheet = document.createElement('style');
-    sheet.textContent = '*::before,*::after{all:revert !important}';
+    sheet.textContent = `*::before,*::after{${['all', ...EXCLUDED_FROM_ALL]
+      .map(property => `${property}:revert !important`)
+      .join(';')}}`;
     document.head.appendChild(sheet);
     for (const [element, name] of pseudoPending) {
       const measured = pseudoBaselines.get(element) || {};

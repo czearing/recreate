@@ -4,6 +4,7 @@ use crate::model::{Attributes, Node, Rect};
 fn node(classes: &str) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: String::new(),
         parent: None,
         tag: "div".into(),

@@ -11,6 +11,7 @@ use crate::model::{Node, Rect, Styles};
 fn icon(class: Option<&str>, id: Option<&str>, attribute: Option<&str>) -> Node {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: "html>body>main>svg".into(),
         parent: Some("html>body>main".into()),
         tag: "svg".into(),

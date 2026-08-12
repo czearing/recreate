@@ -4,6 +4,7 @@ use crate::model::{Attributes, Interaction, Node, PageState, Rect, Specification
 fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: tag.into(),

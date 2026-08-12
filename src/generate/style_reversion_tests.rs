@@ -6,6 +6,7 @@ use crate::model::{Node, Pseudo, Rect, Viewport};
 pub(super) fn box_node(path: &str, style: &[(&str, &str)]) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: Some("html>body".into()),
         tag: "div".into(),

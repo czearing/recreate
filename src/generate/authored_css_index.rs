@@ -314,6 +314,7 @@ mod tests {
     fn node() -> Node {
         let mut node = Node {
             disabled: false,
+            rtl: false,
             path: "button".into(),
             parent: None,
             tag: "button".into(),

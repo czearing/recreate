@@ -53,6 +53,7 @@ fn state() -> PageState {
 fn node(path: &str) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: None,
         tag: "div".into(),

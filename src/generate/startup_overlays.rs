@@ -66,6 +66,7 @@ mod tests {
     fn marks_captured_startup_root() {
         let root = Node {
             disabled: false,
+            rtl: false,
             path: "startup".into(),
             parent: None,
             tag: "div".into(),

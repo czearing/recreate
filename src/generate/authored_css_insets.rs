@@ -45,7 +45,7 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
     {
         return;
     }
-    let rtl = is_rtl(node);
+    let rtl = node.rtl;
     // A shorthand re-states every edge it covers, so removing a longhand while leaving
     // `inset: 0 432px 48px 648px` beside it removes nothing. Split it into the edges it
     // stands for first; the two forms carry the same values, so this is a rewrite of one
@@ -68,12 +68,6 @@ pub(super) fn suppress_derived_insets(styles: &mut Styles, node: &Node, rules: &
             styles.remove(derived);
         }
     }
-}
-
-fn is_rtl(node: &Node) -> bool {
-    node.style
-        .get("direction")
-        .is_some_and(|value| value == "rtl")
 }
 
 /// Rewrite `inset`, `inset-block` and `inset-inline` into the physical longhands they

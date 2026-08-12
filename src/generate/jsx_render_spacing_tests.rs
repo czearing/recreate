@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 fn node(path: &str, tag: &str, text: &str, (x, y): (f64, f64), style: &[(&str, &str)]) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: None,
         tag: tag.into(),

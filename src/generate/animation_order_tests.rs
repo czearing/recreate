@@ -74,6 +74,7 @@ fn state(animated: bool) -> PageState {
 fn node(path: &str, parent: Option<&str>, style: Styles) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: "div".into(),

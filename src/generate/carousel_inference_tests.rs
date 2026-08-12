@@ -171,6 +171,7 @@ fn specification(state: PageState) -> Specification {
 fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_owned),
         tag: tag.into(),

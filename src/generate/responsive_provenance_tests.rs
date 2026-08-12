@@ -28,6 +28,7 @@ fn declared(css: &str) -> BTreeMap<&str, &str> {
 fn element(class: &str, y: f64, height: f64) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: "html>body>section".into(),
         parent: Some("html>body".into()),
         tag: "section".into(),

@@ -25,6 +25,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
     }
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: tag.into(),

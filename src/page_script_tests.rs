@@ -75,6 +75,20 @@ fn records_the_engine_answered_disabled_state_in_every_node_record() {
     }
 }
 
+/// Both node-record producers must record the direction in effect at each element, and
+/// both must be kept in step. `direction` is inherited, so a page declares it once at the
+/// root and every box it positions carries no declaration of its own — the authored style
+/// map is right to leave those empty and cannot answer the question. The engine already
+/// resolved it for the computed style being read on the same line, so the answer is taken
+/// from there rather than re-derived by walking ancestors in a later stage.
+#[test]
+fn records_the_effective_direction_in_every_node_record() {
+    for script in [source(), crate::interaction_script::source()] {
+        assert!(script.contains("rtl: computedStyle.direction === 'rtl'"));
+        assert!(!script.contains("element.dir"));
+    }
+}
+
 #[test]
 fn generated_capture_script_parses() {
     let script = super::source_without_assets();

@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
 
+mod interaction;
+pub use interaction::{Interaction, InteractionAction, InteractionTransition};
+
 pub type Styles = BTreeMap<String, String>;
 pub type Attributes = BTreeMap<String, String>;
 
@@ -47,6 +50,18 @@ pub struct Node {
     /// disabled, so the answer is taken from the engine and recorded once.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub disabled: bool,
+    /// Whether the element's inline axis ran right-to-left when the page was read.
+    ///
+    /// `direction` is inherited, so a page declares it once at the root and every box it
+    /// positions carries no declaration of its own. The authored style map records what
+    /// the author wrote and is right to leave those boxes empty, but a rule that maps a
+    /// logical edge onto a physical one needs the value in effect at the box, which no
+    /// record of authored declarations can hold. Re-deriving it would mean walking
+    /// ancestors from a rule that is handed one node, so the answer is taken from the
+    /// engine and recorded once, exactly as `disabled` is. It is a fact about the
+    /// element rather than a declaration, and is never emitted as CSS.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub rtl: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -158,41 +173,6 @@ pub struct Specification {
     pub interactions: Vec<Interaction>,
     #[serde(default)]
     pub transitions: Vec<InteractionTransition>,
-}
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum InteractionAction {
-    #[default]
-    Activate,
-    Hover,
-    Leave,
-    Focus,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct InteractionTransition {
-    pub from_state: usize,
-    pub to_state: usize,
-    #[serde(default)]
-    pub action: InteractionAction,
-    pub trigger_path: String,
-    pub trigger_tag: String,
-    pub trigger_label: String,
-    #[serde(default)]
-    pub trigger_occurrence: Option<usize>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Interaction {
-    pub trigger_path: String,
-    pub trigger_tag: String,
-    pub trigger_label: String,
-    #[serde(default)]
-    pub trigger_occurrence: Option<usize>,
-    #[serde(default)]
-    pub focused_path: Option<String>,
-    pub states: Vec<PageState>,
 }
 
 #[derive(Clone, Debug, Deserialize)]

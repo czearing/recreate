@@ -106,6 +106,7 @@ __ASSET_ATTRIBUTES__
       text: '',
       attributes,
       disabled: element.matches(':disabled'),
+      rtl: computedStyle.direction === 'rtl',
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       before: pseudo(element, '::before'),

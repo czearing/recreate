@@ -47,6 +47,7 @@ mod tests {
     fn node(path: &str, parent: Option<&str>, width: f64) -> Node {
         Node {
             disabled: false,
+            rtl: false,
             path: path.into(),
             parent: parent.map(str::to_owned),
             tag: "div".into(),

@@ -19,6 +19,29 @@ mod tests {
         assert!(!SOURCE.contains("'all', 'unset'"));
     }
 
+    /// `all` is specified to leave `direction` and `unicode-bidi` alone, so a baseline
+    /// taken under `all: revert` reports the element's own live value back for them and
+    /// the comparison prunes them at every value — `rtl` as surely as `ltr`. The
+    /// comparison never had discriminating power there, so the omitted longhands have to
+    /// be reverted beside the shorthand. The domain is read out of the source rather than
+    /// restated here, so this asserts that the probe covers a declared set rather than
+    /// that one spelling survives somewhere in a string.
+    #[test]
+    fn reverts_the_longhands_the_all_shorthand_omits() {
+        let (_, rest) = SOURCE
+            .split_once("const EXCLUDED_FROM_ALL = [")
+            .expect("the probe must declare which properties `all` leaves alone");
+        let (declared, _) = rest.split_once(']').expect("unterminated declaration");
+        for property in ["direction", "unicode-bidi"] {
+            assert!(
+                declared.contains(property),
+                "`all` does not reset {property}, so the probe must revert it: {declared}"
+            );
+        }
+        assert!(SOURCE.contains("for (const property of EXCLUDED_FROM_ALL)"));
+        assert!(SOURCE.contains("setProperty(property, 'revert', 'important')"));
+    }
+
     /// The property set comes from the engine's own enumeration. A named list here is
     /// the defect this module exists to remove.
     #[test]

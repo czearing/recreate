@@ -17,6 +17,7 @@ fn interaction_layers_do_not_substitute_extreme_z_indexes_for_dom_hierarchy() {
 pub(super) fn node(tag: &str) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
         parent: Some("html>body:nth-of-type(1)".into()),
         tag: tag.into(),

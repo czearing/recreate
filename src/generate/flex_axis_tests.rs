@@ -148,6 +148,7 @@ fn out_of_flow() -> Styles {
 fn node(path: &str, parent: Option<&str>, style: Styles, y: f64) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: "div".into(),

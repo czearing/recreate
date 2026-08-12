@@ -38,6 +38,7 @@ __SELECTION__
     if (element.matches('script,noscript,[data-recreate-startup],.recreateAnchoredSurface')) return;
     const path = pathOf(element);
     const rect = element.getBoundingClientRect();
+    const computedStyle = getComputedStyle(element);
     dom[path] = {
       namespace: element.namespaceURI || '',
       node_type: element.nodeType,
@@ -66,8 +67,9 @@ __SELECTION__
       text: '',
       attributes: recreateAttributes(element, path),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
+      style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       disabled: element.matches(':disabled'),
+      rtl: computedStyle.direction === 'rtl',
       before: null,
       after: null
     });

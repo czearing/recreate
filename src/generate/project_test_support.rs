@@ -14,6 +14,7 @@ pub(super) fn node(path: &str, parent: Option<&str>, text: &str, test_id: Option
     style.insert("width".into(), "100px".into());
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: if path.contains("#text") {

@@ -5,6 +5,7 @@ use crate::model::{Node, Rect, Styles};
 fn ignores_declarations_for_descendants() {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: "button".into(),
         parent: None,
         tag: "button".into(),
@@ -42,6 +43,7 @@ fn ignores_declarations_for_descendants() {
 fn restores_centered_max_width_container() {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: "main".into(),
         parent: None,
         tag: "main".into(),
@@ -78,6 +80,7 @@ fn restores_centered_max_width_container() {
 fn keeps_the_last_active_responsive_declaration() {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: "section".into(),
         parent: None,
         tag: "section".into(),

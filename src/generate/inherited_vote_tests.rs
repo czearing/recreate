@@ -12,6 +12,7 @@ use crate::model::{Node, Rect, Styles};
 fn node(tag: &str, class: &str, styles: &[(&str, &str)]) -> Node {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: tag.into(),
         parent: None,
         tag: tag.into(),

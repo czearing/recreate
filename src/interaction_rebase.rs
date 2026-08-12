@@ -119,6 +119,7 @@ mod tests {
             before: None,
             after: None,
             disabled: false,
+            rtl: false,
         }
     }
 

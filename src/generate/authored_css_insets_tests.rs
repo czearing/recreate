@@ -4,6 +4,7 @@ use crate::model::{Node, Rect, Styles};
 fn node(class: &str, position: &str) -> Node {
     let mut node = Node {
         disabled: false,
+        rtl: false,
         path: "html>body>div>aside".into(),
         parent: Some("html>body>div".into()),
         tag: "aside".into(),
@@ -45,15 +46,22 @@ fn a_logical_inset_is_recognised_as_an_anchor() {
 
 /// Under `direction: rtl` the inline-start edge is `right`, so a mapping written for LTR
 /// would arbitrate the wrong edge and delete the anchor it was meant to protect.
+///
+/// The direction is read from the engine's answer rather than from the node's authored
+/// declarations, and the box here carries none — which is the ordinary shape, because
+/// `direction` is inherited and a real page declares it once at the root. A test that
+/// hand-placed `direction` in the style map would assert the mapping is right while
+/// saying nothing about whether it ever runs, which is how this defect stayed green.
 #[test]
 fn the_inline_axis_follows_direction() {
     let mut node = node("marker", "absolute");
-    node.style.insert("direction".into(), "rtl".into());
+    node.rtl = true;
     let mut styles = Styles::new();
     styles.insert("position".into(), "absolute".into());
     styles.insert("left".into(), "648px".into());
     styles.insert("right".into(), "432px".into());
     node.style.extend(styles.clone());
+    assert!(!node.style.contains_key("direction"));
     normalize(
         &mut styles,
         &node,

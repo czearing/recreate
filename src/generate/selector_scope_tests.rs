@@ -32,6 +32,7 @@ fn tree() -> (Vec<Node>, BTreeMap<String, String>) {
 fn element(path: &str, parent: Option<&str>, class: &str) -> Node {
     Node {
         disabled: false,
+        rtl: false,
         path: path.into(),
         parent: parent.map(Into::into),
         tag: path
