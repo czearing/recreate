@@ -12,10 +12,12 @@
 //!
 //! So identity is separated from paint. Each authored compound taking part in a rewrite gets
 //! its own marker, carried as an extra class on exactly the elements that compound matches,
-//! and the rewrite is expressed over markers. The marker is derived from the compound rather
-//! than from a node, so one rule still serves every element it matches and deduplication is
-//! untouched; and no marker exists unless a selector carrying a combinator survived to be
-//! rewritten, so a page without one is byte-identical.
+//! and the rewrite is expressed over markers. That holds for a lone compound too: `.subject`
+//! and `.control` collapse to one paint class when the page paints them alike, so a rewrite
+//! that borrowed it would apply each element's authored rule to the other. The marker is
+//! derived from the compound rather than from a node, so one rule still serves every element
+//! it matches and deduplication is untouched; and no marker exists unless a selector survived
+//! to be rewritten, so a page without one is byte-identical.
 
 use super::compound::matches_node;
 use super::css_values::{append_class, hash};

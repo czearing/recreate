@@ -6,6 +6,9 @@
 //! keeps the sheet small. So the paint class cannot tell the two subtrees apart, and any
 //! rewrite built from paint classes reaches both.
 
+#[path = "selector_marker_exactness_tests.rs"]
+mod exactness;
+
 use super::selector_marker::{apply, name as marker};
 use super::selector_scope::Scope;
 use crate::model::{Attributes, Node, Rect};

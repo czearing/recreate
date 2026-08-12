@@ -124,3 +124,36 @@ fn a_brace_quoted_in_the_condition_does_not_open_the_body_early() {
         rules[0]
     );
 }
+
+/// A cascade layer is a carrier, so a media rule the author placed inside one reaches this
+/// stage still wrapped in it. Testing only the outermost prelude answers a question about
+/// the wrapper rather than about the rule, and drops it. The layer is settled elsewhere, so
+/// this stage reads through it exactly as `css::global_rule` does — which is also why the
+/// emitted text carries no `@layer`.
+#[test]
+fn claims_an_authored_media_rule_a_cascade_layer_wraps() {
+    let node = node("subject");
+    let captured = vec![
+        "@layer theme { @media (min-width: 100000px) { .subject { letter-spacing: 13px; } } }"
+            .into(),
+    ];
+    let rules = emitted(&node, &captured);
+
+    assert_eq!(
+        rules.len(),
+        1,
+        "dropped a layer-wrapped media rule: {rules:?}"
+    );
+    assert!(
+        rules[0].starts_with("@media (min-width: 100000px)"),
+        "did not lift the media condition to the front: {rules:?}"
+    );
+    assert!(
+        rules[0].contains("letter-spacing: 13px") && rules[0].contains(".generated"),
+        "lost the declaration or its remapped class: {rules:?}"
+    );
+    assert!(
+        !rules[0].contains("@layer"),
+        "re-emitted the cascade layer this stage does not own: {rules:?}"
+    );
+}

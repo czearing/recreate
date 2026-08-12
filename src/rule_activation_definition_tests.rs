@@ -39,23 +39,35 @@ fn supports_scene() -> Value {
     scene("@supports (display: grid)", "(display: grid)", false)
 }
 
-/// The fabrication. A `@font-face` inside a live `@media` was recorded a second time on its
-/// own, with the condition gone, so the generated page declared a font the source declared
-/// only for one viewport range.
+/// The fabrication, and its limit. A `@font-face` inside a live `@media` was recorded a
+/// second time on its own, with the condition gone, so the generated page declared a font
+/// the source declared only for one viewport range — the condition is a carrier and must
+/// travel. A feature query is not: it has one answer for the whole capture, and it was
+/// answered. Re-emitting it would make the recreation re-ask the *viewing* engine, which
+/// can drop a font the captured page had. So the two arms expect opposite text, and
+/// asserting the same shape for both is what conflated them.
 #[test]
-fn records_no_unconditional_copy_of_a_definition_the_author_conditioned() {
-    for (name, scene) in [("media", media_scene()), ("supports", supports_scene())] {
+fn a_definition_keeps_the_condition_that_is_re_answered_and_drops_the_one_already_answered() {
+    for (name, scene, wrapped) in [
+        ("media", media_scene(), true),
+        ("supports", supports_scene(), false),
+    ] {
         let rules = recorded(&walk(scene));
         assert!(
             rules.iter().any(|rule| rule.contains("Vorplish")),
             "{name}: lost the conditioned definition entirely: {rules:?}"
         );
-        assert!(
-            !rules
+        assert_eq!(
+            rules
                 .iter()
                 .any(|rule| rule.starts_with("@font-face") && rule.contains("Vorplish")),
-            "{name}: recorded the definition stripped of the condition it was authored \
-             under: {rules:?}"
+            !wrapped,
+            "{name}: expected the definition {} its authored condition: {rules:?}",
+            if wrapped { "under" } else { "stripped of" }
+        );
+        assert!(
+            !rules.iter().any(|rule| rule.contains("@supports")),
+            "{name}: re-emitted a gate the capturing engine already answered: {rules:?}"
         );
         assert!(
             rules

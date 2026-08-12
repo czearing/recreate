@@ -4,8 +4,8 @@ use std::collections::{BTreeSet, HashSet};
 
 /// The authored `@media` rules this node keeps, and the compounds their selectors name.
 ///
-/// A compound is reported only when a rule survives deduplication, so a page whose authored
-/// media rules all reduce to single compounds reports none and gains no markers.
+/// A compound is reported only when a rule survives deduplication, so a page with no
+/// authored media rule reports none and gains no markers.
 pub fn rules(
     node: &Node,
     scope: &Scope<'_>,
@@ -15,6 +15,11 @@ pub fn rules(
     let mut output = Vec::new();
     let mut seen = HashSet::new();
     for rule in rules {
+        // `@layer` is a carrier, so a media rule authored inside one arrives still wrapped
+        // in it. The layer is the rule's cascade position and is settled elsewhere; what
+        // this stage is asking is whether a media condition is present, so it reads through
+        // the wrapper exactly as `css::global_rule` does.
+        let (_, rule) = super::css_layers::peel(rule);
         let Some((prefix, mut body, _)) = super::css_scan::block(rule) else {
             continue;
         };

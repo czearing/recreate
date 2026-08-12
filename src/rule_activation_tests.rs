@@ -1,7 +1,14 @@
 use serde_json::{Value, json};
 
+#[path = "rule_activation_fixture.rs"]
+mod fixture;
+use fixture::scene;
+
 #[path = "rule_activation_layer_tests.rs"]
 mod layer;
+
+#[path = "rule_activation_nesting_tests.rs"]
+mod nesting;
 
 #[path = "rule_activation_definition_tests.rs"]
 mod definition;
@@ -45,66 +52,6 @@ fn recorded(result: &Value) -> Vec<String> {
         .collect()
 }
 
-/// The scene: a 300px container, a false `@supports` condition, a `@container` condition
-/// that a 300px container cannot satisfy, and — so that dropping every grouped rule cannot
-/// pass — conditions that do hold. The sheet is supplied twice, which is what the capture
-/// does when it cannot tell which sheets the page failed to read.
-fn scene() -> Value {
-    let sheet = json!([
-        style(".panel", "padding", "24px"),
-        {
-            "prelude": "@container panelwrap (min-width: 900px)",
-            "conditionText": "panelwrap (min-width: 900px)",
-            "rules": [style(".panel", "width", "100%")]
-        },
-        {
-            "prelude": "@supports (color: nonexistent-color-function(1))",
-            "conditionText": "(color: nonexistent-color-function(1))",
-            "rules": [style(".panel", "max-width", "50%")]
-        },
-        {
-            "prelude": "@supports (display: grid)",
-            "conditionText": "(display: grid)",
-            "rules": [style(".grid", "display", "grid")]
-        },
-        {
-            "prelude": "@media (min-width: 900px)",
-            "conditionText": "(min-width: 900px)",
-            "media": true,
-            "rules": [style(".panel", "color", "red")]
-        },
-        {
-            "prelude": "@media (min-width: 0px)",
-            "conditionText": "(min-width: 0px)",
-            "media": true,
-            "rules": [{
-                "prelude": "@supports (display: grid)",
-                "conditionText": "(display: grid)",
-                "rules": [style(".wide", "gap", "8px")]
-            }]
-        },
-        {
-            "prelude": "@keyframes spin",
-            "keyframes": true,
-            "rules": [style("from", "rotate", "0deg"), style("to", "rotate", "360deg")]
-        },
-        { "prelude": "@property --angle", "declarations": { "syntax": "'<angle>'" } }
-    ]);
-    json!({
-        "elements": [
-            { "path": "/main/div", "classes": ["wrap"] },
-            { "path": "/main/div/div", "classes": ["panel"] },
-            { "path": "/main/div/span", "classes": ["grid"] },
-            { "path": "/main/div/p", "classes": ["wide"] }
-        ],
-        "matching": {
-            "@supports (display: grid)": ["/main/div", "/main/div/div", "/main/div/span", "/main/div/p"],
-            "@media (min-width: 0px)": ["/main/div", "/main/div/div", "/main/div/span", "/main/div/p"]
-        },
-        "sheets": [sheet.clone(), sheet]
-    })
-}
-
 /// A `@container` block the page's own layout can never satisfy declares nothing, so its
 /// declarations must not be recorded as rules the author wrote.
 #[test]
@@ -137,7 +84,9 @@ fn a_satisfied_condition_still_contributes_its_authored_rule() {
         "lost a live @supports declaration: {rules:?}"
     );
     assert!(
-        rules.iter().any(|rule| rule.starts_with(".wide")),
+        rules
+            .iter()
+            .any(|rule| rule.starts_with("@media (min-width: 0px)") && rule.contains(".wide")),
         "lost a declaration nested in two satisfied conditions: {rules:?}"
     );
     assert!(

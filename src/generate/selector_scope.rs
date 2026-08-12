@@ -16,9 +16,6 @@
 //! over the distinctions the author drew. The generated paint class is not — it is an
 //! equivalence class over computed style, shared by every element that paints alike — so a
 //! selector built from paint classes would reach the look-alikes the author excluded. A
-//! selector of one compound needs no relationship and keeps using the paint class, which is
-//! why a page carrying no combinator selector gains no markers at all.
-//!
 //! Resolution follows the engine's own right-to-left order: the subject is tested first and
 //! a node that fails it costs nothing more, so no ancestor is walked for a rule that was
 //! never going to match. Where several ancestors satisfy a compound the nearest is taken —
@@ -39,6 +36,7 @@ pub(super) struct Scoped {
 pub(super) struct Scope<'a> {
     by_path: HashMap<&'a str, &'a Node>,
     classes: &'a BTreeMap<String, String>,
+    sharers: HashMap<&'a str, Vec<&'a Node>>,
     order: HashMap<&'a str, usize>,
     prefix: &'a str,
 }
@@ -49,12 +47,19 @@ impl<'a> Scope<'a> {
         classes: &'a BTreeMap<String, String>,
         prefix: &'a str,
     ) -> Self {
+        let mut sharers: HashMap<&'a str, Vec<&'a Node>> = HashMap::new();
+        for node in nodes {
+            if let Some(class) = classes.get(&node.path) {
+                sharers.entry(class.as_str()).or_default().push(node);
+            }
+        }
         Self {
             by_path: nodes
                 .iter()
                 .map(|node| (node.path.as_str(), node))
                 .collect(),
             classes,
+            sharers,
             order: nodes
                 .iter()
                 .enumerate()
@@ -68,6 +73,23 @@ impl<'a> Scope<'a> {
         self.classes.get(&node.path).map(String::as_str)
     }
 
+    /// The paint class of `node`, when it names exactly the elements `compound` names.
+    ///
+    /// The paint class is an equivalence class over computed style, so it is many-to-one by
+    /// design. Borrowing it is exact only while every element sharing it also matches the
+    /// authored compound; where it is not, two compounds that paint alike collapse onto one
+    /// selector and each element receives the other's authored declarations. Asking the
+    /// question rather than assuming an answer keeps a page whose paint classes are already
+    /// exact byte-identical, and mints a marker only where one is needed.
+    fn exact_class(&self, node: &'a Node, compound: &str) -> Option<&str> {
+        let class = self.class(node)?;
+        self.sharers
+            .get(class)?
+            .iter()
+            .all(|sharer| matches_node(compound, sharer))
+            .then_some(class)
+    }
+
     /// The selector rewritten for this node, or `None` when it does not match it.
     pub(super) fn rewrite(&self, selector: &str, node: &'a Node) -> Option<Scoped> {
         let mut steps = split(selector).into_iter().rev();
@@ -76,9 +98,11 @@ impl<'a> Scope<'a> {
             return None;
         }
         let ancestors: Vec<_> = steps.collect();
-        if ancestors.is_empty() {
+        if ancestors.is_empty()
+            && let Some(class) = self.exact_class(node, subject)
+        {
             return Some(Scoped {
-                selector: format!(".{}", self.class(node)?),
+                selector: format!(".{class}"),
                 compounds: Vec::new(),
             });
         }

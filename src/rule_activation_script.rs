@@ -23,13 +23,20 @@ pub const SOURCE: &str = r#"
     const brace = rule.cssText.indexOf('{');
     return brace < 0 ? '' : rule.cssText.slice(0, brace).trim();
   };
-  // Conditionality answers whether a rule is active. It does not answer what wrapper the
-  // rule needs to be re-emitted inside, and one predicate cannot serve both: @layer and
-  // @scope group unconditionally, so no probe is needed, but their prelude is cascade
-  // position that no flattened copy can carry. So conditions drive activation and
-  // preludes drive emission, and a group contributes to exactly one of them.
+  // Conditionality answers whether a rule is active. It does not answer which enclosing
+  // preludes have to travel with the rule, and one predicate cannot serve both.
   const conditional = rule =>
     typeof rule.conditionText === 'string' && !!rule.conditionText.trim();
+  // Gate versus carrier, which is the split that matters, and it does not follow
+  // conditionality. A GATE's condition has one answer for the whole capture — engine
+  // feature support is fixed for the run, and a container query the capture already
+  // resolved against the very element it baked — so it is evaluated now and then dropped;
+  // re-emitting it would make the recreation re-ask the viewing engine a question the
+  // capturing engine already answered. A CARRIER cannot be answered here at all: a media
+  // condition is re-answered by whoever views the recreation, and @layer/@scope carry
+  // cascade position and proximity that outrank specificity and that no flattened copy can
+  // express. So carriers are re-emitted verbatim around every member.
+  const carrier = rule => rule.type === CSSRule.MEDIA_RULE || !conditional(rule);
   // The platform's own line between a rule that groups style rules and one that merely has
   // children. @keyframes exposes cssRules, but its children are keyframe selectors rather
   // than rules the cascade ever resolves. Asking "does it have children" instead gets both
@@ -37,22 +44,28 @@ pub const SOURCE: &str = r#"
   // records nothing, dropping the block every animation-name refers to. One owner, because
   // the walk and the recorder each need this answer and a second copy of it drifts.
   const grouping = rule => rule instanceof CSSGroupingRule;
-  const flattenRules = (rules, media = null, conditions = [], preludes = [], whole = false) => {
+  // A grouping rule is never recorded in its own right. Its cssText already serialises
+  // every rule nested inside it, and once each member carries its own carrier chain the
+  // group's text holds nothing its members do not. That also removes the only records a
+  // probe could never reach: a grouping rule has no selector, so its `active` would be the
+  // default it was handed rather than anything observed, and a @media nested in a feature
+  // query that was false at capture would ship as live.
+  const flattenRules = (rules, media = null, gates = [], carriers = []) => {
     const entries = [];
     for (const rule of Array.from(rules || [])) {
-      entries.push({ rule, media, conditions, preludes, active: true, whole });
-      if (!grouping(rule)) continue;
+      if (!grouping(rule)) {
+        entries.push({ rule, media, gates, carriers, active: true });
+        continue;
+      }
       const prelude = preludeOf(rule);
-      const gates = conditional(rule);
-      const nestedMedia = rule.type === CSSRule.MEDIA_RULE
-        ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
-        : media;
+      const held = carrier(rule);
       entries.push(...flattenRules(
         rule.cssRules,
-        nestedMedia,
-        gates && prelude ? conditions.concat(prelude) : conditions,
-        !gates && prelude ? preludes.concat(prelude) : preludes,
-        whole || rule.type === CSSRule.MEDIA_RULE
+        rule.type === CSSRule.MEDIA_RULE
+          ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
+          : media,
+        held || !prelude ? gates : gates.concat(prelude),
+        held && prelude ? carriers.concat(prelude) : carriers
       ));
     }
     return entries;
@@ -73,7 +86,7 @@ pub const SOURCE: &str = r#"
   const activateEntries = entries => {
     const probes = [];
     for (const entry of entries) {
-      if (!entry.conditions.length || !entry.rule.selectorText) continue;
+      if (!entry.gates.length || !entry.rule.selectorText) continue;
       const selector = staticSelector(entry.rule.selectorText);
       if (!selector) continue;
       entry.selector = selector;
@@ -82,7 +95,7 @@ pub const SOURCE: &str = r#"
     }
     if (!probes.length) return entries;
     const style = document.createElement('style');
-    style.textContent = probes.map(entry => entry.conditions.reduceRight(
+    style.textContent = probes.map(entry => entry.gates.reduceRight(
       (inner, condition) => `${condition}{${inner}}`,
       `${entry.selector}{${entry.probe}:1}`
     )).join('\n');

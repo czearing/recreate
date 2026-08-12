@@ -80,28 +80,12 @@ __RULE_ACTIVATION__
     cssRules.push(text);
   };
   const emitEntries = entries => {
-    for (const { rule, media, active, conditions, preludes, whole } of entries) {
-      // A grouping rule's cssText already contains every rule nested inside it, and those
-      // are emitted as entries of their own, so recording both duplicates the entire
-      // stylesheet body of layers, supports and scopes. A media block is the exception:
-      // its condition is authored responsive intent no flattened copy can carry.
-      const nested = grouping(rule) && rule.type !== CSSRule.MEDIA_RULE;
-      // `active` is a measurement only for a rule a probe can reach, and a probe reaches a
-      // rule through its selector. A definition at-rule has none, so the `active` it
-      // carries is the default it was given rather than anything observed, and the
-      // conditions it sits under were never evaluated for it. Two consequences, and they
-      // are the same statement seen from either side of the block: it must not be recorded
-      // bare when the block that holds it was already recorded whole, because that writes
-      // it twice and writes the second copy unconditional; and where no whole copy exists
-      // it must be recorded under the conditions it was authored beneath. A style rule is
-      // measurable and keeps being flattened past a condition that was found to hold.
-      const measured = !!rule.selectorText;
-      if (!nested && !(whole && !measured) && (active || rule.type === CSSRule.MEDIA_RULE)) {
-        // Rebuilding the prelude stack before recording is also what keys the recorded set:
+    for (const { rule, media, active, carriers } of entries) {
+      if (active) {
+        // Rebuilding the carrier stack before recording is also what keys the recorded set:
         // two identical declarations in different layers are different declarations, and
         // deduplicating their bare text would collapse them past reconstruction.
-        const wrappers = measured ? preludes : conditions.concat(preludes);
-        recordRule(wrappers.reduceRight(
+        recordRule(carriers.reduceRight(
           (inner, prelude) => `${prelude}{${inner}}`,
           rule.cssText
         ));
