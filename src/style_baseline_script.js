@@ -21,6 +21,27 @@
    the same measurement as everything else, and each is then recorded on exactly the
    element that declared it. */
 const EXCLUDED_FROM_ALL = ['direction', 'unicode-bidi'];
+/* The declarations that put an element under the user-agent origin, written once as text
+   because both consumers need them as text. The pseudo-element pass has always built them
+   this way, into a stylesheet rule; the element pass reached through `element.style` for
+   the same effect, and that is the one path here a captured page can take away. `style` is
+   an accessor on `HTMLElement.prototype`, and a class field - `class B extends HTMLElement
+   { style = v }` - is installed with [[DefineOwnProperty]], which ignores the prototype
+   chain and shadows it with a plain value. Component frameworks declare fields; the read
+   then throws, and a throw in here is the capture's result, so the whole run ends with no
+   artifact. Assignment `this.style = v` does not do this, because [[Set]] walks the chain
+   and finds the accessor, which is why the construct has to be the field form to matter.
+   Appending these to the style attribute is not a guard around that read, it is the
+   deletion of it: the element pass already reads and restores the attribute, so inline
+   style had two access paths here and only one of them was the page's to redefine. The
+   text is identical either way - `!important` in the attribute has the same weight as the
+   priority argument. Replacing the block rather than appending to it is what the two calls
+   amounted to anyway: `all: revert !important` overrides every declaration the author wrote
+   there, and the only thing it does not reach is a custom property, which the baseline
+   enumeration discards before any consumer sees it. */
+const REVERT_TO_USER_AGENT = ['all', ...EXCLUDED_FROM_ALL]
+  .map(property => `${property}:revert !important`)
+  .join(';');
 /* The engine enumerates a logical alias beside every physical longhand it resolves to -
    `padding-inline-start` next to `padding-left`, `inline-size` next to `width`,
    `border-end-end-radius` next to `border-bottom-right-radius` - so recording both
@@ -129,12 +150,7 @@ const measureBaselines = (root, skip) => {
   }
   for (const level of levels) {
     const saved = level.map(element => element.getAttribute('style'));
-    for (const element of level) {
-      element.style.setProperty('all', 'revert', 'important');
-      for (const property of EXCLUDED_FROM_ALL) {
-        element.style.setProperty(property, 'revert', 'important');
-      }
-    }
+    for (const element of level) element.setAttribute('style', REVERT_TO_USER_AGENT);
     for (const element of level) elementBaselines.set(element, styleMap(getComputedStyle(element)));
     level.forEach((element, index) => {
       if (saved[index] === null) element.removeAttribute('style');
@@ -151,9 +167,7 @@ const measureBaselines = (root, skip) => {
   }
   if (pseudoPending.length) {
     const sheet = document.createElement('style');
-    sheet.textContent = `*::before,*::after{${['all', ...EXCLUDED_FROM_ALL]
-      .map(property => `${property}:revert !important`)
-      .join(';')}}`;
+    sheet.textContent = `*::before,*::after{${REVERT_TO_USER_AGENT}}`;
     document.head.appendChild(sheet);
     for (const [element, name] of pseudoPending) {
       const measured = pseudoBaselines.get(element) || {};

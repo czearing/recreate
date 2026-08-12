@@ -19,11 +19,7 @@ pub struct Cdp {
 }
 
 impl Cdp {
-    pub async fn connect(url: &str) -> anyhow::Result<Self> {
-        Self::connect_with_timeout(url, std::time::Duration::from_secs(30)).await
-    }
-
-    async fn connect_with_timeout(url: &str, timeout: std::time::Duration) -> anyhow::Result<Self> {
+    pub async fn connect(url: &str, timeout: std::time::Duration) -> anyhow::Result<Self> {
         let config = WebSocketConfig::default()
             .max_message_size(Some(64 * 1024 * 1024))
             .max_frame_size(Some(64 * 1024 * 1024));
@@ -37,10 +33,6 @@ impl Cdp {
             events: BTreeMap::new(),
             timeout,
         })
-    }
-
-    pub fn set_timeout(&mut self, timeout: std::time::Duration) {
-        self.timeout = timeout;
     }
 
     pub async fn send(&mut self, method: &str, params: Value) -> anyhow::Result<Value> {

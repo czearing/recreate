@@ -14,9 +14,9 @@ mod tests {
     /// default on every node.
     #[test]
     fn measures_against_the_user_agent_origin() {
-        assert!(SOURCE.contains("setProperty('all', 'revert', 'important')"));
-        assert!(!SOURCE.contains("'all', 'initial'"));
-        assert!(!SOURCE.contains("'all', 'unset'"));
+        assert!(SOURCE.contains("`${property}:revert !important`"));
+        assert!(!SOURCE.contains(":initial"));
+        assert!(!SOURCE.contains(":unset"));
     }
 
     /// `all` is specified to leave `direction` and `unicode-bidi` alone, so a baseline
@@ -38,8 +38,21 @@ mod tests {
                 "`all` does not reset {property}, so the probe must revert it: {declared}"
             );
         }
-        assert!(SOURCE.contains("for (const property of EXCLUDED_FROM_ALL)"));
-        assert!(SOURCE.contains("setProperty(property, 'revert', 'important')"));
+        assert!(SOURCE.contains("['all', ...EXCLUDED_FROM_ALL]"));
+    }
+
+    /// The element pass and the pseudo-element pass revert to the same origin, so they
+    /// must revert the same properties. They once built that list separately, and a
+    /// property added to one would have silently missed the other. Asserting that the
+    /// declarations are declared once and read by both consumers is what keeps the two
+    /// measurements comparable.
+    #[test]
+    fn both_passes_revert_through_one_declaration_list() {
+        assert_eq!(
+            SOURCE.matches("REVERT_TO_USER_AGENT").count(),
+            3,
+            "{SOURCE}"
+        );
     }
 
     /// The property set comes from the engine's own enumeration. A named list here is

@@ -119,7 +119,11 @@ pub async fn target(args: &CaptureArgs) -> Result<Session> {
     if args.reuse {
         activate(endpoint, &target.id).await?;
     }
-    let cdp = Cdp::connect(&target.websocket_url).await?;
+    let cdp = Cdp::connect(
+        &target.websocket_url,
+        crate::capture_settle::TRANSPORT_DEADLINE,
+    )
+    .await?;
     let tab = Tab::new(endpoint, &target.id, !args.reuse);
     Ok(Session { target, cdp, tab })
 }

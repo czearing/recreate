@@ -9,6 +9,8 @@ mod browser;
 mod browser_session_tests;
 mod capture;
 mod capture_settle;
+#[cfg(test)]
+mod capture_settle_budget_tests;
 mod capture_startup;
 #[cfg(test)]
 mod capture_startup_tests;
@@ -50,6 +52,8 @@ mod probe;
 mod release_gate_tests;
 mod rule_activation_script;
 #[cfg(test)]
+mod script_reach;
+#[cfg(test)]
 #[path = "sequence_phase_tests.rs"]
 mod sequence_phase_tests;
 #[cfg(test)]
@@ -62,6 +66,8 @@ mod serve;
 mod skill;
 mod state_style_script;
 mod style_baseline;
+#[cfg(test)]
+mod style_baseline_double;
 #[cfg(test)]
 mod style_baseline_pruning_tests;
 #[cfg(test)]

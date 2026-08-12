@@ -6,22 +6,17 @@
 use crate::node_eval;
 
 /// A document double whose scroll offsets collapse when an element's range is removed,
-/// which is what a browser does when `all: revert` drops `height` and `overflow`.
+/// which is what a browser does when `all: revert` drops `height` and `overflow`. Its
+/// elements shadow `style` with a symbol, as a custom element declaring the class field
+/// `style = v` does, so a probe that reached through the instance would throw here.
 const DOUBLE: &str = r#"
-class Style {
-  constructor(element){ this.element = element; this.properties = new Map(); }
-  setProperty(name, value){
-    this.properties.set(name, value);
-    if (name === 'all' && value === 'revert') this.element.collapse();
-  }
-}
 class Element {
   constructor(tagName, scrollable){
     this.tagName = tagName;
     this.children = [];
     this.shadowRoot = null;
     this.attributes = new Map();
-    this.style = new Style(this);
+    this.style = Symbol('clobbered');
     this.scrollable = scrollable;
     this.scrollLeft = 0;
     this.scrollTop = 0;
@@ -33,7 +28,9 @@ class Element {
   getAttribute(name){ return this.attributes.has(name) ? this.attributes.get(name) : null; }
   setAttribute(name, value){
     this.attributes.set(name, value);
-    if (name === 'style') this.scrollable = true;
+    if (name !== 'style') return;
+    if (value.includes('all:revert !important')) this.collapse();
+    else this.scrollable = true;
   }
   removeAttribute(name){
     this.attributes.delete(name);

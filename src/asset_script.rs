@@ -9,7 +9,7 @@
 /// Completes the table with the content no reference names.
 const SURFACES: &str = "\n  Object.assign(assetData, recreateSurfaceAssets());\n";
 
-const DOWNLOADS: &str = r#"
+pub(crate) const DOWNLOADS: &str = r#"
   const assetData = {};
   await Promise.all(Array.from(assets)
     .filter(url => !url.startsWith('data:'))

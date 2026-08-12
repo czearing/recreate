@@ -11,7 +11,7 @@ pub fn source() -> String {
     TEMPLATE.replace("__STABLE_GAP_MS__", &STABLE_GAP_MS.to_string())
 }
 
-const TEMPLATE: &str = r#"
+pub(crate) const TEMPLATE: &str = r#"
 
   const attributeSequences = [];
   const sequenceCandidates = [];

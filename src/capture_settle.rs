@@ -22,7 +22,20 @@ const QUIET_FRAMES: u32 = 2;
 const STABLE_CEILING_MS: u64 = 8_000;
 /// The longest a page may take to report itself loaded, or a startup curtain to leave,
 /// before capture gives up entirely.
-const READY_CEILING_MS: u64 = 30_000;
+pub(crate) const READY_CEILING_MS: u64 = 30_000;
+/// How long the transport waits for an injected script to answer.
+///
+/// This is derived rather than declared, because the two numbers describe one thing from
+/// two ends. The settle probe is the longest-running script the tool injects, and the
+/// ceiling above is a deliberate grant: a page that never goes quiet is still meant to be
+/// captured once it expires. A transport deadline equal to that grant makes the grant
+/// unreachable — the probe resolves at the same instant the client stops listening, so the
+/// outcome the ceiling exists to produce is discarded by the caller that asked for it, and
+/// every page that needs the full budget fails instead of being captured late. The headroom
+/// covers only what is left after the page resolves: one round trip and the serialisation
+/// of the reply.
+pub const TRANSPORT_DEADLINE: std::time::Duration =
+    std::time::Duration::from_millis(READY_CEILING_MS + 10_000);
 /// The minimum spacing between geometry attempts, so a page that never stops moving rate
 /// limits its own scans instead of running one per frame until the ceiling.
 const RETRY_MS: u64 = 50;
