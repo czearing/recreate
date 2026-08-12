@@ -139,6 +139,9 @@ mod selector_marker;
 #[cfg(test)]
 #[path = "selector_marker_tests.rs"]
 mod selector_marker_tests;
+#[cfg(test)]
+#[path = "selector_quoting_tests.rs"]
+mod selector_quoting_tests;
 mod selector_scope;
 #[cfg(test)]
 mod selector_scope_fixture;

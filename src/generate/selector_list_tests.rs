@@ -137,6 +137,31 @@ fn refuses_to_flatten_a_wrapper_holding_a_list() {
     assert_eq!(static_member(".card:hover"), None);
 }
 
+/// A quoted attribute value is delimited by its quotes, so Selectors 4 lets it hold any
+/// character including a colon — only an unquoted value would need escaping. Such a member
+/// names no pseudo-class and no state; it is the same exact-value test the generated class
+/// already encodes, so refusing it drops an ordinary authored rule whole.
+#[test]
+fn keeps_a_colon_inside_a_quoted_attribute_value() {
+    let mut node = node("slot");
+    node.attributes.insert("data-when".into(), "09:00".into());
+
+    assert!(
+        matches!(
+            static_member("[data-when=\"09:00\"]"),
+            Some(std::borrow::Cow::Borrowed("[data-when=\"09:00\"]"))
+        ),
+        "a member the grammar finds no colon in is returned untouched, never rewritten"
+    );
+    assert_eq!(
+        media(
+            &node,
+            &["@media (max-width: 733px) { [data-when=\"09:00\"] { color: red; } }"]
+        ),
+        vec!["@media (max-width: 733px){.generated{color: red;}}".to_string()]
+    );
+}
+
 /// The authored-value index carried its own copy of this rule and vetoed the same way, so a
 /// list mixing a static member with a stateful one lost the authored value entirely.
 #[test]
