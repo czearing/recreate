@@ -127,10 +127,18 @@ mod scroll_position_tests;
 mod scroll_state;
 #[cfg(test)]
 mod scroll_state_tests;
+#[cfg(test)]
+mod selector_combinator_tests;
 mod selector_list;
 #[cfg(test)]
 mod selector_list_tests;
+mod selector_marker;
+#[cfg(test)]
+#[path = "selector_marker_tests.rs"]
+mod selector_marker_tests;
 mod selector_scope;
+#[cfg(test)]
+mod selector_scope_fixture;
 #[cfg(test)]
 mod selector_scope_tests;
 mod source_css;

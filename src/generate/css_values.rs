@@ -49,3 +49,14 @@ fn append_pseudo(signature: &mut Signature, pseudo: Option<&Pseudo>) {
 pub fn hash(value: &str) -> String {
     hex::encode(Sha256::digest(value.as_bytes()))
 }
+
+/// Add a class to a `class` attribute value, leaving one already present alone.
+pub(super) fn append_class(value: &mut String, class: &str) {
+    if value.split_whitespace().any(|item| item == class) {
+        return;
+    }
+    if !value.is_empty() {
+        value.push(' ');
+    }
+    value.push_str(class);
+}

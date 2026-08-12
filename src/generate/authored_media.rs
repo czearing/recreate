@@ -1,8 +1,17 @@
 use super::selector_scope::Scope;
 use crate::model::Node;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 
-pub fn rules(node: &Node, scope: &Scope<'_>, rules: &[String]) -> Vec<String> {
+/// The authored `@media` rules this node keeps, and the compounds their selectors name.
+///
+/// A compound is reported only when a rule survives deduplication, so a page whose authored
+/// media rules all reduce to single compounds reports none and gains no markers.
+pub fn rules(
+    node: &Node,
+    scope: &Scope<'_>,
+    rules: &[String],
+    compounds: &mut BTreeSet<String>,
+) -> Vec<String> {
     let mut output = Vec::new();
     let mut seen = HashSet::new();
     for rule in rules {
@@ -24,9 +33,14 @@ pub fn rules(node: &Node, scope: &Scope<'_>, rules: &[String]) -> Vec<String> {
             else {
                 continue;
             };
-            let rule = format!("@media {condition}{{{scoped}{{{}}}}}", declarations.trim());
+            let rule = format!(
+                "@media {condition}{{{}{{{}}}}}",
+                scoped.selector,
+                declarations.trim()
+            );
             if seen.insert(rule.clone()) {
                 output.push(rule);
+                compounds.extend(scoped.compounds);
             }
         }
     }
@@ -68,7 +82,12 @@ mod tests {
             let nodes = [node.clone()];
             let classes =
                 std::collections::BTreeMap::from([(node.path.clone(), "generated".to_string())]);
-            rules(&node, &Scope::new(&nodes, &classes), &captured)
+            rules(
+                &node,
+                &Scope::new(&nodes, &classes, "r"),
+                &captured,
+                &mut BTreeSet::new(),
+            )
         };
 
         assert_eq!(rules.len(), 2);

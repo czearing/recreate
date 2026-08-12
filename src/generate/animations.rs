@@ -1,4 +1,5 @@
 use super::before_change;
+use super::css_values::append_class;
 use crate::model::Animation;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -118,13 +119,6 @@ pub(crate) fn sampled_layout_observation(animation: &Animation) -> bool {
                 && !values.contains_key("playState")
                 && !values.contains_key("playbackRate")
         })
-}
-
-fn append_class(value: &mut String, class: &str) {
-    if !value.split_whitespace().any(|item| item == class) {
-        value.push(' ');
-        value.push_str(class);
-    }
 }
 
 #[cfg(test)]

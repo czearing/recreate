@@ -64,6 +64,7 @@ pub(super) fn build_scoped(
     });
     let mut css = output.css;
     let mut classes = output.classes;
+    let scoped_compounds = output.scoped_compounds;
     timing("responsive");
     let mut interaction_classes =
         super::css_interactions::append(specification, assets, &classes, &mut css, &timing);
@@ -103,6 +104,7 @@ pub(super) fn build_scoped(
     if !include_interactions {
         interaction_classes.clear();
     }
+    super::selector_marker::apply(&scoped_compounds, &base.nodes, prefix, &mut classes);
     CssOutput {
         css,
         classes,

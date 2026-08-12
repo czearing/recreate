@@ -42,7 +42,7 @@ pub(super) fn matches_node(compound: &str, node: &Node) -> bool {
 pub(super) fn terminal_compound(selector: &str) -> &str {
     selector
         .trim()
-        .rsplit(|character: char| character.is_whitespace() || matches!(character, '>' | '+' | '~'))
+        .rsplit(is_combinator)
         .find(|part| !part.is_empty())
         .unwrap_or_default()
 }
@@ -115,4 +115,45 @@ pub(super) fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
         remaining = after_close;
     }
     attributes
+}
+
+/// The selector split into compounds, each paired with the combinator that precedes it.
+///
+/// The leading compound has no combinator. A descendant relationship is reported as a space
+/// so every relationship is one character and the walk needs no separate case for it.
+pub(super) fn split(selector: &str) -> Vec<(Option<char>, &str)> {
+    let mut steps = Vec::new();
+    let mut combinator = None;
+    let mut start = None;
+    let mut depth = 0usize;
+    let mut quote = None;
+    for (offset, character) in selector.char_indices() {
+        match (quote, character) {
+            (Some(open), _) if character == open => quote = None,
+            (Some(_), _) => continue,
+            (None, '"' | '\'') => quote = Some(character),
+            (None, '(' | '[') => depth += 1,
+            (None, ')' | ']') => depth = depth.saturating_sub(1),
+            (None, _) if depth == 0 && is_combinator(character) => {
+                if let Some(begin) = start.take() {
+                    steps.push((combinator.take(), &selector[begin..offset]));
+                    combinator = Some(' ');
+                }
+                if character != ' ' {
+                    combinator = Some(character);
+                }
+                continue;
+            }
+            _ => {}
+        }
+        start.get_or_insert(offset);
+    }
+    if let Some(begin) = start {
+        steps.push((combinator, selector[begin..].trim_end()));
+    }
+    steps
+}
+
+pub(super) fn is_combinator(character: char) -> bool {
+    character.is_whitespace() || matches!(character, '>' | '+' | '~')
 }

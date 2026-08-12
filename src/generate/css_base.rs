@@ -1,11 +1,13 @@
 use super::css::{ScopeCache, global_rule, retain};
 use super::css_values::{hash, responsive_signatures_for};
 use crate::model::{PageState, Specification};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 pub struct Output {
     pub css: String,
     pub classes: BTreeMap<String, String>,
+    /// The authored compounds a scoped rewrite named, awaiting their markers.
+    pub scoped_compounds: BTreeSet<String>,
 }
 
 pub struct Request<'a, T: Fn(&str)> {
@@ -137,22 +139,33 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         changed_paths.as_ref(),
         &fluid_heights,
     );
-    append_authored_media(base, &classes, &mut css);
-    Output { css, classes }
+    let scoped_compounds = append_authored_media(base, prefix, &classes, &mut css);
+    Output {
+        css,
+        classes,
+        scoped_compounds,
+    }
 }
 
-fn append_authored_media(base: &PageState, classes: &BTreeMap<String, String>, css: &mut String) {
+fn append_authored_media(
+    base: &PageState,
+    prefix: &str,
+    classes: &BTreeMap<String, String>,
+    css: &mut String,
+) -> BTreeSet<String> {
     let mut emitted = HashSet::new();
-    let scope = super::selector_scope::Scope::new(&base.nodes, classes);
+    let mut compounds = BTreeSet::new();
+    let scope = super::selector_scope::Scope::new(&base.nodes, classes, prefix);
     for node in &base.nodes {
         if classes.get(&node.path).is_none() {
             continue;
         };
-        for rule in super::authored_media::rules(node, &scope, &base.css_rules) {
+        for rule in super::authored_media::rules(node, &scope, &base.css_rules, &mut compounds) {
             if emitted.insert(rule.clone()) {
                 css.push_str(&rule);
                 css.push('\n');
             }
         }
     }
+    compounds
 }
