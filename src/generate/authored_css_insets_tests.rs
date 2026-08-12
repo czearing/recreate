@@ -4,6 +4,7 @@ use crate::model::{Node, Rect, Styles};
 pub(super) fn node(class: &str, position: &str) -> Node {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "html>body>div>aside".into(),

@@ -4,15 +4,15 @@
 //! a positioned element that covers the viewport, paints above the page, and still takes
 //! pointer input. Capture has to recognise it three times — to wait for it to appear, to
 //! wait for it to leave, and to decide which nodes belong to the startup layer — and the
-//! rule had been written out separately at each site. The copies drifted: the one selecting
-//! startup nodes had lost the pointer-events, display and visibility clauses, so it selected
-//! a different set of elements than the check that decided an overlay was there at all.
+//! rule had been written out separately at each site.
 //!
-//! The thresholds are named once here. Capture runs in two places, in-page JavaScript and
-//! Rust over an already-captured node, so the rule is rendered twice from those same
-//! constants and a test holds both renderings against one fixture.
-
-use crate::model::{Node, Viewport};
+//! The rule now exists once, as this JavaScript expression, and is asked once per element
+//! while the page is still open. Rust used to carry a second rendering of the same clauses
+//! over the captured node, which looks like a safe duplicate and is not: `Node::style` is
+//! the authored diff, so a property equal to its revert baseline is absent. Every negative
+//! clause then read absence as evidence — `None != Some("hidden")` is true — and a subtree
+//! hidden by an ancestor was reported as a curtain. The verdict is recorded as
+//! [`crate::model::Node::blocking_overlay`] instead, for the reason `disabled` and `rtl` are.
 
 /// The share of the viewport an element must cover before it can hide the page behind it.
 const AREA_RATIO: f64 = 0.9;
@@ -24,7 +24,15 @@ const POSITIONS: [&str; 2] = ["absolute", "fixed"];
 /// The rule as a JavaScript expression, for use inside an injected page script.
 ///
 /// Evaluates to a function of one element. Callers name it themselves so the same source
-/// can back a `find` predicate and a standalone test.
+/// can back a `find` predicate, a per-node record and a standalone test.
+///
+/// Whether the element is drawn at all is asked of the engine rather than spelled out.
+/// `display`, `visibility`, `opacity` and `content-visibility` each hide an element for a
+/// different reason and resolve by a different rule — `visibility` inherits, `opacity`
+/// composites the subtree without inheriting, `content-visibility: auto` is not a value at
+/// all — so no per-element style read covers them, and enumerating them is what let an
+/// `opacity: 0` ancestor slip past even against live computed style. `checkVisibility` is
+/// specified to answer for the element and every one of its ancestors at once.
 pub fn js_predicate() -> String {
     let positions = POSITIONS.map(|value| format!("'{value}'")).join(",");
     format!(
@@ -36,26 +44,11 @@ pub fn js_predicate() -> String {
          [{positions}].includes(style.position) &&\
          Number.isFinite(z) && z >= {MIN_Z_INDEX} &&\
          style.pointerEvents !== 'none' &&\
-         style.display !== 'none' &&\
-         style.visibility !== 'hidden';\
+         element.checkVisibility({{\
+         opacityProperty: true, visibilityProperty: true, contentVisibilityAuto: true\
+         }});\
          }})"
     )
-}
-
-/// The rule against a node already read out of the page.
-pub fn is_blocking_overlay(node: &Node, viewport: &Viewport) -> bool {
-    let viewport_area = f64::from(viewport.width) * f64::from(viewport.height);
-    let style = |name: &str| node.style.get(name).map(String::as_str);
-    let z_index = node
-        .style
-        .get("z-index")
-        .and_then(|value| value.parse::<i32>().ok());
-    node.rect.width * node.rect.height >= viewport_area * AREA_RATIO
-        && matches!(style("position"), Some("absolute" | "fixed"))
-        && z_index.is_some_and(|value| value >= MIN_Z_INDEX)
-        && style("pointer-events") != Some("none")
-        && style("display") != Some("none")
-        && style("visibility") != Some("hidden")
 }
 
 #[cfg(test)]

@@ -9,6 +9,7 @@ fn node() -> Node {
         disabled: false,
         rtl: false,
         writing_mode: WritingMode::default(),
+        blocking_overlay: false,
         path: "html>body>div".into(),
         parent: Some("html>body".into()),
         tag: "div".into(),

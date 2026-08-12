@@ -4,6 +4,7 @@ use crate::model::Rect;
 fn heading(font_size: &str, width: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "html>body>h1".into(),
@@ -58,6 +59,7 @@ fn emits_responsive_clamped_typography() {
 fn shrinking_title(width: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "html>body>div>span".into(),

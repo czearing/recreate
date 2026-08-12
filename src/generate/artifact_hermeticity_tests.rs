@@ -24,6 +24,7 @@ fn specification() -> Specification {
         .enumerate()
         .map(|(index, path)| Node {
             writing_mode: Default::default(),
+            blocking_overlay: false,
             disabled: false,
             rtl: false,
             path: (*path).to_string(),

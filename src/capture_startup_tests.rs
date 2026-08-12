@@ -1,12 +1,49 @@
 use crate::{
-    capture_startup::ensure_settled,
+    capture_startup::note_curtain,
     model::{Node, PageState, Rect, Viewport},
 };
 
+/// The suspicion is recorded onto the artifact rather than raised, and the captured nodes
+/// survive. Aborting here discarded every viewport already captured and wrote no files, so
+/// the one record that could have adjudicated the guess was the thing it destroyed.
 #[test]
-fn rejects_blocking_overlay_in_settled_capture() {
+fn records_a_blocking_overlay_without_discarding_the_capture() {
     let mut state = state();
-    let mut overlay = node("html>body>div");
+    state.nodes.push(overlay("html>body>div"));
+
+    note_curtain(&mut state);
+
+    assert_eq!(
+        state.capture_blockers,
+        vec!["settled capture still contains a blocking overlay at html>body>div".to_string()]
+    );
+    assert_eq!(state.nodes.len(), 2, "captured nodes must survive the note");
+}
+
+#[test]
+fn settled_content_without_a_blocking_overlay_is_not_noted() {
+    let mut state = state();
+    note_curtain(&mut state);
+    assert!(state.capture_blockers.is_empty());
+}
+
+/// The verdict is a recorded fact about the element, not something re-derived from the
+/// authored declarations. A node that satisfies every geometric and stacking clause but was
+/// judged invisible by the engine carries alse, and nothing here may second-guess it.
+#[test]
+fn a_node_the_page_judged_invisible_is_not_noted_however_it_is_styled() {
+    let mut state = state();
+    let mut hidden = overlay("html>body>div");
+    hidden.blocking_overlay = false;
+    state.nodes.push(hidden);
+
+    note_curtain(&mut state);
+
+    assert!(state.capture_blockers.is_empty());
+}
+
+fn overlay(path: &str) -> Node {
+    let mut overlay = node(path);
     overlay.rect = Rect {
         x: 0.0,
         y: 0.0,
@@ -16,14 +53,8 @@ fn rejects_blocking_overlay_in_settled_capture() {
     overlay.style.insert("position".into(), "absolute".into());
     overlay.style.insert("z-index".into(), "100".into());
     overlay.style.insert("pointer-events".into(), "auto".into());
-    state.nodes.push(overlay);
-
-    assert!(ensure_settled(&state).is_err());
-}
-
-#[test]
-fn accepts_settled_content_without_blocking_overlay() {
-    assert!(ensure_settled(&state()).is_ok());
+    overlay.blocking_overlay = true;
+    overlay
 }
 
 fn state() -> PageState {
@@ -53,6 +84,7 @@ fn state() -> PageState {
 fn node(path: &str) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: path.into(),

@@ -1,7 +1,10 @@
 use crate::node_eval;
 use serde_json::{Value, json};
 
-const HARNESS: &str = include_str!("capture_settle_harness.js");
+const HARNESS: &str = concat!(
+    include_str!("dom_style_harness.js"),
+    include_str!("capture_settle_harness.js")
+);
 
 /// Runs the shipped settle script against a scripted page and reports what it decided.
 fn settle(scene: Value, wait_for_startup: bool) -> Value {

@@ -47,6 +47,7 @@ mod tests {
     fn node(path: &str, parent: Option<&str>, width: f64) -> Node {
         Node {
             writing_mode: Default::default(),
+            blocking_overlay: false,
             disabled: false,
             rtl: false,
             path: path.into(),

@@ -5,6 +5,7 @@ use crate::model::{Node, Rect, Styles};
 fn compound_modifier_rules_require_every_class() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "section".into(),
@@ -41,6 +42,7 @@ fn compound_modifier_rules_require_every_class() {
 fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "html>body>main".into(),
@@ -72,6 +74,7 @@ fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
 fn restores_authored_intrinsic_motion() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "button".into(),
@@ -110,6 +113,7 @@ fn restores_authored_intrinsic_motion() {
 fn keeps_resolved_motion_when_authored_variables_are_filtered() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div".into(),
@@ -149,6 +153,7 @@ fn keeps_resolved_motion_when_authored_variables_are_filtered() {
 fn keeps_measured_width_for_ordinary_flex_items() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "article".into(),
@@ -185,6 +190,7 @@ fn keeps_measured_width_for_ordinary_flex_items() {
 fn removes_measured_width_from_growing_flex_items() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "article>div".into(),

@@ -23,6 +23,7 @@ pub fn empty_state() -> crate::model::PageState {
 pub fn empty_node(path: &str) -> crate::model::Node {
     crate::model::Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         path: path.into(),
         parent: path.rsplit_once('>').map(|(parent, _)| parent.into()),
         tag: path

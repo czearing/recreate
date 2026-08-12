@@ -11,6 +11,7 @@ fn identifies_dynamic_attributes() {
 fn probe(path: &str, tag: &str) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: path.into(),

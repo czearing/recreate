@@ -115,3 +115,29 @@ fn generated_capture_script_parses() {
         .unwrap();
     assert!(status.success());
 }
+
+/// The occlusion verdict must be reached while the page is open, because the record the
+/// script writes is an authored diff and cannot answer it afterwards. This asserts the rule
+/// reached the composed script and is asked per node; the verdicts themselves are proven by
+/// locking_overlay_tests.
+#[test]
+fn records_the_occlusion_verdict_the_authored_diff_cannot_hold() {
+    let script = source();
+    assert!(!script.contains("__BLOCKING_OVERLAY__"));
+    assert!(script.contains("blocking_overlay: isBlockingOverlay(element)"));
+    assert!(script.contains("element.checkVisibility({"));
+}
+
+/// A page that never reports itself settled is read anyway, so the doubt has to reach the
+/// artifact. The capture script is the single owner of capture_blockers, and the settle
+/// script is the only thing that knows the ceiling released it, so the fact is handed over
+/// rather than re-derived on the Rust side where it is no longer observable.
+#[test]
+fn an_unsettled_page_records_the_doubt_on_the_artifact() {
+    let script = source();
+    assert!(script.contains("window.__recreateUnsettled"));
+    assert!(script.contains("it was read at the stability ceiling"));
+    assert!(
+        crate::capture_settle::source(true, true).contains("window.__recreateUnsettled = true")
+    );
+}

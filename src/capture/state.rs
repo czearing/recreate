@@ -1,7 +1,7 @@
 use crate::{
     browser,
     capture_startup::{
-        ensure_settled, startup_nodes, wait_ready, wait_ready_without_lifecycle, wait_startup,
+        note_curtain, startup_nodes, wait_ready, wait_ready_without_lifecycle, wait_startup,
     },
     model::{PageState, Viewport},
     page_script,
@@ -21,8 +21,8 @@ pub async fn capture_state(
     reload: bool,
 ) -> Result<PageState> {
     prepare_state(cdp, &viewport, reload).await?;
-    let state = read_state(cdp, viewport).await?;
-    ensure_settled(&state)?;
+    let mut state = read_state(cdp, viewport).await?;
+    note_curtain(&mut state);
     Ok(state)
 }
 
@@ -38,7 +38,7 @@ pub(super) async fn capture_state_without_assets(
         .context("responsive capture returned non-string")?;
     let mut state: PageState = serde_json::from_str(text)?;
     state.viewport = viewport;
-    ensure_settled(&state)?;
+    note_curtain(&mut state);
     Ok(state)
 }
 
@@ -95,7 +95,7 @@ pub(super) async fn capture_state_with_startup(
     let startup_elapsed = started.elapsed().as_millis() as u64;
     observe_dynamic(cdp, true).await?;
     let mut state = read_state(cdp, viewport).await?;
-    ensure_settled(&state)?;
+    note_curtain(&mut state);
     if let Some((startup_state, delay)) = startup {
         merge_startup(&mut state, startup_state, delay, startup_elapsed);
     }

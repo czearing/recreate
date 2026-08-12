@@ -56,6 +56,19 @@ pub struct Node {
     /// disabled, so the answer is taken from the engine and recorded once.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub disabled: bool,
+    /// Whether the element was a full-page blocking overlay when the page was read.
+    ///
+    /// The verdict is taken from the engine for the same reason `disabled` is. Whether an
+    /// element hides the page behind it depends on `visibility`, which inherits, on
+    /// `opacity`, which composites a subtree without inheriting, and on `content-visibility`,
+    /// which is not a declaration in force at the element at all. A record of authored
+    /// declarations holds none of those for a descendant that declared nothing, and reading
+    /// their absence as evidence is what let a parked dialog be reported as a curtain. The
+    /// rule is spelled once in [`crate::blocking_overlay`] and answered while the page is
+    /// open. It is a fact about the element rather than a declaration, and is never emitted
+    /// as CSS.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub blocking_overlay: bool,
     /// Whether the element's inline axis ran right-to-left when the page was read.
     ///
     /// `direction` is inherited, so a page declares it once at the root and every box it
@@ -149,58 +162,7 @@ pub struct AttributeSequence {
     pub repeats: Option<bool>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-pub struct PageState {
-    pub url: String,
-    pub title: String,
-    #[serde(default)]
-    pub viewport: Viewport,
-    pub nodes: Vec<Node>,
-    #[serde(default)]
-    pub dom: BTreeMap<String, DomNode>,
-    #[serde(default)]
-    pub capture_blockers: Vec<String>,
-    #[serde(default)]
-    pub startup_nodes: Vec<Node>,
-    #[serde(default)]
-    pub startup_delay_ms: u64,
-    #[serde(default)]
-    pub startup_duration_ms: u64,
-    pub animations: Vec<Animation>,
-    #[serde(default)]
-    pub state_styles: Vec<StateStyle>,
-    #[serde(default)]
-    pub attribute_sequences: Vec<AttributeSequence>,
-    pub css_rules: Vec<String>,
-    pub asset_urls: Vec<String>,
-    #[serde(default)]
-    pub asset_data: BTreeMap<String, String>,
-}
+#[path = "model/capture_result.rs"]
+mod capture_result;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Specification {
-    pub schema_version: u32,
-    pub requested_url: String,
-    pub captured_url: String,
-    pub states: Vec<PageState>,
-    #[serde(default)]
-    pub interactions: Vec<Interaction>,
-    #[serde(default)]
-    pub transitions: Vec<InteractionTransition>,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct BrowserCookie {
-    pub name: String,
-    pub value: String,
-    pub domain: String,
-    pub path: String,
-    pub secure: bool,
-}
-
-#[derive(Clone, Debug, Serialize)]
-pub struct Acceptance {
-    pub passed: bool,
-    pub checks: BTreeMap<String, bool>,
-    pub counts: BTreeMap<String, usize>,
-}
+pub use capture_result::{Acceptance, BrowserCookie, PageState, Specification};

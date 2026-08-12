@@ -19,6 +19,7 @@ pub fn span(ordinal: usize) -> Node {
     style.insert("display".into(), "inline-block".into());
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: format!("startup>html>body:nth-of-type(1)>span:nth-of-type({ordinal})"),

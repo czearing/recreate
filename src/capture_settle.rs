@@ -86,7 +86,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
         }}
         shown++;
       }}
-      curtain ||= visible && blocking(element);
+      curtain ||= blocking(element);
     }}
     return {{ signature: shown ? shown + ':' + digest : '', curtain }};
   }};
@@ -110,6 +110,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
       if ({wait_for_startup} && after.curtain) {{ await pause(); continue; }}
       return true;
     }}
+    window.__recreateUnsettled = true;
     return false;
   }} finally {{
     observer.disconnect();

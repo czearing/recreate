@@ -5,6 +5,7 @@ use crate::model::{Node, Rect, Styles};
 fn removes_measured_height_from_growing_flex_items() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "form>div".into(),
@@ -41,6 +42,7 @@ fn removes_measured_height_from_growing_flex_items() {
 fn keeps_used_height_for_percentage_sized_textareas() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "form>textarea".into(),
@@ -76,6 +78,7 @@ fn keeps_used_height_for_percentage_sized_textareas() {
 fn removes_sampled_height_from_intrinsic_flex_cards() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "article>button".into(),
@@ -117,6 +120,7 @@ fn removes_sampled_height_from_intrinsic_flex_cards() {
 fn removes_sampled_height_from_a_content_sized_flex_section() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "main>section".into(),
@@ -157,6 +161,7 @@ fn removes_sampled_height_from_a_content_sized_flex_section() {
 fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div>div".into(),
@@ -195,6 +200,7 @@ fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
 fn keeps_the_height_a_flex_container_authored_through_a_variable() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "body>header".into(),
@@ -231,6 +237,7 @@ fn keeps_the_height_a_flex_container_authored_through_a_variable() {
 fn keeps_the_height_a_flex_container_authored() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "main>section".into(),
@@ -265,6 +272,7 @@ fn keeps_the_height_a_flex_container_authored() {
 fn removes_resolved_grid_rows_without_authored_tracks() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "main>section".into(),
@@ -302,6 +310,7 @@ fn removes_resolved_grid_rows_without_authored_tracks() {
 fn rejects_authored_layout_values_from_inactive_media_rules() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "header".into(),
@@ -342,6 +351,7 @@ fn rejects_authored_layout_values_from_inactive_media_rules() {
 fn ignores_cascade_keywords_when_reading_authored_values() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div>button".into(),
@@ -388,6 +398,7 @@ fn ignores_cascade_keywords_when_reading_authored_values() {
 fn reads_authored_values_from_static_pseudo_class_selectors() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div>div".into(),
@@ -428,6 +439,7 @@ fn reads_authored_values_from_static_pseudo_class_selectors() {
 fn ignores_authored_values_the_captured_style_contradicts() {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div>div".into(),

@@ -6,6 +6,7 @@ __STYLE_BASELINE__
 __ASSET_ATTRIBUTES__
   const skipped = element =>
     ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup');
+  const isBlockingOverlay = __BLOCKING_OVERLAY__;
   measureBaselines(document.documentElement, skipped);
   const computedStyles = new WeakMap(), computedStylePropertySet = new Set();
   const scan = element => {
@@ -106,6 +107,7 @@ __ASSET_ATTRIBUTES__
       text: '',
       attributes,
       disabled: element.matches(':disabled'),
+      blocking_overlay: isBlockingOverlay(element),
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
@@ -223,7 +225,11 @@ __ASSET_CAPTURE__
     dom,
     capture_blockers: (unreadableSheets > 0
       ? [`${unreadableSheets} stylesheet(s) could not be read; their authored rules are missing`]
-      : []).concat(recreateSurfaceBlockers()),
+      : [])
+      .concat(window.__recreateUnsettled
+        ? ['page never reported itself settled; it was read at the stability ceiling']
+        : [])
+      .concat(recreateSurfaceBlockers()),
     animations,
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,

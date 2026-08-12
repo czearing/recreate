@@ -46,15 +46,6 @@ globalThis.setTimeout = (callback, delay) => {
   });
 };
 
-const DEFAULTS = {
-  display: "block",
-  visibility: "visible",
-  opacity: "1",
-  position: "static",
-  "z-index": "auto",
-  "pointer-events": "auto",
-};
-
 // Element identity is keyed by position in the step, not by the step's own object, so an
 // element that moves between frames is still recognisably the same element — which is what
 // lets an animation point at one and the script match it against the scanned page.
@@ -65,8 +56,8 @@ const element = (spec, index) => {
   const node = cache.get(index);
   node.tagName = (spec.tag || "div").toUpperCase();
   node.getBoundingClientRect = () => spec.rect;
-  node.declarations = { ...DEFAULTS, ...(spec.style || {}) };
-  return node;
+  node.declarations = spec.style || {};
+  return recreateStyled(node);
 };
 
 const animation = (spec) =>
@@ -87,17 +78,6 @@ globalThis.CSSAnimation = CSSAnimation;
 
 globalThis.innerWidth = 1000;
 globalThis.innerHeight = 1000;
-
-globalThis.getComputedStyle = (target) =>
-  new Proxy(
-    {},
-    {
-      get: (_, name) =>
-        target.declarations[
-          String(name).replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase())
-        ],
-    },
-  );
 
 globalThis.document = {
   get readyState() {

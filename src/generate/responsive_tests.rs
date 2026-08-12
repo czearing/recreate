@@ -9,6 +9,7 @@ pub(super) fn node(tag: &str, x: f64, width: f64) -> Node {
     }
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: tag.into(),

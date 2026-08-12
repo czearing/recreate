@@ -9,6 +9,7 @@ fn rules(texts: &[&str]) -> Vec<String> {
 fn box_node() -> Node {
     let mut node = Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "div".into(),

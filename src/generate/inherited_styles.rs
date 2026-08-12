@@ -68,6 +68,7 @@ mod tests {
     fn node(tag: &str, class: &str, styles: &[(&str, &str)]) -> Node {
         let mut node = Node {
             writing_mode: Default::default(),
+            blocking_overlay: false,
             disabled: false,
             rtl: false,
             path: tag.into(),

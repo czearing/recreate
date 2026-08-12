@@ -28,6 +28,7 @@ fn declared(css: &str) -> BTreeMap<&str, &str> {
 fn element(class: &str, y: f64, height: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: "html>body>section".into(),

@@ -1,5 +1,5 @@
 use crate::{
-    blocking_overlay::{is_blocking_overlay, js_predicate},
+    blocking_overlay::js_predicate,
     capture::read_state,
     capture_settle,
     cdp::Cdp,
@@ -29,34 +29,45 @@ pub async fn wait_ready_without_lifecycle(cdp: &mut Cdp, wait_for_startup: bool)
 /// same question from Rust meant every answer was rounded up to the next poll interval, and
 /// the cost of asking — a full style scan of every element — was paid on every tick instead
 /// of only at the moments the answer could have changed.
+///
+/// A page that never reports itself settled is read anyway. "Settled" is a guess about a
+/// page the tool has never seen, and failing here discarded every viewport already captured
+/// over that guess, leaving nothing to audit it against. The page records the fact for
+/// itself, so the artifact carries the doubt instead of the run carrying it as an error. A
+/// transport failure is still a fact about the run and still fails.
 async fn wait_ready_mode(
     cdp: &mut Cdp,
     wait_for_startup: bool,
     wait_for_lifecycle: bool,
 ) -> Result<()> {
-    let settled = cdp
-        .evaluate(&capture_settle::source(
-            wait_for_lifecycle,
-            wait_for_startup,
-        ))
-        .await?;
-    anyhow::ensure!(
-        settled.as_bool() == Some(true),
-        "page did not become stable"
-    );
+    cdp.evaluate(&capture_settle::source(
+        wait_for_lifecycle,
+        wait_for_startup,
+    ))
+    .await?;
     Ok(())
 }
 
-/// A settled capture that still holds a curtain recorded the splash screen, not the page.
-pub fn ensure_settled(state: &PageState) -> Result<()> {
-    if state
+/// A settled capture that still holds a curtain probably recorded the splash screen rather
+/// than the page — and "probably" is why this records the suspicion instead of raising it.
+///
+/// The verdict comes from a six-clause rule about a page the tool has never seen, so it is
+/// a guess, and the two ways of being wrong cost wildly different amounts. Aborting threw
+/// away every viewport already captured and wrote no files, which left nothing to audit and
+/// so left the guess itself unfalsifiable. Reporting it costs a line. Facts about the run —
+/// a lost transport, an unparseable response — still fail; heuristics about the page do not.
+pub fn note_curtain(state: &mut PageState) {
+    let Some(path) = state
         .nodes
         .iter()
-        .any(|node| is_blocking_overlay(node, &state.viewport))
-    {
-        anyhow::bail!("settled capture still contains a blocking overlay");
-    }
-    Ok(())
+        .find(|node| node.blocking_overlay)
+        .map(|node| node.path.clone())
+    else {
+        return;
+    };
+    let note = format!("settled capture still contains a blocking overlay at {path}");
+    eprintln!("warning: {note}");
+    state.capture_blockers.push(note);
 }
 
 /// Builds the page script that waits for a startup curtain to finish drawing.
@@ -106,7 +117,7 @@ pub fn startup_nodes(state: &PageState, animation_targets: &[String]) -> Vec<cra
     let mut roots: Vec<_> = state
         .nodes
         .iter()
-        .filter(|node| is_blocking_overlay(node, &state.viewport))
+        .filter(|node| node.blocking_overlay)
         .map(|node| node.path.clone())
         .collect();
     for target in animation_targets {

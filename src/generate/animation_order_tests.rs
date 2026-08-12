@@ -74,6 +74,7 @@ fn state(animated: bool) -> PageState {
 fn node(path: &str, parent: Option<&str>, style: Styles) -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         disabled: false,
         rtl: false,
         path: path.into(),

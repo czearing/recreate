@@ -9,6 +9,7 @@ use std::collections::{BTreeMap, BTreeSet};
 fn panel() -> Node {
     Node {
         writing_mode: Default::default(),
+        blocking_overlay: false,
         path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
         parent: Some("html>body:nth-of-type(1)".into()),
         tag: "div".into(),

@@ -28,6 +28,10 @@ fn template_with_assets(assets: &str) -> String {
             &crate::asset_attributes::js_source(),
         )
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
+        .replace(
+            "__BLOCKING_OVERLAY__",
+            &crate::blocking_overlay::js_predicate(),
+        )
         .replace("__RULE_ACTIVATION__", crate::rule_activation_script::SOURCE)
         .replace(
             "__ATTRIBUTE_SEQUENCE_CAPTURE__",

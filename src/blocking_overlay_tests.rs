@@ -1,43 +1,32 @@
-use super::{is_blocking_overlay, js_predicate};
-use crate::model::{Node, Viewport};
+use super::js_predicate;
 use serde_json::{Value, json};
 
-fn viewport() -> Viewport {
-    Viewport {
-        width: 1000,
-        height: 1000,
-        dpr: 1.0,
-    }
-}
+const HARNESS: &str = concat!(
+    include_str!("dom_style_harness.js"),
+    include_str!("blocking_overlay_harness.js")
+);
 
-fn node(width: f64, height: f64, style: Value) -> Value {
+/// An element under test, with the ancestors above it named outermost first.
+fn entry(ancestors: Value, style: Value, width: f64, height: f64) -> Value {
     json!({
-        "path": "0",
-        "parent": null,
-        "tag": "div",
-        "text": "",
-        "attributes": {},
-        "rect": { "x": 0.0, "y": 0.0, "width": width, "height": height },
+        "ancestors": ancestors,
         "style": style,
-        "before": null,
-        "after": null
+        "rect": { "width": width, "height": height }
     })
 }
 
 /// A covering element that satisfies every clause, so each case below can disable exactly
 /// one of them and show which clause carried the verdict.
-fn covering(overrides: Value) -> Value {
+fn covering(ancestors: Value, overrides: Value) -> Value {
     let mut style = json!({
         "position": "fixed",
         "z-index": "100",
-        "pointer-events": "auto",
-        "display": "block",
-        "visibility": "visible"
+        "pointer-events": "auto"
     });
     for (name, value) in overrides.as_object().unwrap() {
         style[name] = value.clone();
     }
-    node(1000.0, 1000.0, style)
+    entry(ancestors, style, 1000.0, 1000.0)
 }
 
 /// The named cases, each paired with the verdict the rule must reach.
@@ -45,32 +34,32 @@ fn cases() -> Vec<(&'static str, Value, bool)> {
     vec![
         (
             "covers the viewport above the page",
-            covering(json!({})),
+            covering(json!([]), json!({})),
             true,
         ),
         (
             "stacked below the page",
-            covering(json!({ "z-index": "10" })),
+            covering(json!([]), json!({ "z-index": "10" })),
             false,
         ),
         (
             "exactly at the stacking threshold",
-            covering(json!({ "z-index": "50" })),
+            covering(json!([]), json!({ "z-index": "50" })),
             true,
         ),
         (
             "no stacking level at all",
-            covering(json!({ "z-index": "auto" })),
+            covering(json!([]), json!({ "z-index": "auto" })),
             false,
         ),
         (
             "left in normal flow",
-            covering(json!({ "position": "static" })),
+            covering(json!([]), json!({ "position": "static" })),
             false,
         ),
         (
             "absolutely positioned",
-            covering(json!({ "position": "absolute" })),
+            covering(json!([]), json!({ "position": "absolute" })),
             true,
         ),
         // The clause the startup-node copy had lost: a curtain that passes pointer input
@@ -78,55 +67,94 @@ fn cases() -> Vec<(&'static str, Value, bool)> {
         // page had already finished with.
         (
             "passes pointer input through",
-            covering(json!({ "pointer-events": "none" })),
+            covering(json!([]), json!({ "pointer-events": "none" })),
             false,
         ),
         (
             "not displayed",
-            covering(json!({ "display": "none" })),
+            covering(json!([]), json!({ "display": "none" })),
             false,
         ),
         (
             "not visible",
-            covering(json!({ "visibility": "hidden" })),
+            covering(json!([]), json!({ "visibility": "hidden" })),
+            false,
+        ),
+        (
+            "not visible because its opacity is zero",
+            covering(json!([]), json!({ "opacity": "0" })),
+            false,
+        ),
+        // The defect: a parked dialog hides its whole subtree, and the backdrop inside it
+        // declares nothing of its own. Five clauses hold; the page shows no curtain.
+        (
+            "hidden by an ancestor rather than by itself",
+            covering(json!([{ "visibility": "hidden" }]), json!({})),
+            false,
+        ),
+        // The same shape one property along. `opacity` does not inherit, so the backdrop
+        // computes `1` here and only the ancestor walk can answer.
+        (
+            "faded out by an ancestor rather than by itself",
+            covering(json!([{ "opacity": "0" }]), json!({})),
+            false,
+        ),
+        (
+            "inside an ancestor that is not displayed",
+            covering(json!([{ "display": "none" }]), json!({})),
+            false,
+        ),
+        // A hidden ancestor higher up must not blind the rule to a curtain that a nearer
+        // ancestor puts back on screen. `visibility` inherits, so a descendant can re-show
+        // itself, and the capture browser agrees this element is visible.
+        (
+            "under an ancestor chain that hides nothing",
+            covering(
+                json!([{ "visibility": "hidden" }, { "visibility": "visible" }]),
+                json!({}),
+            ),
+            true,
+        ),
+        // `opacity` is the opposite: it composites the subtree away and no descendant can
+        // undo it, so the same chain shape reaches the opposite verdict. Reading either
+        // property the way the other resolves is wrong in one direction or the other, which
+        // is the whole reason the rule asks the engine rather than the declarations.
+        (
+            "faded out above an ancestor that sets its own opacity back",
+            covering(json!([{ "opacity": "0" }, { "opacity": "1" }]), json!({})),
             false,
         ),
         (
             "covers only part of the viewport",
-            node(
+            entry(
+                json!([]),
+                json!({ "position": "fixed", "z-index": "100" }),
                 1000.0,
                 500.0,
-                json!({
-                    "position": "fixed", "z-index": "100"
-                }),
             ),
             false,
         ),
         (
             "exactly at the area threshold",
-            node(
+            entry(
+                json!([]),
+                json!({ "position": "fixed", "z-index": "100" }),
                 1000.0,
                 900.0,
-                json!({
-                    "position": "fixed", "z-index": "100"
-                }),
             ),
             true,
         ),
     ]
 }
 
-/// Runs the shipped JavaScript rendering of the rule over the same fixture.
-fn js_verdicts(fixture: &Value) -> Vec<bool> {
+/// Runs the shipped rule over the fixture in Node, so the rule the page receives is the one
+/// under test and no browser is launched.
+fn verdicts_at(width: u32, height: u32, fixture: &Value) -> Vec<bool> {
     let script = format!(
-        "globalThis.innerWidth = 1000; globalThis.innerHeight = 1000;\n\
-         globalThis.getComputedStyle = element => new Proxy({{}}, {{ get: (_, name) =>\n\
-           element.declarations[String(name).replace(/[A-Z]/g, c => '-' + c.toLowerCase())]\n\
-         }});\n\
+        "globalThis.innerWidth = {width}; globalThis.innerHeight = {height};\n\
+         {HARNESS}\n\
          const blocking = {predicate};\n\
-         console.log(JSON.stringify({fixture}.map(entry => blocking({{\n\
-           getBoundingClientRect: () => entry.rect, declarations: entry.style\n\
-         }}))));",
+         console.log(JSON.stringify(buildOverlayFixture({fixture}).map(blocking)));",
         predicate = js_predicate(),
         fixture = fixture
     );
@@ -145,20 +173,18 @@ fn js_verdicts(fixture: &Value) -> Vec<bool> {
     serde_json::from_slice(&output.stdout).unwrap()
 }
 
-/// Both renderings must reach the stated verdict. Asserting agreement alone would pass if
-/// the two copies drifted together, and asserting the expected verdicts alone would let one
-/// runtime drift unnoticed, so the test asserts both.
+fn verdicts(fixture: &Value) -> Vec<bool> {
+    verdicts_at(1000, 1000, fixture)
+}
+
 #[test]
-fn the_rule_reaches_the_same_verdict_in_both_runtimes() {
+fn the_rule_reaches_the_stated_verdict_for_every_case() {
     let cases = cases();
-    let fixture = Value::Array(cases.iter().map(|(_, node, _)| node.clone()).collect());
-    let js = js_verdicts(&fixture);
-    assert_eq!(js.len(), cases.len());
-    for (index, (name, value, expected)) in cases.iter().enumerate() {
-        let parsed: Node = serde_json::from_value(value.clone()).unwrap();
-        let rust = is_blocking_overlay(&parsed, &viewport());
-        assert_eq!(rust, *expected, "rust disagreed for {name}");
-        assert_eq!(js[index], *expected, "javascript disagreed for {name}");
+    let fixture = Value::Array(cases.iter().map(|(_, entry, _)| entry.clone()).collect());
+    let reached = verdicts(&fixture);
+    assert_eq!(reached.len(), cases.len());
+    for (index, (name, _, expected)) in cases.iter().enumerate() {
+        assert_eq!(reached[index], *expected, "disagreed for {name}");
     }
 }
 
@@ -166,13 +192,7 @@ fn the_rule_reaches_the_same_verdict_in_both_runtimes() {
 /// narrow viewport would report every wide element as a curtain.
 #[test]
 fn coverage_is_measured_against_the_viewport_and_not_absolute_size() {
-    let full = covering(json!({}));
-    let parsed: Node = serde_json::from_value(full).unwrap();
-    let larger = Viewport {
-        width: 2000,
-        height: 2000,
-        dpr: 1.0,
-    };
-    assert!(is_blocking_overlay(&parsed, &viewport()));
-    assert!(!is_blocking_overlay(&parsed, &larger));
+    let full = Value::Array(vec![covering(json!([]), json!({}))]);
+    assert_eq!(verdicts(&full), vec![true]);
+    assert_eq!(verdicts_at(2000, 2000, &full), vec![false]);
 }

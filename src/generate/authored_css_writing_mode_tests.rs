@@ -11,6 +11,7 @@ fn node(mode: WritingMode) -> Node {
         disabled: false,
         rtl: false,
         writing_mode: mode,
+        blocking_overlay: false,
         path: "html>body>section>div".into(),
         parent: Some("html>body>section".into()),
         tag: "div".into(),
