@@ -6,6 +6,7 @@
 //! whether it names the subject of a rule or an ancestor of it.
 
 use super::selector_list;
+use super::selector_scan::{grammatical, name, unquote_value, unquoted};
 use crate::model::Node;
 
 pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
@@ -47,72 +48,77 @@ pub(super) fn terminal_compound(selector: &str) -> &str {
         .unwrap_or_default()
 }
 
+/// The type selector a compound names, or the universal selector, or nothing.
+///
+/// Kept apart from [`name`] because these are two lexical classes, not one: a type
+/// selector may be `*`, and a class or id may not.
 pub(super) fn compound_tag(compound: &str) -> &str {
-    let length = compound
-        .chars()
-        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '*'))
-        .map(char::len_utf8)
-        .sum();
-    &compound[..length]
+    if compound.starts_with('*') {
+        return &compound[..1];
+    }
+    name(compound)
 }
 
+/// The classes a compound requires an element to carry.
+///
+/// Only a dot the selector's own grammar owns opens a class. A dot inside a quoted
+/// attribute value is data — `a[href="https://example.com/"]` requires no class at all —
+/// and reading one as a class adds a requirement no element meets, which drops the rule
+/// whole rather than mismatching it.
 pub(super) fn compound_classes(compound: &str) -> Vec<String> {
     let mut classes = Vec::new();
     let mut remaining = compound;
-    while let Some(index) = remaining.find('.') {
+    while let Some(index) = grammatical(remaining, '.') {
         remaining = &remaining[index + 1..];
-        let length = remaining
-            .chars()
-            .take_while(|character| {
-                character.is_ascii_alphanumeric() || matches!(character, '-' | '_')
-            })
-            .map(char::len_utf8)
-            .sum();
-        if length == 0 {
+        let class = name(remaining);
+        if class.is_empty() {
             break;
         }
 
-        classes.push(remaining[..length].to_string());
-        remaining = &remaining[length..];
+        classes.push(class.to_string());
+        remaining = &remaining[class.len()..];
     }
 
     classes
 }
 
+/// The id a compound requires, if it names one.
+///
+/// A fragment is the ordinary counter-example: `a[href="#main"]` names no id, and reading
+/// its hash as one demands `id="main"` on the link rather than on its destination, which no
+/// in-page link carries.
 pub(super) fn compound_id(compound: &str) -> Option<&str> {
-    let remaining = compound.split_once('#')?.1;
-    let length = remaining
-        .chars()
-        .take_while(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '_'))
-        .map(char::len_utf8)
-        .sum();
-    (length > 0).then_some(&remaining[..length])
+    let index = grammatical(compound, '#')?;
+    let id = name(&compound[index + 1..]);
+    (!id.is_empty()).then_some(id)
 }
 
+/// The attributes a compound requires, each with the exact value it demands when it names
+/// one.
+///
+/// The bracket that closes an attribute selector is the first one outside the value's
+/// quotes. Cutting at the first bracket of any kind truncates `[data-token="a]b"]` to the
+/// value `a`, and unlike the class and id cases that failure over-matches: the rule is
+/// emitted, onto the elements the author excluded.
 pub(super) fn compound_attributes(compound: &str) -> Vec<(&str, Option<&str>)> {
     let mut attributes = Vec::new();
     let mut remaining = compound;
-    while let Some((_, after_open)) = remaining.split_once('[') {
-        let Some((attribute, after_close)) = after_open.split_once(']') else {
+    while let Some(open) = grammatical(remaining, '[') {
+        let after_open = &remaining[open + 1..];
+        let Some(close) = grammatical(after_open, ']') else {
             break;
         };
+        let attribute = &after_open[..close];
         let (name, value) = attribute
             .split_once('=')
             .map_or((attribute, None), |(name, value)| {
-                (
-                    name,
-                    Some(
-                        value
-                            .trim()
-                            .trim_matches(|character| matches!(character, '"' | '\'')),
-                    ),
-                )
+                (name, Some(unquote_value(value)))
             });
         let name = name.trim();
         if !name.is_empty() {
             attributes.push((name, value));
         }
-        remaining = after_close;
+        remaining = &after_open[close + 1..];
     }
     attributes
 }
@@ -125,26 +131,16 @@ pub(super) fn split(selector: &str) -> Vec<(Option<char>, &str)> {
     let mut steps = Vec::new();
     let mut combinator = None;
     let mut start = None;
-    let mut depth = 0usize;
-    let mut quote = None;
-    for (offset, character) in selector.char_indices() {
-        match (quote, character) {
-            (Some(open), _) if character == open => quote = None,
-            (Some(_), _) => continue,
-            (None, '"' | '\'') => quote = Some(character),
-            (None, '(' | '[') => depth += 1,
-            (None, ')' | ']') => depth = depth.saturating_sub(1),
-            (None, _) if depth == 0 && is_combinator(character) => {
-                if let Some(begin) = start.take() {
-                    steps.push((combinator.take(), &selector[begin..offset]));
-                    combinator = Some(' ');
-                }
-                if character != ' ' {
-                    combinator = Some(character);
-                }
-                continue;
+    for (offset, character, depth) in unquoted(selector) {
+        if depth == 0 && is_combinator(character) {
+            if let Some(begin) = start.take() {
+                steps.push((combinator.take(), &selector[begin..offset]));
+                combinator = Some(' ');
             }
-            _ => {}
+            if character != ' ' {
+                combinator = Some(character);
+            }
+            continue;
         }
         start.get_or_insert(offset);
     }

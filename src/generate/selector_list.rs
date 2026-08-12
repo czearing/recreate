@@ -1,43 +1,5 @@
+use super::selector_scan::{grammatical, unquoted};
 use std::borrow::Cow;
-
-/// Every character of a selector that is not inside a quoted string, paired with its byte
-/// offset and the paren nesting depth it sits at.
-///
-/// A selector is grammar interleaved with data: quoted attribute values hold arbitrary text
-/// that may spell out any punctuation the grammar uses. Each question this module asks — is
-/// this comma a list separator, is this colon a pseudo-class, is this paren the one that
-/// closes a wrapper — is a question about the grammar, so all of them must skip the data.
-/// One scanner answers them the same way, because a selector read two ways is a selector
-/// some caller reads wrongly.
-///
-/// The depth reported for a paren is the depth outside it, so in `:is(.a)` the colon, the
-/// name and both parens sit at depth 0 while `.a` sits at depth 1.
-fn unquoted(selector: &str) -> impl Iterator<Item = (usize, char, usize)> + '_ {
-    let mut depth = 0usize;
-    let mut quote = None;
-    selector
-        .char_indices()
-        .filter_map(move |(offset, character)| match (quote, character) {
-            (Some(open), _) if character == open => {
-                quote = None;
-                None
-            }
-            (Some(_), _) => None,
-            (None, '"' | '\'') => {
-                quote = Some(character);
-                None
-            }
-            (None, '(') => {
-                depth += 1;
-                Some((offset, character, depth - 1))
-            }
-            (None, ')') => {
-                depth = depth.saturating_sub(1);
-                Some((offset, character, depth))
-            }
-            (None, _) => Some((offset, character, depth)),
-        })
-}
 
 /// The members of a selector list.
 ///
@@ -63,9 +25,7 @@ pub(super) fn members(selectors: &str) -> impl Iterator<Item = &str> {
 
 /// The offset of the first colon that belongs to the selector's own grammar, if any.
 fn grammatical_colon(selector: &str) -> Option<usize> {
-    unquoted(selector)
-        .find(|(_, character, _)| *character == ':')
-        .map(|(offset, _, _)| offset)
+    grammatical(selector, ':')
 }
 
 /// One member reduced to the compound facts a generated class encodes — tag, id, classes and
