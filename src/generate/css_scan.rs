@@ -12,38 +12,69 @@
 //! token — is defined once and identically for both, so one reader serves both. Scoping it
 //! to the first caller is what leaves the second writing its own.
 
-/// Every character of CSS text that is not inside a quoted string, paired with its byte
-/// offset and the nesting depth it sits at.
+use super::css_escape::Escape;
+
+/// Every character of CSS text that is not inside a quoted string and is not spelled by an
+/// escape, paired with its byte offset and the nesting depth it sits at.
 ///
 /// Depth counts `(`, `[` and `{` alike, so a caller asking about the top level is answered
 /// the same way whether the nesting came from a functional pseudo-class, an attribute
 /// selector or a nested block. The depth reported for an opener is the depth outside it, so
 /// in `:is(.a)` the colon, the name and both parens sit at depth 0 while `.a` sits at
 /// depth 1; a closer is likewise reported at the depth outside the block it ends.
+///
+/// A `\` escapes what follows, so a quote closes a string only when an even number of
+/// backslashes precede it. The escape belongs to the code-point stream rather than to the
+/// string sublanguage, so it is honoured in both states: inside a string it stops `"A\"B"`
+/// from ending early, and outside one it stops the colon of `.md\:flex` from being read as
+/// the selector's own.
+///
+/// An escape may also spell a code point in hex, and then up to six hex digits and one
+/// following space belong to it. That space is part of the escape, not a separator: an ident
+/// cannot begin with a digit, so the class `2xl:flex` must be written `.\32 xl\:flex`, and a
+/// reader that hands the space on reports a descendant combinator that was never written.
+///
+/// The backslash itself is yielded. It spells no grammar, but callers slice by the offsets
+/// reported here, and a compound beginning with an escape loses its first character if the
+/// reader hides it. What the escape spells is withheld, since that is the character being
+/// denied its usual meaning.
+///
+/// Not modelled, and inert: `\` before a newline is not a valid escape, and `\` at the end
+/// of the text spells nothing. Both concern characters no caller ever seeks.
 pub(super) fn unquoted(selector: &str) -> impl Iterator<Item = (usize, char, usize)> + '_ {
     let mut depth = 0usize;
     let mut quote = None;
+    let mut escape = Escape::None;
     selector
         .char_indices()
-        .filter_map(move |(offset, character)| match (quote, character) {
-            (Some(open), _) if character == open => {
-                quote = None;
-                None
+        .filter_map(move |(offset, character)| {
+            if escape.consumes(character) {
+                return None;
             }
-            (Some(_), _) => None,
-            (None, '"' | '\'') => {
-                quote = Some(character);
-                None
+            match (quote, character) {
+                (_, '\\') => {
+                    escape = Escape::Opened;
+                    Some((offset, character, depth))
+                }
+                (Some(open), _) if character == open => {
+                    quote = None;
+                    None
+                }
+                (Some(_), _) => None,
+                (None, '"' | '\'') => {
+                    quote = Some(character);
+                    None
+                }
+                (None, '(' | '[' | '{') => {
+                    depth += 1;
+                    Some((offset, character, depth - 1))
+                }
+                (None, ')' | ']' | '}') => {
+                    depth = depth.saturating_sub(1);
+                    Some((offset, character, depth))
+                }
+                (None, _) => Some((offset, character, depth)),
             }
-            (None, '(' | '[' | '{') => {
-                depth += 1;
-                Some((offset, character, depth - 1))
-            }
-            (None, ')' | ']' | '}') => {
-                depth = depth.saturating_sub(1);
-                Some((offset, character, depth))
-            }
-            (None, _) => Some((offset, character, depth)),
         })
 }
 
@@ -109,76 +140,29 @@ pub(super) fn unquote_value(value: &str) -> &str {
     }
 }
 
-/// The unit of every dimension and percentage token in `text`, with quoted regions skipped.
-///
-/// A unit only means a unit as part of a token. `<dimension-token>` is a number immediately
-/// followed by an identifier, so `30vw` carries a unit while `--vwrap`, a font named `Vwide`
-/// and a `url(a%20b.png)` path merely spell the letters. Reading the number first is the only
-/// thing that separates them, and is why a caller can ask about a unit here without the
-/// over-matching that stops a substring scan from ever naming one.
-///
-/// A number is only a number where an identifier is not already running: the `2` in
-/// `Roboto2Wide` continues an identifier and starts nothing, and a digit already consumed as
-/// part of an earlier number cannot start a second one. Adjacency is decided by byte offset,
-/// so a quoted region breaks a token rather than joining its neighbours.
-pub(super) fn units(text: &str) -> Vec<&str> {
-    let mut units = Vec::new();
-    let mut previous: Option<(usize, char)> = None;
-    let mut consumed = 0usize;
-    for (offset, character, _) in unquoted(text) {
-        let joined = previous.is_some_and(|(at, last)| at + last.len_utf8() == offset);
-        let continues = previous.is_some_and(|(_, last)| identifier(last));
-        if character.is_ascii_digit() && offset >= consumed && !(joined && continues) {
-            let rest = number(&text[offset..]);
-            let unit = if rest.starts_with('%') {
-                "%"
-            } else {
-                name(rest)
-            };
-            consumed = text.len() - rest.len() + unit.len();
-            if !unit.is_empty() {
-                units.push(unit);
-            }
-        }
-        previous = Some((offset, character));
-    }
-    units
-}
-
-/// The text following the numeric token that begins `text`.
-///
-/// A fractional part needs no handling of its own: its digits begin a numeric token in their
-/// own right, carrying the same unit, so reading `12.5vw` as one number or as two yields the
-/// same unit either way. An exponent does need it — without it `1e3vw` reads its unit as
-/// `e3vw`, which is a unit the value never spelled.
-fn number(text: &str) -> &str {
-    let rest = digits(text);
-    rest.strip_prefix(['e', 'E'])
-        .map(|rest| rest.strip_prefix(['+', '-']).unwrap_or(rest))
-        .filter(|rest| rest.starts_with(|character: char| character.is_ascii_digit()))
-        .map_or(rest, digits)
-}
-
-/// The text following a run of decimal digits.
-fn digits(text: &str) -> &str {
-    text.trim_start_matches(|character: char| character.is_ascii_digit())
-}
-
 /// Whether a character continues an identifier that has already started.
-fn identifier(character: char) -> bool {
+pub(super) fn identifier(character: char) -> bool {
     character.is_ascii_alphanumeric() || matches!(character, '-' | '_')
 }
 
 /// The run of characters that spells one identifier, starting at the beginning of `text`.
 ///
 /// A class, an id and a tag are all read this way, so the set of characters that continues
-/// a name is stated once. It is deliberately narrower than the CSS ident grammar, which
-/// admits escapes and non-ASCII: a name the generator cannot reproduce verbatim is one it
-/// must not claim to have matched.
+/// a name is stated once. Escapes are part of the run: `.md\:flex` names one class, and a
+/// reader that stopped at the backslash would report the class `md`, which no element
+/// carries. The run is the name's spelling; [`css_escape::unescape`] turns it into the name.
 pub(super) fn name(text: &str) -> &str {
+    let mut escape = Escape::None;
     let length = text
         .chars()
-        .take_while(|character| identifier(*character))
+        .take_while(|character| {
+            escape.consumes(*character) || {
+                if *character == '\\' {
+                    escape = Escape::Opened;
+                }
+                *character == '\\' || identifier(*character)
+            }
+        })
         .map(char::len_utf8)
         .sum();
     &text[..length]
@@ -193,5 +177,5 @@ mod css_scan_tests;
 mod css_scan_block_tests;
 
 #[cfg(test)]
-#[path = "css_scan_unit_tests.rs"]
-mod css_scan_unit_tests;
+#[path = "css_scan_escape_tests.rs"]
+mod css_scan_escape_tests;

@@ -1,4 +1,4 @@
-use super::css_scan;
+use super::css_dimension;
 
 /// Whether an authored value must be kept as text rather than answered by the sample.
 ///
@@ -30,7 +30,7 @@ pub(super) fn fluid(value: &str) -> bool {
 /// which is why the list this replaced held function names and keywords but no unit, and lost
 /// every viewport length as a result.
 fn context_relative(value: &str) -> bool {
-    css_scan::units(value)
+    css_dimension::units(value)
         .into_iter()
         .any(context_relative_unit)
 }

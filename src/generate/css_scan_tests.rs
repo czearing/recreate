@@ -78,7 +78,10 @@ fn a_quoted_dot_does_not_invent_a_class() {
 #[test]
 fn a_quoted_hash_does_not_invent_an_id() {
     assert_eq!(compound_id(r##"a[href="#main"]"##), None);
-    assert_eq!(compound_id(r##"a#lead[href="#main"]"##), Some("lead"));
+    assert_eq!(
+        compound_id(r##"a#lead[href="#main"]"##).as_deref(),
+        Some("lead")
+    );
 }
 
 /// The bracket that closes an attribute selector is the first one outside the value's

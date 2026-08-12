@@ -42,6 +42,8 @@ mod css_base_style;
 mod css_closure;
 mod css_custom_properties;
 mod css_declaration;
+mod css_dimension;
+mod css_escape;
 mod css_identifiers;
 mod css_inheritance;
 mod css_interactions;

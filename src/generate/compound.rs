@@ -5,6 +5,9 @@
 //! reads an authored selector resolves it through here, so a compound means the same thing
 //! whether it names the subject of a rule or an ancestor of it.
 
+use std::borrow::Cow;
+
+use super::css_escape::unescape;
 use super::css_scan::{grammatical, name, unquote_value, unquoted};
 use super::selector_list;
 use crate::model::Node;
@@ -29,7 +32,11 @@ pub(super) fn matches_node(compound: &str, node: &Node) -> bool {
         !required.is_empty() || !tag.is_empty() || id.is_some() || !attributes.is_empty();
     constrained
         && (tag.is_empty() || tag == "*" || tag == node.tag)
-        && id.is_none_or(|id| node.attributes.get("id").is_some_and(|value| value == id))
+        && id.is_none_or(|id| {
+            node.attributes
+                .get("id")
+                .is_some_and(|value| value.as_str() == id)
+        })
         && attributes.iter().all(|(name, expected)| {
             node.attributes
                 .get(*name)
@@ -75,7 +82,7 @@ pub(super) fn compound_classes(compound: &str) -> Vec<String> {
             break;
         }
 
-        classes.push(class.to_string());
+        classes.push(unescape(class).into_owned());
         remaining = &remaining[class.len()..];
     }
 
@@ -87,10 +94,10 @@ pub(super) fn compound_classes(compound: &str) -> Vec<String> {
 /// A fragment is the ordinary counter-example: `a[href="#main"]` names no id, and reading
 /// its hash as one demands `id="main"` on the link rather than on its destination, which no
 /// in-page link carries.
-pub(super) fn compound_id(compound: &str) -> Option<&str> {
+pub(super) fn compound_id(compound: &str) -> Option<Cow<'_, str>> {
     let index = grammatical(compound, '#')?;
     let id = name(&compound[index + 1..]);
-    (!id.is_empty()).then_some(id)
+    (!id.is_empty()).then(|| unescape(id))
 }
 
 /// The attributes a compound requires, each with the exact value it demands when it names
