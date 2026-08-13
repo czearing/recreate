@@ -12,14 +12,22 @@
 //! it painted is exactly an element whose content is not in the tree; a tag list would
 //! answer the same question for one spelling and be wrong for the next.
 //!
-//! Two reads return nothing while appearing to succeed, and both must be treated as
-//! absence rather than as content: a surface that was never drawn on, and one whose
-//! drawing buffer was discarded after the frame was presented, which is the default for
-//! WebGL. Both export the bytes an unused surface of the same size exports, so that is
-//! what they are compared against — no threshold, no sampling. A third read fails loudly:
-//! a surface holding cross-origin pixels refuses to export at all. That is ordinary on
-//! real pages, so it is recorded as a capture blocker and the capture continues; the
-//! element is still emitted with its box, exactly as it is today.
+//! Two reads return nothing while appearing to succeed, and only one of them is absence: a
+//! surface that was never drawn on, and one whose drawing buffer was discarded after the
+//! frame was presented, which is the default for WebGL. Both export the bytes an unused
+//! surface of the same size exports, so that is what they are compared against — no
+//! threshold, no sampling. Blankness alone cannot separate them, because it answers "are
+//! these bytes empty" and the question that decides is "was this surface readable". Canvas
+//! contexts are exclusive, so the engine answers the second directly: after a blank export,
+//! a surface that returns no 2D context is bound to another kind and its buffer is gone.
+//! Asking creates a context on a surface that had none, so it is asked only of surfaces
+//! already about to be recorded as empty, and never of one that exported its content.
+//!
+//! A third read fails loudly: a surface holding cross-origin pixels refuses to export at
+//! all. That and the discarded buffer fail the same premise — the user saw pixels this
+//! read did not return — and differ only in how the platform reports it, which is a
+//! property of error reporting and not of the page. Both are recorded as a capture blocker
+//! in one voice and the capture continues; the element is still emitted with its box.
 //!
 //! The recorded value is a key, not the bytes. Written into the asset table it travels the
 //! path an inlined subresource already travels — decoded, hashed, written once, and the
