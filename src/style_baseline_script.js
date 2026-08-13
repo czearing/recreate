@@ -45,11 +45,29 @@ const REVERT_TO_USER_AGENT = ['all', ...EXCLUDED_FROM_ALL]
 /* The engine enumerates a logical alias beside every physical longhand it resolves to -
    `padding-inline-start` next to `padding-left`, `inline-size` next to `width`,
    `border-end-end-radius` next to `border-bottom-right-radius` - so recording both
-   writes one declaration twice. Logical names are built from flow-relative segments and
-   physical names are built from side segments, so the physical spelling is selected by
-   the naming grammar rather than by a list of pairs. Physical values are already
-   resolved for the page's writing mode, so nothing is lost by preferring them. */
-const FLOW_RELATIVE = ['inline', 'block', 'start', 'end'];
+   writes one declaration twice. The physical spelling is selected by the naming grammar
+   rather than by a list of pairs, and physical values are already resolved for the page's
+   writing mode, so nothing is lost by preferring them.
+
+   Nothing is lost only where a physical twin is present in the same enumeration, so the
+   grammar has to name the aliases and nothing else. Every logical property carries an
+   AXIS segment - `padding-inline-start`, `inline-size`, `overflow-block` - with one
+   exception: the flow-relative corners are named by two flow edges and have no axis to
+   name, and there are exactly four of them because a box has four corners.
+
+   `start` and `end` on their own are not evidence of anything. Other specs reuse them on
+   axes that are not flow-relative and supply no second spelling: `grid-column-start` ends
+   a grid line range and there is no `grid-column-left`, `marker-end` ends an SVG path,
+   `animation-range-end` is a timeline position. Pruning those loses the value outright
+   instead of preferring a twin, so the axis segment is what decides. */
+const FLOW_AXIS = ['inline', 'block'];
+const FLOW_EDGE = ['start', 'end'];
+/* The flow-relative corners, derived rather than listed: a corner is named by its block edge
+   then its inline edge, so the four names are the cross product of the two flow edges and
+   there can never be a fifth. */
+const LOGICAL_CORNERS = new Set(
+  FLOW_EDGE.flatMap(block => FLOW_EDGE.map(inline => `border-${block}-${inline}-radius`))
+);
 /* The locale property is not authored in CSS at all: the engine derives it from the
    `lang` attribute, which the recreation reproduces verbatim on the same element. Its
    baseline therefore differs for a reason no stylesheet can express, and recording it
@@ -63,8 +81,8 @@ const CUSTOM_PROPERTY = '--';
 const redundantProperty = property => {
   if (property === DERIVED_FROM_ATTRIBUTE) return true;
   if (property.startsWith(CUSTOM_PROPERTY)) return true;
-  const segments = property.split('-');
-  return FLOW_RELATIVE.some(segment => segments.includes(segment));
+  if (LOGICAL_CORNERS.has(property)) return true;
+  return FLOW_AXIS.some(segment => property.split('-').includes(segment));
 };
 const styleMap = style => {
   const values = {};

@@ -70,6 +70,8 @@ mod style_baseline;
 #[cfg(test)]
 mod style_baseline_double;
 #[cfg(test)]
+mod style_baseline_names_tests;
+#[cfg(test)]
 mod style_baseline_pruning_tests;
 #[cfg(test)]
 mod style_baseline_scroll_tests;
