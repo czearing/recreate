@@ -1,6 +1,6 @@
 use super::{
     attribute_sequences, interaction_scroll, interactions, jsx_variants, startup_overlays,
-    startup_timeline, structural_tree, tree::Components,
+    startup_replay, structural_tree, tree::Components,
 };
 use crate::model::Specification;
 use std::collections::BTreeMap;
@@ -76,7 +76,7 @@ pub fn app(
             }
             let startup = structural_tree::fragment_nodes(&state.startup_nodes, classes);
             let fragment =
-                jsx_variants::fragment(&startup, assets, startup_timeline::Timeline::of(state));
+                jsx_variants::fragment(&startup, assets, startup_replay::Replay::of(state));
             format!("<>{page}{{createPortal({fragment},document.body)}}</>")
         })
         .collect::<Vec<_>>();

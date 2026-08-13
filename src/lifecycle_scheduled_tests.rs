@@ -169,7 +169,7 @@ fn instrument_sources() -> Vec<(&'static str, String)> {
             "capture_settle bare",
             crate::capture_settle::source(false, false),
         ),
-        ("capture_startup", crate::capture_startup::curtain_source()),
+        ("first_paint", crate::first_paint::source()),
     ]
 }
 
@@ -198,12 +198,28 @@ fn no_capture_instrument_schedules_through_the_wrapped_scheduler() {
 
 /// The instruments must actually reach the scheduler the tracker set aside, so the test
 /// above cannot pass by an instrument having stopped scheduling at all.
+///
+/// The rule binds an instrument that schedules. One that does not cannot reach the page's
+/// scheduler and so cannot appear in its own measurement — the reader that records first
+/// paint waits on an animation frame, which the tracker does not wrap and the recorder does
+/// not count as work the page still owes. The non-vacuity the doc above is protecting is
+/// therefore asserted over the set rather than over each member, which is where it belongs:
+/// per-member it would have forbidden a timer-free instrument from existing.
 #[test]
 fn every_instrument_that_waits_reaches_the_unmeasured_scheduler() {
+    let mut waiting = 0;
     for (name, source) in instrument_sources() {
+        if !source.contains("setTimeout") {
+            continue;
+        }
+        waiting += 1;
         assert!(
             source.contains(super::INSTRUMENT_TIMEOUT),
             "{name} no longer waits through the unmeasured scheduler"
         );
     }
+    assert!(
+        waiting > 0,
+        "no instrument schedules any more, so the rule above is unenforced"
+    );
 }

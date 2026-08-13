@@ -1,5 +1,5 @@
 use crate::{
-    capture_startup::note_curtain,
+    capture_settle::note_curtain,
     model::{Node, PageState, Rect, Viewport},
 };
 

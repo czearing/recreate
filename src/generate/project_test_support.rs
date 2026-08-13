@@ -112,6 +112,35 @@ pub(super) fn state(width: u32) -> PageState {
     }
 }
 
+/// A first-paint root at a measured box. Its path carries `x` so several roots stay distinct.
+pub(super) fn startup_root(x: f64, y: f64, width: f64, height: f64) -> Node {
+    Node {
+        path: format!("startup>{x}"),
+        parent: None,
+        rect: Rect {
+            x,
+            y,
+            width,
+            height,
+        },
+        ..Default::default()
+    }
+}
+
+/// A page that recorded a phase of the given roots. The two spans are deliberately unequal,
+/// so an emitter that writes one of them twice cannot pass.
+pub(super) fn startup_state(nodes: Vec<Node>) -> PageState {
+    PageState {
+        startup_nodes: nodes,
+        startup_delay_ms: STARTUP_DELAY_MS,
+        startup_duration_ms: STARTUP_DURATION_MS,
+        ..state(1280)
+    }
+}
+
+pub(super) const STARTUP_DELAY_MS: u64 = 1200;
+pub(super) const STARTUP_DURATION_MS: u64 = 800;
+
 fn pseudo(content: &str, color: &str) -> Pseudo {
     Pseudo {
         content: content.into(),

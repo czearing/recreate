@@ -191,7 +191,7 @@ mod source_svg_name_tests;
 mod source_view_split;
 mod stand_in;
 mod startup_overlays;
-mod startup_timeline;
+mod startup_replay;
 #[cfg(test)]
 #[path = "state_reversion_tests.rs"]
 mod state_reversion_tests;

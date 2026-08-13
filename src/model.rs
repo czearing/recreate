@@ -26,7 +26,7 @@ fn default_dpr() -> f64 {
     1.0
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Rect {
     pub x: f64,
     pub y: f64,

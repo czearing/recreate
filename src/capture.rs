@@ -1,7 +1,7 @@
 use crate::{
     browser,
     cli::CaptureArgs,
-    generate, interactions, lifecycle_script,
+    first_paint, generate, interactions, lifecycle_script,
     model::{PageState, Specification},
     probe, serve, validate,
 };
@@ -18,12 +18,15 @@ mod dynamic;
 #[path = "capture/authored_sheets.rs"]
 mod authored_sheets;
 
-use state::{
-    browser_cookies, capture_state_with_startup, capture_state_without_assets, set_motion,
-};
+use state::{browser_cookies, capture_state_without_assets, set_motion};
 
 pub(crate) use state::set_focus;
-pub use state::{capture_state, prepare_interaction_state, read_interaction_state, read_state};
+pub use state::{capture_state, prepare_interaction_state, read_interaction_state};
+
+/// Reading a page without the surrounding capture is something only the verification and
+/// responsive-runtime harnesses need; the pipeline itself always goes through `capture_state`.
+#[cfg(test)]
+pub use state::read_state;
 
 pub async fn run(mut args: CaptureArgs) -> Result<()> {
     let capture_started = std::time::Instant::now();
@@ -64,6 +67,11 @@ async fn capture_into(
         json!({ "source": lifecycle_script::source() }),
     )
     .await?;
+    cdp.send(
+        "Page.addScriptToEvaluateOnNewDocument",
+        json!({ "source": first_paint::source() }),
+    )
+    .await?;
     if args.reuse {
         cdp.evaluate(&lifecycle_script::source()).await?;
     }
@@ -73,12 +81,10 @@ async fn capture_into(
     for viewport in viewports {
         let state_started = std::time::Instant::now();
         let reload = !args.reuse || args.reload;
-        let state = if args.reuse && args.reload && states.is_empty() {
-            capture_state_with_startup(cdp, viewport.clone()).await?
-        } else if !states.is_empty() {
-            capture_state_without_assets(cdp, viewport.clone(), false).await?
+        let state = if states.is_empty() {
+            capture_state(cdp, viewport.clone(), reload).await?
         } else {
-            capture_state(cdp, viewport.clone(), reload && states.is_empty()).await?
+            capture_state_without_assets(cdp, viewport.clone(), false).await?
         };
         let mut state = state;
         let paths = state

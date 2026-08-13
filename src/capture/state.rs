@@ -1,8 +1,7 @@
 use crate::{
     browser,
-    capture_startup::{
-        note_curtain, startup_nodes, wait_ready, wait_ready_without_lifecycle, wait_startup,
-    },
+    capture_settle::{note_curtain, wait_ready, wait_ready_without_lifecycle},
+    first_paint,
     model::{PageState, Viewport},
     page_script,
 };
@@ -15,14 +14,24 @@ mod read;
 pub(in crate::capture) use read::browser_cookies;
 pub use read::{read_interaction_state, read_state};
 
+/// The one full read of a page, including whatever it showed before it settled.
+///
+/// First-paint recording lives here rather than in a second capture routine of its own. The
+/// duplicate existed once, reachable only from a flag combination the default capture never
+/// set, so a page's loading phase went unrecorded even when a curtain matched — the predicate
+/// everyone blamed was never consulted.
 pub async fn capture_state(
     cdp: &mut crate::cdp::Cdp,
     viewport: Viewport,
     reload: bool,
 ) -> Result<PageState> {
     prepare_state(cdp, &viewport, reload).await?;
+    let first = first_paint::collect(cdp, viewport.clone()).await?;
     let mut state = read_state(cdp, viewport).await?;
     note_curtain(&mut state);
+    if let Some(record) = first {
+        first_paint::merge(cdp, &mut state, record).await?;
+    }
     Ok(state)
 }
 
@@ -79,68 +88,6 @@ async fn prepare(cdp: &mut crate::cdp::Cdp, viewport: &Viewport, reload: bool) -
             .await?;
     }
     clear_input_state(cdp).await
-}
-
-pub(super) async fn capture_state_with_startup(
-    cdp: &mut crate::cdp::Cdp,
-    viewport: Viewport,
-) -> Result<PageState> {
-    browser::set_viewport(cdp, viewport.width, viewport.height).await?;
-    let started = std::time::Instant::now();
-    cdp.send("Page.reload", json!({ "ignoreCache": false }))
-        .await?;
-    clear_input_state(cdp).await?;
-    let startup = wait_startup(cdp, &viewport, started).await?;
-    wait_ready(cdp, startup.is_some()).await?;
-    let startup_elapsed = started.elapsed().as_millis() as u64;
-    observe_dynamic(cdp, true).await?;
-    let mut state = read_state(cdp, viewport).await?;
-    note_curtain(&mut state);
-    if let Some((startup_state, delay)) = startup {
-        merge_startup(&mut state, startup_state, delay, startup_elapsed);
-    }
-    Ok(state)
-}
-
-fn merge_startup(
-    state: &mut PageState,
-    startup_state: PageState,
-    delay: u64,
-    startup_elapsed: u64,
-) {
-    let settled: std::collections::BTreeSet<_> =
-        state.nodes.iter().map(|node| node.path.as_str()).collect();
-    let missing: Vec<_> = state
-        .animations
-        .iter()
-        .filter(|animation| !settled.contains(animation.target.as_str()))
-        .map(|animation| animation.target.clone())
-        .collect();
-    state.startup_nodes = startup_nodes(&startup_state, &missing);
-    state.startup_delay_ms = delay;
-    state.startup_duration_ms = startup_elapsed - delay;
-    let startup: std::collections::BTreeSet<_> = state
-        .startup_nodes
-        .iter()
-        .map(|node| node.path.as_str())
-        .collect();
-    for animation in &mut state.animations {
-        if !settled.contains(animation.target.as_str()) {
-            let target = format!("startup>{}", animation.target);
-            if startup.contains(target.as_str()) {
-                animation.target = target;
-            }
-        }
-    }
-    state.animations.retain(|animation| {
-        settled.contains(animation.target.as_str()) || startup.contains(animation.target.as_str())
-    });
-    for url in startup_state.asset_urls {
-        if !state.asset_urls.contains(&url) {
-            state.asset_urls.push(url);
-        }
-    }
-    state.asset_data.extend(startup_state.asset_data);
 }
 
 pub(super) async fn set_motion(cdp: &mut crate::cdp::Cdp) -> Result<()> {

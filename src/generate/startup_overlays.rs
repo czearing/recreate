@@ -1,6 +1,11 @@
-use super::startup_timeline;
+use super::startup_replay;
 use crate::model::PageState;
 
+/// The layer is hidden until its animation runs, which is what makes the reduced-motion case
+/// need no rule of its own: `interactions::REDUCED_MOTION_CSS` already stops every animation,
+/// and with the animation stopped the base rule's `opacity:0;visibility:hidden` is what
+/// remains. Restating that here would emit a second `@media(prefers-reduced-motion:reduce)`
+/// block saying what two rules already say.
 pub fn append(states: &[PageState], css: &mut String) {
     if !states
         .iter()
@@ -18,10 +23,10 @@ pub fn append(states: &[PageState], css: &mut String) {
          animation-iteration-count:1!important;animation-direction:normal!important;\
          animation-play-state:running!important;\
          animation-fill-mode:forwards!important}\
-         @media(prefers-reduced-motion:reduce){.recreateStartupOverlay{animation:none!important;\
-         display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}}\
-         .recreateStartupBlocking{position:fixed!important;inset:0!important;width:100vw!important;\
-         height:100vh!important;max-width:100vw!important;max-height:100vh!important;\
+         .recreateStartupBlocking{position:fixed!important;\
+         left:var(--recreate-startup-x,0)!important;top:var(--recreate-startup-y,0)!important;\
+         width:var(--recreate-startup-width,100vw)!important;\
+         height:var(--recreate-startup-height,100vh)!important;\
          overflow:hidden!important}.recreateStartupBody{overflow:visible!important}\n",
     );
 }
@@ -29,11 +34,7 @@ pub fn append(states: &[PageState], css: &mut String) {
 pub fn runtime(source: String, states: &[PageState]) -> String {
     let settles = states
         .iter()
-        .map(|state| {
-            startup_timeline::Timeline::of(state)
-                .settle_ms()
-                .to_string()
-        })
+        .map(|state| startup_replay::Replay::of(state).settle_ms().to_string())
         .collect::<Vec<_>>()
         .join(",");
     let source = source.replace(
@@ -62,56 +63,5 @@ pub fn runtime(source: String, states: &[PageState]) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::model::{Node, PageState, Rect, Viewport};
-
-    #[test]
-    fn marks_captured_startup_root() {
-        let root = Node {
-            writing_mode: Default::default(),
-            scrollbar_gutter: 0.0,
-            blocking_overlay: false,
-            disabled: false,
-            rtl: false,
-            path: "startup".into(),
-            parent: None,
-            tag: "div".into(),
-            text: String::new(),
-            attributes: Default::default(),
-            rect: Rect {
-                x: 0.0,
-                y: 0.0,
-                width: 100.0,
-                height: 100.0,
-            },
-            style: Default::default(),
-            before: None,
-            after: None,
-        };
-        let state = PageState {
-            url: String::new(),
-            title: String::new(),
-            viewport: Viewport::default(),
-            dom: Default::default(),
-            capture_blockers: Vec::new(),
-            nodes: Vec::new(),
-            startup_nodes: vec![root],
-            startup_delay_ms: 100,
-            startup_duration_ms: 500,
-            animations: Vec::new(),
-            state_styles: Vec::new(),
-            attribute_sequences: Vec::new(),
-            css_rules: Vec::new(),
-            asset_urls: Vec::new(),
-            asset_data: Default::default(),
-        };
-        let mut css = String::new();
-        append(std::slice::from_ref(&state), &mut css);
-        assert!(css.contains("--recreate-startup-duration"));
-        assert!(
-            runtime("const View=baselineViews[0];const activate=".into(), &[])
-                .contains("startupDone")
-        );
-    }
-}
+#[path = "startup_overlays_tests.rs"]
+mod tests;

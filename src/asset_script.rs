@@ -38,3 +38,14 @@ pub fn with_downloads() -> String {
 pub fn without_downloads() -> String {
     format!("  const assetData = {{}};{SURFACES}")
 }
+
+/// The same table for a set of URLs the caller names, for content no element on the settled
+/// page still references — a first-paint phase's own subresources. The rule for turning a URL
+/// into stored content lives here once, so a caller that already knows which URLs it wants
+/// does not restate it.
+pub fn download_source(urls: &[String]) -> String {
+    format!(
+        "(async () => {{\n  const assets = {list};{DOWNLOADS}\n  return JSON.stringify(assetData);\n}})()",
+        list = serde_json::to_string(urls).unwrap_or_else(|_| "[]".into()),
+    )
+}

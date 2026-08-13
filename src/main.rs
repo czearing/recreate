@@ -11,9 +11,6 @@ mod capture;
 mod capture_settle;
 #[cfg(test)]
 mod capture_settle_budget_tests;
-mod capture_startup;
-#[cfg(test)]
-mod capture_startup_tests;
 mod cdp;
 mod cli;
 mod compare;
@@ -24,6 +21,8 @@ mod compare_dom;
 mod compare_node;
 #[cfg(test)]
 mod compare_tests;
+mod first_paint;
+mod first_paint_assets;
 mod generate;
 mod interaction_rebase;
 mod interaction_rebase_node;

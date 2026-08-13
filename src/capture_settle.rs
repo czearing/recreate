@@ -13,6 +13,7 @@
 //! only at moments the DOM has already gone quiet rather than on every tick.
 
 use crate::blocking_overlay;
+use anyhow::Result;
 
 /// How many consecutive animation frames must pass with no DOM edit before geometry is
 /// worth reading. Two frames distinguish "nothing is happening" from "between two edits".
@@ -44,6 +45,58 @@ const RETRY_MS: u64 = 50;
 ///
 /// `wait_for_lifecycle` additionally requires the lifecycle recorder to have closed its
 /// window, and `wait_for_startup` requires any blocking overlay to have left.
+/// Waits for the page to report itself settled, with the lifecycle recorder's window
+/// included in that verdict.
+pub async fn wait_ready(cdp: &mut crate::cdp::Cdp, wait_for_startup: bool) -> Result<()> {
+    wait_ready_mode(cdp, wait_for_startup, true).await
+}
+
+/// The same wait for a page whose lifecycle window has already closed once, so requiring it
+/// again would wait for a recorder that will never reopen.
+pub async fn wait_ready_without_lifecycle(
+    cdp: &mut crate::cdp::Cdp,
+    wait_for_startup: bool,
+) -> Result<()> {
+    wait_ready_mode(cdp, wait_for_startup, false).await
+}
+
+/// A page that never reports itself settled is read anyway. "Settled" is a guess about a
+/// page the tool has never seen, and failing here discarded every viewport already captured
+/// over that guess, leaving nothing to audit it against. The page records the fact for
+/// itself, so the artifact carries the doubt instead of the run carrying it as an error. A
+/// transport failure is still a fact about the run and still fails.
+async fn wait_ready_mode(
+    cdp: &mut crate::cdp::Cdp,
+    wait_for_startup: bool,
+    wait_for_lifecycle: bool,
+) -> Result<()> {
+    cdp.evaluate(&source(wait_for_lifecycle, wait_for_startup))
+        .await?;
+    Ok(())
+}
+
+/// A settled capture that still holds a curtain probably recorded the splash screen rather
+/// than the page — and "probably" is why this records the suspicion instead of raising it.
+///
+/// The verdict comes from a six-clause rule about a page the tool has never seen, so it is
+/// a guess, and the two ways of being wrong cost wildly different amounts. Aborting threw
+/// away every viewport already captured and wrote no files, which left nothing to audit and
+/// so left the guess itself unfalsifiable. Reporting it costs a line. Facts about the run —
+/// a lost transport, an unparseable response — still fail; heuristics about the page do not.
+pub fn note_curtain(state: &mut crate::model::PageState) {
+    let Some(path) = state
+        .nodes
+        .iter()
+        .find(|node| node.blocking_overlay)
+        .map(|node| node.path.clone())
+    else {
+        return;
+    };
+    let note = format!("settled capture still contains a blocking overlay at {path}");
+    eprintln!("warning: {note}");
+    state.capture_blockers.push(note);
+}
+
 pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
     let lifecycle = if wait_for_lifecycle {
         " && window.__recreateLifecycleDone === true"
@@ -126,3 +179,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
 #[cfg(test)]
 #[path = "capture_settle_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "capture_curtain_tests.rs"]
+mod curtain_tests;

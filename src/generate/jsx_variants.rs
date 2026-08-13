@@ -1,4 +1,4 @@
-use super::{jsx, startup_timeline, tree};
+use super::{jsx, startup_replay, tree};
 use crate::model::PageState;
 use std::collections::BTreeMap;
 
@@ -48,7 +48,7 @@ pub fn selector() -> &'static str {
 pub fn fragment(
     components: &tree::Components,
     assets: &BTreeMap<String, String>,
-    timeline: startup_timeline::Timeline,
+    timeline: startup_replay::Replay,
 ) -> String {
     let handlers = BTreeMap::new();
     let roots = components
