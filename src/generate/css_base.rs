@@ -36,7 +36,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     let mut css = String::new();
     if include_interactions {
         for rule in &base.css_rules {
-            if let Some(kept) = retain(rule, &global_rule) {
+            if let Some(kept) = retain(rule, &mut global_rule) {
                 css.push_str(&super::asset_urls::rewrite(&kept, assets));
                 css.push('\n');
             }

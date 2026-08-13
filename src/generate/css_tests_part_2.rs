@@ -144,3 +144,52 @@ fn contextual_widths_do_not_reuse_fluid_cache_entries() {
     assert_ne!(fluid, contextual);
     assert!(declaration.contains("width:36px;"));
 }
+
+/// The wrapper axis is one half of the grid; this is the other.
+///
+/// `retain` classifies a nested rule by itself rather than by what encloses it, so the set
+/// of definition kinds it carries is whatever `global_rule` accepts, with no per-construct
+/// branch to fall out of date. Asserting that across kinds is what separates a real fix from
+/// one that special-cases the construct that happened to be reported: `@keyframes` and
+/// `@font-face` are covered elsewhere, and `@property` and `@counter-style` are the kinds
+/// nothing exercised — both register a name that a computed style can only point at, so
+/// losing either is the same silent failure under a different spelling.
+#[test]
+fn a_conditional_group_carries_every_kind_of_definition_it_holds() {
+    for definition in [
+        "@property --shade{syntax:\"<color>\";inherits:false;initial-value:red;}",
+        "@counter-style ticks{system:cyclic;symbols:\"*\";}",
+        "@font-face{font-family:Vorplish;src:url(a.woff2);}",
+        "@keyframes spin{from{rotate:0deg;}}",
+    ] {
+        for wrapper in ["@media (min-width: 1px)", "@supports (rotate: 0deg)"] {
+            let kept =
+                retain(&format!("{wrapper}{{{definition}}}"), &mut global_rule).unwrap_or_default();
+            assert!(
+                kept.contains(definition),
+                "{wrapper} dropped the definition it held: {kept:?}"
+            );
+            assert!(
+                kept.starts_with(wrapper),
+                "{wrapper} was flattened away, publishing an unconditional definition: {kept:?}"
+            );
+        }
+    }
+}
+
+/// The converse, so widening reach does not become re-emitting the wrapper wholesale. A
+/// style rule inside a group is already baked into a hashed class, so lifting it out with
+/// its neighbouring definition would apply it a second time.
+#[test]
+fn a_conditional_group_carries_none_of_the_style_rules_it_holds() {
+    let kept = retain(
+        "@media (min-width: 1px){@keyframes spin{from{rotate:0deg;}}.card{color:red;}}",
+        &mut global_rule,
+    )
+    .unwrap_or_default();
+    assert!(kept.contains("@keyframes spin"), "{kept:?}");
+    assert!(
+        !kept.contains("color:red"),
+        "a baked style rule was re-emitted: {kept:?}"
+    );
+}

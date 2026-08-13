@@ -2,29 +2,62 @@ use crate::model::Animation;
 use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
-/// The names of the `@keyframes` blocks the emitted authored CSS defines.
+/// The animation names the emitted stylesheet defines.
 ///
 /// An animation the author declared in CSS is already reproduced in full by those
 /// keyframes plus the element's baked computed style, which carries the name and every
 /// timing longhand. Rebuilding it from sampled frames writes a second `animation-name`
 /// over the first, so the authored definition would sit in the output unused — and a
 /// paused or slow animation samples to frames that describe no change at all.
-pub fn authored_names(rules: &[String]) -> BTreeSet<String> {
-    rules
-        .iter()
-        .filter(|rule| super::css::global_rule(rule))
-        .filter_map(|rule| {
-            let (_, rule) = super::css_layers::peel(rule);
-            let prelude = rule.strip_prefix('@')?.split('{').next()?;
-            let (keyword, name) = prelude.trim_end().split_once(char::is_whitespace)?;
-            keyword
-                .trim_start_matches("-webkit-")
-                .eq_ignore_ascii_case("keyframes")
-                .then(|| name.trim().trim_matches(['"', '\'']).to_string())
-        })
-        .collect()
+///
+/// It reads the stylesheet that was emitted rather than the rules it was built from,
+/// because the question is what this pipeline published, not what the page contained. Those
+/// two answers differ whenever emission drops something, and re-deriving the second from
+/// the captured rules is a second implementation of the emission decision that nothing
+/// keeps in step. It already fell out of step once: `css::retain` learned to descend into
+/// grouping at-rules, this stage kept filtering the top level, and a `@keyframes` nested in
+/// a condition was emitted correctly and then reported as undefined — so the sampler
+/// rebuilt it under a generated name and overrode the author's, publishing unconditionally
+/// what the author had written under a condition.
+///
+/// Reading the output makes that disagreement unrepresentable rather than merely tested
+/// for, and any later change to what gets emitted is reflected here with no second opinion
+/// to update.
+pub fn authored_names(css: &str) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    for rule in super::css_rule_split::top_level(css).iter() {
+        // `retain` owns the descent; this closure owns only what counts as a definition.
+        let _ = super::css::retain(rule, &mut |member| match keyframes_name(member) {
+            Some(name) => names.insert(name),
+            None => false,
+        });
+    }
+    names
 }
 
+/// The name a `@keyframes` block defines, or `None` for any other rule.
+///
+/// The vendor-prefixed spelling defines the same name, so it is read through rather than
+/// listed. A grouping rule is rejected by having no `keyframes` keyword, which matters
+/// because splitting `@media (min-width: 1px)` on whitespace yields a token that reads like
+/// an identifier and would otherwise be recorded as a name no element can reference.
+fn keyframes_name(rule: &str) -> Option<String> {
+    let (_, rule) = super::css_layers::peel(rule);
+    let prelude = rule.strip_prefix('@')?.split('{').next()?;
+    let (keyword, name) = prelude.trim_end().split_once(char::is_whitespace)?;
+    keyword
+        .trim_start_matches("-webkit-")
+        .eq_ignore_ascii_case("keyframes")
+        .then(|| name.trim().trim_matches(['"', '\'']).to_string())
+        .filter(|name| !name.is_empty())
+}
+
+#[cfg(test)]
+#[path = "animation_authored_names_tests.rs"]
+mod authored_names_tests;
+#[cfg(test)]
+#[path = "animation_emitted_source_tests.rs"]
+mod emitted_source_tests;
 pub fn append(animation: &Animation, name: &str, css: &mut String) {
     let final_position = position(animation.keyframes.last());
     css.push_str(&format!("@keyframes {name}{{"));

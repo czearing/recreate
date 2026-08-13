@@ -106,9 +106,9 @@ fn preserves_authored_geometry_animations() {
 fn defers_to_the_authored_keyframes_an_animation_was_declared_with() {
     let mut declared = animation("html>body>div");
     declared.name = "spin".into();
-    let authored = crate::generate::animation_keyframes::authored_names(&[
-        "@keyframes spin{from{rotate:0deg}to{rotate:360deg}}".into(),
-    ]);
+    let authored = crate::generate::animation_keyframes::authored_names(
+        "@keyframes spin{from{rotate:0deg}to{rotate:360deg}}",
+    );
     assert!(authored.contains("spin"));
     let mut classes = BTreeMap::from([("html>body>div".into(), "base".into())]);
     let mut css = String::new();
@@ -147,12 +147,12 @@ fn defers_to_the_authored_keyframes_an_animation_was_declared_with() {
 /// does not.
 #[test]
 fn reads_authored_keyframe_names_from_the_rules_the_emitter_keeps() {
-    let names = crate::generate::animation_keyframes::authored_names(&[
-        "@layer motion{@keyframes drift{from{opacity:0}}}".into(),
-        "@-webkit-keyframes pulse{from{opacity:0}}".into(),
-        ".card{animation-name:spin}".into(),
-        "@media (min-width:1px){.card{animation-name:ghost}}".into(),
-    ]);
+    let names = crate::generate::animation_keyframes::authored_names(concat!(
+        "@layer motion{@keyframes drift{from{opacity:0}}}\n",
+        "@-webkit-keyframes pulse{from{opacity:0}}\n",
+        ".card{animation-name:spin}\n",
+        "@media (min-width:1px){.card{animation-name:ghost}}\n",
+    ));
     assert!(names.contains("drift"), "{names:?}");
     assert!(names.contains("pulse"), "{names:?}");
     assert!(!names.contains("spin"), "{names:?}");

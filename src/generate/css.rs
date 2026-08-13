@@ -68,9 +68,10 @@ pub(super) fn build_scoped(
     timing("responsive");
     let mut interaction_classes =
         super::css_interactions::append(specification, assets, &classes, &mut css, &timing);
+    let authored = super::animation_keyframes::authored_names(&css);
     animations::append(
         &base.animations,
-        &super::animation_keyframes::authored_names(&base.css_rules),
+        &authored,
         &super::before_change::BeforeChange::new(&base.css_rules, &base.nodes),
         &mut classes,
         &mut css,
@@ -164,19 +165,21 @@ pub(super) fn global_rule(rule: &str) -> bool {
 /// The parts of a rule worth keeping, with every grouping at-rule rebuilt around whichever
 /// of its members survive.
 ///
-/// `global_rule` answers a question about one rule's kind, which is the whole answer only
-/// at the top level. A grouping at-rule is neither a definition nor a style rule: what it
-/// contributes depends on what it holds, and CSS Conditional Rules 3 allows `@font-face`
-/// and `@keyframes` inside every conditional group. Asking `keep` of the group itself
-/// therefore answers the wrong question — the members have to be asked, one at a time, at
-/// whatever depth they sit.
+/// `global_rule` answers a question about one rule's kind, which is the whole answer only at
+/// the top level. A grouping at-rule is neither a definition nor a style rule: what it
+/// contributes depends on what it holds, and CSS Conditional Rules 3 allows `@font-face` and
+/// `@keyframes` inside every conditional group. Asking `keep` of the group therefore answers
+/// the wrong question — its members must be asked, one at a time, at whatever depth they sit.
 ///
-/// The prelude is rebuilt rather than dropped because a condition is meaning, not
-/// decoration: a definition lifted out of `@media (prefers-reduced-motion: no-preference)`
-/// animates a page the author deliberately kept still, which is worse than omitting it. A
-/// group none of whose members survive contributes nothing, so no empty condition is
-/// published.
-pub(super) fn retain(rule: &str, keep: &dyn Fn(&str) -> bool) -> Option<String> {
+/// This is the only walk that knows a definition can be nested, so every stage needing that
+/// knowledge arrives through here rather than re-deriving it — `keep` is stateful so a
+/// caller can *learn* what a stylesheet holds as it answers, rather than write a second
+/// descent that will drift. This owns where to look; the caller owns only what counts.
+///
+/// The prelude is rebuilt rather than dropped because a condition is meaning: a definition
+/// lifted out of `@media (prefers-reduced-motion: no-preference)` animates a page the author
+/// kept still, which is worse than omitting it. A group nothing survives publishes nothing.
+pub(super) fn retain(rule: &str, keep: &mut dyn FnMut(&str) -> bool) -> Option<String> {
     let body_start = rule.find('{')?;
     let prelude = &rule[..body_start];
     if !rule.ends_with('}') || !prelude.trim_start().starts_with('@') || global_rule(rule) {
@@ -184,7 +187,7 @@ pub(super) fn retain(rule: &str, keep: &dyn Fn(&str) -> bool) -> Option<String> 
     }
     let members = super::css_rule_split::top_level(&rule[body_start + 1..rule.len() - 1])
         .iter()
-        .filter_map(|member| retain(member, keep))
+        .filter_map(|member| retain(member, &mut *keep))
         .collect::<Vec<_>>();
     (!members.is_empty()).then(|| format!("{prelude}{{{}}}", members.join("\n")))
 }

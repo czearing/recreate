@@ -43,7 +43,7 @@ pub(super) fn self_contained(css: &str, classes: &[String]) -> String {
         let declared = rules
             .iter()
             .filter_map(|rule| {
-                super::css::retain(rule, &|member| reaches(member, classes, &carried))
+                super::css::retain(rule, &mut |member| reaches(member, classes, &carried))
             })
             .collect::<Vec<_>>()
             .join("\n");
