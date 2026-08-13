@@ -22,8 +22,6 @@ fn node(path: &str, x: f64) -> Node {
             height: 10.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

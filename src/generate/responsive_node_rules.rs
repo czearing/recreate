@@ -89,22 +89,9 @@ pub(super) fn append_node_rules_indexed(
     if !changed.is_empty() {
         rules.push_str(&format!(".{class}{{{}}}", declarations(&changed, assets)));
     }
-    append_pseudo_rule(
-        class,
-        "before",
-        base.before.as_ref(),
-        node.before.as_ref(),
-        assets,
-        &mut rules,
-    );
-    append_pseudo_rule(
-        class,
-        "after",
-        base.after.as_ref(),
-        node.after.as_ref(),
-        assets,
-        &mut rules,
-    );
+    for (suffix, base, current) in super::super::css_pseudo::paired(&base.pseudos, &node.pseudos) {
+        append_pseudo_rule(class, suffix, base, current, assets, &mut rules);
+    }
     rules
 }
 
@@ -150,7 +137,7 @@ fn multiline_text_box(node: &Node) -> bool {
 
 fn append_pseudo_rule(
     class: &str,
-    name: &str,
+    suffix: &str,
     base: Option<&Pseudo>,
     current: Option<&Pseudo>,
     assets: &BTreeMap<String, String>,
@@ -158,7 +145,7 @@ fn append_pseudo_rule(
 ) {
     let Some(current) = current else {
         if base.is_some() {
-            rules.push_str(&format!(".{class}::{name}{{content:none;}}"));
+            rules.push_str(&format!(".{class}{suffix}{{content:none;}}"));
         }
         return;
     };
@@ -173,13 +160,13 @@ fn append_pseudo_rule(
         &current.style,
     );
     let content = if base.is_none_or(|pseudo| pseudo.content != current.content) {
-        format!("content:{};", current.content)
+        super::super::css_pseudo::content_declaration(&current.content)
     } else {
         String::new()
     };
     if !content.is_empty() || !changed.is_empty() {
         rules.push_str(&format!(
-            ".{class}::{name}{{{content}{}}}",
+            ".{class}{suffix}{{{content}{}}}",
             declarations(&changed, assets)
         ));
     }

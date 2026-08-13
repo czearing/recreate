@@ -72,13 +72,6 @@ __ASSET_ATTRIBUTES__
       - (parseFloat(style.borderRightWidth) || 0);
     return gutter > 0 ? gutter : 0;
   };
-  const pseudo = (element, name) => {
-    const style = getComputedStyle(element, name);
-    const content = style.content;
-    return content && content !== 'none'
-      ? { content, style: authoredStyles(styleMap(style), pseudoBaselineOf(element, name)) }
-      : null;
-  };
   const nodes = [];
   const dom = {};
   const recordDom = (path, element, style, overrides = {}) => {
@@ -122,14 +115,14 @@ __ASSET_ATTRIBUTES__
       attributes,
       control_state: recreateControlState(element),
       disabled: element.matches(':disabled'),
+      modal: element.matches(':modal'),
       blocking_overlay: isBlockingOverlay(element),
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       scrollbar_gutter: scrollbarGutter(element, computedStyle),
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
-      before: pseudo(element, '::before'),
-      after: pseudo(element, '::after')
+      pseudos: recreatePseudos(element)
     });
     recordDom(path, element, computedStyle);
     let textIndex = 0;

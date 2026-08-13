@@ -23,8 +23,6 @@ fn heading(font_size: &str, width: f64) -> Node {
             ("font-size".into(), font_size.into()),
             ("width".into(), format!("{width}px")),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }
@@ -80,8 +78,6 @@ fn shrinking_title(width: f64) -> Node {
             ("flex-shrink".into(), "1".into()),
             ("width".into(), format!("{width}px")),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

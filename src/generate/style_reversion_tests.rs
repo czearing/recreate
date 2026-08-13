@@ -25,8 +25,6 @@ pub(super) fn box_node(path: &str, style: &[(&str, &str)]) -> Node {
             .iter()
             .map(|(name, value)| ((*name).to_string(), (*value).to_string()))
             .collect(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }
@@ -176,9 +174,14 @@ fn pseudo(content: &str, style: &[(&str, &str)]) -> Pseudo {
 #[test]
 fn says_that_a_pseudo_element_property_went_back_to_its_default() {
     let mut base = box_node("html>body>div", &[]);
-    base.before = Some(pseudo("\"x\"", &[("color", "rgb(255, 0, 0)")]));
+    base.pseudos.insert(
+        "::before".into(),
+        pseudo("\"x\"", &[("color", "rgb(255, 0, 0)")]),
+    );
     let mut narrow = box_node("html>body>div", &[]);
-    narrow.before = Some(pseudo("\"x\"", &[]));
+    narrow
+        .pseudos
+        .insert("::before".into(), pseudo("\"x\"", &[]));
     let css = band_rule(&base, &narrow);
     assert!(css.contains(".band::before{color:revert"), "{css}");
 }

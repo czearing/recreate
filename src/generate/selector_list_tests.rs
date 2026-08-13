@@ -20,8 +20,6 @@ fn node(classes: &str) -> Node {
             height: 20.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

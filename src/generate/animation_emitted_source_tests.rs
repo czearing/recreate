@@ -94,8 +94,6 @@ fn node(path: &str, parent: Option<&str>, styles: Styles) -> Node {
             height: 80.0,
         },
         style: styles,
-        before: None,
-        after: None,
         writing_mode: Default::default(),
         blocking_overlay: false,
         disabled: false,

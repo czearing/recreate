@@ -43,8 +43,6 @@ pub fn empty_node(path: &str) -> crate::model::Node {
             height: 1.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         disabled: false,
         rtl: false,
         ..Default::default()

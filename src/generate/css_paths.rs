@@ -23,9 +23,7 @@ pub fn changed(specification: &Specification, baselines: &[PageState]) -> HashSe
                 .filter(move |node| {
                     contextual.contains(&node.path)
                         || nodes.get(node.path.as_str()).is_none_or(|baseline| {
-                            node.style != baseline.style
-                                || node.before != baseline.before
-                                || node.after != baseline.after
+                            node.style != baseline.style || node.pseudos != baseline.pseudos
                         })
                 })
                 .map(|node| node.path.clone())

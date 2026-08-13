@@ -35,8 +35,6 @@ pub fn span(ordinal: usize) -> Node {
             height: 20.0,
         },
         style,
-        before: None,
-        after: None,
         ..Default::default()
     }
 }
@@ -82,9 +80,12 @@ pub fn classes_of(nodes: Vec<Node>) -> (Vec<String>, String) {
 #[test]
 fn distinguishes_a_leading_decoration_from_a_trailing_one() {
     let mut lead = span(1);
-    lead.before = Some(pseudo("\"MARK\"", "red"));
+    lead.pseudos
+        .insert("::before".into(), pseudo("\"MARK\"", "red"));
     let mut trail = span(2);
-    trail.after = Some(pseudo("\"MARK\"", "red"));
+    trail
+        .pseudos
+        .insert("::after".into(), pseudo("\"MARK\"", "red"));
 
     let (classes, css) = classes_of(vec![lead, trail]);
 
@@ -110,10 +111,14 @@ fn distinguishes_a_leading_decoration_from_a_trailing_one() {
 #[test]
 fn distinguishes_two_decorations_from_one_carrying_both_payloads() {
     let mut both = span(1);
-    both.before = Some(pseudo("\"A\"", "red"));
-    both.after = Some(pseudo("\"B\"", "red"));
+    both.pseudos
+        .insert("::before".into(), pseudo("\"A\"", "red"));
+    both.pseudos
+        .insert("::after".into(), pseudo("\"B\"", "red"));
     let mut joined = span(2);
-    joined.before = Some(pseudo("\"A\"\"B\"", "red"));
+    joined
+        .pseudos
+        .insert("::before".into(), pseudo("\"A\"\"B\"", "red"));
 
     let (classes, _) = classes_of(vec![both, joined]);
 
@@ -128,7 +133,9 @@ fn distinguishes_two_decorations_from_one_carrying_both_payloads() {
 fn distinguishes_no_decoration_from_an_empty_one() {
     let plain = span(1);
     let mut empty = span(2);
-    empty.before = Some(pseudo("\"\"", "red"));
+    empty
+        .pseudos
+        .insert("::before".into(), pseudo("\"\"", "red"));
 
     let (classes, _) = classes_of(vec![plain, empty]);
 
@@ -143,9 +150,13 @@ fn distinguishes_no_decoration_from_an_empty_one() {
 #[test]
 fn still_shares_one_class_and_one_rule_between_alike_elements() {
     let mut first = span(1);
-    first.before = Some(pseudo("\"MARK\"", "red"));
+    first
+        .pseudos
+        .insert("::before".into(), pseudo("\"MARK\"", "red"));
     let mut second = span(2);
-    second.before = Some(pseudo("\"MARK\"", "red"));
+    second
+        .pseudos
+        .insert("::before".into(), pseudo("\"MARK\"", "red"));
 
     let (classes, css) = classes_of(vec![first, second]);
 
@@ -157,45 +168,5 @@ fn still_shares_one_class_and_one_rule_between_alike_elements() {
         css.matches("::before{").count(),
         1,
         "the shared rule was written twice: {css}"
-    );
-}
-
-/// The framed sibling had a seam of its own: it folded a decoration's payload in with no
-/// terminator, so the payload ran straight into the first property name after it. A decoration
-/// saying `ab` under property `c` and one saying `a` under property `bc` produced identical
-/// bytes, which is the same flaw one level down.
-#[test]
-fn separates_a_decorations_payload_from_the_property_that_follows_it() {
-    let signature = |content: &str, property: &str| {
-        let mut style = Styles::new();
-        style.insert(property.into(), "red".into());
-        let mut node = span(1);
-        node.path = "html>body:nth-of-type(1)>span:nth-of-type(1)".into();
-        node.parent = Some("html>body:nth-of-type(1)".into());
-        node.before = Some(Pseudo {
-            content: content.into(),
-            style,
-        });
-        let specification = crate::model::Specification {
-            schema_version: 1,
-            requested_url: String::new(),
-            captured_url: String::new(),
-            states: vec![PageState {
-                nodes: vec![node],
-                ..Default::default()
-            }],
-            interactions: Vec::new(),
-            transitions: Vec::new(),
-        };
-        super::css_values::responsive_signatures_for(&specification, None)
-            .into_values()
-            .next()
-            .expect("the node has a signature")
-    };
-
-    assert_ne!(
-        signature("ab", "c"),
-        signature("a", "bc"),
-        "a decoration's payload ran into the property name that followed it"
     );
 }

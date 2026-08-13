@@ -70,10 +70,10 @@ __SELECTION__
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       disabled: element.matches(':disabled'),
+      modal: element.matches(':modal'),
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,
-      before: null,
-      after: null
+      pseudos: {}
     });
     let textIndex = 0;
     for (const child of element.childNodes) {
@@ -90,8 +90,7 @@ __SELECTION__
         attributes: {},
         rect: { x: value.x, y: value.y, width: value.width, height: value.height },
         style: authoredStyles(styleMap(getComputedStyle(element)), baselineOf(element)),
-        before: null,
-        after: null
+        pseudos: {}
       });
     }
   };

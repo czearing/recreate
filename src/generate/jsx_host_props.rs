@@ -77,12 +77,16 @@ fn state(node: &Node, attribute: &str) -> Option<String> {
     }
 }
 
-/// Whether `attribute` is inert on `tag` because React reads the state from a prop instead.
-/// Emitting it anyway would be a prop React ignores, or one that freezes the control.
-pub(super) fn relocated(tag: &str, attribute: &str) -> bool {
+/// Whether `attribute` is inert on this element because React reads the state from a prop,
+/// or because the recreation restores it by other means. Emitting it anyway would be a prop
+/// React ignores, or one that freezes the control.
+pub(super) fn relocated(node: &Node, attribute: &str) -> bool {
+    if super::jsx_promotion::withholds(node, attribute) {
+        return true;
+    }
     BINDINGS
         .iter()
-        .any(|rule| rule.from == tag && rule.attribute == attribute)
+        .any(|rule| rule.from == node.tag && rule.attribute == attribute)
 }
 
 /// Whether this element's value arrives as a prop, so the children that spelled it in HTML

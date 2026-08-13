@@ -24,6 +24,7 @@ mod compare_tests;
 mod first_paint;
 mod first_paint_assets;
 mod generate;
+mod generated_boxes;
 mod interaction_rebase;
 mod interaction_rebase_node;
 #[cfg(test)]

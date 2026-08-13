@@ -36,8 +36,6 @@ fn surface(attributes: &[(&str, &str)]) -> Node {
             height: 120.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

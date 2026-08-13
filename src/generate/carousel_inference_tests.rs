@@ -187,8 +187,6 @@ fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node
             height: 32.0,
         },
         style: BTreeMap::new(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

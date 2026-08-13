@@ -90,8 +90,6 @@ fn node(path: &str, parent: Option<&str>, style: Styles) -> Node {
             height: 20.0,
         },
         style,
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

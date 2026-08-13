@@ -100,8 +100,6 @@ fn node(path: &str) -> Node {
             height: 100.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

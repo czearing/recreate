@@ -23,8 +23,6 @@ fn node() -> Node {
             height: 100.0,
         },
         style: Styles::from([("width".into(), "442px".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());

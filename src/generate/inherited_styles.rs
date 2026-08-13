@@ -88,8 +88,6 @@ mod tests {
                     .iter()
                     .map(|(name, value)| ((*name).into(), (*value).into())),
             ),
-            before: None,
-            after: None,
             ..Default::default()
         };
         node.attributes.insert("class".into(), class.into());

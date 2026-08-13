@@ -25,8 +25,6 @@ fn node(mode: WritingMode) -> Node {
             height: 111.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());

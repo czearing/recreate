@@ -21,8 +21,6 @@ fn compound_modifier_rules_require_every_class() {
             height: 1.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "items".into());
@@ -60,8 +58,6 @@ fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
             height: 1.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("id".into(), "content".into());
@@ -98,8 +94,6 @@ fn restores_authored_intrinsic_motion() {
             ("height".into(), "28px".into()),
             ("transition".into(), "all".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "create".into());
@@ -141,8 +135,6 @@ fn keeps_resolved_motion_when_authored_variables_are_filtered() {
                 "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)".into(),
             ),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
@@ -180,8 +172,6 @@ fn keeps_measured_width_for_ordinary_flex_items() {
             ("width".into(), "253px".into()),
             ("height".into(), "185px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
@@ -216,8 +206,6 @@ fn removes_measured_width_from_growing_flex_items() {
             height: 80.0,
         },
         style: Styles::from([("width".into(), "320px".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "content".into());

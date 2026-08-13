@@ -1,7 +1,7 @@
 //! A baseline reading that no consumer can reach is work the capture pays for and throws away.
-//! The probe enumerates every element four times - live, `::before`, `::after` and the reverted
-//! element - but a pseudo-element is only ever recorded when it generates a box, and the live
-//! enumeration is the same one every consumer then repeats. These tests pin both prunings to the
+//! The probe enumerates every element live and then once per generated box under a revert sheet,
+//! but a box is only ever recorded when the engine generated it, and the live enumeration is the
+//! same one every consumer then repeats. These tests pin both prunings to the
 //! condition that makes them safe rather than to a count: a pseudo baseline is skipped exactly
 //! when the value the consumer tests says it would be discarded, and the handed-over live map is
 //! the one the probe took, so a pruning that reached further would show up as a missing or wrong
@@ -75,6 +75,37 @@ fn enumerates_no_custom_property_in_the_baseline() {
          \\nObject.keys(baselineOf(marked))')",
     );
     assert_eq!(value, serde_json::json!(["color"]));
+}
+
+/// The pruning is keyed on each generated box's own existence condition, not on content. A
+/// `::backdrop` takes no `content` at all — its computed value is `normal` on every element —
+/// so a content test would either record a phantom scrim on every element on the page or, read
+/// the other way, never record the one scrim that exists. The engine answers instead, and the
+/// answer moves the reading: the same element measured with and without top-layer membership
+/// produces a baseline and no baseline.
+#[test]
+fn measures_a_backdrop_baseline_for_exactly_the_elements_the_engine_promoted() {
+    let seen = evaluate(
+        "const plainRun = (read(), globalThis.pseudoMeasured);\
+         \nmarked.modal = true;\
+         \nglobalThis.promoted = (read(), globalThis.pseudoMeasured);\
+         \nglobalThis.plainRun = plainRun;",
+        "[globalThis.plainRun, globalThis.promoted]",
+    );
+    assert_eq!(seen, serde_json::json!([[], ["P#marked::backdrop"]]));
+}
+
+/// Deciding whether a box exists must not cost a read for a box that decides without one.
+/// Resolving a pseudo-element's computed style is a separate layout-sensitive read the engine
+/// cannot share with the element's own, so a third entry in the list would otherwise add one
+/// per element on every page — enough, measured on a scene whose capture races a timed
+/// attribute sequence, to change which phase the capture catches. `::backdrop` answers from
+/// `:modal` alone, so the five elements here cost exactly the two content reads each that they
+/// cost before it existed.
+#[test]
+fn costs_no_pseudo_read_for_a_box_that_decides_without_one() {
+    let reads = evaluate("read();", "globalThis.pseudoReads");
+    assert_eq!(reads, serde_json::json!(10));
 }
 
 /// A component framework declares `style` as a class field, which installs an own property over

@@ -32,8 +32,6 @@ fn node(tag: &str, class: &str, styles: &[(&str, &str)]) -> Node {
                 .iter()
                 .map(|(name, value)| ((*name).into(), (*value).into())),
         ),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), class.into());

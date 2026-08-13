@@ -16,18 +16,19 @@ pub(super) fn rebase_node(state: &mut Node, fresh: &Node, baseline: &Node) {
         &baseline.attributes,
     );
     rebase_map(&mut state.style, &fresh.style, &baseline.style);
-    rebase_pseudo(&mut state.before, &fresh.before, &baseline.before);
-    rebase_pseudo(&mut state.after, &fresh.after, &baseline.after);
+    for suffix in state.pseudos.keys().cloned().collect::<Vec<_>>() {
+        let (Some(fresh), Some(baseline)) =
+            (fresh.pseudos.get(&suffix), baseline.pseudos.get(&suffix))
+        else {
+            continue;
+        };
+        if let Some(state) = state.pseudos.get_mut(&suffix) {
+            rebase_pseudo(state, fresh, baseline);
+        }
+    }
 }
 
-pub(super) fn rebase_pseudo(
-    state: &mut Option<Pseudo>,
-    fresh: &Option<Pseudo>,
-    baseline: &Option<Pseudo>,
-) {
-    let (Some(state), Some(fresh), Some(baseline)) = (state, fresh, baseline) else {
-        return;
-    };
+pub(super) fn rebase_pseudo(state: &mut Pseudo, fresh: &Pseudo, baseline: &Pseudo) {
     if state.content == fresh.content {
         state.content.clone_from(&baseline.content);
     }

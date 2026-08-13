@@ -22,8 +22,6 @@ fn creates_semantic_component_names() {
             height: 1.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes
@@ -52,8 +50,6 @@ fn prefers_the_source_component_name_over_page_copy() {
             height: 1.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert(

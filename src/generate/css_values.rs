@@ -26,8 +26,9 @@ pub fn responsive_signatures_for(
             }
             let signature = signatures.entry(node.path.clone()).or_default();
             signature.styles(&node.style);
-            append_pseudo(signature, node.before.as_ref());
-            append_pseudo(signature, node.after.as_ref());
+            for (suffix, pseudo) in super::css_pseudo::slots(node) {
+                append_pseudo(signature, suffix, pseudo);
+            }
         }
     }
     signatures
@@ -36,14 +37,14 @@ pub fn responsive_signatures_for(
         .collect()
 }
 
-/// Writes the slot marker whether or not the pseudo exists, so an element with no generated box
-/// is not encoded as the same bytes as one whose box is empty.
-fn append_pseudo(signature: &mut Signature, pseudo: Option<&Pseudo>) {
+/// Writes the slot marker and which slot it was, so an element with no generated box is not
+/// encoded as the same bytes as one whose box is empty, and two elements decorating different
+/// slots with the same declarations do not collapse onto one class.
+fn append_pseudo(signature: &mut Signature, suffix: &str, pseudo: &Pseudo) {
     signature.slot();
-    if let Some(pseudo) = pseudo {
-        signature.value(&pseudo.content);
-        signature.styles(&pseudo.style);
-    }
+    signature.value(suffix);
+    signature.value(&pseudo.content);
+    signature.styles(&pseudo.style);
 }
 
 pub fn hash(value: &str) -> String {

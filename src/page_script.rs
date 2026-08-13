@@ -22,7 +22,7 @@ fn source_template() -> String {
 /// One template, so a capture stage added here cannot be missing from the asset-free form.
 fn template_with_assets(assets: &str) -> String {
     CAPTURE
-        .replace("__STYLE_BASELINE__", style_baseline::SOURCE)
+        .replace("__STYLE_BASELINE__", &style_baseline::source())
         .replace(
             "__ASSET_ATTRIBUTES__",
             &crate::asset_attributes::js_source(),
@@ -50,3 +50,7 @@ pub fn source_without_assets() -> String {
 #[cfg(test)]
 #[path = "page_script_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "page_script_producer_tests.rs"]
+mod producer_tests;

@@ -96,9 +96,7 @@ fn compare_node(
             format!("attributes {} {}", expected.path, attributes.join(",")),
         );
     }
-    if !styles::same_pseudo(expected.before.as_ref(), actual.before.as_ref())
-        || !styles::same_pseudo(expected.after.as_ref(), actual.after.as_ref())
-    {
+    if !styles::same_pseudos(&expected.pseudos, &actual.pseudos) {
         report.pseudo_mismatches += 1;
         detail(report, format!("pseudo {}", expected.path));
     }

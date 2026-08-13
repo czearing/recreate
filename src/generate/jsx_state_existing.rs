@@ -31,9 +31,9 @@ pub(super) fn existing_surface(
             })
         })
         .filter(|node| {
-            alignment.counterpart(&node.path).is_some_and(|baseline| {
-                node.before != baseline.before || node.after != baseline.after
-            })
+            alignment
+                .counterpart(&node.path)
+                .is_some_and(|baseline| node.pseudos != baseline.pseudos)
         })
         .filter_map(|node| {
             components

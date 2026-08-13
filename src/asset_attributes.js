@@ -112,7 +112,7 @@
   const recreateAssetUrls = (nodes, cssRules) => {
     const assets = new Set(assetUrls);
     for (const node of nodes) {
-      for (const style of [node.style, node.before?.style, node.after?.style]) {
+      for (const style of [node.style, ...Object.values(node.pseudos || {}).map(b => b.style)]) {
         for (const value of Object.values(style || {})) {
           for (const match of String(value).matchAll(cssUrlPattern)) {
             assets.add(resolveUrl(match[1]));

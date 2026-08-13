@@ -53,7 +53,7 @@ fn rule_parts<'a>(
     parent: Option<&'a Node>,
     state: &'a PageState,
     assets: &BTreeMap<String, String>,
-) -> Vec<(&'static str, String)> {
+) -> Vec<(&'a str, String)> {
     let mut parts = vec![(
         "",
         responsive::base_declarations(
@@ -66,9 +66,7 @@ fn rule_parts<'a>(
         ),
     )];
     for (suffix, pseudo) in super::css_pseudo::slots(node) {
-        if let Some(pseudo) = pseudo {
-            parts.push((suffix, super::css_pseudo::declarations(pseudo, assets)));
-        }
+        parts.push((suffix, super::css_pseudo::declarations(pseudo, assets)));
     }
     parts
 }
@@ -81,7 +79,7 @@ fn rule_parts<'a>(
 /// end to end, let those two produce identical bytes; [`append_rule`] writes once per class, so
 /// the second element kept the class, was skipped, and rendered the first one's decoration on
 /// the wrong side of its content.
-fn class_name(parts: &[(&'static str, String)]) -> String {
+fn class_name(parts: &[(&str, String)]) -> String {
     let mut signature = Signature::new();
     for (suffix, declarations) in parts {
         signature.slot();
@@ -92,7 +90,7 @@ fn class_name(parts: &[(&'static str, String)]) -> String {
 
 fn append_rule(
     class: &str,
-    parts: &[(&'static str, String)],
+    parts: &[(&str, String)],
     css: &mut String,
     emitted: &mut HashSet<String>,
 ) {

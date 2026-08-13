@@ -33,8 +33,6 @@ pub(super) fn node(tag: &str) -> Node {
             height: 1.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

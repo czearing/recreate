@@ -24,8 +24,6 @@ fn removes_measured_height_from_growing_flex_items() {
             ("width".into(), "320px".into()),
             ("height".into(), "34px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "editor".into());
@@ -63,8 +61,6 @@ fn keeps_used_height_for_percentage_sized_textareas() {
             ("width".into(), "320px".into()),
             ("height".into(), "48px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "editor".into());
@@ -102,8 +98,6 @@ fn removes_sampled_height_from_intrinsic_flex_cards() {
             ("height".into(), "245px".into()),
             ("overflow".into(), "hidden".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "task-card".into());
@@ -146,8 +140,6 @@ fn removes_sampled_height_from_a_content_sized_flex_section() {
             ("flex-direction".into(), "column".into()),
             ("height".into(), "204px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes
@@ -189,8 +181,6 @@ fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
             ("height".into(), "168px".into()),
             ("min-height".into(), "152px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
@@ -229,8 +219,6 @@ fn keeps_the_height_a_flex_container_authored_through_a_variable() {
             ("display".into(), "flex".into()),
             ("height".into(), "48px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "appBar".into());
@@ -268,8 +256,6 @@ fn keeps_the_height_a_flex_container_authored() {
             ("display".into(), "flex".into()),
             ("height".into(), "204px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "banner".into());
@@ -306,8 +292,6 @@ fn removes_resolved_grid_rows_without_authored_tracks() {
             ("grid-template-columns".into(), "389px".into()),
             ("grid-template-rows".into(), "168px 164px 164px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "cards".into());
@@ -346,8 +330,6 @@ fn rejects_authored_layout_values_from_inactive_media_rules() {
             ("flex-direction".into(), "row".into()),
             ("gap".into(), "normal".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "header".into());
@@ -388,8 +370,6 @@ fn ignores_cascade_keywords_when_reading_authored_values() {
             ("padding-left".into(), "10px".into()),
             ("padding-right".into(), "10px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes
@@ -434,8 +414,6 @@ fn reads_authored_values_from_static_pseudo_class_selectors() {
             height: 160.0,
         },
         style: Styles::from([("padding".into(), "12px".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes
@@ -477,8 +455,6 @@ fn ignores_authored_values_the_captured_style_contradicts() {
             height: 160.0,
         },
         style: Styles::from([("padding".into(), "12px".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "root card".into());

@@ -20,7 +20,9 @@ class Element {
     this.scrollable = scrollable;
     this.scrollLeft = 0;
     this.scrollTop = 0;
+    this.modal = false;
   }
+  matches(selector){ return selector === ':modal' && this.modal; }
   collapse(){ this.scrollLeft = 0; this.scrollTop = 0; this.scrollable = false; }
   appendChild(child){ this.children.push(child); return child; }
   removeChild(child){ this.children = this.children.filter(item => item !== child); }
@@ -58,7 +60,7 @@ globalThis.getComputedStyle = () => ({
 "#;
 
 fn measure() -> serde_json::Value {
-    let source = crate::style_baseline::SOURCE;
+    let source = crate::style_baseline::source();
     node_eval::evaluate(
         &format!(
             "{DOUBLE}\n{source}\npanel.scrollTop = 300;\
@@ -78,7 +80,7 @@ fn restores_the_scroll_offsets_its_revert_collapsed() {
 /// The probe must put the page back completely, not merely restore what it wrote.
 #[test]
 fn leaves_the_style_attribute_as_it_found_it() {
-    let source = crate::style_baseline::SOURCE;
+    let source = crate::style_baseline::source();
     let result = node_eval::evaluate(
         &format!(
             "{DOUBLE}\n{source}\npanel.setAttribute('style', 'color: red');\

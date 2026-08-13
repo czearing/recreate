@@ -13,7 +13,8 @@ use std::collections::BTreeMap;
 #[test]
 fn writes_no_rule_for_a_slot_the_element_never_used() {
     let mut lead = span(1);
-    lead.before = Some(pseudo("\"MARK\"", "red"));
+    lead.pseudos
+        .insert("::before".into(), pseudo("\"MARK\"", "red"));
 
     let (_, css) = classes_of(vec![lead]);
 
@@ -34,7 +35,8 @@ fn writes_a_shared_decoration_once_across_the_elements_that_share_it() {
         let mut node = span(ordinal);
         node.path = format!("html>body:nth-of-type(1)>span:nth-of-type({ordinal})");
         node.parent = Some("html>body:nth-of-type(1)".into());
-        node.before = Some(pseudo("\"MARK\"", "red"));
+        node.pseudos
+            .insert("::before".into(), pseudo("\"MARK\"", "red"));
         node
     };
     let specification = Specification {
@@ -78,7 +80,8 @@ fn writes_a_shared_decoration_once_across_the_elements_that_share_it() {
 #[test]
 fn declares_the_generated_content_once() {
     let mut lead = span(1);
-    lead.before = Some(pseudo("\"MARK\"", "red"));
+    lead.pseudos
+        .insert("::before".into(), pseudo("\"MARK\"", "red"));
 
     let (_, css) = classes_of(vec![lead]);
 

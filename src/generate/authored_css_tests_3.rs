@@ -24,8 +24,6 @@ fn ignores_declarations_for_descendants() {
             ("width".into(), "200px".into()),
             ("height".into(), "36px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "menu-row".into());
@@ -67,8 +65,6 @@ fn restores_centered_max_width_container() {
             ("margin-left".into(), "0px".into()),
             ("margin-right".into(), "0px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "content".into());
@@ -104,8 +100,6 @@ fn keeps_the_last_active_responsive_declaration() {
             height: 100.0,
         },
         style: Styles::from([("grid-template-columns".into(), "372px 372px".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "grid".into());

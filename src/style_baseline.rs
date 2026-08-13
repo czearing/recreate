@@ -3,11 +3,20 @@
 /// would compute with no author CSS, measured by the engine rather than compared
 /// against a table. Both capture scripts render this same source, so the rule cannot
 /// drift between the resting capture and an interaction capture.
-pub const SOURCE: &str = include_str!("style_baseline_script.js");
+///
+/// The generated boxes it measures are named by [`crate::generated_boxes`], which the
+/// node record producers read too, so the probe cannot measure a box no producer records
+/// or miss one every producer does.
+const SCRIPT: &str = include_str!("style_baseline_script.js");
+
+/// The measurement and the box list it measures, as one evaluable source.
+pub fn source() -> String {
+    format!("{}\n{SCRIPT}", crate::generated_boxes::SOURCE)
+}
 
 #[cfg(test)]
 mod tests {
-    use super::SOURCE;
+    use super::SCRIPT as SOURCE;
 
     /// `initial` and `unset` both discard the user-agent origin, which the recreation
     /// still runs under. Measuring against either would re-emit every user-agent
@@ -83,42 +92,42 @@ mod tests {
         assert!(SOURCE.contains("removeAttribute('style')"));
         assert!(SOURCE.contains("sheet.remove()"));
     }
-}
 
-/// Colour-tracking properties are found by measurement, not by name. The capture must
-/// compare each property against `color` in both the live and the baseline map; any
-/// spelling of `border-top-color` or `caret-color` in the source would be the same
-/// criterion-free list this work removed.
-#[test]
-fn colour_tracking_properties_are_measured_against_color() {
-    assert!(SOURCE.contains("live[property] === live.color"), "{SOURCE}");
-    assert!(
-        SOURCE.contains("baseline[property] === baseline.color"),
-        "{SOURCE}"
-    );
-    for name in [
-        "caret-color",
-        "outline-color",
-        "border-top-color",
-        "currentcolor",
-    ] {
-        assert!(!SOURCE.contains(name), "{name} is named in {SOURCE}");
+    /// Colour-tracking properties are found by measurement, not by name. The capture must
+    /// compare each property against `color` in both the live and the baseline map; any
+    /// spelling of `border-top-color` or `caret-color` in the source would be the same
+    /// criterion-free list this work removed.
+    #[test]
+    fn colour_tracking_properties_are_measured_against_color() {
+        assert!(SOURCE.contains("live[property] === live.color"), "{SOURCE}");
+        assert!(
+            SOURCE.contains("baseline[property] === baseline.color"),
+            "{SOURCE}"
+        );
+        for name in [
+            "caret-color",
+            "outline-color",
+            "border-top-color",
+            "currentcolor",
+        ] {
+            assert!(!SOURCE.contains(name), "{name} is named in {SOURCE}");
+        }
     }
-}
 
-/// Logical aliases are recognised by their flow-relative name segments, not by a table
-/// of alias/physical pairs. `border-end-end-radius` duplicates
-/// `border-bottom-right-radius` and uses neither `inline` nor `block` to say so.
-#[test]
-fn logical_aliases_are_recognised_by_flow_relative_segments() {
-    for segment in ["'inline'", "'block'", "'start'", "'end'"] {
-        assert!(SOURCE.contains(segment), "{segment} missing from {SOURCE}");
-    }
-    let code = SOURCE
-        .split("/*")
-        .map(|part| part.split_once("*/").map_or(part, |(_, code)| code))
-        .collect::<String>();
-    for pair in ["padding-left", "border-bottom-right-radius", "inline-size"] {
-        assert!(!code.contains(pair), "{pair} is named in code: {code}");
+    /// Logical aliases are recognised by their flow-relative name segments, not by a table
+    /// of alias/physical pairs. `border-end-end-radius` duplicates
+    /// `border-bottom-right-radius` and uses neither `inline` nor `block` to say so.
+    #[test]
+    fn logical_aliases_are_recognised_by_flow_relative_segments() {
+        for segment in ["'inline'", "'block'", "'start'", "'end'"] {
+            assert!(SOURCE.contains(segment), "{segment} missing from {SOURCE}");
+        }
+        let code = SOURCE
+            .split("/*")
+            .map(|part| part.split_once("*/").map_or(part, |(_, code)| code))
+            .collect::<String>();
+        for pair in ["padding-left", "border-bottom-right-radius", "inline-size"] {
+            assert!(!code.contains(pair), "{pair} is named in code: {code}");
+        }
     }
 }

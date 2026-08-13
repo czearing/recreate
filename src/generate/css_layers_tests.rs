@@ -25,8 +25,6 @@ fn box_node() -> Node {
             height: 120.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());

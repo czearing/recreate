@@ -35,8 +35,6 @@ pub(super) fn node(path: &str, parent: Option<&str>, text: &str, test_id: Option
             height: 20.0,
         },
         style,
-        before: None,
-        after: None,
         ..Default::default()
     }
 }
@@ -77,10 +75,14 @@ pub(super) fn state(width: u32) -> PageState {
     for index in [3, 5] {
         nodes[index].style.insert("width".into(), card_width.into());
     }
-    nodes[3].before = match width {
-        0..=320 => None,
-        321..=390 => Some(pseudo("\"mobile\"", "blue")),
-        _ => Some(pseudo("\"wide\"", "red")),
+    nodes[3].pseudos = match width {
+        0..=320 => Default::default(),
+        321..=390 => [("::before".to_string(), pseudo("\"mobile\"", "blue"))]
+            .into_iter()
+            .collect(),
+        _ => [("::before".to_string(), pseudo("\"wide\"", "red"))]
+            .into_iter()
+            .collect(),
     };
     PageState {
         url: "https://example.com".into(),

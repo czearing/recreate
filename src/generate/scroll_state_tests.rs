@@ -18,8 +18,6 @@ pub(super) fn node(path: &str, tag: &str) -> Node {
             height: 240.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         disabled: false,
         rtl: false,
         ..Default::default()

@@ -28,8 +28,6 @@ fn node(mode: WritingMode, rtl: bool) -> Node {
             ("margin-top".into(), "20px".into()),
             ("margin-bottom".into(), "60px".into()),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());

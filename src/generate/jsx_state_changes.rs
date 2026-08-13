@@ -37,8 +37,7 @@ pub(super) fn changed_existing_paths(
                 (node.style != previous.style
                     || node.attributes != previous.attributes
                     || node.text != previous.text
-                    || node.before != previous.before
-                    || node.after != previous.after)
+                    || node.pseudos != previous.pseudos)
                     .then(|| node.path.clone())
             }
         })

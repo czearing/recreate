@@ -49,8 +49,6 @@ fn element(class: &str, y: f64, height: f64) -> Node {
             ("height".into(), format!("{height}px")),
             ("min-height".into(), format!("{height}px")),
         ]),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

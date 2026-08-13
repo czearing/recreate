@@ -1,4 +1,4 @@
-use super::{jsx_attr_names, jsx_host_props, stand_in};
+use super::{jsx_attr_names, jsx_host_props, jsx_promotion, stand_in};
 use crate::model::Node;
 use std::collections::BTreeMap;
 
@@ -13,11 +13,15 @@ pub fn attributes(node: &Node, assets: &BTreeMap<String, String>) -> String {
         .iter()
         .filter(|(key, _)| !["class", "style"].contains(&key.as_str()))
         .filter(|(key, _)| !key.starts_with("on"))
-        .filter(|(key, _)| !jsx_host_props::relocated(&node.tag, key))
+        .filter(|(key, _)| !jsx_host_props::relocated(node, key))
         .filter(|(key, _)| !stand_in::suppressed(key, source))
         .map(|(key, value)| render_attribute(key, &crate::asset_attributes::rewrite(value, assets)))
         .collect::<String>();
-    format!("{carried}{}", stand_in::rendered(node, source))
+    format!(
+        "{carried}{}{}",
+        jsx_promotion::promotion(node),
+        stand_in::rendered(node, source)
+    )
 }
 
 fn render_attribute(key: &str, value: &str) -> String {

@@ -1,6 +1,6 @@
 use crate::{
     compare_css_value,
-    model::{Node, Pseudo, Styles},
+    model::{Node, Pseudos, Styles},
 };
 use std::collections::BTreeSet;
 
@@ -30,14 +30,19 @@ pub(super) fn differences(left: &Node, right: &Node, animated: &BTreeSet<String>
         .collect()
 }
 
-pub(super) fn same_pseudo(left: Option<&Pseudo>, right: Option<&Pseudo>) -> bool {
-    match (left, right) {
-        (None, None) => true,
-        (Some(left), Some(right)) => {
-            left.content == right.content && differences_for(&left.style, &right.style).is_empty()
-        }
-        _ => false,
-    }
+/// Whether two records used the same generated boxes and put the same thing in each. A box
+/// one side has and the other lacks is a mismatch, so a scrim that stopped being generated
+/// is reported rather than skipped.
+pub(super) fn same_pseudos(left: &Pseudos, right: &Pseudos) -> bool {
+    crate::generate::css_pseudo::paired(left, right)
+        .into_iter()
+        .all(|(_, left, right)| match (left, right) {
+            (Some(left), Some(right)) => {
+                left.content == right.content
+                    && differences_for(&left.style, &right.style).is_empty()
+            }
+            _ => false,
+        })
 }
 
 fn differences_for(left: &Styles, right: &Styles) -> Vec<String> {

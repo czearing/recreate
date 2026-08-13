@@ -41,8 +41,6 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
             height: 10.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

@@ -40,8 +40,6 @@ fn specification() -> Specification {
                 height: 20.0,
             },
             style: [("display".into(), "block".into())].into(),
-            before: None,
-            after: None,
             ..Default::default()
         })
         .collect();

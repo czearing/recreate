@@ -29,8 +29,10 @@ class Element {
     this.attributes = new Map();
     this.style = Symbol('clobbered');
     this.reverted = false;
+    this.modal = false;
     this.parent = null;
   }
+  matches(selector){ return selector === ':modal' && this.modal; }
   add(child){ child.parent = this; this.children.push(child); return child; }
   getAttribute(name){ return this.attributes.has(name) ? this.attributes.get(name) : null; }
   setAttribute(name, value){
@@ -78,6 +80,7 @@ globalThis.getComputedStyle = (element, pseudo) => {
   let value;
   if (pseudo) {
     if (element.reverted) throw new Error('pseudo read while the element was reverted');
+    globalThis.pseudoReads += 1;
     globalThis.mark('pseudo');
     value = 'pseudo:' + element.name + pseudo;
   } else if (element.reverted) {
@@ -102,6 +105,7 @@ const read = probe => {
   globalThis.measured = [];
   globalThis.pseudoMeasured = [];
   globalThis.live = [];
+  globalThis.pseudoReads = 0;
   globalThis.order = [];
   globalThis.sheets = 0;
   return eval(SCRIPT + '\nmeasureBaselines(documentElement, () => false);\n' + (probe || 'null'));
@@ -109,7 +113,8 @@ const read = probe => {
 "#;
 
 pub(crate) fn evaluate(body: &str, expression: &str) -> serde_json::Value {
-    let script = serde_json::to_string(crate::style_baseline::SOURCE).expect("source is a string");
+    let script =
+        serde_json::to_string(&crate::style_baseline::source()).expect("source is a string");
     node_eval::evaluate(
         &format!("const SCRIPT = {script};\n{DOUBLE}\n{body}"),
         expression,

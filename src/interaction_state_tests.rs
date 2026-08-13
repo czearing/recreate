@@ -177,8 +177,6 @@ fn ignores_replaced_text_inside_absolute_content() {
             height: 20.0,
         },
         style: BTreeMap::from([("position".into(), "absolute".into())]),
-        before: None,
-        after: None,
         disabled: false,
         rtl: false,
         ..Default::default()

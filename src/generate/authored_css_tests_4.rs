@@ -27,8 +27,6 @@ fn icon(class: Option<&str>, id: Option<&str>, attribute: Option<&str>) -> Node 
             height: 20.0,
         },
         style: Styles::from([("fill".into(), "rgb(0, 128, 64)".into())]),
-        before: None,
-        after: None,
         ..Default::default()
     };
     if let Some(class) = class {

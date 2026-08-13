@@ -20,8 +20,6 @@ fn node(path: &str, parent: Option<&str>, text: &str, visible: bool) -> Node {
             height: if visible { 20.0 } else { 0.0 },
         },
         style: Default::default(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::collections::BTreeMap;
 
 mod css_value;
@@ -77,8 +76,36 @@ pub struct Node {
     #[serde(default, skip_serializing_if = "crate::model::is_zero")]
     pub scrollbar_gutter: f64,
     pub style: Styles,
-    pub before: Option<Pseudo>,
-    pub after: Option<Pseudo>,
+    /// The generated boxes this element had, keyed by the selector suffix that names each
+    /// one — `::before`, `::after`, `::backdrop`.
+    ///
+    /// A map rather than one field per box. Every consumer hashes, diffs, rebases and emits
+    /// these identically and none distinguishes them by meaning, so the count was never a
+    /// fact about the record — only about which boxes were needed first. Spelling them as
+    /// parallel fields made a further box an edit at every reader, where a reader that was
+    /// missed keeps compiling and simply stops noticing that box changed.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub pseudos: Pseudos,
+    /// Whether the element was in the top layer when the page was read.
+    ///
+    /// The top layer is a user-agent list, not a property of any element: `showModal()`,
+    /// `requestFullscreen()` and an invoked modal popover put an element in it, and nothing
+    /// in the document declares that. The `open` content attribute cannot answer it, because
+    /// `show()` and `showModal()` set that same attribute — it records that a dialog is being
+    /// shown, not that it is modal. Computed style cannot either, and is worse than silent:
+    /// the user-agent sheet gives `dialog:modal` its own `position` and `inset`, so a
+    /// snapshot picks up plausible centring geometry and the record looks complete.
+    ///
+    /// This is the concession [`Node::disabled`] already makes, under a stronger premise.
+    /// There, re-deriving the answer was merely awkward; here it is impossible, because no
+    /// element anywhere in the document carries a value implying the promotion. `:modal` is
+    /// specified to select exactly the elements excluding interaction with everything outside
+    /// them, so the answer is taken from the engine and recorded once.
+    ///
+    /// It decides two things at once, which is why it is one field and not two: what the
+    /// recreation must replay, and whether a `::backdrop` box exists to be recorded at all.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub modal: bool,
     /// Whether the element matched `:disabled` when the page was read.
     ///
     /// Disabled is not always borne by the element that shows it: a `<fieldset disabled>`
@@ -129,12 +156,6 @@ fn is_zero(value: &f64) -> bool {
     *value == 0.0
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-pub struct Pseudo {
-    pub content: String,
-    pub style: Styles,
-}
-
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct DomNode {
     pub namespace: String,
@@ -156,51 +177,17 @@ pub struct DomNode {
     pub custom_properties: Styles,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Animation {
-    pub target: String,
-    /// The `@keyframes` block this animation was declared with, empty for a script-driven
-    /// animation the author never named.
-    #[serde(default, skip_serializing_if = "String::is_empty")]
-    pub name: String,
-    pub keyframes: Vec<Value>,
-    pub timing: Value,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-pub struct StateStyle {
-    pub target: String,
-    #[serde(default)]
-    pub scope: Option<String>,
-    pub pseudo: Option<String>,
-    #[serde(default)]
-    pub target_pseudo: Option<String>,
-    pub media: Option<String>,
-    pub declarations: String,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct SequenceStep {
-    pub value: String,
-    pub delay_ms: u64,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct AttributeSequence {
-    pub target: String,
-    pub attribute: String,
-    pub values: Vec<String>,
-    pub interval_ms: u64,
-    #[serde(default)]
-    pub steps: Vec<SequenceStep>,
-    /// Whether the observed values came back round, which is the only fact separating a
-    /// progression that should loop from one that should come to rest. `None` is a capture
-    /// taken before this was recorded and says nothing either way, so it keeps looping.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub repeats: Option<bool>,
-}
-
+#[path = "model/behaviour.rs"]
+mod behaviour;
 #[path = "model/capture_result.rs"]
 mod capture_result;
+#[path = "model/pseudo.rs"]
+mod pseudo;
 
+/// Re-exported for the tests that build one directly; the record itself reaches every
+/// consumer inside an [AttributeSequence].
+#[allow(unused_imports)]
+pub use behaviour::SequenceStep;
+pub use behaviour::{Animation, AttributeSequence, StateStyle};
 pub use capture_result::{Acceptance, BrowserCookie, PageState, Specification};
+pub use pseudo::{Pseudo, Pseudos};

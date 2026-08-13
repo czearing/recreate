@@ -53,11 +53,14 @@ mod css_layout;
 #[path = "css_nested_definition_tests.rs"]
 mod css_nested_definition_tests;
 mod css_paths;
-mod css_pseudo;
+pub(crate) mod css_pseudo;
 #[cfg(test)]
 mod css_pseudo_identity_tests;
 #[cfg(test)]
 mod css_pseudo_rule_tests;
+#[cfg(test)]
+#[path = "css_pseudo_signature_tests.rs"]
+mod css_pseudo_signature_tests;
 mod css_rule_groups;
 mod css_rule_split;
 mod css_scan;
@@ -101,6 +104,7 @@ mod jsx_host_props;
 mod jsx_host_props_tests;
 mod jsx_markup;
 mod jsx_markup_scan;
+mod jsx_promotion;
 mod jsx_render;
 mod jsx_render_spacing;
 #[cfg(test)]
@@ -115,6 +119,9 @@ mod jsx_state_roots;
 mod jsx_states;
 mod jsx_text_entry;
 mod jsx_variants;
+#[cfg(test)]
+#[path = "modal_top_layer_tests.rs"]
+mod modal_top_layer_tests;
 #[cfg(test)]
 #[path = "mount_tests.rs"]
 mod mount_tests;

@@ -45,8 +45,6 @@ fn duplicate_path_evidence_keeps_the_richest_state() {
             height: 1.0,
         },
         style: Default::default(),
-        before: None,
-        after: None,
         disabled: false,
         rtl: false,
         ..Default::default()
@@ -96,8 +94,6 @@ pub(super) fn state_with_paths(paths: &[&str]) -> crate::model::PageState {
                 height: 1.0,
             },
             style: Default::default(),
-            before: None,
-            after: None,
             disabled: false,
             rtl: false,
             ..Default::default()

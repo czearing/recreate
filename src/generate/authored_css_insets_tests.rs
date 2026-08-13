@@ -20,8 +20,6 @@ pub(super) fn node(class: &str, position: &str) -> Node {
             height: 24.0,
         },
         style: Styles::new(),
-        before: None,
-        after: None,
         ..Default::default()
     };
     node.attributes.insert("class".into(), class.into());

@@ -119,8 +119,6 @@ mod tests {
                 height: 10.0,
             },
             style: Default::default(),
-            before: None,
-            after: None,
             disabled: false,
             rtl: false,
             ..Default::default()

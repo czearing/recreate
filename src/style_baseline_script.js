@@ -106,11 +106,6 @@ const authoredStyles = (live, baseline) => {
    drops its `animation` and `transition` declarations, and restoring them starts both
    over, so a value read before the pass and a value read after it are different pages -
    which is why nothing read here is carried forward to stand in for a later reading. */
-const PSEUDO_NAMES = ['::before', '::after'];
-const hasContent = style => {
-  const content = style.content;
-  return Boolean(content) && content !== 'none';
-};
 const elementBaselines = new WeakMap();
 const pseudoBaselines = new WeakMap();
 const baselineOf = element => elementBaselines.get(element) || {};
@@ -160,14 +155,17 @@ const measureBaselines = (root, skip) => {
   const pseudoPending = [];
   for (const level of levels) {
     for (const element of level) {
-      for (const name of PSEUDO_NAMES) {
-        if (hasContent(getComputedStyle(element, name))) pseudoPending.push([element, name]);
+      for (const [name, exists] of Object.entries(pseudoElements)) {
+        if (exists(element, generatedBox(element, name).content)) {
+          pseudoPending.push([element, name]);
+        }
       }
     }
   }
   if (pseudoPending.length) {
     const sheet = document.createElement('style');
-    sheet.textContent = `*::before,*::after{${REVERT_TO_USER_AGENT}}`;
+    const every = Object.keys(pseudoElements).map(name => `*${name}`).join(',');
+    sheet.textContent = `${every}{${REVERT_TO_USER_AGENT}}`;
     document.head.appendChild(sheet);
     for (const [element, name] of pseudoPending) {
       const measured = pseudoBaselines.get(element) || {};

@@ -329,8 +329,6 @@ mod tests {
                 height: 10.0,
             },
             style: Styles::from([("display".into(), "flex".into())]),
-            before: None,
-            after: None,
             ..Default::default()
         };
         node.attributes

@@ -32,8 +32,6 @@ fn node(path: &str, tag: &str, text: &str, (x, y): (f64, f64), style: &[(&str, &
             .iter()
             .map(|(name, value)| ((*name).to_string(), (*value).to_string()))
             .collect(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

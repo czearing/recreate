@@ -20,8 +20,6 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
             height: 20.0,
         },
         style: [("display".into(), "block".into())].into(),
-        before: None,
-        after: None,
         ..Default::default()
     }
 }

@@ -30,8 +30,6 @@ fn panel() -> Node {
         ]
         .into_iter()
         .collect(),
-        before: None,
-        after: None,
         disabled: false,
         rtl: false,
         ..Default::default()
