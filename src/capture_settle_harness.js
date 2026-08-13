@@ -32,6 +32,7 @@ globalThis.requestAnimationFrame = (callback) => {
   queueMicrotask(() => {
     now += 16;
     frameIndex++;
+    globalThis.__recreatePendingRequests = current().pending || 0;
     if (current().mutate) {
       for (const observer of observers) observer.callback([]);
     }

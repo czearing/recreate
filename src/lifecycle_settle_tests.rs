@@ -90,10 +90,10 @@ fn a_longer_observed_gap_never_releases_the_recorder_earlier() {
     }
 }
 
-fn awaited(soonest_due: &str, start: f64) -> bool {
+fn awaited(soonest_due: &str, start: f64, changed: bool) -> bool {
     node_eval::evaluate(
         super::SOURCE,
-        &format!("lifecycleAwaited({soonest_due}, {start})"),
+        &format!("lifecycleAwaited({soonest_due}, {start}, {changed})"),
     )
     .as_bool()
     .unwrap()
@@ -105,8 +105,8 @@ fn awaited(soonest_due: &str, start: f64) -> bool {
 /// awaited on exactly the same footing as a request in flight.
 #[test]
 fn work_the_page_scheduled_before_the_ceiling_is_awaited() {
-    assert!(awaited("300", 0.0));
-    assert!(awaited("11999", 0.0));
+    assert!(awaited("300", 0.0, false));
+    assert!(awaited("11999", 0.0, false));
 }
 
 /// Work due after the recorder's own horizon cannot produce anything the recorder will
@@ -114,21 +114,45 @@ fn work_the_page_scheduled_before_the_ceiling_is_awaited() {
 /// page carrying a long poll timer from being watched for twelve seconds.
 #[test]
 fn work_due_after_the_ceiling_is_not_worth_waiting_for() {
-    assert!(!awaited("12001", 0.0));
-    assert!(!awaited("30000", 0.0));
+    assert!(!awaited("12001", 0.0, false));
+    assert!(!awaited("30000", 0.0, false));
 }
 
 /// The horizon is measured from when the recorder started, not from now, so a timer stays
 /// worth waiting for as the recorder runs rather than becoming so.
 #[test]
 fn the_horizon_is_anchored_to_the_start_of_the_recording() {
-    assert!(awaited("11000", 0.0));
-    assert!(!awaited("11000", -2_000.0));
+    assert!(awaited("11000", 0.0, false));
+    assert!(!awaited("11000", -2_000.0, false));
 }
 
 /// A page that has scheduled nothing reports no soonest due time at all, and must not be
 /// held open by its absence.
 #[test]
 fn a_page_that_scheduled_nothing_is_never_awaited() {
-    assert!(!awaited("Infinity", 0.0));
+    assert!(!awaited("Infinity", 0.0, false));
+}
+
+/// The blind spot the schedule was admitted to cover is named precisely in
+/// `lifecycle_scheduled_script`: the silence before the page's first edit, where the longest
+/// observed gap is still zero and one frame of quiet closes the window. Once the page has
+/// edited itself it has demonstrated its own cadence, and the doc says the observed-gap rule
+/// takes over from there.
+///
+/// It did not. The horizon was compared against the ceiling alone, so a timer the page set up
+/// front for eight or ten seconds — a heartbeat, a deferred banner, a carousel advance, all
+/// routine on a production page — held the recorder open until it fired, no matter how much
+/// the page had already shown. That is the ceiling becoming the routine path again, one stage
+/// further along: a fixture schedules nothing and never notices, while a live page is held
+/// for a timer that has already been superseded by evidence the recorder trusts more.
+#[test]
+fn a_schedule_stops_being_evidence_once_the_page_has_edited_itself() {
+    assert!(
+        awaited("8000", 0.0, false),
+        "a page that has not yet moved must still be held by what it scheduled"
+    );
+    assert!(
+        !awaited("8000", 0.0, true),
+        "a page that has already edited itself was still held open by a timer"
+    );
 }

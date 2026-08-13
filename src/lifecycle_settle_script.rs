@@ -52,6 +52,9 @@ pub const SOURCE: &str = r#"
   const animationObserved = ({ declared, playState, rate, delay, duration, localTime }) =>
     declared || playState !== 'running' || !rate ||
     !(duration > 0) || localTime >= delay + duration;
+  const lifecycleLoading = root =>
+    root.fonts.status !== 'loaded' ||
+    Array.from(root.images).some(image => !image.complete && image.currentSrc);
   const lifecycleBusy = (animations, loading) =>
     loading || animations.some(animation => !animationObserved(animation));
   const observedTargets = animations =>
@@ -74,8 +77,23 @@ pub const SOURCE: &str = r#"
     observedTargets(root.getAnimations({ subtree: true }).map(lifecycleTiming));
   const lifecycleSettled = (elapsed, sinceChange, busy, longestGap) =>
     elapsed >= LIFECYCLE_CEILING_MS || (!busy && sinceChange > longestGap);
-  const lifecycleAwaited = (soonestDue, start) =>
-    soonestDue <= start + LIFECYCLE_CEILING_MS;
+  // A gap is silence the page came back from, so observing one takes two changes. The silence
+  // before a page's first change is silence it never returned from, and counting it invents a
+  // cadence out of the one interval that demonstrates none — on a page whose first edit lands
+  // seconds after load, that invented gap is precisely what the recorder then waits out.
+  const lifecycleGap = (widest, sinceLast, observed) =>
+    observed ? Math.max(widest, sinceLast) : widest;
+  const lifecycleLongestGap = times =>
+    Array.from(times)
+      .sort((left, right) => left - right)
+      .reduce(
+        (state, time, index) => ({
+          widest: lifecycleGap(state.widest, time - state.previous, index > 0),
+          previous: time
+        }),
+        { widest: 0, previous: 0 }
+      ).widest;  const lifecycleAwaited = (soonestDue, start, changed) =>
+    !changed && soonestDue <= start + LIFECYCLE_CEILING_MS;
 "#;
 
 #[cfg(test)]
@@ -85,3 +103,7 @@ mod tests;
 #[cfg(test)]
 #[path = "lifecycle_busy_tests.rs"]
 mod busy_tests;
+
+#[cfg(test)]
+#[path = "lifecycle_evidence_tests.rs"]
+mod evidence_tests;

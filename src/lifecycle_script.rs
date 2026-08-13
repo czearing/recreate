@@ -50,7 +50,8 @@ mod tests {
 
     /// The recorder must carry a settle decision rather than run to a constant, and it must
     /// hand that decision the page's own longest observed gap in motion rather than let a
-    /// quiet period be chosen for it.
+    /// quiet period be chosen for it, measured by the shared rule so the recorder and the
+    /// dynamic observer cannot drift into two answers about what counts as a gap.
     #[test]
     fn the_recording_window_is_measured_and_only_ceilinged() {
         let source = super::source();
@@ -59,7 +60,7 @@ mod tests {
         assert!(
             source.contains("lifecycleSettled(now - start, now - lastChange, busy, longestGap)")
         );
-        assert!(source.contains("longestGap = Math.max(longestGap, now - lastChange)"));
+        assert!(source.contains("longestGap = lifecycleGap(longestGap, now - lastChange, moved)"));
         assert!(source.contains("const LIFECYCLE_CEILING_MS = 12000"));
         assert!(!source.contains("LIFECYCLE_QUIET_MS"));
         assert!(!source.contains("(now - start) / 12000"));

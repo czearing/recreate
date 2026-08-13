@@ -46,7 +46,7 @@ const RETRY_MS: u64 = 50;
 /// window, and `wait_for_startup` requires any blocking overlay to have left.
 pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
     let lifecycle = if wait_for_lifecycle {
-        "window.__recreateLifecycleDone === true &&"
+        " && window.__recreateLifecycleDone === true"
     } else {
         ""
     };
@@ -54,6 +54,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
         r#"(async () => {{
 {settle}
   const blocking = {overlay};
+  const networkQuiet = {network};
   const started = Date.now();
   const elapsed = () => Date.now() - started;
   let mutated = false;
@@ -64,8 +65,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
   const frame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
   const pause = () => new Promise(resolve => {timeout}(resolve, {RETRY_MS}));
   const ready = () => document.readyState === 'complete' &&
-    document.fonts.status === 'loaded' && {lifecycle}
-    (window.__recreatePendingRequests || 0) === 0;
+    document.fonts.status === 'loaded'{lifecycle};
   const scan = () => {{
     let shown = 0;
     let digest = 0;
@@ -96,9 +96,9 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
       while (quiet < {QUIET_FRAMES} && elapsed() < {READY_CEILING_MS}) {{
         mutated = false;
         await frame();
-        quiet = mutated ? 0 : quiet + 1;
+        quiet = mutated || !networkQuiet() ? 0 : quiet + 1;
       }}
-      if (!ready()) {{ await pause(); continue; }}
+      if (quiet < {QUIET_FRAMES} || !ready()) {{ await pause(); continue; }}
       const before = scan();
       await frame();
       const after = scan();
@@ -117,6 +117,7 @@ pub fn source(wait_for_lifecycle: bool, wait_for_startup: bool) -> String {
   }}
 }})()"#,
         overlay = blocking_overlay::js_predicate(),
+        network = crate::network_quiet::js_gate(),
         settle = crate::lifecycle_settle_script::SOURCE,
         timeout = crate::lifecycle_scheduled_script::INSTRUMENT_TIMEOUT,
     )

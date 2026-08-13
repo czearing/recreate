@@ -18,10 +18,14 @@
 /// process completely, and waiting for the second tick learns nothing the first did not
 /// already show.
 ///
-/// The due time bounds it. Work scheduled to happen after the recorder's own ceiling cannot
-/// produce anything the recorder will ever see, so it is not evidence for the recorder at
-/// all — which is what stops a page holding a long poll timer from being watched to the
-/// ceiling for a change that would arrive long after.
+/// Two bounds apply, and they answer different questions. Work scheduled to happen after the
+/// recorder's own ceiling cannot produce anything the recorder will ever see, so it is not
+/// evidence for the recorder at all. Work scheduled before it stops being evidence the moment
+/// the page makes its first edit: the blind spot this schedule exists to cover is the silence
+/// before that edit, and once the page has moved it has demonstrated the cadence the
+/// observed-gap rule measures, which is the stronger evidence of the two. Without that second
+/// bound a routine up-front heartbeat or deferred banner held the recorder to its ceiling on
+/// every production page, while a fixture that schedules nothing never noticed.
 ///
 /// Evidence must also be non-renewable, and this is the clause the whole rule turns on. The
 /// recorder's blind spot is one specific interval: the silence before the page's first edit,

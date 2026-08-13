@@ -89,29 +89,38 @@ pub(super) const PREFLIGHT: &str = r#"
 })()
 "#;
 
-pub(super) const SETTLE: &str = r#"
-new Promise(resolve => {
+/// Waits for the page to stop reacting to an action, giving up after `deadline_ms`.
+///
+/// The deadline is a parameter rather than a substring rewritten by the caller: the script
+/// carries other durations, and a caller patching one number by text cannot tell them apart.
+pub(super) fn settle(deadline_ms: u64) -> String {
+    format!(
+        r#"
+new Promise(resolve => {{
   const started = performance.now();
+  const networkQuiet = {network};
   let cleanFrames = 0;
-  const observer = new MutationObserver(() => { cleanFrames = 0; });
-  observer.observe(document, {
+  const observer = new MutationObserver(() => {{ cleanFrames = 0; }});
+  observer.observe(document, {{
     attributes: true, childList: true, characterData: true, subtree: true
-  });
-  const sample = () => {
-    const running = document.getAnimations({ subtree: true })
+  }});
+  const sample = () => {{
+    const running = document.getAnimations({{ subtree: true }})
       .some(animation => animation.playState === 'running');
-    const pending = (window.__recreatePendingRequests || 0) > 0;
-    cleanFrames = running || pending ? 0 : cleanFrames + 1;
-    if (cleanFrames >= 2 || performance.now() - started >= 500) {
+    cleanFrames = running || !networkQuiet() ? 0 : cleanFrames + 1;
+    if (cleanFrames >= 2 || performance.now() - started >= {deadline_ms}) {{
       observer.disconnect();
       resolve(cleanFrames >= 2);
-    } else {
+    }} else {{
       requestAnimationFrame(sample);
-    }
-  };
+    }}
+  }};
   requestAnimationFrame(sample);
-})
-"#;
+}})
+"#,
+        network = crate::network_quiet::js_gate(),
+    )
+}
 
 pub(super) const ACTION_SCOPE: &str = r#"
 trigger => {

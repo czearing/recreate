@@ -36,6 +36,8 @@ __LIFECYCLE_SCHEDULED__
     window.__recreateLifecycleStart = start;
     let lastChange = start;
     let longestGap = 0;
+    // Whether the page has ever edited itself, which is what makes the next silence a gap.
+    let moved = false;
     const previous = new WeakMap();
     const tracks = new Map();
     const safe = new Set([
@@ -72,8 +74,7 @@ __LIFECYCLE_MUTATIONS__
           Object.keys(frame).some(key => !safe.has(key))
         )
       );
-      const loading = document.fonts.status !== 'loaded' ||
-        Array.from(document.images).some(image => !image.complete);
+      const loading = lifecycleLoading(document);
       const running = animations.map(lifecycleTiming);
       const described = observedTargets(running);
       const elements = fullSample || loading || affectsLayout
@@ -117,11 +118,12 @@ __LIFECYCLE_MUTATIONS__
         frames.push(value);
         tracks.set(path, frames);
         if (described.has(element)) continue;
-        longestGap = Math.max(longestGap, now - lastChange);
+        longestGap = lifecycleGap(longestGap, now - lastChange, moved);
+        moved = true;
         lastChange = now;
       }
       fullSample = false;
-      const busy = lifecycleBusy(running, loading || lifecycleAwaited(soonestScheduled(), start));
+      const busy = lifecycleBusy(running, loading || lifecycleAwaited(soonestScheduled(), start, moved));
       if (!lifecycleSettled(now - start, now - lastChange, busy, longestGap)) {
         requestAnimationFrame(sample);
       } else {

@@ -158,28 +158,6 @@ fn a_blocking_curtain_holds_capture_back_until_it_leaves() {
     );
 }
 
-/// Readiness and lifecycle are separate gates from stillness, and a page that never opens
-/// them must be reported as unsettled rather than captured.
-#[test]
-fn a_page_that_never_reports_ready_is_not_settled() {
-    let loading = json!({ "steps": [{ "elements": [box_at(0.0)], "loading": true }] });
-    assert!(!resolved(&settle(loading, true)));
-
-    let fonts = json!({ "steps": [{ "elements": [box_at(0.0)], "fontsPending": true }] });
-    assert!(!resolved(&settle(fonts, true)));
-
-    let lifecycle = json!({ "steps": [still()], "lifecyclePending": true });
-    assert!(!resolved(&settle(lifecycle, true)));
-}
-
-/// A page with nothing visible on it has no geometry to prove still, so it must not be
-/// treated as settled on the strength of an empty reading.
-#[test]
-fn a_page_with_nothing_visible_is_not_settled() {
-    let empty = json!({ "steps": [{ "elements": [] }] });
-    assert!(!resolved(&settle(empty, true)));
-}
-
 /// A page running a permanent animation never repeats its geometry, so the ceiling has to
 /// release it — and it must not spin one scan per frame while it waits.
 #[test]
@@ -197,3 +175,6 @@ fn a_page_that_never_stops_moving_is_released_at_the_ceiling() {
         result["elapsed"]
     );
 }
+
+#[path = "capture_settle_network_tests.rs"]
+mod network;

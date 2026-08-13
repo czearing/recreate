@@ -17,7 +17,12 @@ __LIFECYCLE_SETTLE__
   const reading = () => {
     const events = window.__recreateAttributeMutations || [];
     const groups = new Map();
-    const times = [0];
+    // Seeded empty on purpose. The interval from the recorder's origin to the page's first
+    // change is silence the page never recovered from, so counting it as a gap asserts a
+    // cadence from the one interval that demonstrates none — and on a page whose first
+    // attribute change lands seconds in, that invented gap is what the recorder then waits
+    // out, every time, to its ceiling.
+    const times = [];
     for (const event of events) {
       const key = `${event.target}|${event.attribute}`;
       const group = groups.get(key) || { values: [], times: [] };
@@ -43,11 +48,8 @@ __LIFECYCLE_SETTLE__
         lastNews = Math.max(lastNews, written.at(-1) || 0);
       }
     }
-    times.sort((left, right) => left - right);
-    const longestGap = times.reduce(
-      (widest, time, index) => Math.max(widest, index ? time - times[index - 1] : 0),
-      0
-    );
+    const longestGap = lifecycleLongestGap(times);
+
     return { news, lastNews, longestGap };
   };
   const frame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));

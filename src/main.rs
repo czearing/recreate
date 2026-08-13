@@ -38,6 +38,7 @@ mod lifecycle_scheduled_script;
 mod lifecycle_script;
 mod lifecycle_settle_script;
 mod model;
+mod network_quiet;
 mod node_alignment;
 #[cfg(test)]
 mod node_alignment_regression_tests;

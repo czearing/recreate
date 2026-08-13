@@ -1,7 +1,7 @@
 use super::{
     interactions_activate::activate,
     interactions_evidence::geometry_differs,
-    interactions_scripts::{Candidate, PREFLIGHT, SETTLE},
+    interactions_scripts::{self, Candidate, PREFLIGHT},
 };
 use crate::{browser, capture, cdp::Cdp, interaction_state, model::PageState};
 use anyhow::Result;
@@ -40,8 +40,8 @@ pub(super) async fn close(cdp: &mut Cdp, candidate: &Candidate) -> Result<()> {
 }
 
 pub(super) async fn settle(cdp: &mut Cdp, text_entry: bool) -> Result<bool> {
-    let timeout = if text_entry { 1_500 } else { 500 };
-    let source = SETTLE.replace(">= 500", &format!(">= {timeout}"));
+    let deadline = if text_entry { 1_500 } else { 500 };
+    let source = interactions_scripts::settle(deadline);
     Ok(cdp.evaluate(&source).await?.as_bool() == Some(true))
 }
 
