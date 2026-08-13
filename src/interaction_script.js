@@ -66,6 +66,7 @@ __SELECTION__
       tag: element.tagName.toLowerCase(),
       text: '',
       attributes: recreateAttributes(element, path),
+      control_state: recreateControlState(element),
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       disabled: element.matches(':disabled'),
@@ -75,10 +76,7 @@ __SELECTION__
       after: null
     });
     let textIndex = 0;
-    const textChildren = element.matches('textarea,input') && element.value.trim()
-      ? [document.createTextNode(element.value)]
-      : element.childNodes;
-    for (const child of textChildren) {
+    for (const child of element.childNodes) {
       if (child.nodeType !== Node.TEXT_NODE || !child.textContent.trim()) continue;
       const range = document.createRange();
       if (child.parentNode) range.selectNodeContents(child);

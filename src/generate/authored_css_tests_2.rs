@@ -26,6 +26,7 @@ fn removes_measured_height_from_growing_flex_items() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "editor".into());
     let captured = node.clone();
@@ -64,6 +65,7 @@ fn keeps_used_height_for_percentage_sized_textareas() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "editor".into());
     let captured = node.clone();
@@ -102,6 +104,7 @@ fn removes_sampled_height_from_intrinsic_flex_cards() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "task-card".into());
     let captured = node.clone();
@@ -145,6 +148,7 @@ fn removes_sampled_height_from_a_content_sized_flex_section() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes
         .insert("class".into(), "curatedSection".into());
@@ -187,6 +191,7 @@ fn removes_sampled_height_from_a_block_card_with_an_authored_minimum() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
     let captured = node.clone();
@@ -226,6 +231,7 @@ fn keeps_the_height_a_flex_container_authored_through_a_variable() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "appBar".into());
     let captured = node.clone();
@@ -264,6 +270,7 @@ fn keeps_the_height_a_flex_container_authored() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "banner".into());
     let captured = node.clone();
@@ -301,6 +308,7 @@ fn removes_resolved_grid_rows_without_authored_tracks() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "cards".into());
     let captured = node.clone();
@@ -340,6 +348,7 @@ fn rejects_authored_layout_values_from_inactive_media_rules() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "header".into());
     let captured = node.clone();
@@ -381,6 +390,7 @@ fn ignores_cascade_keywords_when_reading_authored_values() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes
         .insert("class".into(), "filterButton".into());
@@ -426,6 +436,7 @@ fn reads_authored_values_from_static_pseudo_class_selectors() {
         style: Styles::from([("padding".into(), "12px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes
         .insert("class".into(), "root sizeMedium".into());
@@ -468,6 +479,7 @@ fn ignores_authored_values_the_captured_style_contradicts() {
         style: Styles::from([("padding".into(), "12px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "root card".into());
     let rules = [

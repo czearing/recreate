@@ -1,6 +1,6 @@
 use super::{
     jsx_attrs::{attributes, jsx_tag, quoted, void_tag},
-    jsx_host_props::adopted,
+    jsx_host_props::{adopted, binds_value},
     jsx_render_spacing::{
         leading_placeholder, leading_placeholder_extent, needs_text_space, placeholder,
         placeholder_extent, sibling_index,
@@ -45,7 +45,11 @@ pub(super) fn render(
             serde_json::to_string(&node.text).unwrap()
         );
     }
-    let children = render_children(path, components, assets, depth + 1, handlers);
+    let children = if binds_value(node) {
+        String::new()
+    } else {
+        render_children(path, components, assets, depth + 1, handlers)
+    };
     if allow_component && let Some(index) = components.by_root.get(path) {
         let name = &components.items[*index].name;
         let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));

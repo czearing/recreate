@@ -22,6 +22,7 @@ pub(super) fn node(class: &str, position: &str) -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), class.into());
     node.style.insert("position".into(), position.into());

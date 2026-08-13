@@ -29,6 +29,7 @@ fn icon(class: Option<&str>, id: Option<&str>, attribute: Option<&str>) -> Node 
         style: Styles::from([("fill".into(), "rgb(0, 128, 64)".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     if let Some(class) = class {
         node.attributes.insert("class".into(), class.into());

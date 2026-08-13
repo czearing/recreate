@@ -90,6 +90,7 @@ mod tests {
             ),
             before: None,
             after: None,
+            ..Default::default()
         };
         node.attributes.insert("class".into(), class.into());
         node

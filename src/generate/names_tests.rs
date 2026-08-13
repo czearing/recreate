@@ -24,6 +24,7 @@ fn creates_semantic_component_names() {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes
         .insert("data-testid".into(), "result-card".into());
@@ -53,6 +54,7 @@ fn prefers_the_source_component_name_over_page_copy() {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert(
         "aria-label".into(),

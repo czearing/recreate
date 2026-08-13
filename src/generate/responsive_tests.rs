@@ -27,6 +27,7 @@ pub(super) fn node(tag: &str, x: f64, width: f64) -> Node {
         style: Styles::from([("width".into(), format!("{width}px"))]),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

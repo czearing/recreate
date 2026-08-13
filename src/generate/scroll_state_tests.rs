@@ -22,6 +22,7 @@ pub(super) fn node(path: &str, tag: &str) -> Node {
         after: None,
         disabled: false,
         rtl: false,
+        ..Default::default()
     }
 }
 

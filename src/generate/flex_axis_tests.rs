@@ -166,5 +166,6 @@ fn node(path: &str, parent: Option<&str>, style: Styles, y: f64) -> Node {
         style,
         before: None,
         after: None,
+        ..Default::default()
     }
 }

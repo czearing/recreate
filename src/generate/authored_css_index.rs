@@ -331,6 +331,7 @@ mod tests {
             style: Styles::from([("display".into(), "flex".into())]),
             before: None,
             after: None,
+            ..Default::default()
         };
         node.attributes
             .insert("class".into(), "primary control".into());

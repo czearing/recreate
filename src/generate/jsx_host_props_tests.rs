@@ -10,7 +10,7 @@ use super::tree::{Component, Components};
 use crate::model::{Node, Rect};
 use std::collections::BTreeMap;
 
-fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
+pub(super) fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
     Node {
         writing_mode: Default::default(),
         scrollbar_gutter: 0.0,
@@ -31,6 +31,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
         style: Default::default(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 
@@ -73,7 +74,7 @@ fn select(options: &[(Option<&str>, &str, bool)], multiple: bool) -> Components 
     }
 }
 
-fn rendered(components: &Components) -> String {
+pub(super) fn rendered(components: &Components) -> String {
     render(
         "s",
         components,

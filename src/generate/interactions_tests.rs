@@ -35,6 +35,7 @@ pub(super) fn node(tag: &str) -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

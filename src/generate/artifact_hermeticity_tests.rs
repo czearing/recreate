@@ -42,6 +42,7 @@ fn specification() -> Specification {
             style: [("display".into(), "block".into())].into(),
             before: None,
             after: None,
+            ..Default::default()
         })
         .collect();
     Specification {

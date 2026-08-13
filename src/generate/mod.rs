@@ -92,6 +92,9 @@ mod jsx_app;
 mod jsx_attr_names;
 mod jsx_attr_tables;
 mod jsx_attrs;
+#[cfg(test)]
+#[path = "jsx_control_state_tests.rs"]
+mod jsx_control_state_tests;
 mod jsx_host_props;
 #[cfg(test)]
 #[path = "jsx_host_props_tests.rs"]

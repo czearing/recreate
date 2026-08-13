@@ -37,6 +37,7 @@ pub fn span(ordinal: usize) -> Node {
         style,
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

@@ -27,6 +27,7 @@ fn node(mode: WritingMode) -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());
     node

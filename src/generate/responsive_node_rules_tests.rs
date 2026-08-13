@@ -25,6 +25,7 @@ fn heading(font_size: &str, width: f64) -> Node {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 
@@ -81,6 +82,7 @@ fn shrinking_title(width: f64) -> Node {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

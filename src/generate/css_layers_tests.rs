@@ -27,6 +27,7 @@ fn box_node() -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());
     node.attributes.insert("id".into(), "box".into());

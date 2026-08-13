@@ -49,6 +49,7 @@ fn duplicate_path_evidence_keeps_the_richest_state() {
         after: None,
         disabled: false,
         rtl: false,
+        ..Default::default()
     });
     sparse.focused_path = Some("sparse".into());
     let mut values = vec![sparse, rich];
@@ -99,6 +100,7 @@ pub(super) fn state_with_paths(paths: &[&str]) -> crate::model::PageState {
             after: None,
             disabled: false,
             rtl: false,
+            ..Default::default()
         })
         .collect();
     state

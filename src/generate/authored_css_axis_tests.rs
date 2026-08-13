@@ -30,6 +30,7 @@ fn node(mode: WritingMode, rtl: bool) -> Node {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());
     node

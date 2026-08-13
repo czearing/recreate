@@ -100,5 +100,6 @@ fn node(path: &str, parent: Option<&str>, styles: Styles) -> Node {
         blocking_overlay: false,
         disabled: false,
         rtl: false,
+        ..Default::default()
     }
 }

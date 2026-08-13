@@ -120,6 +120,7 @@ __ASSET_ATTRIBUTES__
       tag: element.tagName.toLowerCase(),
       text: '',
       attributes,
+      control_state: recreateControlState(element),
       disabled: element.matches(':disabled'),
       blocking_overlay: isBlockingOverlay(element),
       rtl: computedStyle.direction === 'rtl',

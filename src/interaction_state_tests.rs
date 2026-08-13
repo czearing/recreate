@@ -181,6 +181,7 @@ fn ignores_replaced_text_inside_absolute_content() {
         after: None,
         disabled: false,
         rtl: false,
+        ..Default::default()
     });
 
     assert!(!surface_differs(

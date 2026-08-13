@@ -25,6 +25,7 @@ fn node() -> Node {
         style: Styles::from([("width".into(), "442px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "box".into());
     node

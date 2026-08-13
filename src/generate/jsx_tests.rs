@@ -22,6 +22,7 @@ fn text(path: &str, parent: &str, value: &str, x: f64, width: f64) -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 
@@ -67,6 +68,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
         style: BTreeMap::from([("display".into(), "block".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     let child = Node {
         writing_mode: Default::default(),
@@ -88,6 +90,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
         style: BTreeMap::from([("margin-top".into(), "56px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     let components = Components {
         items: Vec::new(),

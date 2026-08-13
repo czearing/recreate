@@ -1,57 +1,112 @@
-//! The single owner of "can React express this captured attribute on the element that
+//! The single owner of "can React express this captured control state on the element that
 //! carried it, and if not, where does it go instead?".
 //!
-//! `jsx_attr_names` answers what an attribute is *called*. That is not enough: React
-//! discards some DOM-legal authoring outright. A `<option selected>` is the clearest case —
-//! React derives selection solely from `value`/`defaultValue` on the parent `<select>`, so
-//! the captured attribute reaches the generated file intact and is thrown away at render.
-//! A grep for it succeeds precisely when the screen is wrong.
+//! `jsx_attr_names` answers what an attribute is *called*. That is not enough for control
+//! state, for two reasons React imposes and HTML does not.
 //!
-//! A name table structurally cannot express this repair, because it writes to an element
-//! *other than* the one carrying the attribute. So a relocation is declared once, as a
-//! whole, and both halves are derived from it: the attribute is suppressed where it was
-//! captured, and the prop is emitted on the ancestor. Declaring the halves separately would
-//! let them drift into a dropped attribute with no replacement, or a duplicated one.
+//! It rebinds. A `<option selected>` is the clearest case — React derives selection solely
+//! from `value`/`defaultValue` on the parent `<select>`, so the captured attribute reaches
+//! the generated file intact and is thrown away at render. A grep for it succeeds precisely
+//! when the screen is wrong. A name table structurally cannot express that repair, because
+//! it writes to an element *other than* the one carrying the attribute.
+//!
+//! It renames by intent. `value` emitted as `value` makes a *controlled* input: with no
+//! `onChange` React pins the field and it becomes read-only. A recreation is a snapshot of
+//! a page in a state, not an app owning that state, so every control here is uncontrolled
+//! and the prop is `defaultValue`/`defaultChecked`. The read-only form renders an identical
+//! pixel, which is why nothing downstream can catch it.
+//!
+//! Both are declared as whole bindings and both halves derived from each: the attribute is
+//! suppressed where it was captured, and the prop is emitted where React reads it. Declaring
+//! the halves separately would let them drift into a dropped attribute with no replacement.
+//!
+//! Every binding reads [`state`], never the attribute map directly. That is the one place
+//! that knows a live value outranks the markup default, so a control the page never touched
+//! and one the user typed into travel the same path.
 
 use super::tree::Components;
 use crate::model::Node;
 
-/// An attribute whose effect React expresses on a different element than HTML does.
-struct Relocation {
-    /// The captured attribute, inert on `from`.
+/// A binding React expresses somewhere other than where HTML wrote it, or under another
+/// name. `from == to` is the rename case; they differ when React reads an ancestor.
+struct Binding {
+    /// The content attribute whose default this state overrides.
     attribute: &'static str,
-    /// The element that carries the attribute in HTML.
+    /// The element that holds the state in HTML.
     from: &'static str,
-    /// The ancestor React reads the state from.
+    /// The element React reads it from.
     to: &'static str,
-    /// The prop that ancestor carries instead.
+    /// The prop that element carries instead.
     prop: &'static str,
 }
 
-const RELOCATIONS: &[Relocation] = &[Relocation {
-    attribute: "selected",
-    from: "option",
-    to: "select",
-    prop: "defaultValue",
-}];
+const BINDINGS: &[Binding] = &[
+    Binding {
+        attribute: "selected",
+        from: "option",
+        to: "select",
+        prop: "defaultValue",
+    },
+    Binding {
+        attribute: "value",
+        from: "input",
+        to: "input",
+        prop: "defaultValue",
+    },
+    Binding {
+        attribute: "value",
+        from: "textarea",
+        to: "textarea",
+        prop: "defaultValue",
+    },
+    Binding {
+        attribute: "checked",
+        from: "input",
+        to: "input",
+        prop: "defaultChecked",
+    },
+];
 
-/// Whether `attribute` is inert on `tag` because an ancestor carries it instead. Emitting it
-/// anyway would be a prop React ignores.
+/// The effective value of a control-state attribute: what the page currently says, falling
+/// back to what its markup authored. `Some(None)` is a default the page turned off, which is
+/// why this cannot be a plain `or_else` over two maps.
+fn state(node: &Node, attribute: &str) -> Option<String> {
+    match node.control_state.get(attribute) {
+        Some(live) => live.clone(),
+        None => node.attributes.get(attribute).cloned(),
+    }
+}
+
+/// Whether `attribute` is inert on `tag` because React reads the state from a prop instead.
+/// Emitting it anyway would be a prop React ignores, or one that freezes the control.
 pub(super) fn relocated(tag: &str, attribute: &str) -> bool {
-    RELOCATIONS
+    BINDINGS
         .iter()
         .any(|rule| rule.from == tag && rule.attribute == attribute)
 }
 
-/// The props `path` gains from descendants that cannot express them themselves.
+/// Whether this element's value arrives as a prop, so the children that spelled it in HTML
+/// must not also be emitted. A `<textarea>`'s default value *is* its child text, and React
+/// rejects a textarea that carries both.
+pub(super) fn binds_value(node: &Node) -> bool {
+    BINDINGS.iter().any(|rule| {
+        rule.from == node.tag && rule.to == node.tag && state(node, rule.attribute).is_some()
+    })
+}
+
+/// The props `path` carries for state React will not read where HTML put it.
 pub(super) fn adopted(path: &str, components: &Components) -> String {
     let Some(node) = components.nodes.get(path) else {
         return String::new();
     };
-    RELOCATIONS
+    BINDINGS
         .iter()
         .filter(|rule| rule.to == node.tag)
         .filter_map(|rule| {
+            if rule.from == rule.to {
+                return state(node, rule.attribute)
+                    .map(|value| format!(" {}={}", rule.prop, own(rule, &value)));
+            }
             let mut values = Vec::new();
             collect(path, components, rule, &mut values);
             // Nothing marked means the host already agrees with the browser: a single
@@ -60,6 +115,15 @@ pub(super) fn adopted(path: &str, components: &Components) -> String {
             (!values.is_empty()).then(|| format!(" {}={}", rule.prop, literal(node, values)))
         })
         .collect()
+}
+
+/// A boolean binding is spelled as a boolean, not as the empty string HTML uses to mean
+/// present, because React reads `defaultChecked=""` as false.
+fn own(rule: &Binding, value: &str) -> String {
+    if rule.prop == "defaultChecked" {
+        return "{true}".into();
+    }
+    format!("{{{}}}", serde_json::to_string(value).unwrap())
 }
 
 /// A control that accepts several selections takes a list; one that does not takes the
@@ -75,12 +139,12 @@ fn literal(node: &Node, values: Vec<String>) -> String {
 
 /// Walks descendants rather than children, because options are routinely grouped inside
 /// `<optgroup>`. A nested adopting element ends the walk, since it owns its own descendants.
-fn collect(path: &str, components: &Components, rule: &Relocation, values: &mut Vec<String>) {
+fn collect(path: &str, components: &Components, rule: &Binding, values: &mut Vec<String>) {
     for child in components.children.get(path).into_iter().flatten() {
         let Some(node) = components.nodes.get(child) else {
             continue;
         };
-        if node.tag == rule.from && node.attributes.contains_key(rule.attribute) {
+        if node.tag == rule.from && state(node, rule.attribute).is_some() {
             values.push(value_of(child, node, components));
         }
         if node.tag != rule.to {

@@ -22,6 +22,7 @@ fn node(path: &str, parent: Option<&str>, text: &str, visible: bool) -> Node {
         style: Default::default(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

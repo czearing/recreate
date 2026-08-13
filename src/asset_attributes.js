@@ -69,6 +69,44 @@
       ...recreateSurfaceAttributes(element, path)
     };
   };
+  // The IDL attributes that do NOT reflect their content attribute, each paired with the
+  // `default*` twin that does. For a form control the content attribute is the default,
+  // never the state: `value` is `defaultValue`, `checked` is `defaultChecked`, `selected`
+  // is `defaultSelected`. Typing, clicking or assigning the property updates the state and
+  // never writes the attribute, so an attribute-derived record is structurally incapable of
+  // carrying it — no amount of settling puts it there.
+  //
+  // Pairing each with its twin is what keeps this free of element shape tests. The engine
+  // already knows each element's default, so "did this diverge?" is asked the same way for
+  // every member, and a member whose default lives somewhere unusual — a `<textarea>`'s is
+  // its child text, not an attribute — needs no case of its own.
+  //
+  // The one partition the spec forces is which state a control actually holds. A checkbox
+  // or radio holds *checkedness*; its `value` is in the spec's "default/on" mode, where it
+  // reflects the content attribute and falls back to the string "on". Reading `value` there
+  // would report a divergence the page never made, because the fallback differs from the
+  // empty default by construction. `file` is excluded for the opposite reason: its value is
+  // a synthetic path that names a file the recreation cannot have. Every remaining type is
+  // in "default" mode, where the property equals its own default and records nothing.
+  const nonReflectingState = [
+    { attribute: 'value', hosts: 'textarea,input:not([type=checkbox]):not([type=radio]):not([type=file])', live: e => e.value, base: e => e.defaultValue },
+    { attribute: 'checked', hosts: 'input[type=checkbox],input[type=radio]', live: e => e.checked, base: e => e.defaultChecked },
+    { attribute: 'selected', hosts: 'option', live: e => e.selected, base: e => e.defaultSelected }
+  ];
+  // What an element's live state says that its markup default does not. Keyed by the
+  // content attribute it overrides, so a consumer asks one question of two sources; a
+  // boolean is spelled the way the attribute would be, and `null` records a default that
+  // was turned off, which no absent entry could express.
+  const recreateControlState = element => {
+    const state = {};
+    for (const { attribute, hosts, live, base } of nonReflectingState) {
+      if (!element.matches?.(hosts)) continue;
+      const current = live(element);
+      if (current === base(element)) continue;
+      state[attribute] = typeof current === 'boolean' ? (current ? '' : null) : current;
+    }
+    return state;
+  };
   // Every URL the recreation must contain bytes for: one per candidate rather than one
   // per element, plus any `url()` in a captured declaration or stylesheet rule.
   const recreateAssetUrls = (nodes, cssRules) => {

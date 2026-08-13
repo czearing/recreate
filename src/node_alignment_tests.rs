@@ -43,6 +43,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
         style: Default::default(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

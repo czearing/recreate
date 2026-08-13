@@ -38,6 +38,7 @@ fn surface(attributes: &[(&str, &str)]) -> Node {
         style: Default::default(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

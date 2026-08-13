@@ -47,5 +47,6 @@ pub fn empty_node(path: &str) -> crate::model::Node {
         after: None,
         disabled: false,
         rtl: false,
+        ..Default::default()
     }
 }

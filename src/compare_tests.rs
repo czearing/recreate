@@ -24,6 +24,7 @@ fn node(path: &str, x: f64) -> Node {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

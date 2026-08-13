@@ -37,6 +37,7 @@ fn pane(scrollbar_gutter: f64, style: &[(&str, &str)]) -> Node {
             .collect(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

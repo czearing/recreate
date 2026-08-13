@@ -14,6 +14,12 @@ pub use writing_mode::WritingMode;
 pub type Styles = BTreeMap<String, String>;
 pub type Attributes = BTreeMap<String, String>;
 
+/// What an element's live state says that its markup default does not, keyed by the content
+/// attribute it overrides. `None` records a default that was turned off, which an absent
+/// entry cannot express: a checkbox authored `checked` and then cleared differs from one
+/// that was never touched.
+pub type ControlState = BTreeMap<String, Option<String>>;
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Viewport {
     pub width: u32,
@@ -41,6 +47,21 @@ pub struct Node {
     pub tag: String,
     pub text: String,
     pub attributes: Attributes,
+    /// The live state of the IDL attributes that do not reflect a content attribute.
+    ///
+    /// For a form control the content attribute is the *default*, not the state: `value` is
+    /// `defaultValue`, `checked` is `defaultChecked`, `selected` is `defaultSelected`. The
+    /// user typing, or a script assigning the property, updates the state and never writes
+    /// the attribute, so [`Node::attributes`] is structurally incapable of carrying it and
+    /// no amount of settling puts it there. This is the same concession [`Node::disabled`]
+    /// makes, applied to the rest of the family rather than to one member.
+    ///
+    /// Kept apart from the attribute map rather than folded into it because the default and
+    /// the current state are different facts. Overwriting the map would make the record
+    /// claim the page's markup said something it never said, and would break every consumer
+    /// that legitimately wants the authored default.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub control_state: ControlState,
     pub rect: Rect,
     /// The space a classic scrollbar took out of this element's content box, in CSS pixels.
     ///

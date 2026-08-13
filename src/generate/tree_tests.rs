@@ -29,6 +29,7 @@ fn probe(path: &str, tag: &str) -> Node {
         style: crate::model::Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

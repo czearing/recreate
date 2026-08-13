@@ -23,6 +23,7 @@ fn compound_modifier_rules_require_every_class() {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "items".into());
     assert!(directly_targets_node(".items", &node));
@@ -61,6 +62,7 @@ fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
         style: Styles::new(),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("id".into(), "content".into());
     node.attributes.insert("hidden".into(), String::new());
@@ -98,6 +100,7 @@ fn restores_authored_intrinsic_motion() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "create".into());
     let captured = node.clone();
@@ -140,6 +143,7 @@ fn keeps_resolved_motion_when_authored_variables_are_filtered() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
     let rules = [".card { position: relative; transition: transform var(--slow); }".into()];
@@ -178,6 +182,7 @@ fn keeps_measured_width_for_ordinary_flex_items() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "card".into());
     let captured = node.clone();
@@ -213,6 +218,7 @@ fn removes_measured_width_from_growing_flex_items() {
         style: Styles::from([("width".into(), "320px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "content".into());
     let captured = node.clone();

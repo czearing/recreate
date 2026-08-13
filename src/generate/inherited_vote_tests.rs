@@ -34,6 +34,7 @@ fn node(tag: &str, class: &str, styles: &[(&str, &str)]) -> Node {
         ),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), class.into());
     node

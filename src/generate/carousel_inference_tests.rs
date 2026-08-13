@@ -189,6 +189,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node
         style: BTreeMap::new(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

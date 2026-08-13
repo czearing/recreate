@@ -50,10 +50,4 @@ mod tests {
         assert!(source.contains("const assetData = {}"));
         assert!(source.contains("asset_data: assetData"));
     }
-
-    #[test]
-    fn canonicalizes_control_values_as_text_evidence() {
-        assert!(super::SOURCE.contains("element.matches('textarea,input')"));
-        assert!(super::SOURCE.contains("document.createTextNode(element.value)"));
-    }
 }

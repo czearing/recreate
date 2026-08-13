@@ -26,6 +26,7 @@ fn ignores_declarations_for_descendants() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "menu-row".into());
     let captured = node.clone();
@@ -68,6 +69,7 @@ fn restores_centered_max_width_container() {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "content".into());
     let captured = node.clone();
@@ -104,6 +106,7 @@ fn keeps_the_last_active_responsive_declaration() {
         style: Styles::from([("grid-template-columns".into(), "372px 372px".into())]),
         before: None,
         after: None,
+        ..Default::default()
     };
     node.attributes.insert("class".into(), "grid".into());
     let captured = node.clone();

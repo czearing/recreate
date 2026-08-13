@@ -34,6 +34,7 @@ fn panel() -> Node {
         after: None,
         disabled: false,
         rtl: false,
+        ..Default::default()
     }
 }
 

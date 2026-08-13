@@ -51,6 +51,7 @@ fn element(class: &str, y: f64, height: f64) -> Node {
         ]),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

@@ -123,6 +123,7 @@ mod tests {
             after: None,
             disabled: false,
             rtl: false,
+            ..Default::default()
         }
     }
 

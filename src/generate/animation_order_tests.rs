@@ -92,5 +92,6 @@ fn node(path: &str, parent: Option<&str>, style: Styles) -> Node {
         style,
         before: None,
         after: None,
+        ..Default::default()
     }
 }

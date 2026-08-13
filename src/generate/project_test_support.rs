@@ -37,6 +37,7 @@ pub(super) fn node(path: &str, parent: Option<&str>, text: &str, test_id: Option
         style,
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

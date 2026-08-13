@@ -34,6 +34,7 @@ fn node(path: &str, tag: &str, text: &str, (x, y): (f64, f64), style: &[(&str, &
             .collect(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 

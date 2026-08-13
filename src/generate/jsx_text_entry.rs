@@ -65,6 +65,7 @@ mod tests {
             style: Default::default(),
             before: None,
             after: None,
+            ..Default::default()
         }
     }
 

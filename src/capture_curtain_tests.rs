@@ -102,5 +102,6 @@ fn node(path: &str) -> Node {
         style: Default::default(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }

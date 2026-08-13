@@ -27,6 +27,7 @@ pub(super) fn box_node(path: &str, style: &[(&str, &str)]) -> Node {
             .collect(),
         before: None,
         after: None,
+        ..Default::default()
     }
 }
 
