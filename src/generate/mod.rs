@@ -23,6 +23,8 @@ mod authored_css_rules;
 mod authored_css_writing_mode_tests;
 pub(crate) mod before_change;
 #[cfg(test)]
+mod before_change_fixture;
+#[cfg(test)]
 mod binding_check;
 #[cfg(test)]
 #[path = "binding_project_tests.rs"]
@@ -202,6 +204,7 @@ mod source_svg_image_tests;
 mod source_svg_name_tests;
 mod source_view_split;
 mod stand_in;
+mod starting_style;
 mod startup_overlays;
 mod startup_replay;
 #[cfg(test)]

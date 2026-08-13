@@ -9,7 +9,8 @@
 //! silently flattens to whatever the resting style already is.
 //!
 //! The authored rule is the only surviving record of the value, and the capture does keep
-//! it. This module is the one place it is read. It supplies a frame the animation API could
+//! it. Reading it out of either authoring form belongs to `starting_style`; this module is
+//! the one place it is joined to an animation. It supplies a frame the animation API could
 //! not report and nothing else — in particular the declarations never reach an element's
 //! resting style, because a before-change style is by construction the value the element is
 //! *not* at once the change has happened.
@@ -30,7 +31,7 @@ pub(crate) struct BeforeChange {
 
 impl BeforeChange {
     pub(crate) fn new(rules: &[String], nodes: &[Node]) -> Self {
-        let blocks = bodies(rules);
+        let blocks = super::starting_style::declarations(rules);
         if blocks.is_empty() {
             return Self::default();
         }
@@ -115,29 +116,6 @@ fn offset(frame: &Value) -> f64 {
 /// and the reported value agree.
 fn unreported(value: &Value) -> bool {
     value.as_str() == Some("none")
-}
-
-/// The style rules inside every `@starting-style` block, as selector and declaration text.
-///
-/// The capture records one entry per inner rule with the prelude stack rebuilt, so a block
-/// written at the top level and one nested inside a style rule arrive in the same shape and
-/// are read here by one path.
-fn bodies(rules: &[String]) -> Vec<(&str, &str)> {
-    rules
-        .iter()
-        .filter_map(|rule| {
-            let (_, rule) = super::css_layers::peel(rule);
-            let body = rule
-                .trim()
-                .strip_prefix("@starting-style")?
-                .trim_start()
-                .strip_prefix('{')?
-                .trim_end()
-                .strip_suffix('}')?;
-            body.split_once('{')
-                .map(|(selectors, declarations)| (selectors.trim(), declarations))
-        })
-        .collect()
 }
 
 #[cfg(test)]

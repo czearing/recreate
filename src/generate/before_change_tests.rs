@@ -1,85 +1,8 @@
-use super::BeforeChange;
+use super::super::before_change_fixture::{authored_rules, emit, entry_animation, panel};
 use crate::generate::animations::append;
-use crate::model::{Animation, Node, Rect};
+use crate::generate::before_change::BeforeChange;
 use serde_json::json;
 use std::collections::{BTreeMap, BTreeSet};
-
-/// The panel the scene authors: a resting `translate` of zero, and an entry transition whose
-/// only record of where it starts is the authored `@starting-style` rule.
-fn panel() -> Node {
-    Node {
-        writing_mode: Default::default(),
-        scrollbar_gutter: 0.0,
-        blocking_overlay: false,
-        path: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
-        parent: Some("html>body:nth-of-type(1)".into()),
-        tag: "div".into(),
-        text: String::new(),
-        attributes: [("class".to_string(), "panel".to_string())]
-            .into_iter()
-            .collect(),
-        rect: Rect {
-            x: 0.0,
-            y: 0.0,
-            width: 200.0,
-            height: 69.0,
-        },
-        style: [
-            ("opacity".to_string(), "1".to_string()),
-            ("translate".to_string(), "0px".to_string()),
-        ]
-        .into_iter()
-        .collect(),
-        disabled: false,
-        rtl: false,
-        ..Default::default()
-    }
-}
-
-/// What the browser reports for that entry transition.
-///
-/// `opacity` arrives correct because the property has no keyword form. `translate` arrives
-/// as `none` — its initial value — which is indistinguishable from an authored identity, so
-/// nothing downstream can tell the start was lost.
-fn entry_animation() -> Animation {
-    Animation {
-        target: panel().path,
-        name: String::new(),
-        keyframes: vec![
-            json!({"computedOffset":0.0,"easing":"linear","opacity":"0","translate":"none","clipPath":"none"}),
-            json!({"computedOffset":1.0,"easing":"linear","opacity":"1","translate":"0px","clipPath":"inset(0px)"}),
-        ],
-        timing: json!({
-            "duration": 400,
-            "iterations": 1,
-            "direction": "normal",
-            "fill": "backwards",
-            "playState": "running",
-            "playbackRate": 1
-        }),
-    }
-}
-
-fn authored_rules() -> Vec<String> {
-    vec![
-        ".panel { opacity: 1; translate: 0 0; transition: opacity 0.4s linear, translate 0.4s linear; }".into(),
-        "@starting-style{.panel { opacity: 0; translate: 0px 24px; clip-path: inset(40px); }}".into(),
-    ]
-}
-
-fn emit(nodes: &[Node], rules: &[String], animations: &[Animation]) -> String {
-    let mut classes = BTreeMap::from([(panel().path, "base".to_string())]);
-    let mut css = String::new();
-    append(
-        animations,
-        &BTreeSet::new(),
-        &BeforeChange::new(rules, nodes),
-        &mut classes,
-        &mut css,
-    );
-    css
-}
-
 /// The defect. The emitted opening frame must carry the distance the author wrote, not the
 /// keyword the animation API substituted for it.
 #[test]
