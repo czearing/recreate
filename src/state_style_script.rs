@@ -6,16 +6,44 @@ __RULE_ACTIVATION__
     'border-width','flex','font','gap','grid','inset','margin','mask','padding',
     'transition'
   ];
+  const scanValue = (text, from, accept) => {
+    let depth = 0;
+    for (let index = from; index < text.length; index++) {
+      const char = text[index];
+      if (char === '\\') { index++; continue; }
+      if (char === '"' || char === "'") {
+        for (index++; index < text.length && text[index] !== char; index++) {
+          if (text[index] === '\\') index++;
+        }
+        continue;
+      }
+      if (char === '(') depth++;
+      else if (char === ')') depth--;
+      if (accept(char, depth)) return index;
+    }
+    return -1;
+  };
+  const closingParen = (text, open) => scanValue(text, open, (char, depth) => char === ')' && !depth);
+  const topLevelComma = text => scanValue(text, 0, (char, depth) => char === ',' && !depth);
   const resolveVariables = (style, element) => {
     const computed = getComputedStyle(element);
+    const substitute = value => {
+      for (let index = value.indexOf('var('); index >= 0;) {
+        const close = /[\w-]/.test(value[index - 1] || '') ? -1 : closingParen(value, index + 3);
+        if (close < 0) { index = value.indexOf('var(', index + 4); continue; }
+        const inner = value.slice(index + 4, close);
+        const comma = topLevelComma(inner);
+        const name = (comma < 0 ? inner : inner.slice(0, comma)).trim();
+        const replacement =
+          computed.getPropertyValue(name).trim() || (comma < 0 ? '' : inner.slice(comma + 1).trim());
+        value = value.slice(0, index) + replacement + value.slice(close + 1);
+        index = value.indexOf('var(', index + replacement.length);
+      }
+      return value;
+    };
     const resolveValue = value => {
       let resolved = value;
-      for (let pass = 0; pass < 5 && resolved.includes('var('); pass++) {
-        resolved = resolved.replace(
-          /var\((--[\w-]+)(?:,\s*([^)]*))?\)/g,
-          (_, name, fallback = '') => computed.getPropertyValue(name).trim() || fallback.trim()
-        );
-      }
+      for (let pass = 0; pass < 5 && resolved.includes('var('); pass++) resolved = substitute(resolved);
       return resolved;
     };
     const names = new Set(Array.from(style));

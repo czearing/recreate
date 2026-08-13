@@ -11,7 +11,13 @@ const pathOf = element => element.path;
 
 const scene = __SCENE__;
 
-const elements = scene.elements.map(spec => ({ ...spec, probes: {}, shadowRoot: null }));
+// A scene may seed computed values an element already reports before any probe runs, which
+// is how a custom property inherited from `:root` reaches `getComputedStyle` in a browser.
+const elements = scene.elements.map(spec => ({
+  ...spec,
+  probes: { ...spec.computed },
+  shadowRoot: null
+}));
 
 const matchesSelector = (selector, element) =>
   selector

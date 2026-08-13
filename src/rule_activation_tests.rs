@@ -16,6 +16,9 @@ mod definition;
 #[path = "rule_activation_condition_tests.rs"]
 mod condition;
 
+#[path = "state_style_var_tests.rs"]
+mod state_style_var;
+
 const HARNESS: &str = include_str!("rule_activation_harness.js");
 
 fn capture_source() -> String {
