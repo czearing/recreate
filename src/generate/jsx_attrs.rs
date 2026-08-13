@@ -81,6 +81,19 @@ pub fn void_tag(tag: &str) -> bool {
 mod tests {
     use super::*;
 
+    /// A node carrying one attribute. Every case here varies only the tag and the
+    /// attributes, so the rest of the shape is written once rather than per test.
+    fn node(tag: &str, attributes: &[(&str, &str)]) -> Node {
+        Node {
+            tag: tag.into(),
+            attributes: attributes
+                .iter()
+                .map(|(name, value)| ((*name).to_owned(), (*value).to_owned()))
+                .collect(),
+            ..Default::default()
+        }
+    }
+
     /// Element names, unlike attribute names, are matched case-insensitively by the DOM but
     /// must be spelled exactly for JSX to emit the SVG element rather than an unknown tag.
     #[test]
@@ -92,59 +105,30 @@ mod tests {
 
     #[test]
     fn keeps_accessibility_state_on_component_instances() {
-        let mut node = crate::model::Node {
-            writing_mode: Default::default(),
-            scrollbar_gutter: 0.0,
-            blocking_overlay: false,
-            disabled: false,
-            rtl: false,
-            path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
-            parent: Some("html>body:nth-of-type(1)".into()),
-            tag: "button".into(),
-            text: String::new(),
-            attributes: Default::default(),
-            rect: crate::model::Rect {
-                x: 0.0,
-                y: 0.0,
-                width: 10.0,
-                height: 10.0,
-            },
-            style: Default::default(),
-            before: None,
-            after: None,
-        };
-        node.attributes
-            .insert("aria-expanded".into(), "true".into());
-        node.attributes.insert("role".into(), "button".into());
+        let node = node("button", &[("aria-expanded", "true"), ("role", "button")]);
         let output = attributes(&node, &Default::default());
         assert!(output.contains("aria-expanded={\"true\"}"));
         assert!(output.contains("role={\"button\"}"));
     }
 
+    /// A namespaced attribute reaching this emitter is the case that put a colon in an
+    /// attribute position. Babel rejects that outright and esbuild lowers it to a string-keyed
+    /// prop, which React DOM writes to no namespace at all. Asserted here as well as over the
+    /// name translation, because the cheapest wrong repair is a filter in this function that
+    /// drops colon-bearing names — which builds cleanly while the sprite reference is gone.
+    /// Comparing the whole emitted string is what that repair cannot satisfy.
+    #[test]
+    fn emits_a_namespaced_attribute_as_the_react_prop_with_its_value_intact() {
+        let node = node("use", &[("xlink:href", "#i")]);
+        assert_eq!(
+            attributes(&node, &Default::default()),
+            " xlinkHref={\"#i\"}"
+        );
+    }
+
     #[test]
     fn preserves_boolean_control_state() {
-        let mut node = crate::model::Node {
-            writing_mode: Default::default(),
-            scrollbar_gutter: 0.0,
-            blocking_overlay: false,
-            disabled: false,
-            rtl: false,
-            path: "html>body:nth-of-type(1)>button:nth-of-type(1)".into(),
-            parent: Some("html>body:nth-of-type(1)".into()),
-            tag: "button".into(),
-            text: String::new(),
-            attributes: Default::default(),
-            rect: crate::model::Rect {
-                x: 0.0,
-                y: 0.0,
-                width: 10.0,
-                height: 10.0,
-            },
-            style: Default::default(),
-            before: None,
-            after: None,
-        };
-        node.attributes.insert("disabled".into(), String::new());
+        let node = node("button", &[("disabled", "")]);
         assert!(attributes(&node, &Default::default()).contains(" disabled={true}"));
     }
 
@@ -152,29 +136,7 @@ mod tests {
     /// React reads selection from the parent `<select>` and ignores the prop entirely.
     #[test]
     fn drops_control_state_the_host_expresses_elsewhere() {
-        let mut node = crate::model::Node {
-            writing_mode: Default::default(),
-            scrollbar_gutter: 0.0,
-            blocking_overlay: false,
-            disabled: false,
-            rtl: false,
-            path: "html>body:nth-of-type(1)>select:nth-of-type(1)>option:nth-of-type(1)".into(),
-            parent: Some("html>body:nth-of-type(1)>select:nth-of-type(1)".into()),
-            tag: "option".into(),
-            text: String::new(),
-            attributes: Default::default(),
-            rect: crate::model::Rect {
-                x: 0.0,
-                y: 0.0,
-                width: 10.0,
-                height: 10.0,
-            },
-            style: Default::default(),
-            before: None,
-            after: None,
-        };
-        node.attributes.insert("selected".into(), String::new());
-        node.attributes.insert("value".into(), "gold".into());
+        let node = node("option", &[("selected", ""), ("value", "gold")]);
         let output = attributes(&node, &Default::default());
         assert!(!output.contains("selected"));
         assert!(output.contains(" value={\"gold\"}"));

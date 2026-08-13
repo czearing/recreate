@@ -3,6 +3,19 @@
 //! They live beside the rule rather than inside it only to keep each file readable. There
 //! is still exactly one copy of each list, which is what stops the JSX spelling and the
 //! document spelling of a name from drifting apart.
+/// The XML namespace prefixes that reach an HTML document, and the only ones whose JSX
+/// spelling can be split back apart.
+///
+/// The forward direction needs no list at all: a colon is an explicit word boundary, so
+/// camel-joining on it answers for every prefix, including the ones Alpine and htmx invent.
+/// The inverse cannot be a rule, because the boundary is gone — splitting `xlinkHref` at
+/// its case change is the same operation that would turn `dateTime` into `date:time`.
+///
+/// A prefix matches only when an uppercase letter follows it, which is what makes the order
+/// of this list irrelevant: `xmlnsXlink` also begins with `xml`, and a plain prefix search
+/// would split it as `xml:nsXlink` depending on nothing but which entry came first.
+pub(super) const NAMESPACE_PREFIXES: &[&str] = &["xlink", "xml", "xmlns"];
+
 /// React's canonical prop names for HTML attributes that differ from their HTML spelling
 /// only by case. Taken from the React DOM attribute reference.
 ///
