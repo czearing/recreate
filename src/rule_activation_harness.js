@@ -55,12 +55,16 @@ const buildRule = spec => {
     return { type: 12, cssText: `${spec.prelude} { ${declarationText(spec.declarations)} }` };
   }
   const rules = spec.rules.map(buildRule);
-    const grouped = {
-    type: spec.media ? CSSRule.MEDIA_RULE : 12,
+  const grouped = {
+    // A browser reads the rule interface from the at-rule the author wrote, so the double
+    // derives it from the prelude too. Taking it from a fixture flag instead lets a scene
+    // declare a `@media` prelude that is not a media rule, which no page can produce.
+    type: spec.prelude.startsWith('@media') ? CSSRule.MEDIA_RULE : 12,
     conditionText: spec.conditionText,
     cssText: `${spec.prelude} { ${rules.map(rule => rule.cssText).join(' ')} }`,
     cssRules: rules
-  };  // A keyframes block exposes children without grouping style rules, which is the shape
+  };
+  // A keyframes block exposes children without grouping style rules, which is the shape
   // that must not be descended into.
   return spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
 };

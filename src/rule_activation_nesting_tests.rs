@@ -16,7 +16,6 @@ fn scene() -> Value {
         {
             "prelude": "@media (min-width: 900px)",
             "conditionText": "(min-width: 900px)",
-            "media": true,
             "rules": [style(".control", "letter-spacing", "11px")]
         },
         {
@@ -25,7 +24,6 @@ fn scene() -> Value {
             "rules": [{
                 "prelude": "@media (min-width: 900px)",
                 "conditionText": "(min-width: 900px)",
-                "media": true,
                 "rules": [style(".subject", "letter-spacing", "13px")]
             }]
         },
@@ -35,14 +33,12 @@ fn scene() -> Value {
             "rules": [{
                 "prelude": "@media (min-width: 900px)",
                 "conditionText": "(min-width: 900px)",
-                "media": true,
                 "rules": [style(".hidden", "letter-spacing", "17px")]
             }]
         },
         {
             "prelude": "@media (min-width: 900px)",
             "conditionText": "(min-width: 900px)",
-            "media": true,
             "rules": [{
                 "prelude": "@supports (display: grid)",
                 "conditionText": "(display: grid)",

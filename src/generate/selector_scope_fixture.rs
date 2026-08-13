@@ -66,7 +66,7 @@ pub(super) fn emit(subject: usize, rule: &str) -> Vec<String> {
     let (nodes, classes) = tree();
     let scope = Scope::new(&nodes, &classes, "r");
     let mut compounds = BTreeSet::new();
-    super::authored_media::rules(&nodes[subject], &scope, &[rule.to_string()], &mut compounds)
+    super::authored_conditions::rules(&nodes[subject], &scope, &[rule.to_string()], &mut compounds)
 }
 
 /// The selector a correct rewrite of these compounds produces: each authored compound

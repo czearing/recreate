@@ -13,12 +13,11 @@ fn font_face(family: &str) -> Value {
     json!({ "prelude": "@font-face", "declarations": { "font-family": family } })
 }
 
-fn scene(prelude: &str, condition: &str, media: bool) -> Value {
+fn scene(prelude: &str, condition: &str) -> Value {
     let sheet = json!([
         {
             "prelude": prelude,
             "conditionText": condition,
-            "media": media,
             "rules": [font_face("Vorplish"), style(".panel", "color", "red")]
         },
         font_face("Quazitic"),
@@ -32,11 +31,11 @@ fn scene(prelude: &str, condition: &str, media: bool) -> Value {
 }
 
 fn media_scene() -> Value {
-    scene("@media (min-width: 0px)", "(min-width: 0px)", true)
+    scene("@media (min-width: 0px)", "(min-width: 0px)")
 }
 
 fn supports_scene() -> Value {
-    scene("@supports (display: grid)", "(display: grid)", false)
+    scene("@supports (display: grid)", "(display: grid)")
 }
 
 /// The fabrication, and its limit. A `@font-face` inside a live `@media` was recorded a

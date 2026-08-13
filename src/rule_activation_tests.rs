@@ -13,6 +13,9 @@ mod nesting;
 #[path = "rule_activation_definition_tests.rs"]
 mod definition;
 
+#[path = "rule_activation_condition_tests.rs"]
+mod condition;
+
 const HARNESS: &str = include_str!("rule_activation_harness.js");
 
 fn capture_source() -> String {
@@ -52,14 +55,21 @@ fn recorded(result: &Value) -> Vec<String> {
         .collect()
 }
 
-/// A `@container` block the page's own layout can never satisfy declares nothing, so its
-/// declarations must not be recorded as rules the author wrote.
+/// A `@container` block the page's *current* layout cannot satisfy still declares something,
+/// because the recreation is a live document whose container may be resized. What must not
+/// happen is the fabrication: keeping the declarations while dropping the condition, which
+/// publishes as unconditional a rule the author guarded. So the block travels, wrapped.
 #[test]
-fn an_unsatisfiable_container_block_contributes_no_authored_rule() {
+fn an_unsatisfied_container_block_keeps_the_condition_that_guards_it() {
     let rules = recorded(&walk(scene()));
+    let guarded: Vec<_> = rules
+        .iter()
+        .filter(|rule| rule.contains("width: 100%"))
+        .collect();
+    assert_eq!(guarded.len(), 1, "{rules:?}");
     assert!(
-        !rules.iter().any(|rule| rule.contains("width: 100%")),
-        "recorded a dead @container declaration: {rules:?}"
+        guarded[0].starts_with("@container panelwrap (min-width: 900px)"),
+        "a container condition was baked away, publishing an unconditional rule: {rules:?}"
     );
 }
 

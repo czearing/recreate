@@ -81,7 +81,12 @@ fn generate(subject: usize, rule: &str) -> (Vec<String>, BTreeMap<String, String
     let mut compounds = BTreeSet::new();
     let emitted = {
         let scope = Scope::new(&nodes, &classes, "r");
-        super::authored_media::rules(&nodes[subject], &scope, &[rule.to_string()], &mut compounds)
+        super::authored_conditions::rules(
+            &nodes[subject],
+            &scope,
+            &[rule.to_string()],
+            &mut compounds,
+        )
     };
     let mut classes = classes;
     apply(&compounds, &nodes, "r", &mut classes);

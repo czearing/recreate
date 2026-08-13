@@ -31,7 +31,7 @@ fn media(node: &Node, rules: &[&str]) -> Vec<String> {
         .collect::<Vec<_>>();
     let nodes = [node.clone()];
     let classes = std::collections::BTreeMap::from([(node.path.clone(), "generated".to_string())]);
-    super::authored_media::rules(
+    super::authored_conditions::rules(
         node,
         &super::selector_scope::Scope::new(&nodes, &classes, "r"),
         &rules,

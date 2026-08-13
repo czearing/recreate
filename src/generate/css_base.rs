@@ -139,7 +139,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         changed_paths.as_ref(),
         &fluid_heights,
     );
-    let scoped_compounds = append_authored_media(base, prefix, &classes, &mut css);
+    let scoped_compounds = append_authored_conditions(base, prefix, &classes, &mut css);
     Output {
         css,
         classes,
@@ -147,7 +147,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     }
 }
 
-fn append_authored_media(
+fn append_authored_conditions(
     base: &PageState,
     prefix: &str,
     classes: &BTreeMap<String, String>,
@@ -160,7 +160,8 @@ fn append_authored_media(
         if classes.get(&node.path).is_none() {
             continue;
         };
-        for rule in super::authored_media::rules(node, &scope, &base.css_rules, &mut compounds) {
+        for rule in super::authored_conditions::rules(node, &scope, &base.css_rules, &mut compounds)
+        {
             if emitted.insert(rule.clone()) {
                 css.push_str(&rule);
                 css.push('\n');

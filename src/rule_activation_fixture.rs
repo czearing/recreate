@@ -28,13 +28,11 @@ pub(super) fn scene() -> Value {
         {
             "prelude": "@media (min-width: 900px)",
             "conditionText": "(min-width: 900px)",
-            "media": true,
             "rules": [style(".panel", "color", "red")]
         },
         {
             "prelude": "@media (min-width: 0px)",
             "conditionText": "(min-width: 0px)",
-            "media": true,
             "rules": [{
                 "prelude": "@supports (display: grid)",
                 "conditionText": "(display: grid)",

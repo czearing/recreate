@@ -23,20 +23,22 @@ pub const SOURCE: &str = r#"
     const brace = rule.cssText.indexOf('{');
     return brace < 0 ? '' : rule.cssText.slice(0, brace).trim();
   };
-  // Conditionality answers whether a rule is active. It does not answer which enclosing
-  // preludes have to travel with the rule, and one predicate cannot serve both.
-  const conditional = rule =>
-    typeof rule.conditionText === 'string' && !!rule.conditionText.trim();
   // Gate versus carrier, which is the split that matters, and it does not follow
-  // conditionality. A GATE's condition has one answer for the whole capture — engine
-  // feature support is fixed for the run, and a container query the capture already
-  // resolved against the very element it baked — so it is evaluated now and then dropped;
-  // re-emitting it would make the recreation re-ask the viewing engine a question the
-  // capturing engine already answered. A CARRIER cannot be answered here at all: a media
-  // condition is re-answered by whoever views the recreation, and @layer/@scope carry
-  // cascade position and proximity that outrank specificity and that no flattened copy can
-  // express. So carriers are re-emitted verbatim around every member.
-  const carrier = rule => rule.type === CSSRule.MEDIA_RULE || !conditional(rule);
+  // conditionality. The line is *who answers the condition*: the user agent, or the
+  // document. A recreation reproduces the document and not the agent, so only an
+  // agent-answered condition may be evaluated now and dropped. `@supports` asks the engine
+  // about its own feature support, which is fixed for the run and is not a property of the
+  // page — re-emitting it would make the recreation re-ask the viewing engine a question
+  // the capturing engine already answered, and drop declarations the captured page had.
+  // Every other condition is answered by the document and is re-answered by whoever views
+  // the recreation: a media condition by the viewport, and a container condition by the
+  // used inline-size of the nearest ancestor with `container-type`, which layout produces
+  // afresh on every resize and which two instances of one component answer differently in
+  // the same paint. Baking such a condition away publishes the branch that happened to hold
+  // as though the author had written it unconditionally. `@layer` and `@scope` carry cascade
+  // position and proximity that outrank specificity and that no flattened copy can express.
+  // So carriers are re-emitted verbatim around every member.
+  const carrier = prelude => !prelude.startsWith('@supports');
   // The platform's own line between a rule that groups style rules and one that merely has
   // children. @keyframes exposes cssRules, but its children are keyframe selectors rather
   // than rules the cascade ever resolves. Asking "does it have children" instead gets both
@@ -58,7 +60,7 @@ pub const SOURCE: &str = r#"
         continue;
       }
       const prelude = preludeOf(rule);
-      const held = carrier(rule);
+      const held = carrier(prelude);
       entries.push(...flattenRules(
         rule.cssRules,
         rule.type === CSSRule.MEDIA_RULE

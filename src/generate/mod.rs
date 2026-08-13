@@ -8,6 +8,7 @@ mod asset_urls;
 mod assets;
 mod assets_remote;
 mod attribute_sequences;
+mod authored_conditions;
 mod authored_css;
 #[cfg(test)]
 #[path = "authored_css_axis_tests.rs"]
@@ -20,7 +21,6 @@ mod authored_css_rules;
 #[cfg(test)]
 #[path = "authored_css_writing_mode_tests.rs"]
 mod authored_css_writing_mode_tests;
-mod authored_media;
 pub(crate) mod before_change;
 #[cfg(test)]
 mod binding_check;

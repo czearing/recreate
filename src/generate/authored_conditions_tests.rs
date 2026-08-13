@@ -1,6 +1,9 @@
 use super::*;
 use crate::model::{Attributes, Rect};
 
+#[path = "authored_conditions_carrier_tests.rs"]
+mod carrier;
+
 fn node(classes: &str) -> Node {
     Node {
         writing_mode: Default::default(),

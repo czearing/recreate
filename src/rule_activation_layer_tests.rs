@@ -23,7 +23,6 @@ fn scene() -> Value {
             "rules": [{
                 "prelude": "@media (min-width: 0px)",
                 "conditionText": "(min-width: 0px)",
-                "media": true,
                 "rules": [style(".nested", "gap", "4px")]
             }]
         },
@@ -35,7 +34,6 @@ fn scene() -> Value {
         {
             "prelude": "@media (min-width: 1px)",
             "conditionText": "(min-width: 1px)",
-            "media": true,
             "rules": [style(".probe", "outline", "1px solid blue")]
         }
     ]);
