@@ -48,12 +48,25 @@ pub fn extract(sources: &mut [&mut String], components: &BTreeSet<String>) -> Ve
         if available.len() < 2 {
             continue;
         }
-        let varying = varying_fields(&available);
-        if varying.is_empty() {
+        // Whether this group is a component is settled by its signature repeating, which is a
+        // property of shape and holds on every load. Which of its fields become props is settled
+        // by `prop_fields`, and only that question may consult the captured values. Asking the
+        // values first inverted the two: a group whose literals happened to coincide on this load
+        // was abandoned entirely, so a page whose rows all read "2 minutes ago" lost the component
+        // that the same page yields five minutes later.
+        //
+        // The guard survives the reordering rather than being deleted, because it was never about
+        // variance: it stops a parameterless component, which is only a renamed copy of the block.
+        // `prop_fields` is the union of the varying fields and the semantic ones, so it is empty
+        // strictly less often than `varying` is, and this can never admit the case the guard owns.
+        let fields = super::source_item_names::prop_fields(
+            &signature,
+            &available[0].values,
+            &varying_fields(&available),
+        );
+        if fields.is_empty() {
             continue;
         }
-        let fields =
-            super::source_item_names::prop_fields(&signature, &available[0].values, &varying);
         let props = super::source_item_names::prop_names(&signature, &available[0].values, &fields);
         let template = template(&signature, &available[0].values, &props);
         if !super::source_item_component::unresolved("", &template, &props, components).is_empty() {

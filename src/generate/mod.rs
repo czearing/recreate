@@ -170,6 +170,8 @@ mod source_imports;
 #[cfg(test)]
 #[path = "source_item_binding_tests.rs"]
 mod source_item_binding_tests;
+#[cfg(test)]
+mod source_item_coincidence_tests;
 mod source_item_component;
 mod source_item_dedupe;
 mod source_item_name_words;
