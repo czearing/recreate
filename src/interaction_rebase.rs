@@ -105,6 +105,7 @@ mod tests {
     fn node(path: &str, text: &str) -> Node {
         Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             path: path.into(),
             parent: Some("html>body".into()),

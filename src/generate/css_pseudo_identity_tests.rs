@@ -19,6 +19,7 @@ pub fn span(ordinal: usize) -> Node {
     style.insert("display".into(), "inline-block".into());
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

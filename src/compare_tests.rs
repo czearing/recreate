@@ -6,6 +6,7 @@ use crate::{
 fn node(path: &str, x: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

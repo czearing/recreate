@@ -5,6 +5,7 @@ use crate::model::{Node, Rect, Styles};
 fn ignores_declarations_for_descendants() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -45,6 +46,7 @@ fn ignores_declarations_for_descendants() {
 fn restores_centered_max_width_container() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -84,6 +86,7 @@ fn restores_centered_max_width_container() {
 fn keeps_the_last_active_responsive_declaration() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

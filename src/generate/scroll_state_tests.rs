@@ -4,6 +4,7 @@ use crate::model::{DomNode, Node, PageState, Rect, Viewport};
 pub(super) fn node(path: &str, tag: &str) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         path: path.into(),
         parent: Some("html>body".into()),

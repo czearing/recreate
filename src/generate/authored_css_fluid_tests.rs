@@ -6,6 +6,7 @@ use crate::model::{Node, Rect, Styles, WritingMode};
 /// decides between the authored text and the sample.
 fn node() -> Node {
     let mut node = Node {
+        scrollbar_gutter: 0.0,
         disabled: false,
         rtl: false,
         writing_mode: WritingMode::default(),

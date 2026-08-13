@@ -8,6 +8,7 @@ use crate::model::{Node, Rect, Styles, WritingMode};
 /// could see, and would stay green through the defect it was meant to catch.
 fn node(mode: WritingMode) -> Node {
     let mut node = Node {
+        scrollbar_gutter: 0.0,
         disabled: false,
         rtl: false,
         writing_mode: mode,

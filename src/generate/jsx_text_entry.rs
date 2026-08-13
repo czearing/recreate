@@ -47,6 +47,7 @@ mod tests {
     fn node(path: &str, parent: Option<&str>, width: f64) -> Node {
         Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             disabled: false,
             rtl: false,

@@ -4,6 +4,7 @@ use crate::model::{Attributes, Interaction, Node, PageState, Rect, Specification
 fn node(path: &str, parent: Option<&str>, tag: &str, text: &str) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

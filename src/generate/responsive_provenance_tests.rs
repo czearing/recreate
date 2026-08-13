@@ -28,6 +28,7 @@ fn declared(css: &str) -> BTreeMap<&str, &str> {
 fn element(class: &str, y: f64, height: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -137,10 +138,11 @@ fn restores_an_authored_fluid_length_over_the_sampled_pixel() {
 }
 
 /// The opposite failure, in the one stage that writes a size in pixels on purpose.
-/// `preserve_space` widens a thin-scrollbar container by its gutter, because a thin
-/// scrollbar is 10px where the default is 15px and dropping the difference makes every
-/// such container narrower than the source. That value is emitter output whose `px` tail
-/// is arithmetic, not provenance, and the guard deletes it.
+/// `preserve_space` widens a scrolling container by the scrollbar gutter the capture
+/// measured, because the resolved `width` of a content-box element excludes the whole
+/// scrollbar and dropping it makes every such container narrower than the source. That
+/// value is emitter output whose `px` tail is arithmetic, not provenance, and the guard
+/// deletes it.
 #[test]
 fn keeps_the_scrollbar_gutter_a_geometry_stage_reserved() {
     let pane = Node {
@@ -151,6 +153,7 @@ fn keeps_the_scrollbar_gutter_a_geometry_stage_reserved() {
             width: 310.0,
             height: 400.0,
         },
+        scrollbar_gutter: 10.0,
         style: Styles::from([
             ("scrollbar-width".into(), "thin".into()),
             ("overflow-y".into(), "auto".into()),

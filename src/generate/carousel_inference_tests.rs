@@ -171,6 +171,7 @@ fn specification(state: PageState) -> Specification {
 fn node(path: &str, parent: Option<&str>, tag: &str, y: f64, width: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

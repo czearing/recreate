@@ -14,6 +14,7 @@ pub(super) fn node(path: &str, parent: Option<&str>, text: &str, test_id: Option
     style.insert("width".into(), "100px".into());
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

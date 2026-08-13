@@ -70,6 +70,7 @@ mod tests {
     fn marks_captured_startup_root() {
         let root = Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             disabled: false,
             rtl: false,

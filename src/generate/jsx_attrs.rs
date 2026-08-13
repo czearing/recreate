@@ -94,6 +94,7 @@ mod tests {
     fn keeps_accessibility_state_on_component_instances() {
         let mut node = crate::model::Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             disabled: false,
             rtl: false,
@@ -124,6 +125,7 @@ mod tests {
     fn preserves_boolean_control_state() {
         let mut node = crate::model::Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             disabled: false,
             rtl: false,
@@ -152,6 +154,7 @@ mod tests {
     fn drops_control_state_the_host_expresses_elsewhere() {
         let mut node = crate::model::Node {
             writing_mode: Default::default(),
+            scrollbar_gutter: 0.0,
             blocking_overlay: false,
             disabled: false,
             rtl: false,

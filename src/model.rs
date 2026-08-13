@@ -26,7 +26,7 @@ fn default_dpr() -> f64 {
     1.0
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Rect {
     pub x: f64,
     pub y: f64,
@@ -34,7 +34,7 @@ pub struct Rect {
     pub height: f64,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Node {
     pub path: String,
     pub parent: Option<String>,
@@ -42,6 +42,19 @@ pub struct Node {
     pub text: String,
     pub attributes: Attributes,
     pub rect: Rect,
+    /// The space a classic scrollbar took out of this element's content box, in CSS pixels.
+    ///
+    /// Measured in the browser because it cannot be recovered afterwards. The engine reports
+    /// a scrollbar by shrinking the resolved `width` of a content-box element, so restoring
+    /// the authored size means adding the scrollbar back — but deriving it from the recorded
+    /// geometry would need this element's padding and border, and `style` keeps only the
+    /// declarations that differ from the element's baseline. A `<ul>` whose padding is the
+    /// user-agent's own records no padding at all, and the missing term reads as a scrollbar
+    /// that was never there. `offsetWidth - clientWidth` minus the two border widths is exact
+    /// at capture time, where the computed style is still whole, and unlike
+    /// `getBoundingClientRect` it is not scaled by an ancestor `transform`.
+    #[serde(default, skip_serializing_if = "crate::model::is_zero")]
+    pub scrollbar_gutter: f64,
     pub style: Styles,
     pub before: Option<Pseudo>,
     pub after: Option<Pseudo>,
@@ -89,6 +102,10 @@ pub struct Node {
     /// [`WritingMode`] for why the resolved keyword is kept rather than an axis flag.
     #[serde(default, skip_serializing_if = "WritingMode::horizontal")]
     pub writing_mode: WritingMode,
+}
+
+fn is_zero(value: &f64) -> bool {
+    *value == 0.0
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

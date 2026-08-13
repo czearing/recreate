@@ -5,6 +5,7 @@ use crate::model::{Node, Rect, Styles};
 fn compound_modifier_rules_require_every_class() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -42,6 +43,7 @@ fn compound_modifier_rules_require_every_class() {
 fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -74,6 +76,7 @@ fn direct_tag_id_and_attribute_selectors_match_without_descendant_leaks() {
 fn restores_authored_intrinsic_motion() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -113,6 +116,7 @@ fn restores_authored_intrinsic_motion() {
 fn keeps_resolved_motion_when_authored_variables_are_filtered() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -153,6 +157,7 @@ fn keeps_resolved_motion_when_authored_variables_are_filtered() {
 fn keeps_measured_width_for_ordinary_flex_items() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -190,6 +195,7 @@ fn keeps_measured_width_for_ordinary_flex_items() {
 fn removes_measured_width_from_growing_flex_items() {
     let mut node = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

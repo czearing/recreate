@@ -81,6 +81,7 @@ fn specification() -> Specification {
 
 fn node(path: &str, parent: Option<&str>, styles: Styles) -> Node {
     Node {
+        scrollbar_gutter: 0.0,
         path: path.into(),
         parent: parent.map(str::to_string),
         tag: "div".into(),

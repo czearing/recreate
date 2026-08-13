@@ -11,8 +11,6 @@ fn state(nodes: usize) -> PageState {
         capture_blockers: Vec::new(),
         nodes: (0..nodes)
             .map(|index| Node {
-                writing_mode: Default::default(),
-                blocking_overlay: false,
                 path: format!("html>body>div:nth-of-type({index})"),
                 parent: Some("html>body".into()),
                 tag: "div".into(),
@@ -25,10 +23,7 @@ fn state(nodes: usize) -> PageState {
                     height: 20.0,
                 },
                 style: BTreeMap::new(),
-                before: None,
-                after: None,
-                disabled: false,
-                rtl: false,
+                ..Default::default()
             })
             .collect(),
         startup_nodes: Vec::new(),
@@ -168,6 +163,7 @@ fn ignores_replaced_text_inside_absolute_content() {
     let mut changed = baseline.clone();
     changed.nodes.push(Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         path: "html>body>prompt>#text(2)".into(),
         parent: Some("html>body>prompt".into()),

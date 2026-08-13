@@ -6,6 +6,7 @@ use crate::model::{Node, Rect, Styles, WritingMode};
 /// is right only if it came from there.
 fn node(mode: WritingMode, rtl: bool) -> Node {
     let mut node = Node {
+        scrollbar_gutter: 0.0,
         disabled: false,
         rtl,
         writing_mode: mode,

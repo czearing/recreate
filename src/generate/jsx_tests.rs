@@ -4,6 +4,7 @@ use crate::model::{Node, Rect, Styles};
 fn text(path: &str, parent: &str, value: &str, x: f64, width: f64) -> Node {
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -48,6 +49,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
     let child_path = format!("{parent_path}>div:nth-of-type(3)");
     let parent = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
@@ -68,6 +70,7 @@ fn placeholders_do_not_duplicate_the_rendered_child_margin() {
     };
     let child = Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,

@@ -58,6 +58,20 @@ __ASSET_ATTRIBUTES__
     pathCache.set(element, path);
     return path;
   };
+  // The space a classic scrollbar took out of the content box. `offsetWidth - clientWidth`
+  // is the border box minus the padding box, so the two border widths are the rest of it.
+  // Read here rather than derived later because `style` is pruned to the declarations that
+  // differ from the element's baseline, which discards user-agent padding and border.
+  // `clientWidth` is defined as zero when the element has no padding box to report - an
+  // inline box, or no layout box at all - and there is no gutter inside a box that does not
+  // exist, so that is the condition rather than a list of elements to skip.
+  const scrollbarGutter = (element, style) => {
+    if (!element.clientWidth) return 0;
+    const gutter = element.offsetWidth - element.clientWidth
+      - (parseFloat(style.borderLeftWidth) || 0)
+      - (parseFloat(style.borderRightWidth) || 0);
+    return gutter > 0 ? gutter : 0;
+  };
   const pseudo = (element, name) => {
     const style = getComputedStyle(element, name);
     const content = style.content;
@@ -111,6 +125,7 @@ __ASSET_ATTRIBUTES__
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      scrollbar_gutter: scrollbarGutter(element, computedStyle),
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       before: pseudo(element, '::before'),
       after: pseudo(element, '::after')

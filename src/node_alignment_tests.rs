@@ -25,6 +25,7 @@ fn node(path: &str, parent: Option<&str>, tag: &str, text: &str, class: &str) ->
     }
     Node {
         writing_mode: Default::default(),
+        scrollbar_gutter: 0.0,
         blocking_overlay: false,
         disabled: false,
         rtl: false,
