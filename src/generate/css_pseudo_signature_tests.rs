@@ -30,7 +30,7 @@ fn separates_the_slots_in_the_responsive_signature_too() {
             interactions: Vec::new(),
             transitions: Vec::new(),
         };
-        super::css_values::responsive_signatures_for(&specification, None)
+        super::css_values::responsive_signatures_for(&specification, None, &Default::default())
             .into_values()
             .next()
             .expect("the node has a signature")
@@ -73,7 +73,7 @@ fn separates_a_decorations_payload_from_the_property_that_follows_it() {
             interactions: Vec::new(),
             transitions: Vec::new(),
         };
-        super::css_values::responsive_signatures_for(&specification, None)
+        super::css_values::responsive_signatures_for(&specification, None, &Default::default())
             .into_values()
             .next()
             .expect("the node has a signature")

@@ -17,6 +17,7 @@ pub fn declarations(styles: &Styles, assets: &BTreeMap<String, String>) -> Strin
 pub fn responsive_signatures_for(
     specification: &Specification,
     paths: Option<&HashSet<String>>,
+    assets: &BTreeMap<String, String>,
 ) -> BTreeMap<String, String> {
     let mut signatures = BTreeMap::<String, Signature>::new();
     for state in &specification.states {
@@ -25,9 +26,9 @@ pub fn responsive_signatures_for(
                 continue;
             }
             let signature = signatures.entry(node.path.clone()).or_default();
-            signature.styles(&node.style);
+            append_styles(signature, &node.style, assets);
             for (suffix, pseudo) in super::css_pseudo::slots(node) {
-                append_pseudo(signature, suffix, pseudo);
+                append_pseudo(signature, suffix, pseudo, assets);
             }
         }
     }
@@ -37,14 +38,28 @@ pub fn responsive_signatures_for(
         .collect()
 }
 
+/// Folds a style block in as the emitted rule will spell it. An element's identity is the
+/// rules it will receive, and those rules are localised; folding the captured spelling
+/// instead folds in the capture rig's ephemeral origin, which differs on every run.
+fn append_styles(signature: &mut Signature, styles: &Styles, assets: &BTreeMap<String, String>) {
+    for (key, value) in styles {
+        signature.pair(key, &super::asset_urls::rewrite(value, assets));
+    }
+}
+
 /// Writes the slot marker and which slot it was, so an element with no generated box is not
 /// encoded as the same bytes as one whose box is empty, and two elements decorating different
 /// slots with the same declarations do not collapse onto one class.
-fn append_pseudo(signature: &mut Signature, suffix: &str, pseudo: &Pseudo) {
+fn append_pseudo(
+    signature: &mut Signature,
+    suffix: &str,
+    pseudo: &Pseudo,
+    assets: &BTreeMap<String, String>,
+) {
     signature.slot();
     signature.value(suffix);
     signature.value(&pseudo.content);
-    signature.styles(&pseudo.style);
+    append_styles(signature, &pseudo.style, assets);
 }
 
 pub fn hash(value: &str) -> String {

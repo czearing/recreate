@@ -63,10 +63,14 @@ mod css_pseudo_rule_tests;
 #[cfg(test)]
 #[path = "css_pseudo_signature_tests.rs"]
 mod css_pseudo_signature_tests;
+
 mod css_rule_groups;
 mod css_rule_split;
 mod css_scan;
 mod css_signature;
+#[cfg(test)]
+#[path = "css_signature_origin_tests.rs"]
+mod css_signature_origin_tests;
 mod css_state_helpers;
 mod css_values;
 mod css_visual;

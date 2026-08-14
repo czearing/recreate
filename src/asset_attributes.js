@@ -2,7 +2,47 @@
   const assetCandidateAttributes = new Set([__CANDIDATE_ATTRIBUTES__]);
   const skippedAttributes = new Set([__SKIPPED_ATTRIBUTES__]);
   const assetSelector = '__ASSET_SELECTOR__';
-  const cssUrlPattern = /url\(["']?([^"')]+)["']?\)/g;
+  // What terminates a `url()` value is decided by what opened it. CSS Syntax hides two
+  // productions behind one spelling: `url(` followed by a quote is a function token whose
+  // argument is a string token, ending only at the matching unescaped quote, so a `)`
+  // inside it is content; `url(` followed by anything else is a url token, ending at the
+  // first unescaped whitespace or `)`, so a quote inside it is content. One character
+  // class cannot express two terminators, and widening one class to admit the other's
+  // terminator leaves it able to terminate neither.
+  //
+  // This matters because CSSOM never returns authored text. It serialises a URL as `url(`
+  // plus *serialize a string*, which wraps the value in `"` and escapes exactly `"` and
+  // `\`. A `)` or a `'` in the URL therefore arrives raw inside the quotes, as content.
+  const unescapeCss = value =>
+    value.replace(/\\(?:([0-9a-fA-F]{1,6})[ \t\n]?|([\s\S]))/g, (_, hex, char) =>
+      hex ? String.fromCodePoint(parseInt(hex, 16)) : char);
+  // Every `url()` value in a fragment of CSS text, unescaped. Escapes are resolved because
+  // the emitted CSS this keys against is serialised by the same CSSOM, which resolves them
+  // too; leaving them in would key the map on a spelling the text never contains.
+  const cssUrls = function* (text) {
+    let index = 0;
+    while ((index = text.indexOf('url(', index)) >= 0) {
+      if (index > 0 && /[-\w\\]/.test(text[index - 1])) { index += 4; continue; }
+      let at = index + 4;
+      while (/\s/.test(text[at])) at++;
+      const quote = text[at] === '"' || text[at] === "'" ? text[at] : '';
+      const ends = quote
+        ? char => char === quote
+        : char => char === ')' || /\s/.test(char);
+      let value = '';
+      for (at += quote ? 1 : 0; at < text.length && !ends(text[at]); at++) {
+        if (text[at] === '\\') value += text[at++];
+        value += text[at] ?? '';
+      }
+      // An unterminated value is a parse error. Resynchronising past it would consume the
+      // rest of the sheet, so nothing after it is claimed.
+      if (at >= text.length) return;
+      let close = quote ? at + 1 : at;
+      while (/\s/.test(text[close])) close++;
+      index = close + 1;
+      if (text[close] === ')') yield unescapeCss(value);
+    }
+  };
   const resolveUrl = url => {
     try { return new URL(url, location.href).href; } catch { return url; }
   };
@@ -114,15 +154,15 @@
     for (const node of nodes) {
       for (const style of [node.style, ...Object.values(node.pseudos || {}).map(b => b.style)]) {
         for (const value of Object.values(style || {})) {
-          for (const match of String(value).matchAll(cssUrlPattern)) {
-            assets.add(resolveUrl(match[1]));
+          for (const url of cssUrls(String(value))) {
+            assets.add(resolveUrl(url));
           }
         }
       }
     }
     for (const rule of cssRules) {
-      for (const match of rule.matchAll(cssUrlPattern)) {
-        const url = resolveUrl(match[1]);
+      for (const match of cssUrls(rule)) {
+        const url = resolveUrl(match);
         if (!url.startsWith('data:')) assets.add(url);
       }
     }

@@ -11,7 +11,6 @@
 //! value and a present-but-empty one are different bytes. Callers may then fold whatever they
 //! like without having to reason about whether their payloads can be confused.
 
-use crate::model::Styles;
 use sha2::{Digest, Sha256};
 
 /// Terminates a property name, separating it from the value that follows.
@@ -46,12 +45,6 @@ impl Signature {
     /// Opens a slot that may or may not hold anything.
     pub fn slot(&mut self) {
         self.0.update([SLOT]);
-    }
-
-    pub fn styles(&mut self, styles: &Styles) {
-        for (key, value) in styles {
-            self.pair(key, value);
-        }
     }
 
     pub fn finish(self) -> String {

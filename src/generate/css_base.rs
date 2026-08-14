@@ -63,7 +63,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     {
         eprintln!("css_{prefix}_changed_paths={}", paths.len());
     }
-    let signatures = responsive_signatures_for(specification, changed_paths.as_ref());
+    let signatures = responsive_signatures_for(specification, changed_paths.as_ref(), assets);
     let nodes: HashMap<_, _> = base
         .nodes
         .iter()

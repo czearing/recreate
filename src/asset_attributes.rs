@@ -130,3 +130,7 @@ mod gate_tests;
 #[cfg(test)]
 #[path = "asset_attributes_reach_tests.rs"]
 mod reach_tests;
+
+#[cfg(test)]
+#[path = "asset_attributes_url_tests.rs"]
+mod url_tests;
