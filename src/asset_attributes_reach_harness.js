@@ -3,6 +3,12 @@
 // `document.querySelectorAll` is confined to one node tree and cannot cross a shadow
 // boundary. Modelling anything more would test a selector engine this file did not write;
 // modelling anything less would let both reaches coincide, which is the whole defect.
+//
+// `location.href` and `document.baseURI` are supplied separately because they are separate
+// values: HTML resolves a relative reference against the document base URL, which a
+// `<base href>` overrides, while the location never sees it. They are equal on every page
+// without a `<base>`, so a harness that derived one from the other could not express the
+// input where the distinction is the whole point.
 globalThis.location = { href: '__BASE__' };
 
 const element = spec => {
@@ -26,6 +32,7 @@ const tree = element(__TREE__);
 // document-rooted query has, and the reach it is limited to.
 const lightTree = node => [node, ...node.children.flatMap(lightTree)];
 globalThis.document = {
+  baseURI: '__DOCUMENT_BASE__',
   querySelectorAll: () => lightTree(tree).filter(node => node.assetBearing)
 };
 

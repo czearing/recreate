@@ -17,29 +17,15 @@
 //! never fetched, never keyed, and survives into the emitted CSS as a live address on the
 //! capture rig's ephemeral port — so the recreation repaints only while the rig is up.
 
-use crate::node_eval;
 use serde_json::{Value, json};
 
-const HARNESS: &str = include_str!("asset_attributes_reach_harness.js");
-const BASE: &str = "http://rig.test:59700/page.html";
-const ORIGIN: &str = "http://rig.test:59700/";
+use super::reach_harness::{ORIGIN, walk};
+
+const BASE: &str = super::reach_harness::LOCATION;
 
 /// Everything `recreateAssetUrls` collected from one stylesheet rule, sorted.
 fn collected(rules: Value) -> Vec<String> {
-    let tree = json!({ "tag": "div" });
-    let result = node_eval::json(
-        &HARNESS
-            .replace("__ASSET_ATTRIBUTES__", &super::js_source())
-            .replace("__TREE__", &tree.to_string())
-            .replace("__CSS_RULES__", &rules.to_string())
-            .replace("__BASE__", BASE),
-    );
-    result["assets"]
-        .as_array()
-        .expect("assets")
-        .iter()
-        .map(|value| value.as_str().unwrap_or_default().to_string())
-        .collect()
+    super::reach_harness::assets(&walk(&json!({ "tag": "div" }), &rules, BASE))
 }
 
 /// What one declaration's `url()` collected to.
@@ -176,12 +162,6 @@ fn an_unterminated_value_does_not_cost_the_next_rule() {
 #[test]
 fn collects_a_delimiter_bearing_value_from_an_inline_style() {
     let tree = json!({ "tag": "div", "style": { "background-image": r#"url("chart(1).png")"# } });
-    let result = node_eval::json(
-        &HARNESS
-            .replace("__ASSET_ATTRIBUTES__", &super::js_source())
-            .replace("__TREE__", &tree.to_string())
-            .replace("__CSS_RULES__", "[]")
-            .replace("__BASE__", BASE),
-    );
+    let result = walk(&tree, &json!([]), BASE);
     assert_eq!(result["assets"], json!([url("chart(1).png")]));
 }

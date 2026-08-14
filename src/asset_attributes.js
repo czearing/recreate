@@ -43,8 +43,13 @@
       if (text[close] === ')') yield unescapeCss(value);
     }
   };
+  // `document.baseURI`, not `location.href`. HTML resolves a relative reference against the
+  // document base URL — the first `<base href>`, falling back to the document's own URL —
+  // so the location is a near-synonym that is right only until a page carries a `<base>`,
+  // and then wrong for every relative reference at once. Guarded by `base_tests`, which is
+  // the only fixture here that gives the two operands different values.
   const resolveUrl = url => {
-    try { return new URL(url, location.href).href; } catch { return url; }
+    try { return new URL(url, document.baseURI).href; } catch { return url; }
   };
   // Maps every URL in an attribute value through `map`, preserving descriptors and the
   // authored spacing. Two positions, as the srcset grammar defines them: a URL runs to

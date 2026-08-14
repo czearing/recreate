@@ -12,31 +12,18 @@
 //! properties are the platform's: `matches` answers about an element wherever it lives,
 //! and a document-rooted query cannot cross a shadow boundary.
 
-use crate::node_eval;
 use serde_json::{Value, json};
 
-const HARNESS: &str = include_str!("asset_attributes_reach_harness.js");
-const BASE: &str = "http://rig.test:59700/page.html";
-const ORIGIN: &str = "http://rig.test:59700/";
+use super::reach_harness::{ORIGIN, walk};
+
+const BASE: &str = super::reach_harness::LOCATION;
 
 /// Walks `tree` exactly as the capture does, then reports what was collected and what was
 /// recorded onto each visited element.
 fn capture(tree: Value, css_rules: Value) -> (Vec<String>, Vec<Value>) {
-    let result = node_eval::json(
-        &HARNESS
-            .replace("__ASSET_ATTRIBUTES__", &super::js_source())
-            .replace("__TREE__", &tree.to_string())
-            .replace("__CSS_RULES__", &css_rules.to_string())
-            .replace("__BASE__", BASE),
-    );
-    let assets = result["assets"]
-        .as_array()
-        .expect("assets")
-        .iter()
-        .map(|value| value.as_str().unwrap_or_default().to_string())
-        .collect();
+    let result = walk(&tree, &css_rules, BASE);
     (
-        assets,
+        super::reach_harness::assets(&result),
         result["recorded"].as_array().expect("recorded").clone(),
     )
 }

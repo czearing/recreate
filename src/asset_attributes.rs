@@ -128,6 +128,10 @@ mod tests;
 mod gate_tests;
 
 #[cfg(test)]
+#[path = "asset_attributes_reach_harness.rs"]
+mod reach_harness;
+
+#[cfg(test)]
 #[path = "asset_attributes_reach_tests.rs"]
 mod reach_tests;
 
@@ -138,3 +142,7 @@ mod pseudo_tests;
 #[cfg(test)]
 #[path = "asset_attributes_url_tests.rs"]
 mod url_tests;
+
+#[cfg(test)]
+#[path = "asset_attributes_base_tests.rs"]
+mod base_tests;
