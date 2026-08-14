@@ -54,17 +54,23 @@ pub fn declarations(pseudo: &Pseudo, assets: &BTreeMap<String, String>) -> Strin
         .collect();
     format!(
         "{}{}",
-        content_declaration(&pseudo.content),
+        content_declaration(&pseudo.content, assets),
         super::responsive::output_declarations(&rest, assets)
     )
 }
 
 /// `content` spelled as a declaration, or nothing when the box carries none.
-pub fn content_declaration(content: &str) -> String {
+///
+/// This is the one place that answers what text a box's `content` contributes, so it is also
+/// the one place that localises it. The value arrives resolved against the capture origin —
+/// a `<url>` in a computed value is an absolute URL — and every other declaration reaches the
+/// recreation through the same rewrite. A caller that needs the value for anything the
+/// recreation will read must come through here rather than spell the rule again.
+pub fn content_declaration(content: &str, assets: &BTreeMap<String, String>) -> String {
     if content.is_empty() {
         return String::new();
     }
-    format!("content:{content};")
+    format!("content:{};", super::asset_urls::rewrite(content, assets))
 }
 
 /// Appends the rule for each slot this element actually used, under `class`.

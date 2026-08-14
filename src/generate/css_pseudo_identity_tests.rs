@@ -42,6 +42,15 @@ pub fn span(ordinal: usize) -> Node {
 /// Runs the real minter over a startup layer and returns the class of each node, in order,
 /// together with the stylesheet it wrote.
 pub fn classes_of(nodes: Vec<Node>) -> (Vec<String>, String) {
+    classes_with_assets(nodes, &BTreeMap::new())
+}
+
+/// The same, against a page whose assets were downloaded. Localisation is what the emitted
+/// rule and the class identity are both derived from, so a test of either needs this map.
+pub fn classes_with_assets(
+    nodes: Vec<Node>,
+    assets: &BTreeMap<String, String>,
+) -> (Vec<String>, String) {
     let paths: Vec<String> = nodes.iter().map(|node| node.path.clone()).collect();
     let state = PageState {
         url: "https://example.com".into(),
@@ -59,7 +68,7 @@ pub fn classes_of(nodes: Vec<Node>) -> (Vec<String>, String) {
     let maps = class_maps(
         std::slice::from_ref(&state),
         &BTreeMap::new(),
-        &BTreeMap::new(),
+        assets,
         &mut css,
         &mut emitted,
         None,

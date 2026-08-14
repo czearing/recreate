@@ -132,5 +132,9 @@ mod gate_tests;
 mod reach_tests;
 
 #[cfg(test)]
+#[path = "asset_attributes_pseudo_tests.rs"]
+mod pseudo_tests;
+
+#[cfg(test)]
 #[path = "asset_attributes_url_tests.rs"]
 mod url_tests;

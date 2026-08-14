@@ -50,6 +50,11 @@ fn append_styles(signature: &mut Signature, styles: &Styles, assets: &BTreeMap<S
 /// Writes the slot marker and which slot it was, so an element with no generated box is not
 /// encoded as the same bytes as one whose box is empty, and two elements decorating different
 /// slots with the same declarations do not collapse onto one class.
+///
+/// `content` is folded as the declaration it will become rather than as the captured field,
+/// for the reason [`append_styles`] gives: an identity built from the captured spelling folds
+/// the rig's ephemeral origin. Going through the emitter's own function is what makes the two
+/// unable to drift apart.
 fn append_pseudo(
     signature: &mut Signature,
     suffix: &str,
@@ -58,7 +63,10 @@ fn append_pseudo(
 ) {
     signature.slot();
     signature.value(suffix);
-    signature.value(&pseudo.content);
+    signature.value(&super::css_pseudo::content_declaration(
+        &pseudo.content,
+        assets,
+    ));
     append_styles(signature, &pseudo.style, assets);
 }
 

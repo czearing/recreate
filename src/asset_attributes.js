@@ -149,10 +149,17 @@
   };
   // Every URL the recreation must contain bytes for: one per candidate rather than one
   // per element, plus any `url()` in a captured declaration or stylesheet rule.
+  //
+  // A generated box contributes its style map plus its `content`, which is a declaration the
+  // generator emits from its own field. Enumerating only the map would leave the generator
+  // localising a value this walk never saw, and the two would agree only for as long as the
+  // baseline reduction happens to keep `content` in both places.
   const recreateAssetUrls = (nodes, cssRules) => {
     const assets = new Set(assetUrls);
+    const boxes = node =>
+      Object.values(node.pseudos || {}).map(b => ({ ...b.style, content: b.content }));
     for (const node of nodes) {
-      for (const style of [node.style, ...Object.values(node.pseudos || {}).map(b => b.style)]) {
+      for (const style of [node.style, ...boxes(node)]) {
         for (const value of Object.values(style || {})) {
           for (const url of cssUrls(String(value))) {
             assets.add(resolveUrl(url));

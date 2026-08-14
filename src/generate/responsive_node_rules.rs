@@ -159,8 +159,13 @@ fn append_pseudo_rule(
         &super::super::style_delta::declared(&base_styles),
         &current.style,
     );
+    // `changed` still carries `content`, so a box whose content varies across viewports
+    // declares it twice here — once from the field below and once from the map. Both spell it
+    // the same way, so the duplicate is inert. Filtering `content` out of `changed`, as
+    // `css_pseudo::declarations` does, would leave the field below as the only source: correct
+    // only because that field is now localised.
     let content = if base.is_none_or(|pseudo| pseudo.content != current.content) {
-        super::super::css_pseudo::content_declaration(&current.content)
+        super::super::css_pseudo::content_declaration(&current.content, assets)
     } else {
         String::new()
     };

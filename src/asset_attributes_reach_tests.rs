@@ -41,7 +41,7 @@ fn capture(tree: Value, css_rules: Value) -> (Vec<String>, Vec<Value>) {
     )
 }
 
-fn assets(tree: Value) -> Vec<String> {
+pub(super) fn assets(tree: Value) -> Vec<String> {
     capture(tree, json!([])).0
 }
 
@@ -53,7 +53,7 @@ fn host(shadow: Value, children: Value) -> Value {
     json!({ "tag": "div", "shadow": shadow, "children": children })
 }
 
-fn url(path: &str) -> String {
+pub(super) fn url(path: &str) -> String {
     format!("{ORIGIN}{path}")
 }
 

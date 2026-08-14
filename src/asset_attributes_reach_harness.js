@@ -10,6 +10,7 @@ const element = spec => {
     tagName: (spec.tag || 'div').toUpperCase(),
     attributes: Object.entries(spec.attributes || {}).map(([name, value]) => ({ name, value })),
     style: spec.style || {},
+    pseudos: spec.pseudos || {},
     assetBearing: Boolean(spec.assetBearing),
     children: (spec.children || []).map(element),
     shadowRoot: null
@@ -34,7 +35,11 @@ __ASSET_ATTRIBUTES__
 // shadow children. This is the reach every stage is supposed to share.
 const nodes = [];
 const walk = node => {
-  nodes.push({ attributes: recreateAttributes(node, node.tag), style: node.style });
+  nodes.push({
+    attributes: recreateAttributes(node, node.tag),
+    style: node.style,
+    pseudos: node.pseudos
+  });
   for (const child of node.children) walk(child);
   if (node.shadowRoot) for (const child of node.shadowRoot.children) walk(child);
 };

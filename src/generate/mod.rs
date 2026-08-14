@@ -57,6 +57,8 @@ mod css_nested_definition_tests;
 mod css_paths;
 pub(crate) mod css_pseudo;
 #[cfg(test)]
+mod css_pseudo_asset_tests;
+#[cfg(test)]
 mod css_pseudo_identity_tests;
 #[cfg(test)]
 mod css_pseudo_rule_tests;
