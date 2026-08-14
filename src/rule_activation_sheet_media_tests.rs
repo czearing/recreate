@@ -3,7 +3,9 @@
 //! `<style media>`, `<link media>` and the query trailing an `@import` prelude all condition
 //! every rule in a sheet without ever appearing in `cssRules`. A walk that reads only rule
 //! text therefore records those rules as unconditional, and — because the sentinel probe
-//! runs only for entries carrying a gate — as active by a default nobody decided.
+//! runs only for entries carrying a gate — as active by a default nobody decided. The
+//! import route is exercised in `rule_activation_script::tests::import`, which has to reach
+//! the sheet before it can carry anything.
 
 use super::{recorded as recorded_rules, style, walk};
 use serde_json::{Value, json};

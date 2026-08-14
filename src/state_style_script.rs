@@ -140,27 +140,15 @@ __RULE_ACTIVATION__
     }
   };
   try { collectShadowSheets(document); } catch {}
-  let unreadableSheets = 0;
   const ruleEntries = [];
+  // Every collection a sheet can be *listed* in. A sheet reached through `@import` is in
+  // none of them, and is entered by the walk itself rather than named here.
   const allSheets = [
     ...Array.from(document.styleSheets),
     ...Array.from(document.adoptedStyleSheets || []),
     ...shadowSheets
   ];
-  // A sheet's own condition, keyed by the URL that is also the only identity the text
-  // fallback carries, and removed once the sheet's rules have been collected. What remains
-  // is exactly the set of sheets still owed their rules.
-  const pendingSheets = new Map();
-  for (const sheet of allSheets) {
-    const condition = ((sheet.media && sheet.media.mediaText) || '').trim();
-    if (sheet.href) pendingSheets.set(sheet.href, condition);
-    let rules = null;
-    try { rules = sheet.cssRules; } catch { unreadableSheets++; continue; }
-    try {
-      ruleEntries.push(...sheetRules(rules, condition));
-      pendingSheets.delete(sheet.href);
-    } catch { unreadableSheets++; }
-  }
+  for (const sheet of allSheets) ruleEntries.push(...enterSheet(sheet));
   // The fallback recovers sheets the page could not read, so a sheet already walked above
   // must not be walked again from its text. `recordRule` keys on exact rule text, and a
   // second copy carrying a different condition is a different key, so re-walking would

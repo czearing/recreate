@@ -22,6 +22,9 @@ mod sheet_media;
 #[path = "rule_activation_recovered_sheet_tests.rs"]
 mod recovered_sheet;
 
+#[path = "rule_activation_import_tests.rs"]
+mod import;
+
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 

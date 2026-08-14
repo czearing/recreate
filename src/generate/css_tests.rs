@@ -49,8 +49,8 @@ fn discards_grouping_rules_whose_effect_the_baked_classes_already_carry() {
 }
 
 /// A statement at-rule has no block. Every one of them is position-constrained, and
-/// `@import` names a sheet the capture already walked and baked, so re-emitting it would
-/// refetch the sheet and apply every rule in it a second time.
+/// `@import` names a sheet the capture walks in its own right (asserted where that is decided,
+/// in `rule_activation_script::tests::import`), so re-emitting it refetches and double-applies.
 #[test]
 fn discards_statement_at_rules_that_carry_placement_rather_than_definition() {
     assert!(!global_rule("@import url(\"palette.css\");"));

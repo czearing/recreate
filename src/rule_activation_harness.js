@@ -6,6 +6,9 @@ const CSSRule = { MEDIA_RULE: 4 };
 // children: @media, @supports, @container, @layer and @scope are CSSGroupingRule, while
 // @keyframes is not. The walk descends by that test, so the double has to model it.
 class CSSGroupingRule {}
+// An @import is the one rule whose child is a whole sheet rather than a rule list, and it
+// is deliberately not a CSSGroupingRule — which is why the walk saw it as a leaf.
+class CSSImportRule {}
 const pathOf = element => element.path;
 
 const scene = __SCENE__;
@@ -42,6 +45,20 @@ const declarationText = declarations =>
     .join(' ');
 
 const buildRule = spec => {
+  // `import` names the sheet the rule points at: a sheet spec, or a key into `scene.named`
+  // when two rules must reach the same sheet object, which is the only way to spell a cycle.
+  // `null` is the shape CSSOM requires when a supports() condition blocked the fetch.
+  if ('import' in spec) {
+    return Object.assign(new CSSImportRule(), {
+      cssText: `@import url("${spec.imports || 'imported.css'}");`,
+      styleSheet:
+        spec.import == null
+          ? null
+          : typeof spec.import === 'string'
+            ? namedSheet(spec.import)
+            : buildSheet(spec.import)
+    });
+  }
   // A layer order statement (`@layer a, b;`) is a rule with a prelude and no block, so it
   // exposes neither `selectorText` nor `cssRules`. Modelling it keeps the double honest
   // about the one rule shape that carries ordering and nothing else.
@@ -78,16 +95,30 @@ const buildRule = spec => {
 // A sheet is more than its rule list: its `media` conditions everything inside without
 // appearing inside, and its `href` is the only identity a recovered text carries. A scene
 // may spell a sheet as a bare rule list when it exercises neither.
+//
+// Reads are counted because a walk with no bound on the import graph does not crash — the
+// recursion unwinds into the same catch that guards an unreadable sheet — so its only
+// observable is how much work it did before silently giving up.
+let reads = 0;
 const buildSheet = spec => {
   const plain = Array.isArray(spec);
   return {
     href: plain ? null : spec.href || null,
     media: { mediaText: plain ? '' : spec.media || '' },
     get cssRules() {
+      reads++;
       if (!plain && spec.unreadable) throw new Error('SecurityError');
       return (plain ? spec : spec.rules).map(buildRule);
     }
   };
+};
+
+// Two imports of one address are two independent sheets, so a scene names a sheet only when
+// it needs both rules to reach the *same* object — which is what makes a cycle expressible.
+const namedSheets = new Map();
+const namedSheet = name => {
+  if (!namedSheets.has(name)) namedSheets.set(name, buildSheet(scene.named[name]));
+  return namedSheets.get(name);
 };
 
 // The browser parses a recovered sheet's text; the double looks up what that text parses
@@ -143,4 +174,4 @@ const getComputedStyle = element => ({
 
 __CAPTURE__
 
-console.log(JSON.stringify({ cssRules, stateStyles, parses }));
+console.log(JSON.stringify({ cssRules, stateStyles, parses, reads }));

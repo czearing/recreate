@@ -138,9 +138,9 @@ const GROUPING_AT_RULES: &[&str] = &[
 /// Stated as a rejection rather than a list of names, so a definition at-rule this tool
 /// has never seen survives instead of vanishing. The three rejected shapes are the only
 /// ones re-emission can harm: a style rule and a grouping rule double-apply, and a
-/// statement at-rule carries placement rather than definition — `@charset` must be the
-/// first byte, `@namespace` must precede every style rule, and `@import` names a sheet the
-/// capture already walked and baked, so re-emitting it refetches and double-applies.
+/// statement at-rule carries placement rather than definition — `@charset` must be the first
+/// byte, `@namespace` must precede every style rule, and `@import` names a sheet the walk
+/// itself enters via `CSSImportRule.styleSheet`, so re-emitting it refetches and double-applies.
 pub(super) fn global_rule(rule: &str) -> bool {
     // Layer membership is a wrapper the capture rebuilds around every rule it records, so
     // the decision is about the rule inside it. The wrapper itself stays on the emitted

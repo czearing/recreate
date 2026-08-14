@@ -52,9 +52,18 @@ pub const SOURCE: &str = r#"
   // probe could never reach: a grouping rule has no selector, so its `active` would be the
   // default it was handed rather than anything observed, and a @media nested in a feature
   // query that was false at capture would ship as live.
-  const flattenRules = (rules, media = null, gates = [], carriers = []) => {
+  const flattenRules = (rules, media = null, gates = [], carriers = [], seen = new Set()) => {
     const entries = [];
     for (const rule of Array.from(rules || [])) {
+      // The one rule whose child is a whole sheet rather than a rule list. It is not a
+      // grouping rule, so the test above cannot reach it, and the sheet it names appears in
+      // no collection the caller enumerates: CSSOM builds those from owner *nodes*, and an
+      // imported sheet has an owner *rule*. It is consumed rather than recorded, because
+      // re-emitting `@import` would refetch the sheet and apply every rule in it twice.
+      if (rule instanceof CSSImportRule) {
+        entries.push(...enterSheet(rule.styleSheet, media, gates, carriers, seen));
+        continue;
+      }
       if (!grouping(rule)) {
         entries.push({ rule, media, gates, carriers, active: true });
         continue;
@@ -67,7 +76,8 @@ pub const SOURCE: &str = r#"
           ? (media ? `(${media}) and (${rule.conditionText})` : rule.conditionText)
           : media,
         held || !prelude ? gates : gates.concat(prelude),
-        held && prelude ? carriers.concat(prelude) : carriers
+        held && prelude ? carriers.concat(prelude) : carriers,
+        seen
       ));
     }
     return entries;
@@ -82,9 +92,53 @@ pub const SOURCE: &str = r#"
   // sheet's condition into the same carrier stack a `@media` rule builds, so the condition
   // that was false at capture suppresses its rule and the one that was true survives a
   // resize, from one repair rather than two.
-  const sheetRules = (rules, condition) => condition
-    ? flattenRules(rules, condition, [], [`@media ${condition}`])
-    : flattenRules(rules);
+  //
+  // The inherited state is what makes the seed compose rather than replace: a declaration
+  // applies only when the medium matches on every link along the path the sheet was reached
+  // by, so an imported sheet's condition nests inside its importer's rather than replacing
+  // it. At the top level there is no path yet and the defaults are what a document sheet
+  // gets.
+  const sheetRules = (rules, condition, media = null, gates = [], carriers = [], seen = new Set()) =>
+    condition
+      ? flattenRules(
+          rules,
+          media ? `(${media}) and (${condition})` : condition,
+          gates,
+          carriers.concat(`@media ${condition}`),
+          seen
+        )
+      : flattenRules(rules, media, gates, carriers, seen);
+  // Entering a sheet, however the walk found it. A sheet listed by the document and one
+  // hanging off a `CSSImportRule` differ only in how they were reached, so they arrive here
+  // together and nothing can be true of one and not the other — which is the whole defect
+  // this replaced: `@import` was discarded downstream on the premise that the capture had
+  // already walked the sheet it names, and nothing had.
+  const pendingSheets = new Map();
+  let unreadableSheets = 0;
+  const enterSheet = (sheet, media = null, gates = [], carriers = [], seen = new Set()) => {
+    // A null sheet is an answer, not a failure: a `supports()` condition that does not match
+    // forbids the user agent to fetch the sheet at all. Nothing was loaded, so nothing is
+    // owed. Cycles are bounded on sheet identity rather than address, because each link is
+    // an independent sheet and two imports of one file must both be walked.
+    if (!sheet || seen.has(sheet)) return [];
+    seen.add(sheet);
+    // `CSSImportRule.media` is defined to be the imported sheet's own `media`, so an
+    // import's trailing query arrives here without its prelude ever being parsed.
+    const condition = ((sheet.media && sheet.media.mediaText) || '').trim();
+    // Recorded before the read and cleared after it, keyed by the URL that is also the only
+    // identity the text fallback carries. What remains is exactly the set of sheets still
+    // owed their rules, which is why registering here rather than at the caller is what lets
+    // the fallback recover a cross-origin imported sheet — the shape most `@import`s on the
+    // web have, and the one that carries `@font-face`.
+    if (sheet.href) pendingSheets.set(sheet.href, condition);
+    let rules;
+    try { rules = sheet.cssRules; } catch { unreadableSheets++; return []; }
+    try {
+      const entries = sheetRules(rules, condition, media, gates, carriers, seen);
+      pendingSheets.delete(sheet.href);
+      return entries;
+    } catch { unreadableSheets++; return []; }
+  };
   // A container condition resolves per element, so the answer can differ between elements
   // one selector matches. Reading every match of every rule is unbounded on a large page,
   // so the search stops once an answer is found and after a fixed number of candidates.
