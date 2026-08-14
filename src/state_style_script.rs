@@ -98,10 +98,8 @@ __RULE_ACTIVATION__
       } catch {}
     }
   };
-  // Authored rules are a set, not a cascade log: the caller re-supplies sheet text for
-  // sheets the page could not read, and which ones failed cannot be matched back to that
-  // text, so the same sheet is walked twice. Two identical rule texts cannot disagree, so
-  // recording a text once is the whole of the information either copy carries.
+  // Authored rules are a set, not a cascade log. Two identical rule texts cannot disagree,
+  // so recording a text once is the whole of the information either copy carries.
   const recordRule = text => {
     if (cssRuleKeys.has(text)) return;
     cssRuleKeys.add(text);
@@ -149,16 +147,34 @@ __RULE_ACTIVATION__
     ...Array.from(document.adoptedStyleSheets || []),
     ...shadowSheets
   ];
+  // A sheet's own condition, keyed by the URL that is also the only identity the text
+  // fallback carries, and removed once the sheet's rules have been collected. What remains
+  // is exactly the set of sheets still owed their rules.
+  const pendingSheets = new Map();
   for (const sheet of allSheets) {
+    const condition = ((sheet.media && sheet.media.mediaText) || '').trim();
+    if (sheet.href) pendingSheets.set(sheet.href, condition);
     let rules = null;
     try { rules = sheet.cssRules; } catch { unreadableSheets++; continue; }
-    try { ruleEntries.push(...flattenRules(rules)); } catch { unreadableSheets++; }
+    try {
+      ruleEntries.push(...sheetRules(rules, condition));
+      pendingSheets.delete(sheet.href);
+    } catch { unreadableSheets++; }
   }
-  for (const text of authoredSheetTexts) {
+  // The fallback recovers sheets the page could not read, so a sheet already walked above
+  // must not be walked again from its text. `recordRule` keys on exact rule text, and a
+  // second copy carrying a different condition is a different key, so re-walking would
+  // re-emit every conditioned rule unconditioned beside its correct form and no
+  // deduplication could collapse the pair. Only a sheet with its own URL can be unreadable;
+  // a `<style>` element, a document-written one and a constructed one all serialise under
+  // the document's own address, are absent from this map, and are readable by construction.
+  for (const { text, href } of authoredSheetTexts) {
+    if (!pendingSheets.has(href)) continue;
     try {
       const sheet = new CSSStyleSheet();
       sheet.replaceSync(text);
-      ruleEntries.push(...flattenRules(sheet.cssRules));
+      ruleEntries.push(...sheetRules(sheet.cssRules, pendingSheets.get(href)));
+      pendingSheets.delete(href);
       if (unreadableSheets > 0) unreadableSheets--;
     } catch {}
   }

@@ -1,3 +1,5 @@
+use crate::capture::authored_sheets::AuthoredSheet;
+
 /// Fails before the capture fix: the walk read only `document.styleSheets` and
 /// discarded every sheet whose `cssRules` threw, so a page whose CSS is served from
 /// a CDN, adopted as a constructed sheet, or scoped to a shadow root produced no
@@ -17,8 +19,12 @@ fn the_capture_script_reads_sheets_the_page_cannot_read_itself() {
 /// error, which every unit test still passed.
 #[test]
 fn supplied_stylesheet_text_is_injected_without_rewrapping_the_script() {
-    let source = crate::page_script::source_with_sheets(&[".a{color:red}".into()]);
+    let source = crate::page_script::source_with_sheets(&[AuthoredSheet {
+        text: ".a{color:red}".into(),
+        href: "https://cdn/a.css".into(),
+    }]);
     assert!(source.contains(".a{color:red}"));
+    assert!(source.contains("https://cdn/a.css"));
     assert!(source.trim_start().starts_with("(async () => {"));
     assert!(source.trim_end().ends_with("})()"));
     assert!(!source.contains("__AUTHORED_SHEETS__"));

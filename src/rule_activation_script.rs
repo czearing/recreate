@@ -72,6 +72,19 @@ pub const SOURCE: &str = r#"
     }
     return entries;
   };
+  // A condition can also live on the sheet rather than in it — the `media` attribute of a
+  // `<style>` or `<link>`, or the query trailing an `@import` prelude. It conditions every
+  // rule the sheet holds exactly as an enclosing `@media` block would, but it is not a rule,
+  // so it never appears in `cssRules`. A walk seeded with nothing therefore records those
+  // rules as unconditional, and because no gate reaches them `activateEntries` skips them
+  // and the `active: true` default stands unexamined — a parse decision in a module whose
+  // whole premise is that activity is the browser's to decide. Seeding the walk puts the
+  // sheet's condition into the same carrier stack a `@media` rule builds, so the condition
+  // that was false at capture suppresses its rule and the one that was true survives a
+  // resize, from one repair rather than two.
+  const sheetRules = (rules, condition) => condition
+    ? flattenRules(rules, condition, [], [`@media ${condition}`])
+    : flattenRules(rules);
   // A container condition resolves per element, so the answer can differ between elements
   // one selector matches. Reading every match of every rule is unbounded on a large page,
   // so the search stops once an answer is found and after a fixed number of candidates.

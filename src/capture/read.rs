@@ -7,7 +7,7 @@ pub async fn read_state(cdp: &mut crate::cdp::Cdp, viewport: Viewport) -> Result
     read(
         cdp,
         viewport,
-        &crate::page_script::source_with_sheets(&sheets.texts),
+        &crate::page_script::source_with_sheets(&sheets.sheets),
         "capture script returned non-string",
     )
     .await

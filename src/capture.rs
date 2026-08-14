@@ -16,7 +16,7 @@ mod state;
 mod dynamic;
 
 #[path = "capture/authored_sheets.rs"]
-mod authored_sheets;
+pub(crate) mod authored_sheets;
 
 use state::{browser_cookies, capture_state_without_assets, set_motion};
 

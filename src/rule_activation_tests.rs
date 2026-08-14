@@ -16,6 +16,12 @@ mod definition;
 #[path = "rule_activation_condition_tests.rs"]
 mod condition;
 
+#[path = "rule_activation_sheet_media_tests.rs"]
+mod sheet_media;
+
+#[path = "rule_activation_recovered_sheet_tests.rs"]
+mod recovered_sheet;
+
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 

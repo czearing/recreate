@@ -6,10 +6,10 @@ const CSSRule = { MEDIA_RULE: 4 };
 // children: @media, @supports, @container, @layer and @scope are CSSGroupingRule, while
 // @keyframes is not. The walk descends by that test, so the double has to model it.
 class CSSGroupingRule {}
-const authoredSheetTexts = [];
 const pathOf = element => element.path;
 
 const scene = __SCENE__;
+const authoredSheetTexts = scene.authoredSheets || [];
 
 // A scene may seed computed values an element already reports before any probe runs, which
 // is how a custom property inherited from `:root` reaches `getComputedStyle` in a browser.
@@ -75,6 +75,36 @@ const buildRule = spec => {
   return spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
 };
 
+// A sheet is more than its rule list: its `media` conditions everything inside without
+// appearing inside, and its `href` is the only identity a recovered text carries. A scene
+// may spell a sheet as a bare rule list when it exercises neither.
+const buildSheet = spec => {
+  const plain = Array.isArray(spec);
+  return {
+    href: plain ? null : spec.href || null,
+    media: { mediaText: plain ? '' : spec.media || '' },
+    get cssRules() {
+      if (!plain && spec.unreadable) throw new Error('SecurityError');
+      return (plain ? spec : spec.rules).map(buildRule);
+    }
+  };
+};
+
+// The browser parses a recovered sheet's text; the double looks up what that text parses
+// to, so the walk's own decisions about the fallback are observable without a CSS parser.
+// The count is reported because "did not parse this again" is the whole point of the
+// fallback's guard and leaves no trace in what was recorded.
+let parses = 0;
+class CSSStyleSheet {
+  constructor() {
+    this.cssRules = [];
+  }
+  replaceSync(text) {
+    parses++;
+    this.cssRules = ((scene.parsed || {})[text] || []).map(buildRule);
+  }
+}
+
 // Applies a probe block the way a browser would: the sentinel lands only on elements the
 // selector matches and for which every enclosing condition holds.
 const applyProbeBlock = text => {
@@ -96,7 +126,7 @@ const applyProbeBlock = text => {
 };
 
 const document = {
-  styleSheets: scene.sheets.map(sheet => ({ cssRules: sheet.map(buildRule) })),
+  styleSheets: scene.sheets.map(buildSheet),
   adoptedStyleSheets: [],
   head: {
     appendChild: node => {
@@ -113,4 +143,4 @@ const getComputedStyle = element => ({
 
 __CAPTURE__
 
-console.log(JSON.stringify({ cssRules, stateStyles }));
+console.log(JSON.stringify({ cssRules, stateStyles, parses }));
