@@ -48,8 +48,14 @@
   // so the location is a near-synonym that is right only until a page carries a `<base>`,
   // and then wrong for every relative reference at once. Guarded by `base_tests`, which is
   // the only fixture here that gives the two operands different values.
-  const resolveUrl = url => {
-    try { return new URL(url, document.baseURI).href; } catch { return url; }
+  //
+  // The base is a parameter because it is not always the document's: CSS 2.1 §4.3.4 makes a
+  // stylesheet's own location the base for every reference inside it, and a sheet in a
+  // subdirectory therefore answers differently from the page that linked it. The document
+  // base stays the default, which is the right answer for every reference an element carries
+  // and for an inline sheet, whose location is the document's. Guarded by `sheet_base_tests`.
+  const resolveUrl = (url, base = document.baseURI) => {
+    try { return new URL(url, base).href; } catch { return url; }
   };
   // Maps every URL in an attribute value through `map`, preserving descriptors and the
   // authored spacing. Two positions, as the srcset grammar defines them: a URL runs to
@@ -172,9 +178,9 @@
         }
       }
     }
-    for (const rule of cssRules) {
-      for (const match of cssUrls(rule)) {
-        const url = resolveUrl(match);
+    for (const { text, base } of cssRules) {
+      for (const match of cssUrls(text)) {
+        const url = resolveUrl(match, base);
         if (!url.startsWith('data:')) assets.add(url);
       }
     }

@@ -40,7 +40,7 @@ fn keeps_only_active_conditional_children_as_direct_authored_rules() {
     assert!(!script.contains("__RULE_ACTIVATION__"));
     assert!(script.contains("for (const entry of probes) entry.active = probeMatches(entry)"));
     assert!(script.contains("const carrier = prelude =>"));
-    assert!(script.contains("for (const { rule, media, active, carriers } of entries)"));
+    assert!(script.contains("for (const { rule, media, active, carriers, base } of entries)"));
     assert!(!script.contains("matchMedia(media).matches"));
 }
 

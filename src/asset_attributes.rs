@@ -146,3 +146,9 @@ mod url_tests;
 #[cfg(test)]
 #[path = "asset_attributes_base_tests.rs"]
 mod base_tests;
+
+/// Which base a `url()` inside a stylesheet rule resolves against, which is the sheet's own
+/// location rather than the document's.
+#[cfg(test)]
+#[path = "asset_attributes_sheet_base_tests.rs"]
+mod sheet_base_tests;

@@ -30,7 +30,10 @@ fn collected(rules: Value) -> Vec<String> {
 
 /// What one declaration's `url()` collected to.
 fn from_rule(value: &str) -> Vec<String> {
-    collected(json!([format!("#a {{ background-image: {value}; }}")]))
+    collected(json!([super::reach_harness::rule(
+        format!("#a {{ background-image: {value}; }}"),
+        BASE
+    )]))
 }
 
 fn url(path: &str) -> String {
@@ -138,9 +141,10 @@ fn collects_nothing_from_a_value_without_a_url_function() {
 #[test]
 fn collects_nothing_after_an_unterminated_value() {
     assert!(
-        collected(json!([
-            r#"#a { background-image: url("open.png, url(after.png)"#
-        ]))
+        collected(json!([super::reach_harness::rule(
+            r#"#a { background-image: url("open.png, url(after.png)"#,
+            BASE
+        )]))
         .is_empty()
     );
 }
@@ -150,8 +154,8 @@ fn collects_nothing_after_an_unterminated_value() {
 fn an_unterminated_value_does_not_cost_the_next_rule() {
     assert_eq!(
         collected(json!([
-            r#"#a { background-image: url("open.png"#,
-            r#"#b { background-image: url("next.png"); }"#
+            super::reach_harness::rule(r#"#a { background-image: url("open.png"#, BASE),
+            super::reach_harness::rule(r#"#b { background-image: url("next.png"); }"#, BASE)
         ])),
         vec![url("next.png")]
     );

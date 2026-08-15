@@ -5,10 +5,7 @@
 //! document inherits nothing from its host, so `currentcolor` there resolves against
 //! `color`'s initial value. Whatever binds it, the artifact has to show the binding.
 
-use super::relocation_binding::rules;
 use super::source_svg_assets::document;
-use crate::model::{Node, PageState, Styles};
-use std::collections::BTreeMap;
 
 const SVG: &str = r#"<svg className={"r_icon"}><path className={"r_path"} /></svg>"#;
 

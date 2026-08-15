@@ -149,11 +149,18 @@ fn every_candidate_in_a_descriptor_list_is_resolved_against_the_document_base() 
 /// reproduces the authored spelling rather than a resolved one, so a relative `url()`
 /// arrives here still relative and is resolved by this same line. Measured, not assumed:
 /// a capture of an inline sheet holding `url(basetoken2.png)` recorded exactly that text.
+///
+/// The sheet here is the page's own inline `<style>`, whose location is the document's, so
+/// its recorded base is the document base. `sheet_base_tests` covers the sheet whose
+/// location is somewhere else.
 #[test]
 fn a_relative_url_in_a_recorded_rule_resolves_against_the_document_base() {
     let (assets, _) = walked(
         json!({}),
-        json!([r#".a { background-image: url("basetoken2.png"); }"#]),
+        json!([{
+            "text": r#".a { background-image: url("basetoken2.png"); }"#,
+            "base": BASED
+        }]),
         BASED,
     );
     assert_eq!(assets, vec!["http://rig.test:59700/nested/basetoken2.png"]);

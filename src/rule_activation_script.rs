@@ -108,6 +108,20 @@ pub const SOURCE: &str = r#"
           seen
         )
       : flattenRules(rules, media, gates, carriers, seen);
+  // The base every relative reference in a sheet resolves against. CSS 2.1 §4.3.4: "For CSS
+  // style sheets, the base URI is that of the style sheet, not that of the source document."
+  // A sheet with no location — an inline `<style>`, a document-written one, a constructed one
+  // — reports a null `href` and its location *is* the document's, so the document base is the
+  // default rather than a case beside it.
+  const sheetBase = sheet => (sheet && sheet.href) || document.baseURI;
+  // Stamped on the way out of a sheet rather than threaded on the way in, because the base is
+  // a property of the sheet and not of the walk's position inside it. An entry that already
+  // carries one came from a sheet nested deeper — `@import` resolves innermost-first — and the
+  // sheet that produced a rule is the only one entitled to say where its references point.
+  const stampBase = (entries, base) => {
+    for (const entry of entries) if (!entry.base) entry.base = base;
+    return entries;
+  };
   // Entering a sheet, however the walk found it. A sheet listed by the document and one
   // hanging off a `CSSImportRule` differ only in how they were reached, so they arrive here
   // together and nothing can be true of one and not the other — which is the whole defect
@@ -136,7 +150,7 @@ pub const SOURCE: &str = r#"
     try {
       const entries = sheetRules(rules, condition, media, gates, carriers, seen);
       pendingSheets.delete(sheet.href);
-      return entries;
+      return stampBase(entries, sheetBase(sheet));
     } catch { unreadableSheets++; return []; }
   };
   // A container condition resolves per element, so the answer can differ between elements

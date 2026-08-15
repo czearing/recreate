@@ -157,6 +157,8 @@ const applyProbeBlock = text => {
 };
 
 const document = {
+  // A sheet with no location inherits this, which is what CSSOM's null `href` means.
+  baseURI: 'http://harness.test/index.html',
   styleSheets: scene.sheets.map(buildSheet),
   adoptedStyleSheets: [],
   head: {

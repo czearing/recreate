@@ -139,7 +139,10 @@ fn collects_every_url_it_rewrote_onto_a_walked_element() {
             ]),
             json!([image("light.png")]),
         ),
-        json!(["body { background: url(sheet.png) }"]),
+        json!([super::reach_harness::rule(
+            "body { background: url(sheet.png) }",
+            BASE
+        )]),
     );
     let rewritten: Vec<String> = recorded
         .iter()

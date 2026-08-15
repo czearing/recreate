@@ -242,7 +242,7 @@ __ASSET_CAPTURE__
     animations,
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,
-    css_rules: cssRules,
+    css_rules: cssRuleTexts,
     asset_urls: Array.from(assets),
     asset_data: assetData
   });

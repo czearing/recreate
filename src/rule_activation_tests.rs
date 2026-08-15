@@ -25,6 +25,9 @@ mod recovered_sheet;
 #[path = "rule_activation_import_tests.rs"]
 mod import;
 
+#[path = "rule_activation_base_tests.rs"]
+mod base;
+
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 
@@ -58,12 +61,14 @@ fn style(selector: &str, name: &str, value: &str) -> Value {
     json!({ "selectorText": selector, "declarations": { name: value } })
 }
 
+/// The rule texts the walk recorded. A record also carries the base of the sheet that held
+/// it, which `base` asserts separately.
 fn recorded(result: &Value) -> Vec<String> {
     result["cssRules"]
         .as_array()
         .unwrap()
         .iter()
-        .map(|rule| rule.as_str().unwrap().to_string())
+        .map(|rule| rule["text"].as_str().unwrap().to_string())
         .collect()
 }
 

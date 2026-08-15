@@ -99,22 +99,25 @@ __RULE_ACTIVATION__
     }
   };
   // Authored rules are a set, not a cascade log. Two identical rule texts cannot disagree,
-  // so recording a text once is the whole of the information either copy carries.
-  const recordRule = text => {
-    if (cssRuleKeys.has(text)) return;
-    cssRuleKeys.add(text);
-    cssRules.push(text);
+  // so recording a text once is the whole of the information either copy carries — except
+  // where they came from sheets in different directories, which makes their relative
+  // references name different files. The base is therefore part of the record's identity.
+  const recordRule = (text, base) => {
+    const key = `${base}\u0000${text}`;
+    if (cssRuleKeys.has(key)) return;
+    cssRuleKeys.add(key);
+    cssRules.push({ text, base });
   };
   const emitEntries = entries => {
-    for (const { rule, media, active, carriers } of entries) {
+    for (const { rule, media, active, carriers, base } of entries) {
       if (active) {
         // Rebuilding the carrier stack before recording is also what keys the recorded set:
         // two identical declarations in different layers are different declarations, and
         // deduplicating their bare text would collapse them past reconstruction.
-        recordRule(carriers.reduceRight(
-          (inner, prelude) => `${prelude}{${inner}}`,
-          rule.cssText
-        ));
+        recordRule(
+          carriers.reduceRight((inner, prelude) => `${prelude}{${inner}}`, rule.cssText),
+          base
+        );
       }
       // A state rule is recorded whatever its condition, because the state it describes is
       // entered later, under conditions that need not be the ones in force now.
@@ -161,7 +164,7 @@ __RULE_ACTIVATION__
     try {
       const sheet = new CSSStyleSheet();
       sheet.replaceSync(text);
-      ruleEntries.push(...sheetRules(sheet.cssRules, pendingSheets.get(href)));
+      ruleEntries.push(...stampBase(sheetRules(sheet.cssRules, pendingSheets.get(href)), href));
       pendingSheets.delete(href);
       if (unreadableSheets > 0) unreadableSheets--;
     } catch {}
@@ -169,6 +172,9 @@ __RULE_ACTIVATION__
   // Activation is resolved for every collected rule at once, so the whole walk costs one
   // style recalculation rather than one per conditional rule.
   emitEntries(activateEntries(ruleEntries));
+  // The artifact records rule text and nothing else, so two sheets that authored the same
+  // rule contribute one line to it however differently their references resolve.
+  const cssRuleTexts = [...new Set(cssRules.map(rule => rule.text))];
 "#;
 
 #[cfg(test)]

@@ -58,9 +58,7 @@ pub fn rules(states: &[(&PageState, &BTreeMap<String, String>)], css: &str) -> S
             );
             let declarations = super::css_identifiers::implicit_references(&read)
                 .iter()
-                .filter(|property| {
-                    super::css_identifiers::declared_value(body, property).is_none()
-                })
+                .filter(|property| super::css_identifiers::declared_value(body, property).is_none())
                 .filter_map(|property| {
                     Some(format!("{property}:{};", resolved(&nodes, node, property)?))
                 })
@@ -84,7 +82,10 @@ fn resolved(nodes: &HashMap<&str, &Node>, node: &Node, property: &str) -> Option
         if let Some(value) = node.style.get(property) {
             return Some(value.clone());
         }
-        current = node.parent.as_deref().and_then(|path| nodes.get(path).copied());
+        current = node
+            .parent
+            .as_deref()
+            .and_then(|path| nodes.get(path).copied());
     }
     None
 }

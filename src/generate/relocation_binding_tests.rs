@@ -154,7 +154,8 @@ fn binds_the_color_a_presentation_attribute_resolves_against() {
 #[test]
 fn binds_nothing_for_an_attribute_naming_a_literal() {
     let mut rect = node("body>span>svg>rect", Some("body>span>svg"), &[]);
-    rect.attributes.insert("fill".into(), "rgb(0, 128, 0)".into());
+    rect.attributes
+        .insert("fill".into(), "rgb(0, 128, 0)".into());
     let state = PageState {
         nodes: vec![
             node("body", None, &[("color", "rgb(220, 20, 60)")]),

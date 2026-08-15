@@ -31,6 +31,14 @@ pub(super) fn walk(tree: &Value, css_rules: &Value, base: &str) -> Value {
     )
 }
 
+/// A recorded stylesheet rule as the capture carries it: the text, and the location of the
+/// sheet that held it. CSS 2.1 §4.3.4 makes that location the base for every relative
+/// reference inside the rule, so it travels with the text rather than being re-derived.
+/// A page's own inline `<style>` has no location of its own and carries the document base.
+pub(super) fn rule(text: impl std::fmt::Display, base: &str) -> Value {
+    serde_json::json!({ "text": text.to_string(), "base": base })
+}
+
 /// The URLs the walk queued for download.
 pub(super) fn assets(result: &Value) -> Vec<String> {
     result["assets"]
