@@ -142,6 +142,13 @@ mod project_mount;
 mod project_test_support;
 #[cfg(test)]
 mod project_text_entry_support;
+mod relocation_binding;
+#[cfg(test)]
+#[path = "relocation_binding_tests.rs"]
+mod relocation_binding_tests;
+#[cfg(test)]
+#[path = "relocated_current_color_tests.rs"]
+mod relocated_current_color_tests;
 mod responsive;
 mod responsive_attributes;
 mod responsive_geometry;

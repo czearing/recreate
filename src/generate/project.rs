@@ -101,10 +101,26 @@ pub async fn write_project(
         &interaction_state_classes,
         &assets,
     );
+    let relocation_css = format!(
+        "{}{}",
+        styles.css,
+        super::relocation_binding::rules(
+            &std::iter::once((&specification.states[0], &styles.classes))
+                .chain(
+                    specification
+                        .interactions
+                        .iter()
+                        .filter_map(|interaction| interaction.states.first())
+                        .zip(&styles.interaction_classes)
+                )
+                .collect::<Vec<_>>(),
+            &styles.css,
+        )
+    );
     super::source_svg_assets::extract(
         &mut [&mut app_source, &mut state_source],
         &root.join("public").join("assets"),
-        &styles.css,
+        &relocation_css,
     )?;
     if let Some(block_source) =
         source_dedupe::extract_repeated_blocks(&mut [&mut app_source, &mut state_source])

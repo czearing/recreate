@@ -24,6 +24,23 @@ pub(super) fn references(text: &str) -> BTreeSet<String> {
     references
 }
 
+/// The inherited properties `text` reads by keyword rather than by function.
+///
+/// `currentcolor` is `var()`'s counterpart in the other syntax: a value naming the used
+/// value of another property, resolved wherever it finally renders rather than where it is
+/// written. A declaration reading it is half a pair, so the property it names is not
+/// spare however well an ancestor duplicates it.
+///
+/// The text is lowercased because `css_rules` reports the keyword lowercased while an
+/// attribute keeps whatever the author spelled.
+pub(super) fn implicit_references(text: &str) -> BTreeSet<String> {
+    let mut references = BTreeSet::new();
+    if mentions(&text.to_ascii_lowercase(), "currentcolor") {
+        references.insert("color".to_string());
+    }
+    references
+}
+
 /// The value `text` declares for the custom property `name`, if it declares one.
 ///
 /// The value is returned as written, empty included, because whether an empty value counts
