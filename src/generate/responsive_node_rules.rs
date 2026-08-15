@@ -74,6 +74,10 @@ pub(super) fn append_node_rules_indexed(
         changed.remove("height");
     }
     super::super::inherited_styles::normalize_indexed(&mut changed, node, parent, css_rules);
+    super::super::style_delta::remove_restatements(
+        &mut changed,
+        &normalized_base(base, parent, css_rules),
+    );
     super::super::responsive_geometry::normalize(
         &mut changed,
         node,
@@ -93,6 +97,20 @@ pub(super) fn append_node_rules_indexed(
         append_pseudo_rule(class, suffix, base, current, assets, &mut rules);
     }
     rules
+}
+
+/// The base viewport's rule as the same normalizers would write it, which is what a band's
+/// declarations have to be a difference from. Only the viewport-independent normalizers belong
+/// here: a geometry normalizer already answers a question about this band alone.
+fn normalized_base(
+    base: &Node,
+    parent: Option<&Node>,
+    css_rules: &super::super::authored_css::Index<'_>,
+) -> Styles {
+    let mut styles = base.style.clone();
+    super::super::authored_css::normalize_indexed(&mut styles, base, css_rules);
+    super::super::inherited_styles::normalize_indexed(&mut styles, base, parent, css_rules);
+    styles
 }
 
 fn normalize_line_clamp(

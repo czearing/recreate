@@ -130,3 +130,88 @@ fn never_freezes_a_sampled_pixel_width_on_a_shrunk_flex_item() {
     assert!(!css.contains("max-width:170.65625px"), "{css}");
     assert!(!css.contains("width:170.65625px"), "{css}");
 }
+
+/// A viewport band carries a delta. An inherited paint the author declared once, whose value is
+/// identical at the base viewport and at this one, did not change, so restating it inside every
+/// band is pure duplication of a rule the baseline stylesheet already emits. The normalisation
+/// that rewrites an inherited paint into its authored spelling must not introduce a property the
+/// delta never asked about.
+#[test]
+fn omits_an_unchanged_authored_inherited_paint_from_a_band() {
+    let mut icon = heading("16px", 48.0);
+    icon.tag = "svg".into();
+    icon.attributes
+        .insert("class".into(), "controltoken".into());
+    icon.style = Styles::from([("fill".into(), "rgb(30, 160, 90)".into())]);
+    let mut parent = heading("16px", 300.0);
+    parent.tag = "div".into();
+    parent.style = Styles::new();
+    let css = append_node_rules(
+        &icon.clone(),
+        &icon,
+        Some(&parent),
+        (
+            &Viewport {
+                width: 1920,
+                height: 1080,
+                dpr: 1.0,
+            },
+            &Viewport {
+                width: 768,
+                height: 1024,
+                dpr: 1.0,
+            },
+        ),
+        "icon",
+        &Default::default(),
+        &[".controltoken{fill:rgb(30, 160, 90);}".into()],
+        false,
+        false,
+    );
+    assert!(
+        !css.contains("fill"),
+        "unchanged paint restated in a band: {css}"
+    );
+}
+
+/// The inverse. A paint that really does change across viewports still has to reach the band,
+/// so the omission above is a delta rule and not a blanket suppression of `fill`.
+#[test]
+fn keeps_an_authored_inherited_paint_that_changes_across_viewports() {
+    let mut base = heading("16px", 48.0);
+    base.tag = "svg".into();
+    base.attributes
+        .insert("class".into(), "controltoken".into());
+    base.style = Styles::from([("fill".into(), "rgb(30, 160, 90)".into())]);
+    let mut narrow = base.clone();
+    narrow.style = Styles::from([("fill".into(), "rgb(200, 10, 10)".into())]);
+    let mut parent = heading("16px", 300.0);
+    parent.tag = "div".into();
+    parent.style = Styles::new();
+    let css = append_node_rules(
+        &base,
+        &narrow,
+        Some(&parent),
+        (
+            &Viewport {
+                width: 1920,
+                height: 1080,
+                dpr: 1.0,
+            },
+            &Viewport {
+                width: 768,
+                height: 1024,
+                dpr: 1.0,
+            },
+        ),
+        "icon",
+        &Default::default(),
+        &["@media(max-width:800px){.controltoken{fill:rgb(200, 10, 10);}}".into()],
+        false,
+        false,
+    );
+    assert!(
+        css.contains("fill:rgb(200, 10, 10)"),
+        "changed paint lost from a band: {css}"
+    );
+}

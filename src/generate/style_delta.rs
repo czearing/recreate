@@ -64,6 +64,19 @@ pub(in crate::generate) fn changed_styles(base: &Styles, current: &Styles) -> St
         .collect()
 }
 
+/// The declarations `changed` still makes that `base` already makes in the same words.
+///
+/// `changed_styles` compares the two maps as the capture recorded them, but a normalizer
+/// runs afterwards and rewrites a value into the spelling the author used - and, where the
+/// author declared a property the capture never had to record as a difference, introduces
+/// one. Both sides of the comparison would be rewritten identically, so the result is a
+/// property that did not move restated inside every band. Comparing once more against the
+/// base put through the same normalizers is what keeps the difference a difference in
+/// spelling as well as in value.
+pub(in crate::generate) fn remove_restatements(changed: &mut Styles, base: &Styles) {
+    changed.retain(|key, value| base.get(key) != Some(&*value));
+}
+
 /// Applied after every normalizer, so that no later stage can substitute the value the
 /// reset exists to withdraw - the same reason sample removal runs last on the base rule.
 pub(in crate::generate) fn append_reversions(
