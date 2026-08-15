@@ -21,6 +21,7 @@ mod compare_dom;
 mod compare_node;
 #[cfg(test)]
 mod compare_tests;
+mod css_url_text;
 mod first_paint;
 mod first_paint_assets;
 mod generate;

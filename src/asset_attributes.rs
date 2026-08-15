@@ -108,7 +108,7 @@ pub fn js_source() -> String {
     };
     format!(
         "{}{}",
-        crate::surface_content::js_source(),
+        crate::css_url_text::js_source().to_string() + &crate::surface_content::js_source(),
         JS_SOURCE
             .replace("__URL_ATTRIBUTES__", &quoted(&URL_ATTRIBUTES))
             .replace("__CANDIDATE_ATTRIBUTES__", &quoted(&CANDIDATE_ATTRIBUTES))
@@ -134,6 +134,10 @@ mod reach_harness;
 #[cfg(test)]
 #[path = "asset_attributes_reach_tests.rs"]
 mod reach_tests;
+
+#[cfg(test)]
+#[path = "asset_attributes_rule_text_tests.rs"]
+mod rule_text_tests;
 
 #[cfg(test)]
 #[path = "asset_attributes_pseudo_tests.rs"]

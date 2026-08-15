@@ -172,9 +172,6 @@ __RULE_ACTIVATION__
   // Activation is resolved for every collected rule at once, so the whole walk costs one
   // style recalculation rather than one per conditional rule.
   emitEntries(activateEntries(ruleEntries));
-  // The artifact records rule text and nothing else, so two sheets that authored the same
-  // rule contribute one line to it however differently their references resolve.
-  const cssRuleTexts = [...new Set(cssRules.map(rule => rule.text))];
 "#;
 
 #[cfg(test)]

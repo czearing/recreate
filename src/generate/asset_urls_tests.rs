@@ -125,6 +125,40 @@ fn rewrites_a_font_the_stylesheet_wrote_as_a_root_relative_path() {
     );
 }
 
+/// A sheet that wrote both references relatively now hands the emitter two absolute URLs in
+/// a prefix relation, which only resolution could have produced. The text is exactly what
+/// `rule_text_tests::resolves_two_references_whose_absolute_forms_are_in_a_prefix_relation`
+/// asserts the capture writes, so maximal munch is proved on the new path, not assumed.
+#[test]
+fn rewrites_two_references_a_sheet_wrote_as_relative() {
+    let assets = BTreeMap::from([
+        (
+            "http://rig.test:59700/s/f.woff".to_string(),
+            "/assets/aaaa.woff".to_string(),
+        ),
+        (
+            "http://rig.test:59700/s/f.woff2".to_string(),
+            "/assets/bbbb.woff2".to_string(),
+        ),
+    ]);
+    assert_eq!(
+        rewrite(
+            r#"@font-face{src:url("/s/f.woff2"),url("/s/f.woff")}"#,
+            &assets,
+        ),
+        r#"@font-face{src:url("/assets/bbbb.woff2"),url("/assets/aaaa.woff")}"#
+    );
+}
+
+/// A reference whose bytes the capture never obtained has no local path to point at, so it
+/// must survive untouched. Rewriting it to anything would name a file the project does not
+/// serve while looking repaired.
+#[test]
+fn leaves_a_reference_the_capture_never_collected() {
+    let text = r#"@font-face{src:url("/absent.woff2")}"#;
+    assert_eq!(rewrite(text, &assets()), text);
+}
+
 /// One owner means one behaviour: the spellings the rule rewriter always handled must now
 /// reach the baked path too, which the two unsorted folds never did.
 #[test]

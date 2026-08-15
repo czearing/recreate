@@ -2,46 +2,30 @@
   const assetCandidateAttributes = new Set([__CANDIDATE_ATTRIBUTES__]);
   const skippedAttributes = new Set([__SKIPPED_ATTRIBUTES__]);
   const assetSelector = '__ASSET_SELECTOR__';
-  // What terminates a `url()` value is decided by what opened it. CSS Syntax hides two
-  // productions behind one spelling: `url(` followed by a quote is a function token whose
-  // argument is a string token, ending only at the matching unescaped quote, so a `)`
-  // inside it is content; `url(` followed by anything else is a url token, ending at the
-  // first unescaped whitespace or `)`, so a quote inside it is content. One character
-  // class cannot express two terminators, and widening one class to admit the other's
-  // terminator leaves it able to terminate neither.
+  // A recorded rule as the artifact carries it: the text, with every reference resolved
+  // against the sheet that held it and then written in its shortest unambiguous spelling.
+  // The asset map is keyed by that same expression, so the emitter's substitution matches by
+  // construction rather than by recognising a spelling. A relative path is not a spelling of
+  // a URL — it is a URL plus a base — and the base is known here and nowhere later.
+  const resolveCssRuleUrls = ({ text, base }) =>
+    mapCssUrls(text, url => shortestUrlSpelling(resolveUrl(url, base)));
+  // A reference to the document's own origin, written origin-relative. The capture rig's
+  // ephemeral port is not a fact about the page: baking it in would make two runs of one
+  // capture disagree, and would point any reference the capture could not download at a
+  // server that stops existing when the run ends. Origin-relative is what the recreation
+  // serves those bytes from anyway. A cross-origin reference keeps its absolute form, the
+  // only spelling that names it.
   //
-  // This matters because CSSOM never returns authored text. It serialises a URL as `url(`
-  // plus *serialize a string*, which wraps the value in `"` and escapes exactly `"` and
-  // `\`. A `)` or a `'` in the URL therefore arrives raw inside the quotes, as content.
-  const unescapeCss = value =>
-    value.replace(/\\(?:([0-9a-fA-F]{1,6})[ \t\n]?|([\s\S]))/g, (_, hex, char) =>
-      hex ? String.fromCodePoint(parseInt(hex, 16)) : char);
-  // Every `url()` value in a fragment of CSS text, unescaped. Escapes are resolved because
-  // the emitted CSS this keys against is serialised by the same CSSOM, which resolves them
-  // too; leaving them in would key the map on a spelling the text never contains.
-  const cssUrls = function* (text) {
-    let index = 0;
-    while ((index = text.indexOf('url(', index)) >= 0) {
-      if (index > 0 && /[-\w\\]/.test(text[index - 1])) { index += 4; continue; }
-      let at = index + 4;
-      while (/\s/.test(text[at])) at++;
-      const quote = text[at] === '"' || text[at] === "'" ? text[at] : '';
-      const ends = quote
-        ? char => char === quote
-        : char => char === ')' || /\s/.test(char);
-      let value = '';
-      for (at += quote ? 1 : 0; at < text.length && !ends(text[at]); at++) {
-        if (text[at] === '\\') value += text[at++];
-        value += text[at] ?? '';
-      }
-      // An unterminated value is a parse error. Resynchronising past it would consume the
-      // rest of the sheet, so nothing after it is claimed.
-      if (at >= text.length) return;
-      let close = quote ? at + 1 : at;
-      while (/\s/.test(text[close])) close++;
-      index = close + 1;
-      if (text[close] === ')') yield unescapeCss(value);
-    }
+  // Nothing is lost by shortening: an origin-relative path is base-independent, so resolving
+  // the result against the document base recovers the absolute URL exactly, which is how the
+  // asset set is read back out of these strings.
+  const shortestUrlSpelling = url => {
+    try {
+      const resolved = new URL(url);
+      return resolved.origin === new URL(document.baseURI).origin
+        ? resolved.href.slice(resolved.origin.length)
+        : resolved.href;
+    } catch { return url; }
   };
   // `document.baseURI`, not `location.href`. HTML resolves a relative reference against the
   // document base URL — the first `<base href>`, falling back to the document's own URL —
@@ -161,6 +145,11 @@
   // Every URL the recreation must contain bytes for: one per candidate rather than one
   // per element, plus any `url()` in a captured declaration or stylesheet rule.
   //
+  // The rule texts arrive resolved and shortened, so this reads the very strings the
+  // artifact will carry and resolves them back — origin-relative is base-independent, so
+  // the absolute URL comes back exactly. Resolving against a different base here would let
+  // the set and the text drift apart the moment one of the two stopped doing it.
+  //
   // A generated box contributes its style map plus its `content`, which is a declaration the
   // generator emits from its own field. Enumerating only the map would leave the generator
   // localising a value this walk never saw, and the two would agree only for as long as the
@@ -178,11 +167,20 @@
         }
       }
     }
-    for (const { text, base } of cssRules) {
+    for (const text of cssRules) {
       for (const match of cssUrls(text)) {
-        const url = resolveUrl(match, base);
-        if (!url.startsWith('data:')) assets.add(url);
+        if (!match.startsWith('data:')) assets.add(resolveUrl(match));
       }
     }
     return assets;
+  };
+  // Both of the artifact's views of the page's stylesheets, from one expression. The rule
+  // texts carry every reference resolved against the sheet that held it — the only stage
+  // where that sheet's identity still exists — and the asset set is read back out of those
+  // very strings, so what the recreation fetches and what it references cannot disagree.
+  // Two sheets that authored the same rule contribute one line only when their references
+  // genuinely resolve to the same bytes.
+  const recreateCssAssets = (nodes, cssRules) => {
+    const texts = [...new Set(cssRules.map(resolveCssRuleUrls))];
+    return { texts, urls: recreateAssetUrls(nodes, texts) };
   };

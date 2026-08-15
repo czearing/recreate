@@ -225,7 +225,7 @@ __ASSET_ATTRIBUTES__
   ].filter(meaningfulTransient);
 __STATE_STYLE_CAPTURE__
 __ATTRIBUTE_SEQUENCE_CAPTURE__
-  const assets = recreateAssetUrls(nodes, cssRules);
+  const { texts: cssRuleTexts, urls: assets } = recreateCssAssets(nodes, cssRules);
 __ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,

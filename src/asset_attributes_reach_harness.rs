@@ -39,6 +39,17 @@ pub(super) fn rule(text: impl std::fmt::Display, base: &str) -> Value {
     serde_json::json!({ "text": text.to_string(), "base": base })
 }
 
+/// The rule texts as the artifact will carry them, with every reference resolved against the
+/// sheet that held it.
+pub(super) fn rules(result: &Value) -> Vec<String> {
+    result["rules"]
+        .as_array()
+        .expect("rules")
+        .iter()
+        .map(|value| value.as_str().unwrap_or_default().to_string())
+        .collect()
+}
+
 /// The URLs the walk queued for download.
 pub(super) fn assets(result: &Value) -> Vec<String> {
     result["assets"]
