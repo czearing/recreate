@@ -32,7 +32,15 @@ class Element {
     this.modal = false;
     this.parent = null;
   }
-  matches(selector){ return selector === ':modal' && this.modal; }
+  matches(selector){
+    if (selector === ':modal') return this.modal;
+    return selector.split(',').some(part => {
+      const trimmed = part.trim();
+      if (trimmed === '*') return true;
+      if (trimmed.startsWith('#')) return this.attributes.get('id') === trimmed.slice(1);
+      return trimmed.toUpperCase() === this.tagName;
+    });
+  }
   add(child){ child.parent = this; this.children.push(child); return child; }
   getAttribute(name){ return this.attributes.has(name) ? this.attributes.get(name) : null; }
   setAttribute(name, value){
@@ -66,17 +74,32 @@ globalThis.marked = marked;
 globalThis.plain = plain;
 globalThis.body = body;
 head.appendChild = child => { head.add(child); globalThis.sheets += 1; };
+// The selectors a document authored, as the only thing the scan reads from a sheet. Tests set
+// `globalThis.authoredSelectors` to a list of selector texts, which is what `cssRules` yields once the
+// walk has descended through whatever conditions they were written inside.
+globalThis.authoredSelectors = [];
 globalThis.document = {
   documentElement,
   head,
+  get styleSheets(){
+    return [{ get cssRules(){ return globalThis.authoredSelectors.map(selectorText => ({ selectorText })); } }];
+  },
+  adoptedStyleSheets: [],
   createElement: tag => {
     const made = new Element(tag.toUpperCase());
     made.remove = () => { head.children = head.children.filter(item => item !== made); };
     return made;
   }
 };
+// CSSOM answers a lookup for a pseudo-element the engine does not support with an empty
+// declaration block rather than an error, and a vendor-prefixed widget internal the engine
+// keeps inside its own shadow tree answers the same way. Modelled because the difference
+// between "described and identical to its baseline" and "not described at all" is the whole of
+// what a reader can be told about a rule that did not survive.
+globalThis.unsupported = new Set();
 globalThis.getComputedStyle = (element, pseudo) => {
   const generated = globalThis.content.get(element.name + (pseudo || '')) || 'none';
+  const described = !pseudo || !globalThis.unsupported.has(pseudo);
   let value;
   if (pseudo) {
     if (element.reverted) throw new Error('pseudo read while the element was reverted');
@@ -92,13 +115,14 @@ globalThis.getComputedStyle = (element, pseudo) => {
   }
   const enumerated = pseudo ? globalThis.pseudoMeasured : null;
   return {
-    content: generated,
+    content: described ? generated : '',
     *[Symbol.iterator](){
       if (enumerated) enumerated.push(element.name + pseudo);
+      if (!described) return;
       yield 'color';
       yield '--brand';
     },
-    getPropertyValue: property => property + '=' + value
+    getPropertyValue: property => (described ? property + '=' + value : '')
   };
 };
 const read = probe => {

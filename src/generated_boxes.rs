@@ -1,13 +1,20 @@
 /// The one place that decides which pseudo-elements a capture records and when each one
-/// exists. A pseudo-element is not a property of the element that originates it: the user
-/// agent either generates the box or does not, and each pseudo-element's own specification
-/// states the condition — `::before` and `::after` on content, `::backdrop` on top-layer
-/// membership, which no attribute and no computed style can express.
+/// exists.
+///
+/// A handful of boxes the user agent generates on its own terms, and each of those
+/// specifications states the condition — `::before` and `::after` on content, `::backdrop` on
+/// top-layer membership, which no attribute and no computed style can express. Every other
+/// pseudo-element exists because an author wrote a rule for one, and those are found by
+/// reading the document's own selectors rather than by naming them here, because a list of
+/// names reproduces exactly the pseudo-elements someone thought to write down.
 ///
 /// Named here rather than at each reader so the probe that reverts these boxes, both node
-/// record producers and every consumer answer from one list. A further pseudo-element is
-/// one entry.
+/// record producers and every consumer answer from one list.
 pub const SOURCE: &str = include_str!("generated_boxes.js");
+
+#[cfg(test)]
+#[path = "generated_boxes_tests.rs"]
+mod discovery_tests;
 
 #[cfg(test)]
 mod tests {

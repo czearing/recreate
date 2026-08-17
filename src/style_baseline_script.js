@@ -173,7 +173,7 @@ const measureBaselines = (root, skip) => {
   const pseudoPending = [];
   for (const level of levels) {
     for (const element of level) {
-      for (const [name, exists] of Object.entries(pseudoElements)) {
+      for (const [name, exists] of generatedBoxTests()) {
         if (exists(element, generatedBox(element, name).content)) {
           pseudoPending.push([element, name]);
         }
@@ -182,8 +182,14 @@ const measureBaselines = (root, skip) => {
   }
   if (pseudoPending.length) {
     const sheet = document.createElement('style');
-    const every = Object.keys(pseudoElements).map(name => `*${name}`).join(',');
-    sheet.textContent = `${every}{${REVERT_TO_USER_AGENT}}`;
+    // One rule per name rather than one selector list, because a selector list is invalid as
+    // a whole if any part of it is, and a name discovered from text the engine never parsed
+    // could be one this engine does not support. A list would then revert nothing and every
+    // baseline would come back live, which reads as the whole computed style being authored.
+    // Separate rules are still one insertion, so this shares the single style recalculation.
+    sheet.textContent = generatedBoxTests()
+      .map(([name]) => `*${name}{${REVERT_TO_USER_AGENT}}`)
+      .join('\n');
     document.head.appendChild(sheet);
     for (const [element, name] of pseudoPending) {
       const measured = pseudoBaselines.get(element) || {};

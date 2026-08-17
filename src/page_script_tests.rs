@@ -70,13 +70,20 @@ fn caches_dom_paths_and_sibling_indexes() {
 /// The conditions themselves belong to `generated_boxes`; what is asserted here is that the
 /// composed capture script carries that one table and derives its revert sheet from it
 /// rather than from a second literal list beside it.
+///
+/// The revert sheet must also emit one rule per name. A selector list is invalid as a whole
+/// if any part of it is, and the table now holds names discovered from the page rather than
+/// only names written here, so a single list would revert nothing on a page naming a
+/// pseudo-element this engine does not implement — and every baseline would come back live.
 #[test]
 fn derives_every_generated_box_it_reverts_from_the_one_recorded_list() {
     let script = source();
     assert!(script.contains(crate::generated_boxes::SOURCE.trim()));
-    assert!(script.contains("Object.keys(pseudoElements).map(name => `*${name}`).join(',')"));
+    assert!(script.contains("generatedBoxTests()"));
+    assert!(script.contains(".map(([name]) => `*${name}{${REVERT_TO_USER_AGENT}}`)"));
     assert!(!script.contains("'*::before,*::after"));
     assert!(!script.contains("['::before', '::after']"));
+    assert!(!script.contains(".join(',')}{${REVERT_TO_USER_AGENT}"));
 }
 
 #[test]

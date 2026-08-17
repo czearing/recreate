@@ -238,7 +238,8 @@ __ASSET_CAPTURE__
       .concat(window.__recreateUnsettled
         ? ['page never reported itself settled; it was read at the stability ceiling']
         : [])
-      .concat(recreateSurfaceBlockers()),
+      .concat(recreateSurfaceBlockers())
+      .concat(recreatePseudoBlockers()),
     animations,
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,
