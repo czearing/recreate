@@ -5,7 +5,7 @@ const MUTATIONS: &str = include_str!("lifecycle_mutations.js");
 /// learns what the page still has to do, and how it records the attribute and text changes
 /// that become sequences.
 pub fn source() -> String {
-    RECORDER
+    crate::node_path::embed(RECORDER)
         .replace(
             "__LIFECYCLE_SETTLE__",
             crate::lifecycle_settle_script::SOURCE,

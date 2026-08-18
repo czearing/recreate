@@ -9,16 +9,7 @@ use serde_json::Value;
 
 const ANIMATIONS: &str = r#"
 (() => {
-  const pathOf = element => {
-    const parts = [];
-    for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
-      const peers = node.parentElement
-        ? [...node.parentElement.children].filter(child => child.tagName === node.tagName)
-        : [node];
-      parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
-    }
-    return `html>${parts.reverse().join('>')}`;
-  };
+__NODE_PATH__
   return document.getAnimations({subtree:true}).map(animation => {
     const timing = animation.effect?.getTiming?.() || {};
     return {
@@ -34,6 +25,11 @@ const ANIMATIONS: &str = r#"
   }).filter(animation => animation.target);
 })()
 "#;
+
+/// The animation reader, with the shared path definition spliced in.
+pub fn animations_script() -> String {
+    crate::node_path::embed(ANIMATIONS)
+}
 
 pub async fn state(
     cdp: &mut Cdp,
@@ -110,7 +106,7 @@ pub async fn state(
     .await?;
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
     let mut state = capture::read_interaction_state(cdp, expected.viewport.clone()).await?;
-    let animations: Value = cdp.evaluate(ANIMATIONS).await?;
+    let animations: Value = cdp.evaluate(&animations_script()).await?;
     state.animations = serde_json::from_value(animations)?;
     Ok(state)
 }

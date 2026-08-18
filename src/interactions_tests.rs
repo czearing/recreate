@@ -1,28 +1,31 @@
 use super::{
     interactions_evidence::{deduplicate, discovery_differs, responsive_baselines},
     interactions_runtime::restoration_requires_reload,
-    interactions_scripts::{CANDIDATES, PREFLIGHT},
+    interactions_scripts::{PREFLIGHT, candidates},
 };
 use dedup::state_with_paths;
 
 #[test]
 fn repeated_controls_keep_independent_bindings() {
-    assert!(!CANDIDATES.contains("values.findIndex"));
-    assert!(CANDIDATES.contains("visible(element)"));
-    assert!(CANDIDATES.contains("[tabindex]:not([tabindex=\"-1\"])"));
-    assert!(CANDIDATES.contains("[data-tabster-dummy]"));
-    assert!(CANDIDATES.contains("[role=\"none\"]"));
-    assert!(CANDIDATES.contains("element.querySelector('button,a[href],[role=\"button\"]')"));
-    assert!(!CANDIDATES.contains("closest('article"));
-    assert!(!CANDIDATES.contains("priority"));
-    assert!(!CANDIDATES.contains("}).filter(candidate =>"));
-    assert!(!CANDIDATES.contains("pub(super)"));
+    assert!(!candidates().contains("values.findIndex"));
+    assert!(candidates().contains("visible(element)"));
+    assert!(candidates().contains("[tabindex]:not([tabindex=\"-1\"])"));
+    assert!(candidates().contains("[data-tabster-dummy]"));
+    assert!(candidates().contains("[role=\"none\"]"));
+    assert!(candidates().contains("element.querySelector('button,a[href],[role=\"button\"]')"));
+    assert!(!candidates().contains("closest('article"));
+    assert!(!candidates().contains("priority"));
+    assert!(!candidates().contains("}).filter(candidate =>"));
+    assert!(!candidates().contains("pub(super)"));
     assert!(PREFLIGHT.contains("getBoundingClientRect"));
 }
 
 #[test]
 fn embedded_interaction_scripts_parse_as_javascript() {
-    for (name, source) in [("candidates", CANDIDATES), ("preflight", PREFLIGHT)] {
+    for (name, source) in [
+        ("candidates", candidates().as_str()),
+        ("preflight", PREFLIGHT),
+    ] {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join(format!("{name}.js"));
         std::fs::write(&path, source).unwrap();
@@ -86,10 +89,10 @@ fn interactions_capture_every_recorded_viewport() {
 
 #[test]
 fn discovers_text_entry_controls() {
-    assert!(CANDIDATES.contains("input:not([type=\"hidden\"])"));
-    assert!(CANDIDATES.contains("textarea,select"));
-    assert!(CANDIDATES.contains("element.getAttribute('role') === 'tab'"));
-    assert!(CANDIDATES.contains("element.hasAttribute('aria-pressed')"));
+    assert!(candidates().contains("input:not([type=\"hidden\"])"));
+    assert!(candidates().contains("textarea,select"));
+    assert!(candidates().contains("element.getAttribute('role') === 'tab'"));
+    assert!(candidates().contains("element.hasAttribute('aria-pressed')"));
 }
 
 #[test]

@@ -29,35 +29,7 @@ __ASSET_ATTRIBUTES__
   };
   const computedStyleValues = style => computedStyleProperties
     .map(property => computedStyleValue(style.getPropertyValue(property)));
-  const pathCache = new WeakMap([[document.documentElement, 'html']]);
-  const siblingIndexes = new WeakMap();
-  const siblingIndex = element => {
-    const root = element.parentElement || element.getRootNode();
-    let indexes = siblingIndexes.get(root);
-    if (!indexes) {
-      indexes = new WeakMap();
-      const counts = new Map();
-      for (const child of root.children || []) {
-        const count = (counts.get(child.tagName) || 0) + 1;
-        counts.set(child.tagName, count);
-        indexes.set(child, count);
-      }
-      siblingIndexes.set(root, indexes);
-    }
-    return indexes.get(element) || 1;
-  };
-  const shadowPath = root => `${pathOf(root.host)}>::shadow-root(${root.mode})`;
-  const pathOf = element => {
-    const cached = pathCache.get(element);
-    if (cached) return cached;
-    const root = element.getRootNode();
-    const parent = element.parentElement
-      ? pathOf(element.parentElement)
-      : root instanceof ShadowRoot ? shadowPath(root) : 'html';
-    const path = `${parent}>${element.tagName.toLowerCase()}:nth-of-type(${siblingIndex(element)})`;
-    pathCache.set(element, path);
-    return path;
-  };
+__NODE_PATH__
   // The space a classic scrollbar took out of the content box. `offsetWidth - clientWidth`
   // is the border box minus the padding box, so the two border widths are the rest of it.
   // Read here rather than derived later because `style` is pruned to the declarations that

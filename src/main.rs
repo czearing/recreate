@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod action_scope_tests;
 mod asset_attributes;
 mod asset_script;
 mod attribute_sequence_script;
@@ -34,6 +36,7 @@ mod interaction_script;
 mod interaction_state;
 mod interaction_surface;
 mod interactions;
+mod interactions_approach;
 mod interactions_input;
 mod lifecycle_scheduled_script;
 mod lifecycle_script;
@@ -46,6 +49,7 @@ mod node_alignment_regression_tests;
 #[cfg(test)]
 mod node_alignment_tests;
 mod node_alignment_walk;
+mod node_path;
 #[cfg(test)]
 mod node_removal_tests;
 mod page_script;

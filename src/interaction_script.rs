@@ -9,7 +9,7 @@ pub fn source() -> String {
 }
 
 fn render(selection: &str) -> String {
-    SOURCE
+    crate::node_path::embed(SOURCE)
         .replace("__STYLE_BASELINE__", &style_baseline::source())
         .replace(
             "__ASSET_ATTRIBUTES__",

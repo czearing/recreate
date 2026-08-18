@@ -3,27 +3,7 @@ __STYLE_BASELINE__
 __ASSET_ATTRIBUTES__
   const skipped = element => false;
   measureBaselines(document.documentElement, skipped);
-  const pathCache = new WeakMap([[document.documentElement, 'html']]);
-  const siblingIndexes = new WeakMap();
-  const pathOf = element => {
-    const cached = pathCache.get(element);
-    if (cached) return cached;
-    const parent = element.parentElement;
-    let indexes = siblingIndexes.get(parent);
-    if (!indexes) {
-      indexes = new WeakMap();
-      const counts = new Map();
-      for (const child of parent.children) {
-        const count = (counts.get(child.tagName) || 0) + 1;
-        counts.set(child.tagName, count);
-        indexes.set(child, count);
-      }
-      siblingIndexes.set(parent, indexes);
-    }
-    const path = `${pathOf(parent)}>${element.tagName.toLowerCase()}:nth-of-type(${indexes.get(element)})`;
-    pathCache.set(element, path);
-    return path;
-  };
+__NODE_PATH__
   const visible = element => {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);

@@ -1,7 +1,7 @@
 use super::{
     interactions_activate::activate,
     interactions_runtime::{RestingStates, restore, settle},
-    interactions_scripts::{ACTION_SCOPE, Candidate, TAKE_SCOPE},
+    interactions_scripts::{Candidate, TAKE_SCOPE, action_scope},
 };
 use crate::{capture, cdp::Cdp, model::PageState};
 use anyhow::Result;
@@ -10,7 +10,8 @@ use anyhow::Result;
 /// narrowed to what the action actually caused rather than everything that happened to differ.
 pub(super) async fn begin_scope(cdp: &mut Cdp, trigger: &str) -> Result<()> {
     cdp.evaluate(&format!(
-        "({ACTION_SCOPE})({})",
+        "({})({})",
+        action_scope(),
         serde_json::to_string(trigger)?
     ))
     .await?;

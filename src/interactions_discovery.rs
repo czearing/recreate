@@ -4,7 +4,7 @@ use super::{
     interactions_graph::{candidate, edge, edge_candidate, same_edge, state_matches},
     interactions_runtime::{RestingStates, restoration_requires_reload, settle},
     interactions_scope::{begin_scope, reach, take_scope},
-    interactions_scripts::{CANDIDATES, Candidate},
+    interactions_scripts::Candidate,
 };
 use crate::{
     capture,
@@ -43,7 +43,10 @@ pub(super) async fn discover_transitions(
             state_index += 1;
             continue;
         };
-        let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
+        let candidates: Vec<Candidate> = serde_json::from_value(
+            cdp.evaluate(&super::interactions_scripts::candidates())
+                .await?,
+        )?;
         let trigger = prefix.last().map(|candidate| candidate.path.as_str());
         let popup = prefix
             .last()

@@ -13,7 +13,7 @@ mod interactions_runtime;
 #[path = "interactions_scope.rs"]
 mod interactions_scope;
 #[path = "interactions_scripts.rs"]
-mod interactions_scripts;
+pub mod interactions_scripts;
 
 pub use interactions_capture::{CapturedGraph, capture_graph};
 

@@ -1,18 +1,8 @@
 use serde::Deserialize;
 
-pub(super) const CANDIDATES: &str = r#"
+const CANDIDATES_TEMPLATE: &str = r#"
 (() => {
-  const pathOf = element => {
-    const parts = [];
-    for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
-      const peers = node.parentElement
-        ? Array.from(node.parentElement.children).filter(child => child.tagName === node.tagName)
-        : [node];
-      parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
-    }
-
-    return `html>${parts.reverse().join('>')}`;
-  };
+__NODE_PATH__
   const visible = element => {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
@@ -122,21 +112,19 @@ new Promise(resolve => {{
     )
 }
 
-pub(super) const ACTION_SCOPE: &str = r#"
+const ACTION_SCOPE_TEMPLATE: &str = r#"
 trigger => {
   globalThis.__recreateCaptureScope?.observer?.disconnect();
-  const pathOf = element => {
-    if (!(element instanceof Element)) return '';
-    const parts = [];
-    for (let node = element; node && node !== document.documentElement;
-         node = node.parentElement) {
-      const peers = [...node.parentElement.children]
-        .filter(child => child.tagName === node.tagName);
-      parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
-    }
-    return `html>${parts.reverse().join('>')}`;
-  };
+__NODE_PATH__
   const paths = new Set(trigger ? [trigger] : []);
+  // Reaching an offscreen control means scrolling to it, and that scroll is the harness
+  // moving rather than the page reacting. It cannot simply be discarded when it happens,
+  // because a scroll event is delivered asynchronously and arrives well after the approach
+  // has returned. So the approach reports where it left each scroller, and a scroll still
+  // sitting at exactly that position is recognised as its own rather than the page's.
+  const approached = new Map();
+  const at = element => `${element.scrollLeft}:${element.scrollTop}`;
+  const settle = elements => elements.forEach(element => approached.set(element, at(element)));
   const add = node => {
     if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
     if (!(node instanceof Element)) return;
@@ -155,12 +143,15 @@ trigger => {
     attributes: true, childList: true, characterData: true, subtree: true
   });
   const focus = event => add(event.target);
-  const scroll = event => add(
-    event.target === document ? document.scrollingElement : event.target
-  );
+  const scroll = event => {
+    const element =
+      event.target === document ? document.scrollingElement : event.target;
+    if (approached.get(element) === at(element)) return;
+    add(element);
+  };
   addEventListener('focusin', focus, true);
   addEventListener('scroll', scroll, true);
-  globalThis.__recreateCaptureScope = {paths, observer, focus, scroll};
+  globalThis.__recreateCaptureScope = {paths, observer, focus, scroll, settle};
 }
 "#;
 
@@ -190,4 +181,16 @@ impl Candidate {
     pub(super) fn uses_text_entry(&self) -> bool {
         crate::interactions_input::text_entry(&self.tag)
     }
+}
+
+/// The discovery script, with the shared path definition spliced in. Every consumer asks for
+/// it here rather than for the template, so no caller can evaluate a script whose paths were
+/// never defined.
+pub fn candidates() -> String {
+    crate::node_path::embed(CANDIDATES_TEMPLATE)
+}
+
+/// The scope recorder, spliced from the same owner for the same reason.
+pub fn action_scope() -> String {
+    crate::node_path::embed(ACTION_SCOPE_TEMPLATE)
 }

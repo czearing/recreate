@@ -7,7 +7,7 @@ use super::{
     interactions_graph::edge,
     interactions_runtime::{RestingStates, close, restore, settle},
     interactions_scope::{begin_scope, take_scope},
-    interactions_scripts::{CANDIDATES, Candidate, PREFLIGHT},
+    interactions_scripts::{Candidate, PREFLIGHT},
 };
 use crate::{
     capture,
@@ -73,7 +73,10 @@ pub(super) async fn capture_states(
         return Ok((Vec::new(), Vec::new()));
     };
     let mut initial = Some(restore(cdp, rest, first, false).await?);
-    let candidates: Vec<Candidate> = serde_json::from_value(cdp.evaluate(CANDIDATES).await?)?;
+    let candidates: Vec<Candidate> = serde_json::from_value(
+        cdp.evaluate(&super::interactions_scripts::candidates())
+            .await?,
+    )?;
     let mut interactions = Vec::new();
     let mut aliases = Vec::new();
     for candidate in &candidates {

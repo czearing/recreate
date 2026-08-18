@@ -51,17 +51,7 @@ __LIFECYCLE_SCHEDULED__
     }).observe(document.documentElement, {
       attributes: true, childList: true, characterData: true, subtree: true
     });
-    const pathOf = element => {
-      if (element === document.documentElement) return 'html';
-      const parts = [];
-      for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
-        const peers = node.parentElement
-          ? Array.from(node.parentElement.children).filter(child => child.tagName === node.tagName)
-          : [node];
-        parts.push(`${node.tagName.toLowerCase()}:nth-of-type(${peers.indexOf(node) + 1})`);
-      }
-      return `html>${parts.reverse().join('>')}`;
-    };
+__NODE_PATH__
 __LIFECYCLE_MUTATIONS__
     const sample = () => {
       const now = performance.now();

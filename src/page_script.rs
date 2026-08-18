@@ -21,7 +21,7 @@ fn source_template() -> String {
 
 /// One template, so a capture stage added here cannot be missing from the asset-free form.
 fn template_with_assets(assets: &str) -> String {
-    CAPTURE
+    crate::node_path::embed(CAPTURE)
         .replace("__STYLE_BASELINE__", &style_baseline::source())
         .replace(
             "__ASSET_ATTRIBUTES__",
