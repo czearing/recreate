@@ -1,6 +1,6 @@
 //! What a viewport band may state, and what the re-emitted condition already covers.
 
-use super::{node, scene};
+use super::{decided, node, scene};
 use crate::generate::authored_conditions::restore_unconditional;
 use crate::generate::authored_css_index::Index;
 use crate::model::Styles;
@@ -9,9 +9,12 @@ use crate::model::Styles;
 /// must not be introduced by it with a value the band never measured.
 #[test]
 fn writes_only_properties_the_condition_actually_declares() {
-    let node = node(
-        "unsampled",
-        &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+    let node = decided(
+        node(
+            "unsampled",
+            &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+        ),
+        &["background-color"],
     );
     let mut styles = Styles::new();
     restore_unconditional(
@@ -30,7 +33,10 @@ fn writes_only_properties_the_condition_actually_declares() {
 /// condition states it at the author's own breakpoint instead.
 #[test]
 fn withdraws_from_a_band_what_the_re_emitted_condition_states_at_the_authored_breakpoint() {
-    let narrow = node("controltoken", &[("fill", "rgb(200, 10, 10)")]);
+    let narrow = decided(
+        node("controltoken", &[("fill", "rgb(200, 10, 10)")]),
+        &["fill"],
+    );
     let captured = vec!["@media(max-width:800px){.controltoken{fill:rgb(200, 10, 10);}}".into()];
     let mut delta = narrow.style.clone();
     restore_unconditional(&mut delta, &narrow, &Index::new(&captured));

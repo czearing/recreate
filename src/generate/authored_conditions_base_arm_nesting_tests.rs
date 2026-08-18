@@ -4,7 +4,7 @@
 //! real breakpoints arrive one group inside another and the identity condition arrives around
 //! everything else. Both readings are asserted here against the shipped stages.
 
-use super::restore_unconditional;
+use super::{decided, restore_unconditional};
 use crate::generate::authored_conditions::rules;
 use crate::generate::authored_css_index::Index;
 use crate::generate::selector_scope::Scope;
@@ -70,7 +70,10 @@ fn nested_with_unconditional_base() -> Vec<String> {
 
 #[test]
 fn restores_the_base_arm_of_a_breakpoint_nested_inside_the_sheet_wrapper() {
-    let node = node("card", &[("background-color", "rgb(0, 0, 255)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
     let styles = restored(&node, &nested_with_unconditional_base());
 
     assert_eq!(styles["background-color"], "rgb(255, 0, 0)");
@@ -78,7 +81,10 @@ fn restores_the_base_arm_of_a_breakpoint_nested_inside_the_sheet_wrapper() {
 
 #[test]
 fn re_emits_a_nested_breakpoint_inside_every_condition_it_was_authored_in() {
-    let node = node("card", &[("background-color", "rgb(0, 0, 255)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
     let emitted = emitted(&node, &nested());
 
     assert!(
@@ -96,7 +102,10 @@ fn re_emits_a_nested_breakpoint_inside_every_condition_it_was_authored_in() {
 /// is the only reading that paints each arm on its own side of the breakpoint.
 #[test]
 fn puts_back_under_its_condition_every_declaration_it_withdraws() {
-    let node = node("card", &[("background-color", "rgb(0, 0, 255)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
     let restored = restored(&node, &nested());
     let emitted = emitted(&node, &nested()).join("");
 
@@ -116,9 +125,12 @@ fn puts_back_under_its_condition_every_declaration_it_withdraws() {
 /// against it would delete the only one the author wrote.
 #[test]
 fn keeps_a_declaration_guarded_only_by_the_identity_condition() {
-    let node = node(
-        "card",
-        &[("position", "absolute"), ("left", "18px"), ("top", "12px")],
+    let node = decided(
+        node(
+            "card",
+            &[("position", "absolute"), ("left", "18px"), ("top", "12px")],
+        ),
+        &["position", "left", "top"],
     );
     let captured =
         vec!["@media all{.card { position: absolute; left: 18px; top: 12px; }}".to_string()];
@@ -133,7 +145,10 @@ fn keeps_a_declaration_guarded_only_by_the_identity_condition() {
 /// around a real breakpoint must not exempt that breakpoint from withdrawal.
 #[test]
 fn does_not_exempt_a_real_breakpoint_merely_wrapped_in_the_identity_condition() {
-    let node = node("card", &[("background-color", "rgb(0, 0, 255)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
     let styles = restored(&node, &nested_with_unconditional_base());
 
     assert_eq!(styles["background-color"], "rgb(255, 0, 0)");
@@ -143,11 +158,17 @@ fn does_not_exempt_a_real_breakpoint_merely_wrapped_in_the_identity_condition() 
 /// nothing here may generalise the exemption from the identity condition to media types.
 #[test]
 fn withdraws_against_a_media_type_that_can_be_false() {
-    let node = node("card", &[("background-color", "rgb(0, 0, 255)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
     let captured = vec![
         ".card { background-color: rgb(255, 0, 0); }".to_string(),
         "@media print{.card { background-color: rgb(0, 0, 255); }}".to_string(),
     ];
 
-    assert_eq!(restored(&node, &captured)["background-color"], "rgb(255, 0, 0)");
+    assert_eq!(
+        restored(&node, &captured)["background-color"],
+        "rgb(255, 0, 0)"
+    );
 }

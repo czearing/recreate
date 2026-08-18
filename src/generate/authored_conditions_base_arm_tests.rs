@@ -33,6 +33,17 @@ fn node(classes: &str, style: &[(&str, &str)]) -> Node {
     }
 }
 
+/// The engine's own answer, as the capture records it: the properties whose computed value
+/// moved when the rules the recreation re-emits under a condition were withdrawn.
+///
+/// Stated by each case rather than derived here, because deriving it would mean resolving the
+/// cascade from the same authored text the stage under test reads — which is the proxy this
+/// evidence replaced. A case that states none is a page where no condition decided anything.
+fn decided(mut node: Node, properties: &[&str]) -> Node {
+    node.condition_decided = properties.iter().map(|name| (*name).to_string()).collect();
+    node
+}
+
 /// The stage as the emitters run it: the captured style is what the base rule would say,
 /// and the authored rules are the ones the capture recorded alongside it.
 fn restored(node: &Node, captured: &[String]) -> Styles {
@@ -52,9 +63,12 @@ fn scene(subject: &str, condition: &str, over: &str) -> Vec<String> {
 /// the override and the arm below it existed nowhere in the output.
 #[test]
 fn publishes_the_arm_below_the_breakpoint_rather_than_the_measured_override() {
-    let node = node(
-        "unsampled",
-        &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+    let node = decided(
+        node(
+            "unsampled",
+            &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+        ),
+        &["background-color"],
     );
     let styles = restored(
         &node,
@@ -69,7 +83,10 @@ fn publishes_the_arm_below_the_breakpoint_rather_than_the_measured_override() {
 /// the repair. Same assertion, breakpoint moved onto a sampled width.
 #[test]
 fn repairs_a_breakpoint_that_a_sampled_width_sits_exactly_on() {
-    let node = node("sampled", &[("background-color", "rgb(0, 255, 0)")]);
+    let node = decided(
+        node("sampled", &[("background-color", "rgb(0, 255, 0)")]),
+        &["background-color"],
+    );
     let styles = restored(
         &node,
         &scene("sampled", "(min-width: 768px)", "rgb(0, 255, 0)"),
@@ -96,7 +113,7 @@ fn leaves_an_element_no_condition_names_untouched() {
 /// keeping the override, would both paint something the source does not.
 #[test]
 fn drops_a_property_the_unconditional_cascade_never_declared() {
-    let node = node("only", &[("color", "rgb(0, 0, 255)")]);
+    let node = decided(node("only", &[("color", "rgb(0, 0, 255)")]), &["color"]);
     let captured = vec!["@media (min-width: 600px){.only { color: rgb(0, 0, 255); }}".into()];
     let styles = restored(&node, &captured);
 
@@ -108,9 +125,12 @@ fn drops_a_property_the_unconditional_cascade_never_declared() {
 /// that entry point and not only against the function that performs it.
 #[test]
 fn reaches_the_node_through_the_stage_both_emitters_call() {
-    let node = node(
-        "unsampled",
-        &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+    let node = decided(
+        node(
+            "unsampled",
+            &[("background-color", "rgb(0, 0, 255)"), ("height", "40px")],
+        ),
+        &["background-color"],
     );
     let mut styles = node.style.clone();
     crate::generate::authored_css::normalize(

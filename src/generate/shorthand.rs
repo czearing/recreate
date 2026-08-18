@@ -68,6 +68,10 @@ pub(super) fn claim<'a>(
     match divided(shorthands, block, property) {
         Some("") => Claim::Unsettled,
         Some(share) => Claim::Value(share),
+        // The engine divided this block and did not store this longhand, so the block does
+        // not set it. That refusal is what bounds `expands_to`'s deliberate over-answer —
+        // `border` prefixes `border-radius` and sets none of it — without a second list.
+        None if shorthands.contains_key(block_key(block)) => Claim::Elsewhere,
         None => match crate::model::value_components(value).as_slice() {
             [only] => Claim::Value(only),
             _ => Claim::Unsettled,
@@ -75,13 +79,18 @@ pub(super) fn claim<'a>(
     }
 }
 
-/// Every property of `style` that the declaration `name: value` of `block` set to the value
-/// measured there — the properties for which this declaration is the proof that the condition
-/// guarding it was in force.
+/// Every property of `style` that the declaration `name: value` of `block` sets.
 ///
 /// The sample is the key space, so a name the author shortened is asked of the longhands it
 /// stands for rather than looked up as itself and missed.
-pub(super) fn measured(
+///
+/// This answers which longhands a declaration *names*, and deliberately not whether it is
+/// the one that produced their samples. The two questions used to be one, answered by
+/// comparing the authored text against the sample — which holds only where the author spelled
+/// a value the way the engine serialises it, and silently fails for every relative length,
+/// percentage, math function, container unit and colour keyword. Whether a declaration
+/// produced a sample is the engine's answer, carried on [`crate::model::Node::condition_decided`].
+pub(super) fn sets(
     shorthands: &Shorthands,
     block: &str,
     style: &crate::model::Styles,
@@ -89,14 +98,14 @@ pub(super) fn measured(
     value: &str,
 ) -> Vec<String> {
     style
-        .iter()
-        .filter(
-            |(property, sample)| match claim(shorthands, block, name, value, property) {
-                Claim::Value(value) => *sample == value,
-                Claim::Elsewhere | Claim::Unsettled => false,
-            },
-        )
-        .map(|(property, _)| property.clone())
+        .keys()
+        .filter(|property| {
+            !matches!(
+                claim(shorthands, block, name, value, property),
+                Claim::Elsewhere
+            )
+        })
+        .cloned()
         .collect()
 }
 

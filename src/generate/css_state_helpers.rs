@@ -123,6 +123,7 @@ mod tests {
             style: [("background-color".to_string(), "rgb(0, 255, 0)".to_string())]
                 .into_iter()
                 .collect(),
+            condition_decided: ["background-color".to_string()].into_iter().collect(),
             ..Default::default()
         };
         let mut styles = node.style.clone();

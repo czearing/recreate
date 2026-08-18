@@ -45,6 +45,9 @@ __NODE_PATH__
     return gutter > 0 ? gutter : 0;
   };
   const nodes = [];
+  // The element each record came from, so a stage that must ask the engine a second
+  // question can ask it of the element and answer it onto the record.
+  const elementNodes = [];
   const dom = {};
   const recordDom = (path, element, style, overrides = {}) => {
     const root = element.getRootNode();
@@ -77,7 +80,7 @@ __NODE_PATH__
     const rect = element.getBoundingClientRect();
     const computedStyle = computedStyles.get(element) || getComputedStyle(element);
     const attributes = recreateAttributes(element, path);
-    nodes.push({
+    const record = {
       path,
       parent: holderPath(element),
       tag: element.tagName.toLowerCase(),
@@ -93,7 +96,9 @@ __NODE_PATH__
       scrollbar_gutter: scrollbarGutter(element, computedStyle),
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       pseudos: recreatePseudos(element)
-    });
+    };
+    nodes.push(record);
+    elementNodes.push([element, record]);
     recordDom(path, element, computedStyle);
     let textIndex = 0;
     for (const child of element.childNodes) {
@@ -194,6 +199,7 @@ __NODE_PATH__
     ...(window.__recreateLifecycleAnimations || [])
   ].filter(meaningfulTransient);
 __STATE_STYLE_CAPTURE__
+__CONDITION_WITHDRAWAL__
 __ATTRIBUTE_SEQUENCE_CAPTURE__
   const { texts: cssRuleTexts, urls: assets, shorthands } =
     recreateCssAssets(nodes, cssRules, shorthandBlocks.values());

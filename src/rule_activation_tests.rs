@@ -31,18 +31,26 @@ mod base;
 #[path = "rule_activation_shorthand_tests.rs"]
 mod shorthand;
 
+#[path = "capture_conditions_tests.rs"]
+mod conditions;
+
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 
-const HARNESS: &str = include_str!("rule_activation_harness.js");
+const HARNESS: &str = concat!(
+    include_str!("rule_activation_cssom.js"),
+    "\n",
+    include_str!("rule_activation_harness.js")
+);
 
 fn capture_source() -> String {
     format!(
-        "{}\n{}",
+        "{}\n{}\n{}",
         crate::scoped_rules::SOURCE,
         crate::state_style_script::SOURCE
             .replace("__RULE_ACTIVATION__", super::SOURCE)
-            .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE)
+            .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE),
+        crate::capture_conditions::SOURCE,
     )
 }
 

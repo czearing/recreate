@@ -38,6 +38,10 @@ fn template_with_assets(assets: &str, motion: &str) -> String {
         )
         .replace("__STATE_STYLE_CAPTURE__", crate::state_style_script::SOURCE)
         .replace(
+            "__CONDITION_WITHDRAWAL__",
+            crate::capture_conditions::SOURCE,
+        )
+        .replace(
             "__BLOCKING_OVERLAY__",
             &crate::blocking_overlay::js_predicate(),
         )

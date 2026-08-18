@@ -72,17 +72,31 @@ pub fn rules(
 /// rule, so the recreation stated the override twice and stated the arm below the breakpoint
 /// nowhere, painting the override at every width.
 ///
-/// The condition's own declaration is the proof. `@media` and `@container` add no specificity,
-/// so a conditional declaration is the computed value exactly while its condition holds; a
-/// value equal to the sample therefore reports the engine's own answer, at a width the capture
-/// really visited, without this stage evaluating a single media feature. Where it disagrees the
-/// condition was false, or that declaration lost the cascade, and the measured value stands.
+/// Two facts have to meet, and each has exactly one owner. *Which* properties a condition
+/// decided is the engine's answer, taken while the page was open by withdrawing the blocks of
+/// the rules re-emitted above and reading what moved; it is on the node as
+/// [`Node::condition_decided`]. *Whose* rules the emitter can rewrite is this stage's answer,
+/// and is narrower: a rule reaching the node through an ancestor or through a compound the
+/// node only partly satisfies decides properties here that no generated class can put back.
+/// The withdrawal is the intersection, so neither owner has to guess the other's answer.
 ///
-/// What replaces it is the unconditional cascade's own last word, or nothing where the author
-/// wrote none — below the breakpoint the element takes its inherited or initial value, which
-/// the recreation re-produces by saying nothing. No width is consulted, so this is equally the
-/// answer for a container query, whose condition no viewport can settle at all.
+/// Reading the condition's declared text against the sample was the previous proof and is
+/// gone. It asked whether the author spelled the value the way the engine serialises it, so
+/// an override written `0.5em`, `5%`, `calc(...)`, `10cqw` or `teal` proved nothing and its
+/// base arm reached no file — the failure this replaced.
+///
+/// What replaces the withdrawn value is the unconditional cascade's own last word, or nothing
+/// where the author wrote none — below the breakpoint the element takes its inherited or
+/// initial value, which the recreation re-produces by saying nothing. No width is consulted,
+/// so this is equally the answer for a container query, whose condition no viewport can
+/// settle at all.
 pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>) {
+    // Behaviour-neutral: the intersection below decides the same thing. It is here because
+    // the walk it skips is the expensive half, and on any page most elements sit under no
+    // condition at all.
+    if node.condition_decided.is_empty() {
+        return;
+    }
     let matched = index.conditional_declarations(node);
     if matched.is_empty() {
         return;
@@ -96,20 +110,16 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
             for (name, value) in super::authored_css_rules::physical_property(node, name)
                 .into_declarations(name, value)
             {
-                // The proof, and the whole of it: this property's own sample equals what the
-                // condition declares for it. A value merely present elsewhere in the node's
-                // style is a coincidence, not evidence. Asked of every longhand the name
-                // stands for, because a capture enumerates longhands and a name the author
-                // shortened matches none of them; the block travels with it, because how the
-                // engine divided a shorthand is a fact about the block it was written in.
+                // Which longhands this declaration names, asked of every one the name stands
+                // for, because a capture enumerates longhands and a name the author shortened
+                // matches none of them; the block travels with it, because how the engine
+                // divided a shorthand is a fact about the block it was written in.
                 let shorthands = index.shorthands();
-                withdraw.extend(super::shorthand::measured(
-                    shorthands,
-                    declarations,
-                    &node.style,
-                    &name,
-                    &value,
-                ));
+                withdraw.extend(
+                    super::shorthand::sets(shorthands, declarations, &node.style, &name, &value)
+                        .into_iter()
+                        .filter(|property| node.condition_decided.contains(property)),
+                );
             }
         }
     }

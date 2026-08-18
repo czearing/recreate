@@ -10,6 +10,7 @@ mod browser;
 #[cfg(test)]
 mod browser_session_tests;
 mod capture;
+mod capture_conditions;
 mod capture_settle;
 #[cfg(test)]
 mod capture_settle_budget_tests;

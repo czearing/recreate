@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 mod css_value;
 mod interaction;
@@ -76,6 +76,23 @@ pub struct Node {
     #[serde(default, skip_serializing_if = "crate::model::is_zero")]
     pub scrollbar_gutter: f64,
     pub style: Styles,
+    /// The properties an authored condition the recreation re-emits decided at this element,
+    /// as the engine answered it.
+    ///
+    /// [`Node::style`] is one branch of every condition the page carries — whichever branch
+    /// held while the capture read it. The emitter republishes the condition, so it must take
+    /// that branch back out of the unconditional rule, and the only sound proof that a
+    /// condition put it there is the engine's: the capture withdraws the blocks of exactly
+    /// the rules the emitter republishes, reads again, and records what moved.
+    ///
+    /// Recorded rather than re-derived because the two vocabularies do not meet. An authored
+    /// `0.5em`, `5%`, `calc()`, `10cqw` or `teal` is never the string its own computed sample
+    /// serialises to, so comparing them answers "was this spelled the way the engine spells
+    /// it", not "did this declaration produce this value" — and no table of unit families
+    /// closes that gap, because a percentage needs a containing block and a container unit
+    /// needs the query container's used size.
+    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+    pub condition_decided: BTreeSet<String>,
     /// The generated boxes this element had, keyed by the selector suffix that names each
     /// one — `::before`, `::after`, `::backdrop`.
     ///

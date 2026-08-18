@@ -11,7 +11,7 @@
 //! and the arm the element must be able to return to. How the author spelled the declaration
 //! is varied *within* that statement rather than being its subject.
 
-use super::restore_unconditional;
+use super::{decided, restore_unconditional};
 use crate::generate::authored_css_index::{Authored, Index};
 use crate::generate::shorthand::Shorthands;
 use crate::model::{Attributes, Node, Rect, Styles};
@@ -114,12 +114,22 @@ fn scene_divisions() -> Shorthands {
 #[test]
 fn a_card_returns_to_its_base_arm_however_the_override_was_spelled() {
     for class in ["multi", "single", "longhand"] {
-        let wide = node(
-            class,
-            &[
-                ("background-color", "rgb(0, 255, 0)"),
-                ("background-clip", "border-box"),
-            ],
+        // The engine moved `background-clip` only where the author wrote a shorthand that
+        // states it, so the evidence differs between the three spellings exactly as the page
+        // does.
+        let moved: &[&str] = match class {
+            "multi" => &["background-color", "background-clip"],
+            _ => &["background-color"],
+        };
+        let wide = decided(
+            node(
+                class,
+                &[
+                    ("background-color", "rgb(0, 255, 0)"),
+                    ("background-clip", "border-box"),
+                ],
+            ),
+            moved,
         );
 
         let styles = restored(&wide, &scene(), &scene_divisions());

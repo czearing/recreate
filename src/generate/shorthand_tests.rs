@@ -1,6 +1,6 @@
 //! The relation between the name an author wrote and the longhands a capture records.
 
-use super::{Claim, Shorthands, expands_to, measured, renamed_parts};
+use super::{Claim, Shorthands, expands_to, renamed_parts, sets};
 use crate::model::Styles;
 
 /// No division recorded for any block — the fallback every hand-written fixture reaches.
@@ -87,20 +87,23 @@ fn reads_the_families_whose_longhands_were_renamed() {
     assert_eq!(renamed_parts("padding"), None);
 }
 
-/// The suffix rule over-answers on purpose. `border` does not set `border-radius`, and what
-/// refuses the pair is the value the caller compares, so this reports the claim and lets the
-/// comparison decide.
+/// The suffix rule over-answers on purpose. `border` does not set `border-radius`, and the
+/// engine's own division of the block is what refuses the pair — a block it divided is a
+/// complete statement of the longhands that block sets, so a longhand missing from it is one
+/// the declaration did not set.
 #[test]
-fn claims_a_prefixed_property_the_shorthand_does_not_set() {
+fn refuses_a_prefixed_property_the_engine_divided_the_block_without() {
     assert_eq!(value("border", "8px", "border-radius"), Some("8px"));
 
     let style = Styles::from([
         ("border-radius".to_string(), "4px".to_string()),
         ("border-top-width".to_string(), "8px".to_string()),
     ]);
+    let block = "border: 8px solid red";
+    let shorthands = divided(block, &[("border-top-width", "8px")]);
 
     assert_eq!(
-        measured(&undivided(), "", &style, "border", "8px"),
+        sets(&shorthands, block, &style, "border", "8px solid red"),
         ["border-top-width"]
     );
 }
@@ -130,19 +133,24 @@ fn counts_a_function_call_as_one_component() {
     );
 }
 
-/// Only a property whose measured value the declaration accounts for is reported, so a
-/// property that merely happens to hold the same value under an unrelated name is not.
+/// Which longhands a declaration names is a question about names and the engine's division of
+/// the block, never about whether the sample happens to hold the authored text: an override
+/// spelled `0.5em` sets `padding-left` exactly as one spelled `8px` does. A property under an
+/// unrelated name is still not reported, because no spelling of `background` reaches `color`.
 #[test]
-fn reports_only_the_properties_the_declaration_accounts_for() {
+fn reports_the_longhands_the_declaration_names_however_its_value_is_spelled() {
     let style = Styles::from([
-        ("background-color".to_string(), "rgb(0, 255, 0)".to_string()),
+        ("padding-left".to_string(), "8px".to_string()),
         ("color".to_string(), "rgb(0, 255, 0)".to_string()),
-        ("background-image".to_string(), "none".to_string()),
     ]);
 
     assert_eq!(
-        measured(&undivided(), "", &style, "background", "rgb(0, 255, 0)"),
-        ["background-color"]
+        sets(&undivided(), "", &style, "padding-left", "0.5em"),
+        ["padding-left"]
+    );
+    assert_eq!(
+        sets(&undivided(), "", &style, "background", "rgb(0, 255, 0)"),
+        [] as [String; 0]
     );
 }
 

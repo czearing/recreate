@@ -3,7 +3,7 @@
 //! A capture enumerates longhands, so `background` names no key in a sampled style. Every
 //! case here authors the shorthand and asserts on the longhand the capture actually holds.
 
-use super::restore_unconditional;
+use super::{decided, restore_unconditional};
 use crate::generate::authored_css_index::Index;
 use crate::model::{Attributes, Node, Rect, Styles};
 
@@ -48,12 +48,15 @@ fn scene() -> Vec<String> {
 /// the threshold existed nowhere and shrinking the container could never reach it.
 #[test]
 fn publishes_the_base_arm_of_an_override_a_container_answered_yes() {
-    let vorpal = node(
-        "cq-card",
-        &[
-            ("background-color", "rgb(0, 255, 0)"),
-            ("padding-top", "24px"),
-        ],
+    let vorpal = decided(
+        node(
+            "cq-card",
+            &[
+                ("background-color", "rgb(0, 255, 0)"),
+                ("padding-top", "24px"),
+            ],
+        ),
+        &["background-color"],
     );
 
     let styles = restored(&vorpal, &scene());
@@ -66,7 +69,10 @@ fn publishes_the_base_arm_of_an_override_a_container_answered_yes() {
 /// reason, so the kind is not what decides and no `@container` branch can be the repair.
 #[test]
 fn publishes_the_base_arm_of_an_override_the_viewport_answered_yes() {
-    let quillow = node("mq-card", &[("background-color", "rgb(0, 0, 255)")]);
+    let quillow = decided(
+        node("mq-card", &[("background-color", "rgb(0, 0, 255)")]),
+        &["background-color"],
+    );
 
     let styles = restored(&quillow, &scene());
 
@@ -85,13 +91,17 @@ fn leaves_the_instance_whose_container_answered_no_untouched() {
 }
 
 /// A shorthand names its longhands by prefix, which over-answers: `border` prefixes
-/// `border-radius` and does not set it. The value comparison is what refuses the pair, so
-/// a longer list is never what keeps this right.
+/// `border-radius` and does not set it. The engine's own answer is what refuses the pair — it
+/// reports the width as condition-decided and the corner as untouched — so a longer list is
+/// never what keeps this right.
 #[test]
 fn refuses_a_prefixed_property_the_shorthand_does_not_set() {
-    let node = node(
-        "card",
-        &[("border-radius", "4px"), ("border-top-width", "8px")],
+    let node = decided(
+        node(
+            "card",
+            &[("border-radius", "4px"), ("border-top-width", "8px")],
+        ),
+        &["border-top-width"],
     );
     let captured = vec![
         ".card { border: 2px; border-radius: 4px; }".into(),
@@ -109,7 +119,7 @@ fn refuses_a_prefixed_property_the_shorthand_does_not_set() {
 /// value stands rather than being deleted for want of a replacement.
 #[test]
 fn keeps_the_measured_value_when_the_base_arm_divides_between_longhands() {
-    let node = node("card", &[("padding-top", "40px")]);
+    let node = decided(node("card", &[("padding-top", "40px")]), &["padding-top"]);
     let captured = vec![
         ".card { padding: 24px 8px; }".into(),
         "@media (min-width: 500px){.card { padding: 40px; }}".into(),
@@ -120,11 +130,14 @@ fn keeps_the_measured_value_when_the_base_arm_divides_between_longhands() {
     assert_eq!(styles["padding-top"], "40px");
 }
 
-/// A conditional value that divides is equally undecodable, so it proves nothing and the
-/// measured value stands.
+/// A conditional value the artifact recorded no division for still names its longhands, and
+/// which of them a condition decided is not this stage's to work out — so the override needs
+/// no decoding at all. The base arm does need one, and `24px` has a single component, so the
+/// replacement is exact. Before the engine answered the first half, this published `40px` as
+/// the element's unconditional padding, which is the filed defect in shorthand clothing.
 #[test]
-fn withdraws_nothing_for_a_conditional_value_that_divides() {
-    let node = node("card", &[("padding-top", "40px")]);
+fn withdraws_to_a_base_arm_it_can_divide_from_an_override_it_cannot() {
+    let node = decided(node("card", &[("padding-top", "40px")]), &["padding-top"]);
     let captured = vec![
         ".card { padding: 24px; }".into(),
         "@media (min-width: 500px){.card { padding: 40px 8px; }}".into(),
@@ -132,14 +145,14 @@ fn withdraws_nothing_for_a_conditional_value_that_divides() {
 
     let styles = restored(&node, &captured);
 
-    assert_eq!(styles["padding-top"], "40px");
+    assert_eq!(styles["padding-top"], "24px");
 }
 
 /// A family whose longhands CSS renamed rather than prefixed. Nothing about `row-gap`
 /// begins with `gap`, so only the rename table reaches it.
 #[test]
 fn publishes_the_base_arm_of_a_shorthand_whose_longhands_were_renamed() {
-    let node = node("row", &[("row-gap", "32px")]);
+    let node = decided(node("row", &[("row-gap", "32px")]), &["row-gap"]);
     let captured = vec![
         ".row { gap: 8px; }".into(),
         "@container (min-width: 500px){.row { gap: 32px; }}".into(),
@@ -155,7 +168,10 @@ fn publishes_the_base_arm_of_a_shorthand_whose_longhands_were_renamed() {
 /// the one case that may still delete.
 #[test]
 fn drops_a_longhand_no_unconditional_shorthand_declared() {
-    let node = node("card", &[("background-color", "rgb(0, 255, 0)")]);
+    let node = decided(
+        node("card", &[("background-color", "rgb(0, 255, 0)")]),
+        &["background-color"],
+    );
     let captured =
         vec!["@container (min-width: 500px){.card { background: rgb(0, 255, 0); }}".into()];
 

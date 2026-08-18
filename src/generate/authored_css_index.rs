@@ -154,9 +154,9 @@ impl<'a> Index<'a> {
     ///
     /// That test exists to abstain where a literal demonstrably lost to a rule this index
     /// cannot order. Its only caller here has already identified the winner — a declaration
-    /// inside a document-answered condition, whose value it matched against the sample — so
-    /// the disagreement is explained rather than unexplained, and abstaining would restore
-    /// the very value the caller is withdrawing.
+    /// inside a document-answered condition, which the engine itself reported as deciding
+    /// this property — so the disagreement is explained rather than unexplained, and
+    /// abstaining would restore the very value the caller is withdrawing.
     pub(super) fn unconditional_values(
         &self,
         node: &Node,

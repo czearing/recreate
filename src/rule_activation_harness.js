@@ -1,17 +1,12 @@
 // A CSSOM double for the capture walk, so the walk's real logic runs under Node instead of
-// a browser. The double decides which at-rule conditions match, which is exactly what a
-// browser decides, so a walk that assumes conditions match cannot pass against it.
-const CSSRule = { MEDIA_RULE: 4 };
-// The platform's own line between a rule that groups style rules and one that merely has
-// children: @media, @supports, @container, @layer and @scope are CSSGroupingRule, while
-// @keyframes is not. The walk descends by that test, so the double has to model it.
-class CSSGroupingRule {}
-// An @import is the one rule whose child is a whole sheet rather than a rule list, and it
-// is deliberately not a CSSGroupingRule — which is why the walk saw it as a leaf.
-class CSSImportRule {}
+// a browser. This half is the page: which elements exist, which at-rule conditions hold for
+// each, and what `getComputedStyle` therefore answers. The rule and sheet objects it reads
+// come from `rule_activation_cssom.js`, which is concatenated ahead of this file.
+//
+// The double decides which at-rule conditions match, which is exactly what a browser
+// decides, so a walk that assumes conditions match cannot pass against it.
 const pathOf = element => element.path;
 
-const scene = __SCENE__;
 const authoredSheetTexts = scene.authoredSheets || [];
 
 // A scene may seed computed values an element already reports before any probe runs, which
@@ -28,119 +23,10 @@ const matchesSelector = (selector, element) =>
     .map(part => part.trim())
     .some(part => part === '*' || (part.startsWith('.') && element.classes.includes(part.slice(1))));
 
-// A declaration block stores longhands: a shorthand is a parsing convenience the engine does
-// not retain, so iterating a block yields the longhands it set while asking for the shorthand
-// by name re-serialises them. A scene spells that division as `expanded`, which is the only
-// part of CSS grammar a double cannot derive and a browser always can.
-const makeStyle = (declarations, expanded) => {
-  const stored = expanded || declarations;
-  const names = Object.keys(stored);
-  return {
-    cssText: declarationText(declarations),
-    getPropertyValue: name => (name in stored ? stored[name] : declarations[name]) || '',
-    getPropertyPriority: () => '',
-    [Symbol.iterator]: function* () {
-      yield* names;
-    }
-  };
-};
-
-const declarationText = declarations =>
-  Object.entries(declarations)
-    .map(([name, value]) => `${name}: ${value};`)
-    .join(' ');
-
-const buildRule = spec => {
-  // `import` names the sheet the rule points at: a sheet spec, or a key into `scene.named`
-  // when two rules must reach the same sheet object, which is the only way to spell a cycle.
-  // `null` is the shape CSSOM requires when a supports() condition blocked the fetch.
-  if ('import' in spec) {
-    return Object.assign(new CSSImportRule(), {
-      cssText: `@import url("${spec.imports || 'imported.css'}");`,
-      styleSheet:
-        spec.import == null
-          ? null
-          : typeof spec.import === 'string'
-            ? namedSheet(spec.import)
-            : buildSheet(spec.import)
-    });
-  }
-  // A layer order statement (`@layer a, b;`) is a rule with a prelude and no block, so it
-  // exposes neither `selectorText` nor `cssRules`. Modelling it keeps the double honest
-  // about the one rule shape that carries ordering and nothing else.
-  if (spec.statement) {
-    return { type: 12, cssText: spec.statement };
-  }
-  if (spec.selectorText) {
-    return {
-      selectorText: spec.selectorText,
-      cssText: `${spec.selectorText} { ${declarationText(spec.declarations)} }`,
-      style: makeStyle(spec.declarations, spec.expanded)
-    };
-  }
-  // A definition rule such as @property or @counter-style has a block of descriptors and
-  // no children at all, so it exposes neither `selectorText` nor `cssRules`.
-  if (!spec.rules) {
-    return { type: 12, cssText: `${spec.prelude} { ${declarationText(spec.declarations)} }` };
-  }
-  const rules = spec.rules.map(buildRule);
-  const grouped = {
-    // A browser reads the rule interface from the at-rule the author wrote, so the double
-    // derives it from the prelude too. Taking it from a fixture flag instead lets a scene
-    // declare a `@media` prelude that is not a media rule, which no page can produce.
-    type: spec.prelude.startsWith('@media') ? CSSRule.MEDIA_RULE : 12,
-    conditionText: spec.conditionText,
-    cssText: `${spec.prelude} { ${rules.map(rule => rule.cssText).join(' ')} }`,
-    cssRules: rules
-  };
-  // A keyframes block exposes children without grouping style rules, which is the shape
-  // that must not be descended into.
-  return spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
-};
-
-// A sheet is more than its rule list: its `media` conditions everything inside without
-// appearing inside, and its `href` is the only identity a recovered text carries. A scene
-// may spell a sheet as a bare rule list when it exercises neither.
-//
-// Reads are counted because a walk with no bound on the import graph does not crash — the
-// recursion unwinds into the same catch that guards an unreadable sheet — so its only
-// observable is how much work it did before silently giving up.
-let reads = 0;
-const buildSheet = spec => {
-  const plain = Array.isArray(spec);
-  return {
-    href: plain ? null : spec.href || null,
-    media: { mediaText: plain ? '' : spec.media || '' },
-    get cssRules() {
-      reads++;
-      if (!plain && spec.unreadable) throw new Error('SecurityError');
-      return (plain ? spec : spec.rules).map(buildRule);
-    }
-  };
-};
-
-// Two imports of one address are two independent sheets, so a scene names a sheet only when
-// it needs both rules to reach the *same* object — which is what makes a cycle expressible.
-const namedSheets = new Map();
-const namedSheet = name => {
-  if (!namedSheets.has(name)) namedSheets.set(name, buildSheet(scene.named[name]));
-  return namedSheets.get(name);
-};
-
-// The browser parses a recovered sheet's text; the double looks up what that text parses
-// to, so the walk's own decisions about the fallback are observable without a CSS parser.
-// The count is reported because "did not parse this again" is the whole point of the
-// fallback's guard and leaves no trace in what was recorded.
-let parses = 0;
-class CSSStyleSheet {
-  constructor() {
-    this.cssRules = [];
-  }
-  replaceSync(text) {
-    parses++;
-    this.cssRules = ((scene.parsed || {})[text] || []).map(buildRule);
-  }
-}
+// Which elements an at-rule prelude holds for, answered by the scene exactly as a browser
+// answers it from the viewport or from a container's used size.
+const conditionHolds = (prelude, element) =>
+  (scene.matching[prelude] || []).includes(element.path);
 
 // Applies a probe block the way a browser would: the sentinel lands only on elements the
 // selector matches and for which every enclosing condition holds.
@@ -157,8 +43,9 @@ const applyProbeBlock = text => {
   const property = rest.slice(open + 1, rest.lastIndexOf('}')).split(':')[0].trim();
   for (const element of elements) {
     if (!matchesSelector(selector, element)) continue;
-    const holds = conditions.every(condition => (scene.matching[condition] || []).includes(element.path));
-    if (holds) element.probes[property] = '1';
+    if (conditions.every(condition => conditionHolds(condition, element))) {
+      element.probes[property] = '1';
+    }
   }
 };
 
@@ -177,9 +64,38 @@ const document = {
 };
 
 const getComputedStyle = element => ({
-  getPropertyValue: name => element.probes[name] || ''
+  // A probe sentinel is read straight back; anything else is resolved through the rules
+  // still in force, so a block a stage empties stops contributing exactly as it would.
+  getPropertyValue: name => {
+    if (element.probes[name]) return element.probes[name];
+    let value = '';
+    for (const { selectorText, style, conditions, rule } of liveRules) {
+      if (rule.parentStyleSheet && rule.parentStyleSheet.disabled) continue;
+      if (!matchesSelector(selectorText, element)) continue;
+      if (!conditions.every(prelude => conditionHolds(prelude, element))) continue;
+      const declared = style.getPropertyValue(name);
+      if (declared) value = declared;
+    }
+    return value;
+  }
 });
+
+// The records the walk would have built, paired with the elements they came from.
+const elementNodes = elements.map(element => [element, { path: element.path }]);
 
 __CAPTURE__
 
-console.log(JSON.stringify({ cssRules, stateStyles, parses, reads, shorthands: [...shorthandBlocks.values()] }));
+console.log(JSON.stringify({
+  cssRules,
+  stateStyles,
+  parses,
+  reads,
+  shorthands: [...shorthandBlocks.values()],
+  decided: elementNodes.map(([, node]) => node),
+  // Each sheet's switch once the walk is over, so a stage that turns a sheet off to rewrite
+  // its rules can be shown to have left it as the page had it.
+  switches: document.styleSheets.map(sheet => sheet.disabled),
+  // What every style rule's block holds once the walk is over, so a stage that withdraws a
+  // block to read past it can be shown to have put the page back as it found it.
+  blocks: liveRules.map(rule => ({ selectorText: rule.selectorText, cssText: rule.style.cssText }))
+}));
