@@ -96,6 +96,10 @@ impl<'a> Index<'a> {
     /// test in `authored_value` deliberately absent, and with a property the author never
     /// declared unconditionally simply absent from the result.
     ///
+    /// A property declared only through a value this stage cannot divide between longhands is
+    /// present and `None`, so a caller can tell "the author wrote no arm" from "the author
+    /// wrote one this cannot read" and refuse to delete on the second.
+    ///
     /// That test exists to abstain where a literal demonstrably lost to a rule this index
     /// cannot order. Its only caller here has already identified the winner — a declaration
     /// inside a document-answered condition, whose value it matched against the sample — so
@@ -105,7 +109,7 @@ impl<'a> Index<'a> {
         &self,
         node: &Node,
         properties: &BTreeSet<String>,
-    ) -> BTreeMap<String, String> {
+    ) -> BTreeMap<String, Option<String>> {
         self.table.declared_values(node, properties)
     }
 

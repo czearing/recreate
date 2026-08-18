@@ -190,6 +190,7 @@ mod selector_scope_fixture;
 #[cfg(test)]
 mod selector_scope_tests;
 mod shadow_root;
+mod shorthand;
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;

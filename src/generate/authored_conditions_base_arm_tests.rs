@@ -128,3 +128,6 @@ mod guards;
 
 #[path = "authored_conditions_base_arm_nesting_tests.rs"]
 mod nesting;
+
+#[path = "authored_conditions_base_arm_shorthand_tests.rs"]
+mod shorthand;

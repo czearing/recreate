@@ -121,9 +121,10 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
                 // condition declares for it. A value merely present elsewhere in the node's
                 // style is a coincidence, not evidence, and reading it as one withdraws an
                 // arm that was never in force.
-                if node.style.get(&name) == Some(&value) {
-                    withdraw.insert(name);
-                }
+                //
+                // Asked of every longhand the name stands for, because a capture enumerates
+                // longhands and a name the author shortened matches none of them.
+                withdraw.extend(super::shorthand::measured(&node.style, &name, &value));
             }
         }
     }
@@ -136,9 +137,17 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
     let unconditional = index.unconditional_values(node, &withdraw);
     for name in withdraw {
         match unconditional.get(&name) {
-            Some(value) => styles.insert(name, value.clone()),
-            None => styles.remove(&name),
-        };
+            // Declared, and divided between longhands by a grammar this stage does not read.
+            // The measured value is the only one it can state, so the withdrawal is dropped
+            // rather than completed with a value nothing supports.
+            Some(None) => (),
+            Some(Some(value)) => {
+                styles.insert(name, value.clone());
+            }
+            None => {
+                styles.remove(&name);
+            }
+        }
     }
 }
 

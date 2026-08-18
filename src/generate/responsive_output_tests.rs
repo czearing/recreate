@@ -105,7 +105,7 @@ fn a_shorthand_no_longhand_replaces_is_kept() {
     assert!(css.contains("padding:2vw"), "{css}");
 }
 
-/// `gap` and `inset` are the two families whose parts are not spelled as their prefix.
+/// `gap` and `inset` are among the families whose parts are not spelled as their prefix.
 /// A partial set of parts leaves the shorthand carrying the rest, so it stays.
 #[test]
 fn a_shorthand_only_partly_replaced_is_kept() {
@@ -116,6 +116,24 @@ fn a_shorthand_only_partly_replaced_is_kept() {
         .replace("row-gap:8px;", "")
         .replace("column-gap:8px;", "");
     assert!(!replaced.contains("gap:"), "{replaced}");
+}
+
+/// `flex-flow` is renamed exactly as `gap` and `inset` are, and sorted emission places it
+/// between the two longhands that spell it out — so it overrode `flex-direction` with its
+/// own copy while claiming to be inert. Reading the renames from their one owner is what
+/// reaches it; a family listed twice was only ever going to be listed short in one place.
+#[test]
+fn a_renamed_shorthand_its_longhands_override_is_not_repeated() {
+    let css = render(&[
+        ("flex-flow", "row wrap"),
+        ("flex-direction", "row"),
+        ("flex-wrap", "wrap"),
+    ]);
+    assert!(!css.contains("flex-flow:"), "{css}");
+    assert!(css.contains("flex-direction:row"), "{css}");
+
+    let partial = render(&[("flex-flow", "row wrap"), ("flex-direction", "row")]);
+    assert!(partial.contains("flex-flow:row wrap"), "{partial}");
 }
 
 /// A longhand that merely shares a prefix with another longhand is not a shorthand of
