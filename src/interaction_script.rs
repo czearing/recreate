@@ -10,6 +10,7 @@ pub fn source() -> String {
 
 fn render(selection: &str) -> String {
     crate::node_path::embed(SOURCE)
+        .replace("__MOTION_POLICY__", crate::page_script::RESTING)
         .replace("__STYLE_BASELINE__", &style_baseline::source())
         .replace(
             "__ASSET_ATTRIBUTES__",

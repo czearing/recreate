@@ -227,6 +227,7 @@ mod source_svg_name_tests;
 mod source_view_split;
 mod stand_in;
 mod starting_style;
+mod starting_style_entry;
 mod startup_overlays;
 mod startup_replay;
 #[cfg(test)]

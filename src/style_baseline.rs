@@ -11,7 +11,11 @@ const SCRIPT: &str = include_str!("style_baseline_script.js");
 
 /// The measurement and the box list it measures, as one evaluable source.
 pub fn source() -> String {
-    format!("{}\n{SCRIPT}", crate::generated_boxes::SOURCE)
+    format!(
+        "{}\n{}\n{SCRIPT}",
+        crate::generated_boxes::SOURCE,
+        crate::capture_transitions::SOURCE
+    )
 }
 
 #[cfg(test)]

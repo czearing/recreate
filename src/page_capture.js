@@ -7,7 +7,7 @@ __ASSET_ATTRIBUTES__
   const skipped = element =>
     ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup');
   const isBlockingOverlay = __BLOCKING_OVERLAY__;
-  measureBaselines(document.documentElement, skipped);
+  __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
   const computedStyles = new WeakMap(), computedStylePropertySet = new Set();
   const scan = element => {
     if (ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup')) return;

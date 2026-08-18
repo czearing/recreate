@@ -27,6 +27,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub(crate) struct BeforeChange {
     by_target: HashMap<String, Styles>,
+    entry: Vec<Animation>,
 }
 
 impl BeforeChange {
@@ -50,7 +51,20 @@ impl BeforeChange {
                 by_target.insert(node.path.clone(), declared);
             }
         }
-        Self { by_target }
+        Self {
+            by_target,
+            entry: Vec::new(),
+        }
+    }
+
+    /// The same reading, joined to the animations a state recorded.
+    ///
+    /// Building the entry motion needs the nodes as well as the blocks, so it is done once the
+    /// recorded animations are known and kept beside the seeding rather than repeated by every
+    /// caller of it.
+    pub(crate) fn with_entry_motion(mut self, nodes: &[Node], recorded: &[Animation]) -> Self {
+        self.entry = super::starting_style_entry::animations(&self.by_target, nodes, recorded);
+        self
     }
 
     /// The animations with every opening frame the API could not report restored.
@@ -62,7 +76,7 @@ impl BeforeChange {
         if self.by_target.is_empty() {
             return animations.to_vec();
         }
-        animations
+        let mut seeded: Vec<Animation> = animations
             .iter()
             .map(|animation| {
                 let mut animation = animation.clone();
@@ -83,7 +97,9 @@ impl BeforeChange {
                 }
                 animation
             })
-            .collect()
+            .collect();
+        seeded.extend(self.entry.iter().cloned());
+        seeded
     }
 }
 

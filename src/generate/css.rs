@@ -72,7 +72,8 @@ pub(super) fn build_scoped(
     animations::append(
         &base.animations,
         &authored,
-        &super::before_change::BeforeChange::new(&base.css_rules, &base.nodes),
+        &super::before_change::BeforeChange::new(&base.css_rules, &base.nodes)
+            .with_entry_motion(&base.nodes, &base.animations),
         &mut classes,
         &mut css,
     );

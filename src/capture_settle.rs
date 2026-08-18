@@ -8,9 +8,18 @@
 //!
 //! The page already knows when it changed. A `MutationObserver` reports DOM edits as they
 //! happen, so quiet costs nothing to observe and is detected within one animation frame
-//! instead of one poll interval. Layout that moves without a DOM edit — a CSS transition —
-//! is caught by comparing the geometry signature across a single frame, and that scan runs
-//! only at moments the DOM has already gone quiet rather than on every tick.
+//! instead of one poll interval. Layout that moves without a DOM edit is caught by comparing
+//! the geometry signature across a single frame, and that scan runs only at moments the DOM
+//! has already gone quiet rather than on every tick.
+//!
+//! A geometry signature says whether the page's shape has stopped moving, which is not the
+//! same question as whether every value on it has arrived: a transition on a paint-only
+//! property changes what the page looks like without changing any rect, so two consecutive
+//! frames of one hash identically. That second question is not asked here and cannot be,
+//! because the capture's own baseline measurement provokes a transition on every element it
+//! reverts and restores, so any answer taken before it would already be stale.
+//! `capture_transitions` answers it by suspending transitions for the reading that needs one,
+//! and the signature is left to answer only the question it can answer.
 
 use crate::blocking_overlay;
 use anyhow::Result;

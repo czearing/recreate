@@ -15,7 +15,10 @@ pub fn append(
     let mut emitted_keyframes = BTreeSet::new();
     let mut targets: BTreeMap<&str, Vec<(String, String, &Animation)>> = BTreeMap::new();
     for animation in &animations {
-        if animation.keyframes.len() < 2
+        // A record with no frames describes nothing. One frame is a beginning and nothing
+        // else, which is exactly what an entry motion is: a keyframes block that states
+        // `from` and stops travels towards the element's own computed value.
+        if animation.keyframes.is_empty()
             || sampled_layout_observation(animation)
             || authored.contains(&animation.name)
         {

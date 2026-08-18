@@ -16,12 +16,21 @@ fn with_sheets(template: &str, sheets: &[AuthoredSheet]) -> String {
 }
 
 fn source_template() -> String {
-    template_with_assets(&asset_script::with_downloads())
+    template_with_assets(&asset_script::with_downloads(), RESTING)
 }
 
+/// How the reader treats motion still under way.
+///
+/// A read of a resting page must not land mid-transition, because an interpolated value is one
+/// the author never wrote. A read of a single moment must land wherever that moment is, so it
+/// leaves the page moving exactly as it found it.
+pub const RESTING: &str = "restingRead";
+const AS_FOUND: &str = "movingRead";
+
 /// One template, so a capture stage added here cannot be missing from the asset-free form.
-fn template_with_assets(assets: &str) -> String {
+fn template_with_assets(assets: &str, motion: &str) -> String {
     crate::node_path::embed(CAPTURE)
+        .replace("__MOTION_POLICY__", motion)
         .replace("__STYLE_BASELINE__", &style_baseline::source())
         .replace(
             "__ASSET_ATTRIBUTES__",
@@ -42,7 +51,20 @@ fn template_with_assets(assets: &str) -> String {
 
 pub fn source_without_assets() -> String {
     with_sheets(
-        &template_with_assets(&asset_script::without_downloads()),
+        &template_with_assets(&asset_script::without_downloads(), RESTING),
+        &[],
+    )
+}
+
+/// The same reader, reading a page that is deliberately still moving.
+///
+/// The first-paint phase is a snapshot of one moment, and every entry transition the page
+/// declares is in flight during it. Bringing those to their end would be reading a later page
+/// than the one asked for, and would leave the page holding values that stop the transition
+/// from ever being re-provoked, so the motion is lost to every reader after this one too.
+pub fn source_at_first_paint() -> String {
+    with_sheets(
+        &template_with_assets(&asset_script::without_downloads(), AS_FOUND),
         &[],
     )
 }

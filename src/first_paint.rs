@@ -75,7 +75,7 @@ pub fn source() -> String {
          (document.body.children.length>0||document.readyState!=='loading');\
          const arm=()=>requestAnimationFrame(()=>{{if(!painted())return arm();\
          window.{STASH}={{at:performance.now(),state:{capture}}};}});arm();}})();",
-        capture = crate::page_script::source_without_assets(),
+        capture = crate::page_script::source_at_first_paint(),
     )
 }
 

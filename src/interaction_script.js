@@ -2,7 +2,7 @@
 __STYLE_BASELINE__
 __ASSET_ATTRIBUTES__
   const skipped = element => false;
-  measureBaselines(document.documentElement, skipped);
+  __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
 __NODE_PATH__
   const visible = element => {
     const rect = element.getBoundingClientRect();
