@@ -23,7 +23,7 @@ __SELECTION__
       namespace: element.namespaceURI || '',
       node_type: element.nodeType,
       tree_scope: 'document',
-      physical_parent: element.parentElement ? pathOf(element.parentElement) : null,
+      physical_parent: holderPath(element),
       assigned_slot: element.assignedSlot ? pathOf(element.assignedSlot) : null,
       shadow_root_mode: element.shadowRoot?.mode || null,
       client_rects: [...element.getClientRects()].map(value => ({
@@ -42,7 +42,7 @@ __SELECTION__
     };
     nodes.push({
       path,
-      parent: element.parentElement ? pathOf(element.parentElement) : null,
+      parent: holderPath(element),
       tag: element.tagName.toLowerCase(),
       text: '',
       attributes: recreateAttributes(element, path),

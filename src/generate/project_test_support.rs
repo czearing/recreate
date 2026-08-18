@@ -65,6 +65,8 @@ pub(super) fn state(width: u32) -> PageState {
             None,
         ));
     }
+    nodes.extend(super::project_shadow_support::shadow_host(1));
+    nodes.extend(super::project_shadow_support::shadow_host(2));
     let card_width = match width {
         0..=320 => "70px",
         321..=390 => "80px",

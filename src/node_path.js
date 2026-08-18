@@ -28,13 +28,19 @@
     return indexes.get(element) || 1;
   };
   const shadowPath = root => `${pathOf(root.host)}>::shadow-root(${root.mode})`;
+  // The address of the node that holds `element`. Every record of parentage is this value,
+  // so it is written once: a copy that stops at `parentElement` reports no holder at all for
+  // the top of a shadow tree, which detaches that whole tree from the element that opened it.
+  // `null` is reserved for the one element that genuinely has no holder.
+  const holderPath = element => {
+    if (element.parentElement) return pathOf(element.parentElement);
+    const root = element.getRootNode();
+    return root instanceof ShadowRoot ? shadowPath(root) : null;
+  };
   const pathOf = element => {
     const cached = pathCache.get(element);
     if (cached) return cached;
-    const root = element.getRootNode();
-    const parent = element.parentElement
-      ? pathOf(element.parentElement)
-      : root instanceof ShadowRoot ? shadowPath(root) : 'html';
+    const parent = holderPath(element) ?? 'html';
     const path = `${parent}>${element.tagName.toLowerCase()}:nth-of-type(${siblingIndex(element)})`;
     pathCache.set(element, path);
     return path;

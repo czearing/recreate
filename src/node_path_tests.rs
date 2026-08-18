@@ -14,6 +14,12 @@ fn paths(scene: &str, expression: &str) -> Vec<String> {
     serde_json::from_value(evaluate(&preamble, expression)).unwrap()
 }
 
+/// The same, for the half of the definition that is allowed to answer "nothing holds this".
+fn holders(scene: &str, expression: &str) -> Vec<Option<String>> {
+    let preamble = format!("{}\n{scene}", crate::node_path::embed(HARNESS));
+    serde_json::from_value(evaluate(&preamble, expression)).unwrap()
+}
+
 /// A page with no shadow tree at all: the path is the chain of elements, numbered per tag.
 #[test]
 fn addresses_a_light_dom_element_by_its_position_among_same_tag_siblings() {
@@ -102,71 +108,57 @@ fn records_the_mode_of_the_tree_the_element_lives_in() {
     assert!(paths(scene, "[pathOf(slot)]")[0].contains("::shadow-root(closed)"));
 }
 
-/// Every script that resolves an element to a path, named once.
+/// The parentage half of the address, which is the half the artifact is assembled from.
 ///
-/// A path is a key in one map, so these must agree byte for byte; the list is here rather
-/// than in each caller so a new producer is added by one line and cannot be half-registered.
-fn producers() -> Vec<(&'static str, String)> {
-    vec![
-        (
-            "resting capture",
-            crate::page_script::source_without_assets(),
-        ),
-        ("interaction capture", crate::interaction_script::source()),
-        ("lifecycle recorder", crate::lifecycle_script::source()),
-        (
-            "interaction discovery",
-            crate::interactions::interactions_scripts::candidates(),
-        ),
-        (
-            "action scope",
-            crate::interactions::interactions_scripts::action_scope(),
-        ),
-        (
-            "comparison animations",
-            crate::compare_capture::animations_script(),
-        ),
-        (
-            "focused element",
-            crate::interactions_input::focused_script(),
-        ),
-    ]
+/// Every top node of a shadow tree has a null `parentElement`, so a record derived from that
+/// property alone reports no holder at all for them — while their paths stay perfectly
+/// correct. The tree builder attaches a node only under a holder it was given, so the whole
+/// shadow subtree detaches at its top and disappears from the output, addresses and all.
+#[test]
+fn holds_the_top_of_a_shadow_tree_under_the_root_that_opened_it() {
+    let scene = "
+      const body = element('BODY', document.documentElement);
+      const card = element('X-CARD', body);
+      const root = attachShadow(card, 'open');
+      const frame = inShadow(root, 'DIV');
+      const nested = element('SPAN', frame);
+    ";
+    assert_eq!(
+        holders(scene, "[holderPath(frame), holderPath(nested)]"),
+        [
+            Some(
+                "html>body:nth-of-type(1)>x-card:nth-of-type(1)>::shadow-root(open)".to_string()
+            ),
+            Some(
+                "html>body:nth-of-type(1)>x-card:nth-of-type(1)>::shadow-root(open)>div:nth-of-type(1)"
+                    .to_string()
+            ),
+        ]
+    );
 }
 
-/// The seam, which is the part a behavioural test cannot pin: a producer that grew its own
-/// copy would still resolve light-DOM paths correctly and would still pass every assertion
-/// above, right up to the moment it met a shadow tree and aborted the run.
+/// The unchanged case, and the one value that is genuinely absent. A holder of `null` has to
+/// keep meaning "nothing holds this", or the document root acquires a parent and the tree
+/// builder loses its only entry point.
 #[test]
-fn every_producer_of_a_path_carries_the_one_definition() {
-    for (name, script) in producers() {
-        assert!(
-            crate::node_path::embedded(&script),
-            "{name} does not carry the shared path definition"
-        );
-        assert_eq!(
-            script.matches("const pathOf").count(),
-            1,
-            "{name} defines a path function of its own"
-        );
-        assert!(
-            !script.contains(crate::node_path::PLACEHOLDER),
-            "{name} ships the placeholder unsubstituted"
-        );
-    }
+fn reports_no_holder_only_for_the_element_that_has_none() {
+    let scene = "
+      const body = element('BODY', document.documentElement);
+      const div = element('DIV', body);
+    ";
+    assert_eq!(
+        holders(
+            scene,
+            "[holderPath(document.documentElement), holderPath(body), holderPath(div)]"
+        ),
+        [
+            None,
+            Some("html".to_string()),
+            Some("html>body:nth-of-type(1)".to_string()),
+        ]
+    );
 }
 
-/// No producer may reach a parent's children without the branch that survives a shadow root.
-/// This is the exact expression that threw, and its absence is what the whole repair buys.
-#[test]
-fn no_producer_reads_children_through_an_unguarded_parent_element() {
-    for (name, script) in producers() {
-        assert!(
-            !script.contains("parentElement.children"),
-            "{name} enumerates a parent element that is null inside a shadow tree"
-        );
-        assert!(
-            script.contains("root instanceof ShadowRoot"),
-            "{name} cannot tell a shadow boundary from the document root"
-        );
-    }
-}
+#[cfg(test)]
+#[path = "node_path_seam_tests.rs"]
+mod seam;

@@ -1,19 +1,26 @@
-//! A generated file imports only what it uses.
+//! A generated file imports exactly what it uses.
 //!
 //! The preamble each split file needs depends on what its own segment happens to contain, so
 //! any preamble written as a fixed string is right for some files and wrong for the rest. That
 //! is not cosmetic: an unused import names a module the reader will open and study, and it
 //! keeps a runtime file alive that no code path can reach, so the recreation reads as though
-//! it has behaviour it does not have.
+//! it has behaviour it does not have. The mirror failure is worse: a file that uses a binding
+//! it never imported does not parse at all.
 //!
 //! Rather than deciding per binding at each of the many places a source file is written, the
 //! decision is made once, here, over the finished tree — which is also the only place that can
-//! see a file after every writer has contributed to it.
+//! see a file after every writer has contributed to it, and the only place that knows how deep
+//! in the tree each file sits, which is what a relative import path is made of.
 
 use anyhow::Result;
 use std::{fs, path::Path};
 
-/// Rewrites every emitted script under `root` to drop named imports it never mentions.
+/// Bindings a writer may emit without arranging for them, because the import they need is a
+/// path only the finished tree can spell. Keyed on the binding, so the writer names the
+/// component and nothing else.
+const SUPPLIED: [(&str, &str); 1] = [(super::shadow_root::COMPONENT, super::shadow_root::MODULE)];
+
+/// Rewrites every emitted script under `root` so its imports match what it mentions.
 pub fn prune_tree(root: &Path) -> Result<()> {
     let mut pending = vec![root.to_path_buf()];
     while let Some(path) = pending.pop() {
@@ -30,12 +37,52 @@ pub fn prune_tree(root: &Path) -> Result<()> {
                 continue;
             }
             let source = fs::read_to_string(&path)?;
-            if let Some(pruned) = prune(&source) {
-                fs::write(&path, pruned)?;
+            let supplied = supply(&source, root, &path);
+            let source = supplied.as_deref().unwrap_or(&source);
+            match prune(source) {
+                Some(pruned) => fs::write(&path, pruned)?,
+                None if supplied.is_some() => fs::write(&path, source)?,
+                None => {}
             }
         }
     }
     Ok(())
+}
+
+/// The source with any supplied binding it mentions but does not bind now imported, or `None`
+/// when it already binds everything it uses.
+///
+/// The module that defines a binding is skipped, or it would import itself.
+fn supply(source: &str, root: &Path, path: &Path) -> Option<String> {
+    let added = SUPPLIED
+        .iter()
+        .filter(|(_, module)| !path.ends_with(module))
+        .filter(|(name, _)| mentions(source, name))
+        .filter(|(name, _)| !source.lines().any(|line| is_import_of(line, name)))
+        .map(|(name, module)| format!("import {{{name}}} from '{}{module}';", up(root, path)))
+        .collect::<Vec<_>>();
+    (!added.is_empty()).then(|| format!("{}\n{source}", added.join("\n")))
+}
+
+/// The prefix that reaches `root` from the directory `path` sits in.
+fn up(root: &Path, path: &Path) -> String {
+    let depth = path
+        .parent()
+        .and_then(|parent| parent.strip_prefix(root).ok())
+        .map_or(0, |relative| relative.components().count());
+    if depth == 0 {
+        "./".to_string()
+    } else {
+        "../".repeat(depth)
+    }
+}
+
+fn is_import_of(line: &str, name: &str) -> bool {
+    is_named_import(line)
+        && line
+            .split_once('{')
+            .and_then(|(_, rest)| rest.split_once('}'))
+            .is_some_and(|(names, _)| names.split(',').any(|value| binding(value) == name))
 }
 
 /// The rewritten source, or `None` when every import is already used.
@@ -101,62 +148,5 @@ pub(super) fn mentions(source: &str, name: &str) -> bool {
 }
 
 #[cfg(test)]
-mod tests {
-    /// The case the corpus was shipping: a portal helper imported into every view, and used by
-    /// two thirds of none of them.
-    #[test]
-    fn drops_an_import_the_file_never_mentions() {
-        let source = "import React from 'react';\nimport {createPortal} from 'react-dom';\n\nexport default function View(){return <div/>}\n";
-        assert_eq!(
-            super::prune(source).unwrap(),
-            "import React from 'react';\n\nexport default function View(){return <div/>}\n"
-        );
-    }
-
-    /// Pruning must be a narrowing. A file that uses what it imports is returned untouched, and
-    /// reported as untouched so the tree is not rewritten for nothing.
-    #[test]
-    fn leaves_a_used_import_alone() {
-        let source = "import {createPortal} from 'react-dom';\nconst view=createPortal(null,document.body);\n";
-        assert_eq!(super::prune(source), None);
-    }
-
-    /// One clause commonly carries several bindings, so the decision is per name.
-    #[test]
-    fn keeps_only_the_used_names_of_a_shared_clause() {
-        let source = "import {keyActivate,ExistingSurface,InsertedSurface} from './runtime.jsx';\nconst a=<InsertedSurface/>;\n";
-        assert_eq!(
-            super::prune(source).unwrap(),
-            "import {InsertedSurface} from './runtime.jsx';\nconst a=<InsertedSurface/>;\n"
-        );
-    }
-
-    /// An import renamed on the way in is used under its local name, which is the one that has
-    /// to appear.
-    #[test]
-    fn judges_a_renamed_import_by_its_local_name() {
-        let used =
-            "import {moveCarousel as move} from './carousel.mjs';\nconst next=move(state);\n";
-        assert_eq!(super::prune(used), None);
-        let unused = "import {moveCarousel as move} from './carousel.mjs';\nconst next=moveCarousel(state);\n";
-        assert_eq!(
-            super::prune(unused).unwrap(),
-            "const next=moveCarousel(state);\n"
-        );
-    }
-
-    /// A name that merely occurs inside a longer identifier is not a use of it, or nothing
-    /// would ever be pruned.
-    #[test]
-    fn does_not_count_a_longer_identifier_as_a_use() {
-        let source = "import {Surface} from './runtime.jsx';\nconst a=<SurfaceHost/>;\n";
-        assert_eq!(super::prune(source).unwrap(), "const a=<SurfaceHost/>;\n");
-    }
-
-    /// An import used only by another import line is still unused by the file.
-    #[test]
-    fn ignores_uses_that_are_themselves_import_clauses() {
-        let source = "import {createPortal} from 'react-dom';\nimport {createPortal} from './shim.js';\nconst a=1;\n";
-        assert_eq!(super::prune(source).unwrap(), "const a=1;\n");
-    }
-}
+#[path = "source_imports_tests.rs"]
+mod tests;

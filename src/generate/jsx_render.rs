@@ -1,3 +1,4 @@
+use super::shadow_root;
 use super::{
     jsx_attrs::{attributes, jsx_tag, quoted, void_tag},
     jsx_host_props::{adopted, binds_value},
@@ -50,6 +51,9 @@ pub(super) fn render(
     } else {
         render_children(path, components, assets, depth + 1, handlers)
     };
+    if shadow_root::is_root(node) {
+        return shadow_root::element(node, &children, &indent);
+    }
     if allow_component && let Some(index) = components.by_root.get(path) {
         let name = &components.items[*index].name;
         let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));

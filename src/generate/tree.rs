@@ -1,3 +1,4 @@
+use super::component_bodies::merge_identical_bodies;
 use super::{names, structural_tree};
 use crate::model::{Node, Specification};
 use sha2::{Digest, Sha256};
@@ -46,6 +47,15 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
     let mut candidates: Vec<(Vec<String>, usize)> = groups
         .into_values()
         .filter(|roots| roots.len() >= 2)
+        .filter(|roots| {
+            // A component is a styled wrapper around its children. A shadow root has neither
+            // a box nor a class, and two hosts of one custom element fingerprint alike, so
+            // without this the sentinel would be re-emitted from `jsx_render::component`,
+            // where no translation reaches it.
+            !nodes
+                .get(&roots[0])
+                .is_some_and(|node| super::shadow_root::is_root(node))
+        })
         .filter_map(|roots| {
             let size = subtree_size(&roots[0], &children, &mut sizes);
             (2..=120).contains(&size).then_some((roots, size))
@@ -100,45 +110,6 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             .map(|node| (node.path.clone(), node))
             .collect(),
     }
-}
-
-/// Collapses candidate groups that would emit byte-identical components.
-///
-/// A generated component is a styled wrapper — its body is only the tag and the
-/// class, because children are always rendered at the call site. So two groups
-/// sharing a tag and a class are the same component by construction, however
-/// their subtrees differ, and emitting both produces pure duplication.
-fn merge_identical_bodies(
-    candidates: Vec<(Vec<String>, usize)>,
-    nodes: &BTreeMap<String, &Node>,
-    classes: &BTreeMap<String, String>,
-) -> Vec<(Vec<String>, usize)> {
-    let mut order: Vec<String> = Vec::new();
-    let mut merged: HashMap<String, (Vec<String>, usize)> = HashMap::new();
-    for (roots, size) in candidates {
-        let Some(root) = roots.first() else {
-            continue;
-        };
-        let Some(node) = nodes.get(root) else {
-            continue;
-        };
-        let body = format!(
-            "{}|{}",
-            node.tag,
-            classes.get(root).map(String::as_str).unwrap_or_default()
-        );
-        match merged.get_mut(&body) {
-            Some((existing, _)) => existing.extend(roots),
-            None => {
-                order.push(body.clone());
-                merged.insert(body, (roots, size));
-            }
-        }
-    }
-    order
-        .into_iter()
-        .filter_map(|body| merged.remove(&body))
-        .collect()
 }
 
 fn fingerprint(

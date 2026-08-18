@@ -40,6 +40,7 @@ mod carousel_inference;
 #[cfg(test)]
 #[path = "carousel_inference_tests.rs"]
 mod carousel_inference_tests;
+mod component_bodies;
 mod component_identity;
 mod compound;
 mod css;
@@ -143,6 +144,8 @@ mod names_tests;
 mod project;
 mod project_mount;
 #[cfg(test)]
+mod project_shadow_support;
+#[cfg(test)]
 mod project_test_support;
 #[cfg(test)]
 mod project_text_entry_support;
@@ -186,6 +189,7 @@ mod selector_scope;
 mod selector_scope_fixture;
 #[cfg(test)]
 mod selector_scope_tests;
+mod shadow_root;
 mod source_css;
 mod source_css_compact;
 mod source_dedupe;

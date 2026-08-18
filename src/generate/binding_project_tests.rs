@@ -68,6 +68,48 @@ async fn checks_a_project_that_still_contains_the_branch_the_defect_lived_in() {
     );
 }
 
+/// The shadow repair, stated over the artifact. Parsing alone is not the property: dropping
+/// the subtree would satisfy it too, and that is the erasure this replaces. So the sentinel
+/// must be absent *and* the content it named must be present, nested inside the translation.
+#[tokio::test]
+async fn translates_the_shadow_sentinel_and_keeps_the_subtree_it_named() {
+    let directory = tempfile::tempdir().unwrap();
+    write_project(&support::specification(), directory.path(), &[])
+        .await
+        .unwrap();
+    let source = directory.path().join("react/src");
+    let sources = scripts(&source)
+        .iter()
+        .map(|path| {
+            (
+                path.strip_prefix(&source).unwrap().to_owned(),
+                fs::read_to_string(path).unwrap(),
+            )
+        })
+        .collect::<Vec<_>>();
+    for (path, text) in &sources {
+        assert!(
+            !text.contains("#shadow-root"),
+            "{path:?} ships the capture sentinel"
+        );
+    }
+    let hosts = sources
+        .iter()
+        .filter(|(_, text)| text.contains("<ShadowRoot mode={\"open\"}>"))
+        .collect::<Vec<_>>();
+    assert!(!hosts.is_empty(), "no file opens a shadow root");
+    for (path, text) in hosts {
+        assert!(
+            text.contains("\"Shadowed\""),
+            "{path:?} opens a shadow root whose subtree was dropped"
+        );
+        assert!(
+            text.contains("{ShadowRoot}") && text.contains("runtime/shadow.mjs"),
+            "{path:?} uses a component it never imports"
+        );
+    }
+}
+
 /// Every emitted module, whichever writer produced it.
 fn scripts(root: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();

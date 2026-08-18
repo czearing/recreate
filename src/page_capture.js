@@ -52,9 +52,7 @@ __NODE_PATH__
       namespace: element.namespaceURI || '',
       node_type: element.nodeType,
       tree_scope: root instanceof ShadowRoot ? shadowPath(root) : 'document',
-      physical_parent: element.parentElement
-        ? pathOf(element.parentElement)
-        : root instanceof ShadowRoot ? shadowPath(root) : null,
+      physical_parent: holderPath(element),
       assigned_slot: element.assignedSlot ? pathOf(element.assignedSlot) : null,
       shadow_root_mode: null,
       client_rects: Array.from(element.getClientRects(), rect => ({
@@ -81,7 +79,7 @@ __NODE_PATH__
     const attributes = recreateAttributes(element, path);
     nodes.push({
       path,
-      parent: element.parentElement ? pathOf(element.parentElement) : null,
+      parent: holderPath(element),
       tag: element.tagName.toLowerCase(),
       text: '',
       attributes,
