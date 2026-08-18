@@ -147,13 +147,16 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
     }
 }
 
+/// Rules sharing a condition chain and a declaration block are emitted once, on one selector
+/// list. A sheet linked `media="all"` wraps every rule it holds in the identity condition, so
+/// without the merge a page's resets arrive once per element that carries them.
 fn append_authored_conditions(
     base: &PageState,
     prefix: &str,
     classes: &BTreeMap<String, String>,
     css: &mut String,
 ) -> BTreeSet<String> {
-    let mut emitted = HashSet::new();
+    let mut groups = super::css_rule_groups::Groups::default();
     let mut compounds = BTreeSet::new();
     let scope = super::selector_scope::Scope::new(&base.nodes, classes, prefix);
     for node in &base.nodes {
@@ -162,11 +165,21 @@ fn append_authored_conditions(
         };
         for rule in super::authored_conditions::rules(node, &scope, &base.css_rules, &mut compounds)
         {
-            if emitted.insert(rule.clone()) {
-                css.push_str(&rule);
-                css.push('\n');
-            }
+            groups.add(
+                (String::new(), Some(rule.opening), rule.declarations),
+                rule.selector,
+            );
         }
+    }
+    for ((_, opening, declarations), selectors) in groups {
+        let opening = opening.unwrap_or_default();
+        css.push_str(&super::authored_conditions::Emitted {
+            selector: selectors.into_iter().collect::<Vec<_>>().join(","),
+            opening,
+            declarations,
+        }
+        .text());
+        css.push('\n');
     }
     compounds
 }

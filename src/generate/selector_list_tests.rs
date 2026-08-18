@@ -37,6 +37,9 @@ fn media(node: &Node, rules: &[&str]) -> Vec<String> {
         &rules,
         &mut std::collections::BTreeSet::new(),
     )
+        .iter()
+        .map(crate::generate::authored_conditions::Emitted::text)
+        .collect()
 }
 
 /// A selector list is a logical OR of independent selectors, so a member that carries no

@@ -36,6 +36,9 @@ fn emitted(node: &Node, captured: &[String]) -> Vec<String> {
         captured,
         &mut BTreeSet::new(),
     )
+    .iter()
+    .map(crate::generate::authored_conditions::Emitted::text)
+    .collect()
 }
 #[test]
 fn remaps_direct_authored_media_rules_to_generated_classes() {

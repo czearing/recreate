@@ -8,16 +8,20 @@ mod asset_urls;
 mod assets;
 mod assets_remote;
 mod attribute_sequences;
+mod authored_condition_chain;
 mod authored_conditions;
 mod authored_css;
 #[cfg(test)]
 #[path = "authored_css_axis_tests.rs"]
 mod authored_css_axis_tests;
+mod authored_css_conditional;
 #[cfg(test)]
 #[path = "authored_css_fluid_tests.rs"]
 mod authored_css_fluid_tests;
 mod authored_css_index;
 mod authored_css_rules;
+mod authored_css_table;
+mod authored_css_value;
 #[cfg(test)]
 #[path = "authored_css_writing_mode_tests.rs"]
 mod authored_css_writing_mode_tests;

@@ -13,38 +13,66 @@ use super::selector_list;
 use crate::model::Node;
 
 pub(super) fn directly_targets_node(selectors: &str, node: &Node) -> bool {
-    selector_list::members(selectors)
-        .any(|selector| terminal_compound(selector) == selector && matches_node(selector, node))
+    Subject::new(node).directly_targeted_by(selectors)
+}
+
+/// A node reduced to what a subject compound is allowed to ask about, gathered once.
+///
+/// Matching one node against a page's rules asks these same questions once per candidate
+/// rule, and the class set is the costly answer — read from the attribute each time, it is
+/// rebuilt thousands of times per node for an answer that cannot change.
+pub(super) struct Subject<'n> {
+    node: &'n Node,
+    classes: std::collections::HashSet<&'n str>,
+}
+
+impl<'n> Subject<'n> {
+    pub(super) fn new(node: &'n Node) -> Self {
+        Self {
+            node,
+            classes: node
+                .attributes
+                .get("class")
+                .into_iter()
+                .flat_map(|value| value.split_whitespace())
+                .collect(),
+        }
+    }
+
+    pub(super) fn directly_targeted_by(&self, selectors: &str) -> bool {
+        selector_list::members(selectors)
+            .any(|selector| terminal_compound(selector) == selector && self.matches(selector))
+    }
+
+    pub(super) fn matches(&self, compound: &str) -> bool {
+        let required = compound_classes(compound);
+        let tag = compound_tag(compound);
+        let id = compound_id(compound);
+        let attributes = compound_attributes(compound);
+        let constrained =
+            !required.is_empty() || !tag.is_empty() || id.is_some() || !attributes.is_empty();
+        constrained
+            && (tag.is_empty() || tag == "*" || tag == self.node.tag)
+            && id.is_none_or(|id| {
+                self.node
+                    .attributes
+                    .get("id")
+                    .is_some_and(|value| value.as_str() == id)
+            })
+            && attributes.iter().all(|(name, expected)| {
+                self.node
+                    .attributes
+                    .get(*name)
+                    .is_some_and(|actual| expected.is_none_or(|expected| actual == expected))
+            })
+            && required
+                .iter()
+                .all(|class| self.classes.contains(class.as_str()))
+    }
 }
 
 pub(super) fn matches_node(compound: &str, node: &Node) -> bool {
-    let classes = node
-        .attributes
-        .get("class")
-        .into_iter()
-        .flat_map(|value| value.split_whitespace())
-        .collect::<std::collections::HashSet<_>>();
-    let required = compound_classes(compound);
-    let tag = compound_tag(compound);
-    let id = compound_id(compound);
-    let attributes = compound_attributes(compound);
-    let constrained =
-        !required.is_empty() || !tag.is_empty() || id.is_some() || !attributes.is_empty();
-    constrained
-        && (tag.is_empty() || tag == "*" || tag == node.tag)
-        && id.is_none_or(|id| {
-            node.attributes
-                .get("id")
-                .is_some_and(|value| value.as_str() == id)
-        })
-        && attributes.iter().all(|(name, expected)| {
-            node.attributes
-                .get(*name)
-                .is_some_and(|actual| expected.is_none_or(|expected| actual == expected))
-        })
-        && required
-            .iter()
-            .all(|class| classes.contains(class.as_str()))
+    Subject::new(node).matches(compound)
 }
 
 pub(super) fn terminal_compound(selector: &str) -> &str {

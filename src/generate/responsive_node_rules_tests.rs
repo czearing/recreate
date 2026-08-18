@@ -174,8 +174,9 @@ fn omits_an_unchanged_authored_inherited_paint_from_a_band() {
     );
 }
 
-/// The inverse. A paint that really does change across viewports still has to reach the band,
-/// so the omission above is a delta rule and not a blanket suppression of `fill`.
+/// The inverse. A paint that really does change across viewports still has to reach the band, so
+/// the omission is a delta rule. The token is load-bearing: a media-authored difference is stated
+/// at the author's own breakpoint instead.
 #[test]
 fn keeps_an_authored_inherited_paint_that_changes_across_viewports() {
     let mut base = heading("16px", 48.0);
@@ -206,7 +207,7 @@ fn keeps_an_authored_inherited_paint_that_changes_across_viewports() {
         ),
         "icon",
         &Default::default(),
-        &["@media(max-width:800px){.controltoken{fill:rgb(200, 10, 10);}}".into()],
+        &[".controltoken{fill:var(--brand-token);}".into()],
         false,
         false,
     );

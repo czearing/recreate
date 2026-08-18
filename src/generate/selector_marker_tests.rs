@@ -82,6 +82,9 @@ fn generate(subject: usize, rule: &str) -> (Vec<String>, BTreeMap<String, String
             &[rule.to_string()],
             &mut compounds,
         )
+        .iter()
+        .map(super::authored_conditions::Emitted::text)
+        .collect::<Vec<_>>()
     };
     let mut classes = classes;
     apply(&compounds, &nodes, "r", &mut classes);

@@ -67,6 +67,9 @@ pub(super) fn emit(subject: usize, rule: &str) -> Vec<String> {
     let scope = Scope::new(&nodes, &classes, "r");
     let mut compounds = BTreeSet::new();
     super::authored_conditions::rules(&nodes[subject], &scope, &[rule.to_string()], &mut compounds)
+        .iter()
+        .map(crate::generate::authored_conditions::Emitted::text)
+        .collect()
 }
 
 /// The selector a correct rewrite of these compounds produces: each authored compound
