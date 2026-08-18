@@ -68,24 +68,17 @@ const eachAuthoredSelector = (sheet, visit, seen) => {
   descend(rules);
 };
 /* Constructed sheets are adopted rather than listed, and a shadow root holds its own of both
-   kinds, so none of them appear in `document.styleSheets`. */
+   kinds, so none of them appear in `document.styleSheets`. A scope's own `styleSheets` is the
+   engine's answer for that scope, which is what makes a `<link>` inside a shadow root - which
+   no search for `style` elements finds - count as an authored sheet like any other. */
 const documentSheets = () => {
-  const sheets = [
-    ...Array.from(document.styleSheets || []),
-    ...Array.from(document.adoptedStyleSheets || [])
-  ];
-  const collectShadow = root => {
-    for (const element of root.querySelectorAll('*')) {
-      const shadow = element.shadowRoot;
-      if (!shadow) continue;
-      for (const sheet of shadow.adoptedStyleSheets || []) sheets.push(sheet);
-      for (const style of shadow.querySelectorAll('style')) {
-        if (style.sheet) sheets.push(style.sheet);
-      }
-      collectShadow(shadow);
-    }
-  };
-  try { collectShadow(document); } catch {}
+  const sheets = [];
+  for (const scope of treeScopes()) {
+    sheets.push(
+      ...Array.from(scope.styleSheets || []),
+      ...Array.from(scope.adoptedStyleSheets || [])
+    );
+  }
   return sheets;
 };
 let authored = null;

@@ -37,9 +37,13 @@ mod state_style_var;
 const HARNESS: &str = include_str!("rule_activation_harness.js");
 
 fn capture_source() -> String {
-    crate::state_style_script::SOURCE
-        .replace("__RULE_ACTIVATION__", super::SOURCE)
-        .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE)
+    format!(
+        "{}\n{}",
+        crate::scoped_rules::SOURCE,
+        crate::state_style_script::SOURCE
+            .replace("__RULE_ACTIVATION__", super::SOURCE)
+            .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE)
+    )
 }
 
 /// Runs the real capture walk over a scripted CSSOM and returns what it recorded.

@@ -31,20 +31,29 @@ class Animation {
 class CSSTransition extends Animation {}
 const root = { getAnimations: options => (options && options.subtree ? globalThis.running : []) };
 const names = () => globalThis.running.map(animation => animation.name);
-globalThis.sheets = [];
-class StyleElement {
-  remove() { globalThis.sheets = globalThis.sheets.filter(text => text !== this.textContent); }
+class CSSStyleSheet {
+  replaceSync(text) { this.text = text; }
 }
+globalThis.CSSStyleSheet = CSSStyleSheet;
 const document = {
-  createElement: () => new StyleElement(),
-  head: { appendChild: node => globalThis.sheets.push(node.textContent) },
+  querySelectorAll: () => [],
+  adoptedStyleSheets: [],
   getAnimations: options => root.getAnimations(options)
 };
+// What the page is being read under, named as the rule texts in force rather than as the
+// carrier that delivers them, so the assertions survive a change of carrier.
+Object.defineProperty(globalThis, 'sheets', {
+  get: () => document.adoptedStyleSheets.map(sheet => sheet.text)
+});
 "#;
 
 fn evaluate(body: &str, expression: &str) -> serde_json::Value {
     node_eval::evaluate(
-        &format!("{DOUBLE}\n{}\n{body}", crate::capture_transitions::SOURCE),
+        &format!(
+            "{DOUBLE}\n{}\n{}\n{body}",
+            crate::scoped_rules::SOURCE,
+            crate::capture_transitions::SOURCE
+        ),
         expression,
     )
 }

@@ -26,6 +26,7 @@ class Element {
     this.tagName = tagName;
     this.children = [];
     this.shadowRoot = null;
+    this.scope = null;
     this.attributes = new Map();
     this.style = Symbol('clobbered');
     this.reverted = false;
@@ -41,7 +42,11 @@ class Element {
       return trimmed.toUpperCase() === this.tagName;
     });
   }
-  add(child){ child.parent = this; this.children.push(child); return child; }
+  add(child){ child.parent = this; child.scope = this.scope; this.children.push(child); return child; }
+  attachShadow(){
+    this.shadowRoot = new ShadowRoot(this);
+    return this.shadowRoot;
+  }
   getAttribute(name){ return this.attributes.has(name) ? this.attributes.get(name) : null; }
   setAttribute(name, value){
     this.attributes.set(name, value);
@@ -64,6 +69,7 @@ class Element {
   get name(){ return this.tagName + (this.attributes.get('id') ? '#' + this.attributes.get('id') : ''); }
 }
 const documentElement = new Element('HTML');
+__TREE_SCOPES__
 const head = documentElement.add(new Element('HEAD'));
 const body = documentElement.add(new Element('BODY'));
 const plain = body.add(new Element('P'));
@@ -73,7 +79,7 @@ marked.setAttribute('id', 'marked');
 globalThis.marked = marked;
 globalThis.plain = plain;
 globalThis.body = body;
-head.appendChild = child => { head.add(child); globalThis.sheets += 1; };
+head.appendChild = child => head.add(child);
 // The selectors a document authored, as the only thing the scan reads from a sheet. Tests set
 // `globalThis.authoredSelectors` to a list of selector texts, which is what `cssRules` yields once the
 // walk has descended through whatever conditions they were written inside.
@@ -81,22 +87,38 @@ globalThis.authoredSelectors = [];
 globalThis.document = {
   documentElement,
   head,
+  querySelectorAll: selector =>
+    [documentElement, ...lightDescendants(documentElement)].filter(element => element.matches(selector)),
   get styleSheets(){
     return [{ get cssRules(){ return globalThis.authoredSelectors.map(selectorText => ({ selectorText })); } }];
   },
-  adoptedStyleSheets: [],
-  createElement: tag => {
-    const made = new Element(tag.toUpperCase());
-    made.remove = () => { head.children = head.children.filter(item => item !== made); };
-    return made;
-  }
+  adoptedStyleSheets: []
 };
+documentElement.scope = globalThis.document;
+for (const element of lightDescendants(documentElement)) element.scope = globalThis.document;
 // CSSOM answers a lookup for a pseudo-element the engine does not support with an empty
 // declaration block rather than an error, and a vendor-prefixed widget internal the engine
 // keeps inside its own shadow tree answers the same way. Modelled because the difference
 // between "described and identical to its baseline" and "not described at all" is the whole of
 // what a reader can be told about a rule that did not survive.
 globalThis.unsupported = new Set();
+// Whether a pseudo-element was read under the user-agent origin is a property of the tree scope
+// its originating element is in, because a rule is in force in the scope whose sheets hold it
+// and in no other. A page that authored nothing for a box reads the same either way, which is
+// what every pruning test depends on; a box the page did author reads its authored value only
+// when the revert did not reach it, and reporting that apart is the whole of what distinguishes
+// a baseline from the live value it is meant to be compared against.
+globalThis.pseudoAuthored = new Set();
+// `walked` is every element the probe took an element baseline for, which is the walk's own
+// record of what it reached, whatever tree scope it reached it through.
+globalThis.walked = [];
+const pseudoValue = (element, pseudo) => {
+  const key = element.name + pseudo;
+  const scope = element.scope;
+  const declared = globalThis.declaredIn(scope, scope === globalThis.document ? head.children : scope.children);
+  const reverted = declared.some(text => text.includes('*' + pseudo + '{'));
+  return (!reverted && globalThis.pseudoAuthored.has(key) ? 'pseudo-authored:' : 'pseudo:') + key;
+};
 globalThis.getComputedStyle = (element, pseudo) => {
   const generated = globalThis.content.get(element.name + (pseudo || '')) || 'none';
   const described = !pseudo || !globalThis.unsupported.has(pseudo);
@@ -105,9 +127,10 @@ globalThis.getComputedStyle = (element, pseudo) => {
     if (element.reverted) throw new Error('pseudo read while the element was reverted');
     globalThis.pseudoReads += 1;
     globalThis.mark('pseudo');
-    value = 'pseudo:' + element.name + pseudo;
+    value = pseudoValue(element, pseudo);
   } else if (element.reverted) {
     globalThis.measured.push(element.name);
+    globalThis.walked.push(element);
     value = 'revert:' + element.name;
   } else {
     globalThis.live.push(element.name);
@@ -130,8 +153,10 @@ const read = probe => {
   globalThis.pseudoMeasured = [];
   globalThis.live = [];
   globalThis.pseudoReads = 0;
+  globalThis.walked = [];
   globalThis.order = [];
   globalThis.sheets = 0;
+  globalThis.document.adoptedStyleSheets = [];
   return eval(SCRIPT + '\nmeasureBaselines(documentElement, () => false);\n' + (probe || 'null'));
 };
 "#;
@@ -139,8 +164,9 @@ const read = probe => {
 pub(crate) fn evaluate(body: &str, expression: &str) -> serde_json::Value {
     let script =
         serde_json::to_string(&crate::style_baseline::source()).expect("source is a string");
+    let double = DOUBLE.replace("__TREE_SCOPES__", crate::tree_scope_double::SCOPES);
     node_eval::evaluate(
-        &format!("const SCRIPT = {script};\n{DOUBLE}\n{body}"),
+        &format!("const SCRIPT = {script};\n{double}\n{body}"),
         expression,
     )
 }

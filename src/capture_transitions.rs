@@ -60,15 +60,13 @@ pub const SOURCE: &str = r#"
     }
   };
   // Declaring the transitions away rather than pausing them, because a paused transition is
-  // still applying its interpolated value over the one being measured. Removing the sheet
-  // provokes nothing: every change made under it is already the page's current value.
+  // still applying its interpolated value over the one being measured. Removing the rules
+  // provokes nothing: every change made under them is already the page's current value.
   const restingRead = read => {
-    const suspended = document.createElement('style');
-    suspended.textContent = '*,*::before,*::after{transition-property:none !important}';
-    document.head.appendChild(suspended);
-    try { read(); } finally { suspended.remove(); }
-    // A stylesheet reaches the document tree only. A shadow tree has its own cascade, so
-    // whatever is still running inside one is brought to its end by the rule directly.
+    underRules('*,*::before,*::after{transition-property:none !important}', read);
+    // Suspending a transition holds its interpolated value out of the read; it does not give
+    // the transition a resting value. Every later stage reads a page that has one, so the
+    // motion still in flight is brought to its end once the read is over.
     arriveTransitions(document);
   };
   const movingRead = read => read();

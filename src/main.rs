@@ -62,6 +62,7 @@ mod probe;
 #[cfg(test)]
 mod release_gate_tests;
 mod rule_activation_script;
+mod scoped_rules;
 #[cfg(test)]
 mod script_reach;
 #[cfg(test)]
@@ -84,8 +85,12 @@ mod style_baseline_names_tests;
 #[cfg(test)]
 mod style_baseline_pruning_tests;
 #[cfg(test)]
+mod style_baseline_scope_tests;
+#[cfg(test)]
 mod style_baseline_scroll_tests;
 mod surface_content;
+#[cfg(test)]
+mod tree_scope_double;
 mod updater;
 mod validate;
 

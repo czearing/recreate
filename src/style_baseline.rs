@@ -9,10 +9,12 @@
 /// or miss one every producer does.
 const SCRIPT: &str = include_str!("style_baseline_script.js");
 
-/// The measurement and the box list it measures, as one evaluable source.
+/// The measurement, the box list it measures, and the scope reach both are declared through,
+/// as one evaluable source.
 pub fn source() -> String {
     format!(
-        "{}\n{}\n{SCRIPT}",
+        "{}\n{}\n{}\n{SCRIPT}",
+        crate::scoped_rules::SOURCE,
         crate::generated_boxes::SOURCE,
         crate::capture_transitions::SOURCE
     )
@@ -89,12 +91,13 @@ mod tests {
     }
 
     /// A baseline pass that does not put the page back leaves every later stage
-    /// reading a stripped document.
+    /// reading a stripped document. The declared rules are put back by their owner, which
+    /// restores every scope it reached rather than only the one it started in.
     #[test]
     fn restores_the_style_attribute_it_overwrote() {
         assert!(SOURCE.contains("element.getAttribute('style')"));
         assert!(SOURCE.contains("removeAttribute('style')"));
-        assert!(SOURCE.contains("sheet.remove()"));
+        assert!(crate::scoped_rules::SOURCE.contains("} finally {"));
     }
 
     /// Colour-tracking properties are found by measurement, not by name. The capture must

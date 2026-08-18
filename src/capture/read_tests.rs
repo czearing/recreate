@@ -9,7 +9,7 @@ fn the_capture_script_reads_sheets_the_page_cannot_read_itself() {
     let source = crate::page_script::source_with_sheets(&[]);
     assert!(source.contains("authoredSheetTexts"));
     assert!(source.contains("adoptedStyleSheets"));
-    assert!(source.contains("collectShadowSheets"));
+    assert!(source.contains("for (const scope of treeScopes())"));
     assert!(!source.contains("try { visitRules(sheet.cssRules); } catch {}"));
 }
 

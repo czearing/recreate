@@ -51,7 +51,7 @@ const head = documentElement.appendChild(new Element('HEAD', false));
 globalThis.document = {
   documentElement,
   head,
-  createElement: tag => new Element(tag.toUpperCase(), false)
+  querySelectorAll: () => []
 };
 globalThis.getComputedStyle = () => ({
   *[Symbol.iterator](){ yield 'color'; },

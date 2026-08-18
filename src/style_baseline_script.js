@@ -131,10 +131,9 @@ const pseudoBaselineOf = (element, name) => (pseudoBaselines.get(element) || {})
 /* Inheritance is one-way, so reverting every element at one depth leaves the parents it
    inherits from untouched. Writing a whole level and then reading it costs one style
    recalculation per level rather than one per element, which is what keeps this inside
-   the run budget on a deep page. A pseudo-element has its own cascade, so reverting the
-   originating element does not reach it; one stylesheet reverts every pseudo at once,
-   which is sound in a single pass because a pseudo inherits from an element that still
-   holds its real values. */
+   run budget on a deep page. A pseudo-element has its own cascade, so reverting the
+   originating element does not reach it; one sheet reverts every pseudo at once, which is
+   sound because a pseudo inherits from an element still holding its real values. */
 /* Reverting an element removes the declarations that gave it a scroll range - its size
    and its `overflow` - so the engine clamps any offset it was holding to zero, and
    putting the style attribute back does not restore it. The offset is the one fact only
@@ -181,22 +180,23 @@ const measureBaselines = (root, skip) => {
     }
   }
   if (pseudoPending.length) {
-    const sheet = document.createElement('style');
     // One rule per name rather than one selector list, because a selector list is invalid as
     // a whole if any part of it is, and a name discovered from text the engine never parsed
     // could be one this engine does not support. A list would then revert nothing and every
     // baseline would come back live, which reads as the whole computed style being authored.
-    // Separate rules are still one insertion, so this shares the single style recalculation.
-    sheet.textContent = generatedBoxTests()
+    // A pseudo-element has no node to carry a style attribute either, so this rule is its only
+    // carrier and has to hold in every scope the walk above entered - the shadow trees it
+    // descends into included, which is what `underRules` and no document stylesheet reaches.
+    const reverted = generatedBoxTests()
       .map(([name]) => `*${name}{${REVERT_TO_USER_AGENT}}`)
       .join('\n');
-    document.head.appendChild(sheet);
-    for (const [element, name] of pseudoPending) {
-      const measured = pseudoBaselines.get(element) || {};
-      measured[name] = styleMap(getComputedStyle(element, name));
-      pseudoBaselines.set(element, measured);
-    }
-    sheet.remove();
+    underRules(reverted, () => {
+      for (const [element, name] of pseudoPending) {
+        const measured = pseudoBaselines.get(element) || {};
+        measured[name] = styleMap(getComputedStyle(element, name));
+        pseudoBaselines.set(element, measured);
+      }
+    });
   }
   for (const [element, left, top] of scrolled) element.scrollTo(left, top);
 };

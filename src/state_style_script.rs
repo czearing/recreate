@@ -137,18 +137,13 @@ __SHORTHAND_EXPANSION__
   // counted and their text is supplied by the caller, which reads it through the browser's
   // own CSSOM where CORS does not apply.
   const shadowSheets = [];
-  const collectShadowSheets = root => {
-    for (const element of root.querySelectorAll('*')) {
-      const shadow = element.shadowRoot;
-      if (!shadow) continue;
-      for (const sheet of shadow.adoptedStyleSheets || []) shadowSheets.push(sheet);
-      for (const style of shadow.querySelectorAll('style')) {
-        if (style.sheet) shadowSheets.push(style.sheet);
-      }
-      collectShadowSheets(shadow);
-    }
-  };
-  try { collectShadowSheets(document); } catch {}
+  for (const scope of treeScopes()) {
+    if (scope === document) continue;
+    shadowSheets.push(
+      ...Array.from(scope.styleSheets || []),
+      ...Array.from(scope.adoptedStyleSheets || [])
+    );
+  }
   const ruleEntries = [];
   // Every collection a sheet can be *listed* in. A sheet reached through `@import` is in
   // none of them, and is entered by the walk itself rather than named here.
