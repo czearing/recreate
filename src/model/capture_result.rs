@@ -33,6 +33,11 @@ pub struct PageState {
     #[serde(default)]
     pub attribute_sequences: Vec<AttributeSequence>,
     pub css_rules: Vec<String>,
+    /// How the engine divided each authored declaration block that sets a longhand it does
+    /// not name, keyed by the block text as `css_rules` spells it. A block absent from here
+    /// declared no shorthand; an empty share is a division the engine could not settle.
+    #[serde(default)]
+    pub css_shorthands: BTreeMap<String, BTreeMap<String, String>>,
     pub asset_urls: Vec<String>,
     #[serde(default)]
     pub asset_data: BTreeMap<String, String>,

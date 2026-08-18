@@ -56,14 +56,7 @@ fn rule_parts<'a>(
 ) -> Vec<(&'a str, String)> {
     let mut parts = vec![(
         "",
-        responsive::base_declarations(
-            node,
-            parent,
-            &state.viewport,
-            assets,
-            &state.css_rules,
-            false,
-        ),
+        responsive::base_declarations(node, parent, &state.viewport, assets, state, false),
     )];
     for (suffix, pseudo) in super::css_pseudo::slots(node) {
         parts.push((suffix, super::css_pseudo::declarations(pseudo, assets)));

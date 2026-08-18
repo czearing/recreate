@@ -42,6 +42,7 @@ fn template_with_assets(assets: &str, motion: &str) -> String {
             &crate::blocking_overlay::js_predicate(),
         )
         .replace("__RULE_ACTIVATION__", crate::rule_activation_script::SOURCE)
+        .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE)
         .replace(
             "__ATTRIBUTE_SEQUENCE_CAPTURE__",
             &crate::attribute_sequence_script::source(),

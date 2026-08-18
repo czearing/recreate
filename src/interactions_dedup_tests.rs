@@ -23,6 +23,7 @@ fn duplicate_path_evidence_keeps_the_richest_state() {
             state_styles: Vec::new(),
             attribute_sequences: Vec::new(),
             css_rules: Vec::new(),
+            css_shorthands: Default::default(),
             asset_urls: Vec::new(),
             asset_data: Default::default(),
         }],
@@ -73,6 +74,7 @@ pub(super) fn state_with_paths(paths: &[&str]) -> crate::model::PageState {
         state_styles: Vec::new(),
         attribute_sequences: Vec::new(),
         css_rules: Vec::new(),
+        css_shorthands: Default::default(),
         asset_urls: Vec::new(),
         asset_data: Default::default(),
     };

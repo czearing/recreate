@@ -9,6 +9,7 @@ mod assets;
 mod assets_remote;
 mod attribute_sequences;
 mod authored_condition_chain;
+mod authored_condition_kind;
 mod authored_conditions;
 mod authored_css;
 #[cfg(test)]

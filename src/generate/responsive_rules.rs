@@ -30,7 +30,7 @@ pub fn append_filtered(
             .iter()
             .map(|node| (node.path.as_str(), node))
             .collect();
-        let authored_rules = super::super::authored_css::Index::new(&state.css_rules);
+        let authored_rules = super::super::authored_css::Index::new(*state);
         let shrunk_roots = shrunk_roots(&state.nodes, &base_nodes, &state_nodes);
         let mut rules = String::new();
         // Nodes that share a class produce the same band rule, so emitting one per node

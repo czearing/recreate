@@ -23,14 +23,8 @@ pub(super) fn root_reset(
             .parent
             .as_deref()
             .and_then(|path| state.nodes.iter().find(|other| other.path == path));
-        let declarations = responsive::base_declarations(
-            node,
-            parent,
-            &state.viewport,
-            assets,
-            &state.css_rules,
-            false,
-        );
+        let declarations =
+            responsive::base_declarations(node, parent, &state.viewport, assets, state, false);
         if !declarations.is_empty() {
             css.push_str(&format!("{tag}{{{declarations}}}\n"));
         }

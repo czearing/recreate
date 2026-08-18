@@ -76,6 +76,7 @@ fn state() -> PageState {
         state_styles: Vec::new(),
         attribute_sequences: Vec::new(),
         css_rules: Vec::new(),
+        css_shorthands: Default::default(),
         asset_urls: Vec::new(),
         asset_data: Default::default(),
     }

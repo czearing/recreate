@@ -131,3 +131,6 @@ mod nesting;
 
 #[path = "authored_conditions_base_arm_shorthand_tests.rs"]
 mod shorthand;
+
+#[path = "authored_conditions_base_arm_divided_tests.rs"]
+mod divided;

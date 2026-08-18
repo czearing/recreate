@@ -72,6 +72,7 @@ fn specification() -> Specification {
                 timing: serde_json::json!({"duration":4000,"iterations":"infinite"}),
             }],
             css_rules: vec![DEFINITION.into()],
+            css_shorthands: Default::default(),
             ..Default::default()
         }],
         interactions: Vec::new(),

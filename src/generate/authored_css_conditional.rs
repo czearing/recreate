@@ -23,7 +23,7 @@ impl<'a> Conditional<'a> {
     /// recreation does not re-emit is not recorded, so nothing downstream can withdraw a
     /// branch that nothing puts back.
     pub(super) fn add(&mut self, rule: &'a str, position: super::css_layers::Position) {
-        if super::authored_conditions::document_answered(
+        if super::authored_condition_kind::document_answered(
             rule.split('{').next().unwrap_or("").trim(),
         ) {
             self.groups.push((rule, position));
@@ -54,13 +54,14 @@ impl<'a> Conditional<'a> {
     fn flattened(&self) -> Table<'a> {
         let mut table = Table::default();
         for (rule, position) in &self.groups {
-            super::authored_condition_chain::for_each_rule(rule, &mut |conditions,
-                                                                  selectors,
-                                                                  declarations| {
-                if conditions.falsifiable() {
-                    table.add(selectors, declarations, position.clone());
-                }
-            });
+            super::authored_condition_chain::for_each_rule(
+                rule,
+                &mut |conditions, selectors, declarations| {
+                    if conditions.falsifiable() {
+                        table.add(selectors, declarations, position.clone());
+                    }
+                },
+            );
         }
         table
     }

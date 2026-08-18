@@ -4,25 +4,6 @@ use super::selector_scope::Scope;
 use crate::model::{Node, Styles};
 use std::collections::{BTreeSet, HashSet};
 
-/// The grouping at-rules whose condition the **document** answers, so no baked computed
-/// style can stand in for them.
-///
-/// A capture bakes each element's computed style, which is the answer the condition had at
-/// the instant of capture. That is the whole answer only for a condition with one answer for
-/// the run — `@supports` asks the engine about its own feature support, and the artifact does
-/// not reproduce the engine. These two are re-answered by whoever views the recreation: a
-/// media condition by the viewport, and a container condition by the used inline-size of the
-/// nearest ancestor with `container-type`, which layout re-produces on every resize and which
-/// two instances of one component answer differently in the same paint. Baking either away
-/// publishes the branch that happened to hold as though the author had written it
-/// unconditionally.
-///
-/// `@layer` and `@scope` are carriers at capture but are not listed here: their preludes name
-/// authored cascade positions and authored selectors, neither of which survives into the
-/// generated document, so re-emitting them verbatim would reference names that do not exist.
-/// `@starting-style` has its own owner in `before_change`.
-const DOCUMENT_ANSWERED_AT_RULES: &[&str] = &["@media", "@container"];
-
 /// One authored condition rule rewritten onto generated classes, kept in parts.
 ///
 /// The parts stay apart because the emitter merges rules that share a condition and a
@@ -99,10 +80,8 @@ pub fn rules(
 ///
 /// What replaces it is the unconditional cascade's own last word, or nothing where the author
 /// wrote none — below the breakpoint the element takes its inherited or initial value, which
-/// the recreation re-produces by saying nothing.
-///
-/// No width is consulted, so this is equally the answer for a container query, whose condition
-/// no viewport can settle at all.
+/// the recreation re-produces by saying nothing. No width is consulted, so this is equally the
+/// answer for a container query, whose condition no viewport can settle at all.
 pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>) {
     let matched = index.conditional_declarations(node);
     if matched.is_empty() {
@@ -119,12 +98,18 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
             {
                 // The proof, and the whole of it: this property's own sample equals what the
                 // condition declares for it. A value merely present elsewhere in the node's
-                // style is a coincidence, not evidence, and reading it as one withdraws an
-                // arm that was never in force.
-                //
-                // Asked of every longhand the name stands for, because a capture enumerates
-                // longhands and a name the author shortened matches none of them.
-                withdraw.extend(super::shorthand::measured(&node.style, &name, &value));
+                // style is a coincidence, not evidence. Asked of every longhand the name
+                // stands for, because a capture enumerates longhands and a name the author
+                // shortened matches none of them; the block travels with it, because how the
+                // engine divided a shorthand is a fact about the block it was written in.
+                let shorthands = index.shorthands();
+                withdraw.extend(super::shorthand::measured(
+                    shorthands,
+                    declarations,
+                    &node.style,
+                    &name,
+                    &value,
+                ));
             }
         }
     }
@@ -137,8 +122,8 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
     let unconditional = index.unconditional_values(node, &withdraw);
     for name in withdraw {
         match unconditional.get(&name) {
-            // Declared, and divided between longhands by a grammar this stage does not read.
-            // The measured value is the only one it can state, so the withdrawal is dropped
+            // Declared, and divided into a share the engine itself could not settle. The
+            // measured value is the only one this can state, so the withdrawal is dropped
             // rather than completed with a value nothing supports.
             Some(None) => (),
             Some(Some(value)) => {
@@ -149,44 +134,6 @@ pub fn restore_unconditional(styles: &mut Styles, node: &Node, index: &Index<'_>
             }
         }
     }
-}
-
-/// Whether the **document** answers this at-rule's condition, so no baked computed style can
-/// stand in for it. Shared by the re-emitter above and by the index, which flattens exactly
-/// these groups into its rule table, so one definition decides both.
-pub(super) fn document_answered(prelude: &str) -> bool {
-    DOCUMENT_ANSWERED_AT_RULES
-        .iter()
-        .any(|name| starts_with_at_rule(prelude, name))
-}
-
-/// Whether this condition has a false branch at all.
-///
-/// Withdrawal is owed only where the recreation can be asked the condition again and get a
-/// different answer. `all` is the media type Media Queries 4 defines as matching every device,
-/// so `@media all` is the identity condition: it is what a capture writes around a sheet linked
-/// with `media="all"`, it holds at every width and in every container, and there is no arm
-/// below any breakpoint for the unconditional cascade to restore. Withdrawing against it would
-/// take a declaration out of the base rule to answer a question that is never asked.
-pub(super) fn falsifiable(prelude: &str) -> bool {
-    document_answered(prelude) && !identity_media(prelude)
-}
-
-fn identity_media(prelude: &str) -> bool {
-    prelude
-        .get(..6)
-        .is_some_and(|name| name.eq_ignore_ascii_case("@media"))
-        && prelude[6..].trim().eq_ignore_ascii_case("all")
-}
-
-/// Matched on the at-rule name and not on a bare prefix, so `@media-hypothetical` — any
-/// future at-rule whose name merely begins with one of these — is not swept in.
-fn starts_with_at_rule(prelude: &str, name: &str) -> bool {
-    prelude.len() > name.len()
-        && prelude.is_char_boundary(name.len())
-        && prelude[..name.len()].eq_ignore_ascii_case(name)
-        && !prelude[name.len()..]
-            .starts_with(|character: char| character.is_alphanumeric() || character == '-')
 }
 
 #[cfg(test)]

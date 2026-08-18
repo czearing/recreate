@@ -92,17 +92,12 @@ pub fn contextual_widths(state: &PageState, baseline: &PageState) -> HashSet<Str
             };
             baseline_nodes.get(path.as_str()).is_some_and(|original| {
                 let mut generated = original.style.clone();
-                super::authored_css::normalize(&mut generated, original, &baseline.css_rules);
+                super::authored_css::normalize(&mut generated, original, baseline);
                 let parent = original
                     .parent
                     .as_deref()
                     .and_then(|parent| baseline_nodes.get(parent).copied());
-                super::inherited_styles::normalize(
-                    &mut generated,
-                    original,
-                    parent,
-                    &baseline.css_rules,
-                );
+                super::inherited_styles::normalize(&mut generated, original, parent, baseline);
                 super::responsive_geometry::normalize(
                     &mut generated,
                     original,

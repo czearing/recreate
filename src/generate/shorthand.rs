@@ -4,6 +4,18 @@
 //! `background-color` names one. Every stage that compares authored text against a sample has
 //! to ask what the author's name stands for, and asking with the name alone silently misses
 //! every shorthand a page is written with.
+//!
+//! The question has two halves and only one of them can be read off the text. Which longhands
+//! a name *may* set follows from how CSS spells them, so `expands_to` answers it for families
+//! nobody listed. What share each one gets is a per-family grammar, and the only reader of
+//! that grammar is the engine that parsed the sheet — so the capture records the engine's own
+//! division and this stage looks it up, rather than transcribing a table of families that
+//! answers for the ones somebody thought of and withholds the rest.
+
+use std::collections::BTreeMap;
+
+/// How the engine divided each authored declaration block, keyed by the block text.
+pub type Shorthands = BTreeMap<String, BTreeMap<String, String>>;
 
 /// What an authored declaration `name: value` says about the longhand `property`.
 pub(super) enum Claim<'a> {
@@ -11,41 +23,79 @@ pub(super) enum Claim<'a> {
     Elsewhere,
     /// It sets it, to this value.
     Value(&'a str),
-    /// It sets it, to a share of a value only the family's own grammar divides.
-    Opaque,
+    /// It sets it, to a share nothing can state — because the engine itself reported the
+    /// division as unsettled, or because no division was recorded for the block at all.
+    Unsettled,
 }
 
-/// A shorthand distributing one component gives that component to each longhand it sets, so
-/// the component is what the longhand computed to and comparing it against a sample is exact.
-/// Several components are divided by a per-family grammar this reads nothing of — two lengths
-/// on a box are one per axis, two words on `font` are a size and a family — so the share is
-/// named rather than guessed, and a caller that cannot name it keeps the answer it had.
-pub(super) fn claim<'a>(name: &str, value: &'a str, property: &str) -> Claim<'a> {
+/// The block text a recorded division is keyed by, from a declarations run as either the rule
+/// table or the condition walk hands it over. One spelling, so a lookup cannot miss by a brace.
+pub(super) fn block_key(declarations: &str) -> &str {
+    declarations.trim().trim_end_matches('}').trim()
+}
+
+/// The engine's share of `block` for `property`, where the capture recorded one.
+fn divided<'a>(shorthands: &'a Shorthands, block: &str, property: &str) -> Option<&'a str> {
+    shorthands
+        .get(block_key(block))?
+        .get(property)
+        .map(String::as_str)
+}
+
+/// What the declaration `name: value`, written in `block`, says about `property`.
+///
+/// The engine's division wins wherever the capture recorded one: it is that block's own
+/// parse, already serialised in the vocabulary a sample uses, and it has resolved the block's
+/// internal cascade, so a longhand restated after its shorthand reads back as the restatement.
+///
+/// Where no division was recorded — an artifact older than the recording, or a fixture written
+/// by hand — a single-component value is still exact, because a shorthand with one component
+/// has only that component to give. Anything longer is answered `Unsettled`, which withdraws
+/// nothing and deletes nothing.
+pub(super) fn claim<'a>(
+    shorthands: &'a Shorthands,
+    block: &str,
+    name: &str,
+    value: &'a str,
+    property: &str,
+) -> Claim<'a> {
     if name == property {
         return Claim::Value(value);
     }
     if !expands_to(name, property) {
         return Claim::Elsewhere;
     }
-    match crate::model::value_components(value).as_slice() {
-        [only] => Claim::Value(only),
-        _ => Claim::Opaque,
+    match divided(shorthands, block, property) {
+        Some("") => Claim::Unsettled,
+        Some(share) => Claim::Value(share),
+        None => match crate::model::value_components(value).as_slice() {
+            [only] => Claim::Value(only),
+            _ => Claim::Unsettled,
+        },
     }
 }
 
-/// Every property of `style` that the declaration `name: value` set to the value measured
-/// there — the properties for which this declaration is the proof that the condition
+/// Every property of `style` that the declaration `name: value` of `block` set to the value
+/// measured there — the properties for which this declaration is the proof that the condition
 /// guarding it was in force.
 ///
 /// The sample is the key space, so a name the author shortened is asked of the longhands it
 /// stands for rather than looked up as itself and missed.
-pub(super) fn measured(style: &crate::model::Styles, name: &str, value: &str) -> Vec<String> {
+pub(super) fn measured(
+    shorthands: &Shorthands,
+    block: &str,
+    style: &crate::model::Styles,
+    name: &str,
+    value: &str,
+) -> Vec<String> {
     style
         .iter()
-        .filter(|(property, sample)| match claim(name, value, property) {
-            Claim::Value(value) => *sample == value,
-            Claim::Elsewhere | Claim::Opaque => false,
-        })
+        .filter(
+            |(property, sample)| match claim(shorthands, block, name, value, property) {
+                Claim::Value(value) => *sample == value,
+                Claim::Elsewhere | Claim::Unsettled => false,
+            },
+        )
         .map(|(property, _)| property.clone())
         .collect()
 }

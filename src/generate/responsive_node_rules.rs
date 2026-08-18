@@ -8,14 +8,14 @@ use std::collections::BTreeMap;
 
 #[cfg(test)]
 #[allow(clippy::too_many_arguments)]
-pub(in crate::generate) fn append_node_rules(
+pub(in crate::generate) fn append_node_rules<'a>(
     base: &Node,
     node: &Node,
     parent: Option<&Node>,
     viewports: (&Viewport, &Viewport),
     class: &str,
     assets: &BTreeMap<String, String>,
-    css_rules: &[String],
+    css_rules: impl Into<super::super::authored_css::Authored<'a>>,
     fluid_height: bool,
     constrained_by_flex: bool,
 ) -> String {

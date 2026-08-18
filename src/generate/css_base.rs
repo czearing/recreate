@@ -56,7 +56,7 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         })
         .map(|baseline| super::css_paths::contextual_widths(base, baseline))
         .unwrap_or_default();
-    let authored_rules = super::authored_css::Index::new(&base.css_rules);
+    let authored_rules = super::authored_css::Index::new(base);
     let fluid_heights = super::css_state_helpers::fluid_height_paths(specification);
     if std::env::var_os("RECREATE_TIMING").is_some()
         && let Some(paths) = &changed_paths
@@ -173,12 +173,14 @@ fn append_authored_conditions(
     }
     for ((_, opening, declarations), selectors) in groups {
         let opening = opening.unwrap_or_default();
-        css.push_str(&super::authored_conditions::Emitted {
-            selector: selectors.into_iter().collect::<Vec<_>>().join(","),
-            opening,
-            declarations,
-        }
-        .text());
+        css.push_str(
+            &super::authored_conditions::Emitted {
+                selector: selectors.into_iter().collect::<Vec<_>>().join(","),
+                opening,
+                declarations,
+            }
+            .text(),
+        );
         css.push('\n');
     }
     compounds

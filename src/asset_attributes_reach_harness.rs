@@ -21,11 +21,22 @@ pub(super) const ORIGIN: &str = "http://rig.test:59700/";
 /// Walks `tree` exactly as the capture does, resolving against `base` as the document base
 /// URL, and returns the harness's report.
 pub(super) fn walk(tree: &Value, css_rules: &Value, base: &str) -> Value {
+    walk_with_shorthands(tree, css_rules, &serde_json::json!([]), base)
+}
+
+/// The same walk, with the divisions the capture recorded for the blocks in `css_rules`.
+pub(super) fn walk_with_shorthands(
+    tree: &Value,
+    css_rules: &Value,
+    shorthands: &Value,
+    base: &str,
+) -> Value {
     node_eval::json(
         &HARNESS
             .replace("__ASSET_ATTRIBUTES__", &super::js_source())
             .replace("__TREE__", &tree.to_string())
             .replace("__CSS_RULES__", &css_rules.to_string())
+            .replace("__CSS_SHORTHANDS__", &shorthands.to_string())
             .replace("__DOCUMENT_BASE__", base)
             .replace("__BASE__", LOCATION),
     )

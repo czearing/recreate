@@ -13,6 +13,7 @@ mod capture;
 mod capture_settle;
 #[cfg(test)]
 mod capture_settle_budget_tests;
+mod capture_shorthands;
 mod capture_transitions;
 #[cfg(test)]
 #[path = "capture_transitions_tests.rs"]

@@ -10,7 +10,7 @@
 //! back, and the withdrawal must know whether any layer can be false. Answering it once here is
 //! what keeps a declaration the base rule gives up from being one the output states nowhere.
 
-use super::authored_conditions::{document_answered, falsifiable};
+use super::authored_condition_kind::{document_answered, falsifiable};
 
 /// The chain of document-answered conditions a style rule sits inside, innermost first.
 ///

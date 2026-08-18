@@ -2,7 +2,12 @@ use crate::model::{Node, Styles};
 
 const PROPERTIES: &[&str] = &["-webkit-text-fill-color", "color", "fill", "stroke"];
 
-pub fn normalize(styles: &mut Styles, node: &Node, parent: Option<&Node>, rules: &[String]) {
+pub fn normalize<'a>(
+    styles: &mut Styles,
+    node: &Node,
+    parent: Option<&Node>,
+    rules: impl Into<super::authored_css::Authored<'a>>,
+) {
     normalize_indexed(
         styles,
         node,

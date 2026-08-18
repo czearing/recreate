@@ -195,7 +195,8 @@ __NODE_PATH__
   ].filter(meaningfulTransient);
 __STATE_STYLE_CAPTURE__
 __ATTRIBUTE_SEQUENCE_CAPTURE__
-  const { texts: cssRuleTexts, urls: assets } = recreateCssAssets(nodes, cssRules);
+  const { texts: cssRuleTexts, urls: assets, shorthands } =
+    recreateCssAssets(nodes, cssRules, shorthandBlocks.values());
 __ASSET_CAPTURE__
   return JSON.stringify({
     url: location.href,
@@ -214,6 +215,7 @@ __ASSET_CAPTURE__
     state_styles: stateStyles,
     attribute_sequences: attributeSequences,
     css_rules: cssRuleTexts,
+    css_shorthands: shorthands,
     asset_urls: Array.from(assets),
     asset_data: assetData
   });

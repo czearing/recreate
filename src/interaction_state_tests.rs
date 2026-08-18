@@ -40,6 +40,7 @@ fn state(nodes: usize) -> PageState {
         }],
         attribute_sequences: Vec::new(),
         css_rules: vec!["body{margin:0}".into()],
+        css_shorthands: Default::default(),
         asset_urls: vec!["https://example.test/logo.svg".into()],
         asset_data: BTreeMap::from([("blob:logo".into(), "data:image/png;base64,AA==".into())]),
     }

@@ -28,13 +28,18 @@ mod import;
 #[path = "rule_activation_base_tests.rs"]
 mod base;
 
+#[path = "rule_activation_shorthand_tests.rs"]
+mod shorthand;
+
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 
 const HARNESS: &str = include_str!("rule_activation_harness.js");
 
 fn capture_source() -> String {
-    crate::state_style_script::SOURCE.replace("__RULE_ACTIVATION__", super::SOURCE)
+    crate::state_style_script::SOURCE
+        .replace("__RULE_ACTIVATION__", super::SOURCE)
+        .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE)
 }
 
 /// Runs the real capture walk over a scripted CSSOM and returns what it recorded.

@@ -1,17 +1,54 @@
 //! The relation between the name an author wrote and the longhands a capture records.
 
-use super::{Claim, expands_to, measured, renamed_parts};
+use super::{Claim, Shorthands, expands_to, measured, renamed_parts};
 use crate::model::Styles;
 
-fn value<'a>(name: &str, value: &'a str, property: &str) -> Option<&'a str> {
-    match super::claim(name, value, property) {
+/// No division recorded for any block — the fallback every hand-written fixture reaches.
+fn undivided() -> Shorthands {
+    Shorthands::new()
+}
+
+/// A block as the capture records it: the text, and the shares the engine stored under it.
+fn divided(block: &str, shares: &[(&str, &str)]) -> Shorthands {
+    Shorthands::from([(
+        block.to_string(),
+        shares
+            .iter()
+            .map(|(name, share)| ((*name).to_string(), (*share).to_string()))
+            .collect(),
+    )])
+}
+
+fn share<'a>(
+    shorthands: &'a Shorthands,
+    block: &str,
+    name: &str,
+    value: &'a str,
+    property: &str,
+) -> Option<&'a str> {
+    match super::claim(shorthands, block, name, value, property) {
         Claim::Value(share) => Some(share),
-        Claim::Elsewhere | Claim::Opaque => None,
+        Claim::Elsewhere | Claim::Unsettled => None,
     }
 }
 
-fn opaque(name: &str, value: &str, property: &str) -> bool {
-    matches!(super::claim(name, value, property), Claim::Opaque)
+fn value<'a>(name: &str, value: &'a str, property: &str) -> Option<&'a str> {
+    match super::claim(no_division(), "", name, value, property) {
+        Claim::Value(share) => Some(share),
+        Claim::Elsewhere | Claim::Unsettled => None,
+    }
+}
+
+fn no_division() -> &'static Shorthands {
+    static EMPTY: std::sync::OnceLock<Shorthands> = std::sync::OnceLock::new();
+    EMPTY.get_or_init(Shorthands::new)
+}
+
+fn unsettled(name: &str, value: &str, property: &str) -> bool {
+    matches!(
+        super::claim(no_division(), "", name, value, property),
+        Claim::Unsettled
+    )
 }
 
 /// The name a capture records is the longhand, so the shorthand has to reach it by the
@@ -62,17 +99,21 @@ fn claims_a_prefixed_property_the_shorthand_does_not_set() {
         ("border-top-width".to_string(), "8px".to_string()),
     ]);
 
-    assert_eq!(measured(&style, "border", "8px"), ["border-top-width"]);
+    assert_eq!(
+        measured(&undivided(), "", &style, "border", "8px"),
+        ["border-top-width"]
+    );
 }
 
-/// One component is what every longhand the shorthand sets computed to, so it transfers.
-/// Several are divided by a grammar this reads nothing of, so the share is named undecodable
-/// rather than guessed — passing the whole text through publishes nonsense.
+/// One component is what every longhand the shorthand sets computed to, so it transfers even
+/// where nothing recorded the division. Anything longer is answered unsettled rather than
+/// guessed: passing the whole text through publishes nonsense, and dividing it by position
+/// publishes a *wrong* share, which is worse than none.
 #[test]
-fn transfers_one_component_and_refuses_to_divide_several() {
+fn transfers_one_component_and_refuses_to_divide_several_unaided() {
     assert_eq!(value("padding", "24px", "padding-top"), Some("24px"));
-    assert!(opaque("padding", "24px 8px", "padding-top"));
-    assert!(opaque(
+    assert!(unsettled("padding", "24px 8px", "padding-top"));
+    assert!(unsettled(
         "background",
         "url(a.png) rgb(255, 0, 0)",
         "background-color"
@@ -100,7 +141,10 @@ fn reports_only_the_properties_the_declaration_accounts_for() {
     ]);
 
     assert_eq!(
-        measured(&style, "background", "rgb(0, 255, 0)"),
+        measured(&undivided(), "", &style, "background", "rgb(0, 255, 0)"),
         ["background-color"]
     );
 }
+
+#[path = "shorthand_division_tests.rs"]
+mod division;

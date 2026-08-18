@@ -6,12 +6,12 @@ use std::collections::BTreeMap;
 
 use super::samples::{remove_sampled_origins, remove_sampled_sizes};
 
-pub fn base_declarations(
+pub fn base_declarations<'a>(
     node: &Node,
     parent: Option<&Node>,
     viewport: &Viewport,
     assets: &BTreeMap<String, String>,
-    css_rules: &[String],
+    css_rules: impl Into<super::super::authored_css::Authored<'a>>,
     fluid_height: bool,
 ) -> String {
     base_declarations_indexed(

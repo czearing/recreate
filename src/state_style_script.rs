@@ -1,5 +1,6 @@
 pub const SOURCE: &str = r#"
 __RULE_ACTIVATION__
+__SHORTHAND_EXPANSION__
   const cssRules = [], cssRuleKeys = new Set(), stateStyles = [], stateStyleKeys = new Set();
   const stateShorthands = [
     'animation','background','border','border-color','border-radius','border-style',
@@ -121,7 +122,12 @@ __RULE_ACTIVATION__
       }
       // A state rule is recorded whatever its condition, because the state it describes is
       // entered later, under conditions that need not be the ones in force now.
-      if (rule.selectorText && rule.style) captureStateStyles(rule, media);
+      if (rule.selectorText && rule.style) {
+        // Recorded from the same rule object that produced the text above, so the division
+        // and the text it divides cannot come from different parses of the same sheet.
+        recordShorthandBlock(rule.style, base);
+        captureStateStyles(rule, media);
+      }
     }
   };
   // `document.styleSheets` excludes constructed sheets adopted by the document or by a

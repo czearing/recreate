@@ -1,8 +1,8 @@
 use crate::model::{Node, Styles};
 
-pub use super::authored_css_index::Index;
+pub use super::authored_css_index::{Authored, Index};
 
-pub fn normalize(styles: &mut Styles, node: &Node, rules: &[String]) {
+pub fn normalize<'a>(styles: &mut Styles, node: &Node, rules: impl Into<Authored<'a>>) {
     normalize_indexed(styles, node, &Index::new(rules));
 }
 

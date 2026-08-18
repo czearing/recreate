@@ -54,10 +54,12 @@ walk(tree);
 
 // The projection exactly as `page_capture.js` performs it: resolve each rule's references
 // against its own sheet, then read the asset set out of those very strings.
-const { texts: cssRuleTexts, urls: assets } = recreateCssAssets(nodes, __CSS_RULES__);
+const { texts: cssRuleTexts, urls: assets, shorthands } =
+  recreateCssAssets(nodes, __CSS_RULES__, __CSS_SHORTHANDS__);
 
 console.log(JSON.stringify({
   assets: [...assets].sort(),
   rules: cssRuleTexts,
+  shorthands,
   recorded: nodes.map(node => node.attributes)
 }));

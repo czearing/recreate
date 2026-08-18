@@ -159,3 +159,6 @@ fn resolves_two_references_whose_absolute_forms_are_in_a_prefix_relation() {
         "@font-face{src:url(\"/s/f.woff2\"),url(\"/s/f.woff\")}"
     );
 }
+
+#[path = "asset_attributes_division_key_tests.rs"]
+mod division_key;

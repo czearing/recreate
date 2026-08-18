@@ -28,10 +28,16 @@ const matchesSelector = (selector, element) =>
     .map(part => part.trim())
     .some(part => part === '*' || (part.startsWith('.') && element.classes.includes(part.slice(1))));
 
-const makeStyle = declarations => {
-  const names = Object.keys(declarations);
+// A declaration block stores longhands: a shorthand is a parsing convenience the engine does
+// not retain, so iterating a block yields the longhands it set while asking for the shorthand
+// by name re-serialises them. A scene spells that division as `expanded`, which is the only
+// part of CSS grammar a double cannot derive and a browser always can.
+const makeStyle = (declarations, expanded) => {
+  const stored = expanded || declarations;
+  const names = Object.keys(stored);
   return {
-    getPropertyValue: name => declarations[name] || '',
+    cssText: declarationText(declarations),
+    getPropertyValue: name => (name in stored ? stored[name] : declarations[name]) || '',
     getPropertyPriority: () => '',
     [Symbol.iterator]: function* () {
       yield* names;
@@ -69,7 +75,7 @@ const buildRule = spec => {
     return {
       selectorText: spec.selectorText,
       cssText: `${spec.selectorText} { ${declarationText(spec.declarations)} }`,
-      style: makeStyle(spec.declarations)
+      style: makeStyle(spec.declarations, spec.expanded)
     };
   }
   // A definition rule such as @property or @counter-style has a block of descriptors and
@@ -176,4 +182,4 @@ const getComputedStyle = element => ({
 
 __CAPTURE__
 
-console.log(JSON.stringify({ cssRules, stateStyles, parses, reads }));
+console.log(JSON.stringify({ cssRules, stateStyles, parses, reads, shorthands: [...shorthandBlocks.values()] }));

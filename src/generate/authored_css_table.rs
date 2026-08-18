@@ -151,12 +151,14 @@ impl<'a> Table<'a> {
     /// recreation's own cascade resolves against a different origin than the source's did.
     pub(super) fn declared_values(
         &self,
+        shorthands: &super::shorthand::Shorthands,
         node: &Node,
         properties: &std::collections::BTreeSet<String>,
     ) -> std::collections::BTreeMap<String, Option<String>> {
         let mut resolved = std::collections::BTreeMap::new();
         for index in self.matching(node) {
-            for (name, value) in super::css_declaration::parsed(self.rules[index].declarations) {
+            let block = self.rules[index].declarations;
+            for (name, value) in super::css_declaration::parsed(block) {
                 let value = value.trim().trim_end_matches('}').trim();
                 if value.is_empty() || super::authored_css_rules::cascade_keyword(value) {
                     continue;
@@ -167,11 +169,11 @@ impl<'a> Table<'a> {
                         resolved.insert(property.clone(), Some(value.to_string()));
                         continue;
                     }
-                    match super::shorthand::claim(name, value, property) {
+                    match super::shorthand::claim(shorthands, block, name, value, property) {
                         super::shorthand::Claim::Value(share) => {
                             resolved.insert(property.clone(), Some(share.to_string()));
                         }
-                        super::shorthand::Claim::Opaque => {
+                        super::shorthand::Claim::Unsettled => {
                             resolved.insert(property.clone(), None);
                         }
                         super::shorthand::Claim::Elsewhere => (),

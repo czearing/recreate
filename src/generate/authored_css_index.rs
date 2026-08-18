@@ -4,17 +4,69 @@ use std::collections::{BTreeMap, BTreeSet};
 use super::authored_css_conditional::Conditional;
 use super::authored_css_table::Table;
 use super::authored_css_value::absolute_length;
+use super::shorthand::Shorthands;
+
+/// Everything one capture recorded about the page's authored stylesheets: the rule texts, and
+/// how the engine divided each block that spells a shorthand.
+///
+/// The two travel together because the division is keyed by the block text — indexing one
+/// without the other is what leaves a shorthand-authored declaration unreadable. A caller
+/// holding a captured state hands the state over and gets both; one holding bare rule text
+/// converts in and gets no divisions, which is the answer for text nothing ever parsed.
+#[derive(Clone, Copy)]
+pub struct Authored<'a> {
+    pub rules: &'a [String],
+    pub shorthands: &'a Shorthands,
+}
+
+fn no_shorthands() -> &'static Shorthands {
+    static EMPTY: std::sync::OnceLock<Shorthands> = std::sync::OnceLock::new();
+    EMPTY.get_or_init(Shorthands::new)
+}
+
+impl<'a> From<&'a [String]> for Authored<'a> {
+    fn from(rules: &'a [String]) -> Self {
+        Self {
+            rules,
+            shorthands: no_shorthands(),
+        }
+    }
+}
+
+impl<'a> From<&'a Vec<String>> for Authored<'a> {
+    fn from(rules: &'a Vec<String>) -> Self {
+        rules.as_slice().into()
+    }
+}
+
+impl<'a, const N: usize> From<&'a [String; N]> for Authored<'a> {
+    fn from(rules: &'a [String; N]) -> Self {
+        rules.as_slice().into()
+    }
+}
+
+impl<'a> From<&'a crate::model::PageState> for Authored<'a> {
+    fn from(state: &'a crate::model::PageState) -> Self {
+        Self {
+            rules: &state.css_rules,
+            shorthands: &state.css_shorthands,
+        }
+    }
+}
 
 pub struct Index<'a> {
     table: Table<'a>,
     conditional: Conditional<'a>,
+    shorthands: &'a Shorthands,
 }
 
 impl<'a> Index<'a> {
-    pub fn new(rules: &'a [String]) -> Self {
+    pub fn new(authored: impl Into<Authored<'a>>) -> Self {
+        let Authored { rules, shorthands } = authored.into();
         let mut index = Self {
             table: Table::default(),
             conditional: Conditional::default(),
+            shorthands,
         };
         let order = super::css_layers::Order::new(rules);
         for rule in rules {
@@ -110,7 +162,14 @@ impl<'a> Index<'a> {
         node: &Node,
         properties: &BTreeSet<String>,
     ) -> BTreeMap<String, Option<String>> {
-        self.table.declared_values(node, properties)
+        self.table
+            .declared_values(self.shorthands, node, properties)
+    }
+
+    /// How the engine divided each authored block, for the stages that must read an authored
+    /// declaration against a sampled longhand.
+    pub(super) fn shorthands(&self) -> &'a Shorthands {
+        self.shorthands
     }
 
     pub fn positive_integer_property(&self, node: &Node, property: &str) -> Option<u32> {

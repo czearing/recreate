@@ -96,6 +96,7 @@ fn shared_state(state: &PageState, baseline: &PageState) -> PageState {
         state_styles: state.state_styles.clone(),
         attribute_sequences: Vec::new(),
         css_rules: state.css_rules.clone(),
+        css_shorthands: state.css_shorthands.clone(),
         asset_urls: Vec::new(),
         asset_data: Default::default(),
     }

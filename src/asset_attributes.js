@@ -180,7 +180,21 @@
   // very strings, so what the recreation fetches and what it references cannot disagree.
   // Two sheets that authored the same rule contribute one line only when their references
   // genuinely resolve to the same bytes.
-  const recreateCssAssets = (nodes, cssRules) => {
+  //
+  // A block's recorded division is projected through the same resolution, key and shares
+  // alike, because it is keyed by the block text as the artifact spells it. Resolving the two
+  // views separately is what would let a rule carrying `url()` arrive under a key nothing
+  // later looks it up by.
+  const recreateCssAssets = (nodes, cssRules, shorthandBlocks = []) => {
     const texts = [...new Set(cssRules.map(resolveCssRuleUrls))];
-    return { texts, urls: recreateAssetUrls(nodes, texts) };
+    const shorthands = {};
+    for (const { text, base, shares } of shorthandBlocks) {
+      shorthands[resolveCssRuleUrls({ text, base })] = Object.fromEntries(
+        Object.entries(shares).map(([property, share]) => [
+          property,
+          resolveCssRuleUrls({ text: share, base })
+        ])
+      );
+    }
+    return { texts, urls: recreateAssetUrls(nodes, texts), shorthands };
   };
