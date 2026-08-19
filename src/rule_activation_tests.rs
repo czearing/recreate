@@ -50,7 +50,7 @@ fn capture_source() -> String {
         crate::state_style_script::SOURCE
             .replace("__RULE_ACTIVATION__", super::SOURCE)
             .replace("__SHORTHAND_EXPANSION__", crate::capture_shorthands::SOURCE),
-        crate::capture_conditions::SOURCE,
+        crate::capture_conditions::source(),
     )
 }
 

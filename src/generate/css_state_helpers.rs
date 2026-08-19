@@ -123,11 +123,16 @@ mod tests {
             style: [("background-color".to_string(), "rgb(0, 255, 0)".to_string())]
                 .into_iter()
                 .collect(),
-            condition_decided: ["background-color".to_string()].into_iter().collect(),
+            condition_decided: [(
+                "@media (min-width: 600px)".to_string(),
+                ["background-color".to_string()].into_iter().collect(),
+            )]
+            .into_iter()
+            .collect(),
             ..Default::default()
         };
         let mut styles = node.style.clone();
-        super::super::authored_conditions::restore_unconditional(
+        super::super::authored_conditions_base_arm::restore_unconditional(
             &mut styles,
             &node,
             &super::super::authored_css::Index::new(&merged),

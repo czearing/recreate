@@ -9,13 +9,15 @@ mod assets;
 mod assets_remote;
 mod attribute_sequences;
 mod authored_condition_chain;
-mod authored_condition_kind;
+
 mod authored_conditions;
+mod authored_conditions_base_arm;
+mod authored_conditions_measured;
 mod authored_css;
 #[cfg(test)]
 #[path = "authored_css_axis_tests.rs"]
 mod authored_css_axis_tests;
-mod authored_css_conditional;
+
 #[cfg(test)]
 #[path = "authored_css_fluid_tests.rs"]
 mod authored_css_fluid_tests;

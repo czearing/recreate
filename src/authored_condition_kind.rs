@@ -22,31 +22,45 @@
 /// `@starting-style` has its own owner in `before_change`.
 const DOCUMENT_ANSWERED_AT_RULES: &[&str] = &["@media", "@container"];
 
+/// The same two questions in JavaScript, generated from the list above rather than written a
+/// second time, so the conditions a capture withdraws and the conditions the emitter
+/// re-publishes cannot drift into being different sets.
+///
+/// It answers for a carrier stack rather than for one prelude, because that is the unit both
+/// sides key on: the chain spelled as the text that opens it, which is what
+/// [`crate::generate`]'s re-emitter puts back around a rewritten rule.
+pub fn js_source() -> String {
+    let names = DOCUMENT_ANSWERED_AT_RULES
+        .iter()
+        .map(|name| format!("'{name}'"))
+        .collect::<Vec<_>>()
+        .join(",");
+    format!(
+        r#"
+  const documentAnsweredAtRules = [{names}];
+  const documentAnswered = prelude => documentAnsweredAtRules.some(name =>
+    prelude.length > name.length
+      && prelude.slice(0, name.length).toLowerCase() === name
+      && !/[a-z0-9-]/i.test(prelude[name.length]));
+  const identityMedia = prelude =>
+    prelude.slice(0, 6).toLowerCase() === '@media' && prelude.slice(6).trim().toLowerCase() === 'all';
+  // The chain of document-answered conditions a rule sits under, spelled as the text that
+  // opens it — the key the re-emitter groups its rewritten rules by. Empty when no layer of
+  // the chain has a false branch at all, which is the whole of what withdrawal is owed for.
+  const conditionOpening = carriers => {{
+    const chain = carriers.map(prelude => prelude.trim()).filter(documentAnswered);
+    return chain.length && chain.some(prelude => !identityMedia(prelude)) ? chain.join('{{') : '';
+  }};
+"#
+    )
+}
+
 /// Whether the **document** answers this at-rule's condition, so no baked computed style can
 /// stand in for it.
-pub(super) fn document_answered(prelude: &str) -> bool {
+pub(crate) fn document_answered(prelude: &str) -> bool {
     DOCUMENT_ANSWERED_AT_RULES
         .iter()
         .any(|name| starts_with_at_rule(prelude, name))
-}
-
-/// Whether this condition has a false branch at all.
-///
-/// Withdrawal is owed only where the recreation can be asked the condition again and get a
-/// different answer. `all` is the media type Media Queries 4 defines as matching every device,
-/// so `@media all` is the identity condition: it is what a capture writes around a sheet linked
-/// with `media="all"`, it holds at every width and in every container, and there is no arm
-/// below any breakpoint for the unconditional cascade to restore. Withdrawing against it would
-/// take a declaration out of the base rule to answer a question that is never asked.
-pub(super) fn falsifiable(prelude: &str) -> bool {
-    document_answered(prelude) && !identity_media(prelude)
-}
-
-fn identity_media(prelude: &str) -> bool {
-    prelude
-        .get(..6)
-        .is_some_and(|name| name.eq_ignore_ascii_case("@media"))
-        && prelude[6..].trim().eq_ignore_ascii_case("all")
 }
 
 /// Matched on the at-rule name and not on a bare prefix, so `@media-hypothetical` — any

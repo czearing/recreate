@@ -1,12 +1,6 @@
 //! The relation between the name an author wrote and the longhands a capture records.
 
-use super::{Claim, Shorthands, expands_to, renamed_parts, sets};
-use crate::model::Styles;
-
-/// No division recorded for any block — the fallback every hand-written fixture reaches.
-fn undivided() -> Shorthands {
-    Shorthands::new()
-}
+use super::{Claim, Shorthands, expands_to, renamed_parts};
 
 /// A block as the capture records it: the text, and the shares the engine stored under it.
 fn divided(block: &str, shares: &[(&str, &str)]) -> Shorthands {
@@ -95,17 +89,29 @@ fn reads_the_families_whose_longhands_were_renamed() {
 fn refuses_a_prefixed_property_the_engine_divided_the_block_without() {
     assert_eq!(value("border", "8px", "border-radius"), Some("8px"));
 
-    let style = Styles::from([
-        ("border-radius".to_string(), "4px".to_string()),
-        ("border-top-width".to_string(), "8px".to_string()),
-    ]);
     let block = "border: 8px solid red";
     let shorthands = divided(block, &[("border-top-width", "8px")]);
 
     assert_eq!(
-        sets(&shorthands, block, &style, "border", "8px solid red"),
-        ["border-top-width"]
+        share(
+            &shorthands,
+            block,
+            "border",
+            "8px solid red",
+            "border-top-width"
+        ),
+        Some("8px")
     );
+    assert!(matches!(
+        super::claim(
+            &shorthands,
+            block,
+            "border",
+            "8px solid red",
+            "border-radius"
+        ),
+        Claim::Elsewhere
+    ));
 }
 
 /// One component is what every longhand the shorthand sets computed to, so it transfers even
@@ -139,19 +145,14 @@ fn counts_a_function_call_as_one_component() {
 /// unrelated name is still not reported, because no spelling of `background` reaches `color`.
 #[test]
 fn reports_the_longhands_the_declaration_names_however_its_value_is_spelled() {
-    let style = Styles::from([
-        ("padding-left".to_string(), "8px".to_string()),
-        ("color".to_string(), "rgb(0, 255, 0)".to_string()),
-    ]);
-
     assert_eq!(
-        sets(&undivided(), "", &style, "padding-left", "0.5em"),
-        ["padding-left"]
+        value("padding-left", "0.5em", "padding-left"),
+        Some("0.5em")
     );
-    assert_eq!(
-        sets(&undivided(), "", &style, "background", "rgb(0, 255, 0)"),
-        [] as [String; 0]
-    );
+    assert!(matches!(
+        super::claim(no_division(), "", "background", "rgb(0, 255, 0)", "color"),
+        Claim::Elsewhere
+    ));
 }
 
 #[path = "shorthand_division_tests.rs"]

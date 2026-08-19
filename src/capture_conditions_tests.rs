@@ -6,13 +6,15 @@
 use super::{style, walk};
 use serde_json::{Value, json};
 
+const CONTAINER: &str = "@container (max-width: 400px)";
+
 /// One element under one `@container` that holds, with the override spelled in a vocabulary
 /// no computed sample uses, plus an element under a `@supports` that also holds.
 fn scene() -> Value {
     json!({
         "elements": [
-            { "path": "/main/p", "classes": ["arm"] },
-            { "path": "/main/span", "classes": ["grid"] }
+            { "path": "/main/p", "classes": ["arm"], "baked": { "padding-left": "0.5em" } },
+            { "path": "/main/span", "classes": ["grid"], "baked": { "display": "grid" } }
         ],
         "matching": {
             "@container (max-width: 400px)": ["/main/p"],
@@ -44,13 +46,18 @@ fn scene() -> Value {
     })
 }
 
-fn decided(result: &Value, path: &str) -> Vec<String> {
+fn record<'a>(result: &'a Value, path: &str) -> &'a Value {
     result["decided"]
         .as_array()
         .unwrap()
         .iter()
         .find(|node| node["path"] == path)
-        .unwrap()["condition_decided"]
+        .unwrap()
+}
+
+/// The properties the pass credited to one condition chain at one element.
+fn decided(result: &Value, path: &str, opening: &str) -> Vec<String> {
+    record(result, path)["condition_decided"][opening]
         .as_array()
         .map(|names| {
             names
@@ -61,12 +68,34 @@ fn decided(result: &Value, path: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// Every chain the pass credited anything to at one element.
+fn chains(result: &Value, path: &str) -> Vec<String> {
+    record(result, path)["condition_decided"]
+        .as_object()
+        .map(|credited| credited.keys().cloned().collect())
+        .unwrap_or_default()
+}
+
 /// The filed defect's acquisition half. `0.5em` is never the string a computed sample holds,
 /// so no comparison of the two can report that a condition decided this property — and the
 /// engine reports it without being told what an `em` is.
 #[test]
 fn names_a_property_an_override_decided_however_it_was_spelled() {
-    assert_eq!(decided(&walk(scene()), "/main/p"), ["padding-left"]);
+    assert_eq!(
+        decided(&walk(scene()), "/main/p", CONTAINER),
+        ["padding-left"]
+    );
+}
+
+/// The arm the unconditional cascade owes, measured beside the name. A stage that has this
+/// can restore a base the authored text states only as a reference it cannot resolve.
+#[test]
+fn measures_the_arm_the_unconditional_cascade_owes() {
+    let result = walk(scene());
+    assert_eq!(
+        record(&result, "/main/p")["condition_base"]["padding-left"],
+        json!("42px")
+    );
 }
 
 /// `@supports` is answered by the engine, not the document, so the recreation bakes its
@@ -75,7 +104,7 @@ fn names_a_property_an_override_decided_however_it_was_spelled() {
 /// rather than withdrawing every conditional rule.
 #[test]
 fn leaves_a_gate_the_recreation_does_not_re_emit_out_of_the_answer() {
-    assert!(decided(&walk(scene()), "/main/span").is_empty());
+    assert!(chains(&walk(scene()), "/main/span").is_empty());
 }
 
 /// The pass reads the page and must leave it as it found it, or every stage after it — and
@@ -109,7 +138,7 @@ fn names_nothing_for_a_condition_that_does_not_hold() {
     let mut scene = scene();
     scene["matching"] = json!({ "@supports (display: grid)": ["/main/span"] });
 
-    assert!(decided(&walk(scene), "/main/p").is_empty());
+    assert!(chains(&walk(scene), "/main/p").is_empty());
 }
 
 /// Observed on github.com: a `@position-try` nested in a `@media` carries a declaration
@@ -122,7 +151,10 @@ fn passes_over_a_definition_rule_that_selects_nothing() {
     let mut scene = scene();
     scene["matching"]["@media (min-width: 1px)"] = json!(["/main/p", "/main/span"]);
 
-    assert_eq!(decided(&walk(scene), "/main/p"), ["padding-left"]);
+    assert_eq!(
+        decided(&walk(scene), "/main/p", CONTAINER),
+        ["padding-left"]
+    );
 }
 
 /// The blocks are emptied with their sheets switched off, because a live sheet rebuilds its
@@ -153,3 +185,9 @@ fn leaves_every_sheet_switched_as_the_page_had_it() {
         result["switches"]
     );
 }
+
+#[path = "capture_conditions_token_tests.rs"]
+mod token;
+
+#[path = "capture_conditions_attribution_tests.rs"]
+mod attribution;

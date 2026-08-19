@@ -63,25 +63,60 @@ const document = {
   querySelectorAll: selector => elements.filter(element => matchesSelector(selector, element))
 };
 
+// Custom properties inherit, so a token declared on an ancestor reaches this element. The
+// double has no node objects, only paths, so ancestry is read off the path the way the real
+// walk builds it.
+const ancestry = element => {
+  const chain = [element];
+  let path = element.path;
+  while (path.lastIndexOf('/') > 0) {
+    path = path.slice(0, path.lastIndexOf('/'));
+    const ancestor = elements.find(candidate => candidate.path === path);
+    if (ancestor) chain.push(ancestor);
+  }
+  return chain;
+};
+
+const declaredValue = (element, name) => {
+  let value = '';
+  for (const { selectorText, style, conditions, rule } of liveRules) {
+    if (rule.parentStyleSheet && rule.parentStyleSheet.disabled) continue;
+    if (!matchesSelector(selectorText, element)) continue;
+    if (!conditions.every(prelude => conditionHolds(prelude, element))) continue;
+    const declared = style.getPropertyValue(name);
+    if (declared) value = declared;
+  }
+  return value;
+};
+
+// `var()` substitutes at computed-value time, which is why a block declaring only a token
+// decides longhands it never names. A double that returned the reference verbatim would let
+// that whole mechanism pass unmodelled.
+const substituted = (element, value, depth = 0) => {
+  if (depth > 5 || !value.includes('var(')) return value;
+  return substituted(
+    element,
+    value.replace(/var\(\s*(--[\w-]+)\s*(?:,([^()]*))?\)/g, (whole, name, fallback) => {
+      const carrier = ancestry(element).find(node => declaredValue(node, name));
+      return carrier ? declaredValue(carrier, name) : (fallback || '').trim();
+    }),
+    depth + 1
+  );
+};
+
 const getComputedStyle = element => ({
   // A probe sentinel is read straight back; anything else is resolved through the rules
   // still in force, so a block a stage empties stops contributing exactly as it would.
-  getPropertyValue: name => {
-    if (element.probes[name]) return element.probes[name];
-    let value = '';
-    for (const { selectorText, style, conditions, rule } of liveRules) {
-      if (rule.parentStyleSheet && rule.parentStyleSheet.disabled) continue;
-      if (!matchesSelector(selectorText, element)) continue;
-      if (!conditions.every(prelude => conditionHolds(prelude, element))) continue;
-      const declared = style.getPropertyValue(name);
-      if (declared) value = declared;
-    }
-    return value;
-  }
+  getPropertyValue: name =>
+    element.probes[name] || substituted(element, declaredValue(element, name))
 });
 
-// The records the walk would have built, paired with the elements they came from.
-const elementNodes = elements.map(element => [element, { path: element.path }]);
+// The records the walk would have built, paired with the elements they came from. A record
+// carries the style the node will bake, because that is the set the withdrawal watches.
+const elementNodes = elements.map(element => [element, {
+  path: element.path,
+  style: { ...(element.baked || {}) }
+}]);
 
 __CAPTURE__
 

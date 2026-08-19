@@ -79,36 +79,6 @@ pub(super) fn claim<'a>(
     }
 }
 
-/// Every property of `style` that the declaration `name: value` of `block` sets.
-///
-/// The sample is the key space, so a name the author shortened is asked of the longhands it
-/// stands for rather than looked up as itself and missed.
-///
-/// This answers which longhands a declaration *names*, and deliberately not whether it is
-/// the one that produced their samples. The two questions used to be one, answered by
-/// comparing the authored text against the sample — which holds only where the author spelled
-/// a value the way the engine serialises it, and silently fails for every relative length,
-/// percentage, math function, container unit and colour keyword. Whether a declaration
-/// produced a sample is the engine's answer, carried on [`crate::model::Node::condition_decided`].
-pub(super) fn sets(
-    shorthands: &Shorthands,
-    block: &str,
-    style: &crate::model::Styles,
-    name: &str,
-    value: &str,
-) -> Vec<String> {
-    style
-        .keys()
-        .filter(|property| {
-            !matches!(
-                claim(shorthands, block, name, value, property),
-                Claim::Elsewhere
-            )
-        })
-        .cloned()
-        .collect()
-}
-
 /// Whether `property` is one of the longhands `name` is the shorthand for.
 ///
 /// CSS spells a longhand as its shorthand's own name and a suffix in every family but the few

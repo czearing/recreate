@@ -3,6 +3,7 @@ mod action_scope_tests;
 mod asset_attributes;
 mod asset_script;
 mod attribute_sequence_script;
+mod authored_condition_kind;
 mod backtest;
 mod behavior;
 mod blocking_overlay;

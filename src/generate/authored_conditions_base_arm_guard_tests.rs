@@ -4,7 +4,7 @@
 //! in every one the measured value must survive untouched. Without these the repair would
 //! withdraw values that nothing puts back.
 
-use super::{decided, node, restored, scene};
+use super::{decided, emitted, node, restored, scene};
 /// A condition that was false at capture moved nothing, so the engine names no property and
 /// the measured value is left alone. Without this the stage would withdraw a value nothing
 /// puts back.
@@ -32,19 +32,27 @@ fn keeps_the_measured_value_when_the_condition_was_false_at_capture() {
 }
 
 /// A rule is found through each class its subject compound names, so a node carrying one of
-/// two is a candidate for a rule that needs both. The compound test is what rejects it: the
-/// engine reports the property as condition-decided — some other rule did decide it — and the
-/// declaration this stage can see belongs to an element the author never styled.
+/// two is a candidate for a rule that needs both. The declaration this stage can see belongs
+/// to an element the author never styled — but the engine still reports the property as
+/// condition-decided, because some rule under that chain did decide it. Both arms are known
+/// without knowing which rule: the base is the unconditional cascade's, and the override is
+/// the value the capture measured with the chain in force. So the override is re-published on
+/// this node's own generated class rather than left baked at every width.
 #[test]
-fn leaves_a_condition_whose_compound_the_node_only_partly_satisfies() {
+fn publishes_both_arms_where_the_node_only_partly_satisfies_the_compound() {
     let node = decided(node("card", &[("color", "rgb(0, 0, 255)")]), &["color"]);
     let captured = vec![
         ".card { color: rgb(255, 0, 0); }".into(),
         "@media (min-width: 600px){.card.featured { color: rgb(0, 0, 255); }}".into(),
     ];
-    let styles = restored(&node, &captured);
 
-    assert_eq!(styles["color"], "rgb(0, 0, 255)");
+    assert_eq!(restored(&node, &captured)["color"], "rgb(255, 0, 0)");
+    assert!(
+        emitted(&node, &captured)
+            .contains(&"@media (min-width: 600px){.card{color:rgb(0, 0, 255);}}".to_string()),
+        "{:?}",
+        emitted(&node, &captured)
+    );
 }
 
 /// A length is where abstaining is most tempting and most wrong: the index normally treats a
@@ -110,19 +118,25 @@ fn leaves_a_condition_the_recreation_does_not_re_emit_alone() {
 }
 
 /// A rule inside a condition reaches the node through a relationship rather than by naming
-/// it, so the same matcher that found no unconditional arm for it finds no override either.
-/// The engine reports the property as condition-decided — it truly is — and withdrawing on
-/// that alone would delete a value with nothing to replace it. The reach is the emitter's.
+/// it, so the matcher that rewrites selectors finds no override to rewrite. The engine still
+/// reports the property as condition-decided, and both arms are measured, so the override is
+/// re-published on this node's own generated class. Leaving it baked instead is what made a
+/// component permanently unresponsive to the ancestor the author made it depend on.
 #[test]
-fn leaves_a_conditional_rule_that_reaches_the_node_through_an_ancestor() {
+fn publishes_both_arms_of_a_conditional_rule_that_reaches_the_node_through_an_ancestor() {
     let node = decided(node("title", &[("color", "rgb(0, 0, 255)")]), &["color"]);
     let captured = vec![
         ".title { color: rgb(255, 0, 0); }".into(),
         "@media (min-width: 600px){.wrap .title { color: rgb(0, 0, 255); }}".into(),
     ];
-    let styles = restored(&node, &captured);
 
-    assert_eq!(styles["color"], "rgb(0, 0, 255)");
+    assert_eq!(restored(&node, &captured)["color"], "rgb(255, 0, 0)");
+    assert!(
+        emitted(&node, &captured)
+            .contains(&"@media (min-width: 600px){.card{color:rgb(0, 0, 255);}}".to_string()),
+        "{:?}",
+        emitted(&node, &captured)
+    );
 }
 
 /// A state rule inside a condition describes a state, not the resting value, and the state

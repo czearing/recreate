@@ -34,6 +34,8 @@ fn emitted(node: &Node, captured: &[String]) -> Vec<String> {
         node,
         &Scope::new(&nodes, &classes, "r"),
         captured,
+        &crate::generate::authored_css_index::Index::new(captured),
+        &crate::generate::authored_conditions_measured::from_nodes(&nodes),
         &mut BTreeSet::new(),
     )
     .iter()

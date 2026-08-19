@@ -4,12 +4,16 @@
 //! real breakpoints arrive one group inside another and the identity condition arrives around
 //! everything else. Both readings are asserted here against the shipped stages.
 
-use super::{decided, restore_unconditional};
-use crate::generate::authored_conditions::rules;
-use crate::generate::authored_css_index::Index;
-use crate::generate::selector_scope::Scope;
-use crate::model::{Attributes, Node, Rect, Styles};
-use std::collections::{BTreeMap, BTreeSet};
+use super::{credited, emitted, restored};
+use crate::model::{Attributes, Node, Rect};
+
+/// The chain a sheet linked `media="all"` produces around the page's real breakpoint, which is
+/// what the emitter re-publishes and therefore what the capture credits an override to.
+const NESTED: &str = "@media all{@media (min-width: 600px)";
+
+fn decided(node: Node, properties: &[&str]) -> Node {
+    credited(node, NESTED, properties)
+}
 
 fn node(classes: &str, style: &[(&str, &str)]) -> Node {
     Node {
@@ -29,23 +33,6 @@ fn node(classes: &str, style: &[(&str, &str)]) -> Node {
             .collect(),
         ..Default::default()
     }
-}
-
-fn restored(node: &Node, captured: &[String]) -> Styles {
-    let mut styles = node.style.clone();
-    restore_unconditional(&mut styles, node, &Index::new(captured));
-    styles
-}
-
-fn emitted(node: &Node, captured: &[String]) -> Vec<String> {
-    let nodes = vec![node.clone()];
-    let classes = BTreeMap::from([(node.path.clone(), "card".to_string())]);
-    let scope = Scope::new(&nodes, &classes, "r");
-    let mut compounds = BTreeSet::new();
-    rules(&nodes[0], &scope, captured, &mut compounds)
-        .iter()
-        .map(crate::generate::authored_conditions::Emitted::text)
-        .collect()
 }
 
 /// The sheet-level wrapper a capture writes around a `media="all"` stylesheet, holding the
@@ -122,15 +109,13 @@ fn puts_back_under_its_condition_every_declaration_it_withdraws() {
 
 /// `all` is the media type Media Queries 4 defines as matching every device, so `@media all`
 /// holds wherever the base rule does. There is no arm below it to restore, and withdrawing
-/// against it would delete the only one the author wrote.
+/// against it would delete the only one the author wrote — so the capture credits nothing to
+/// it, and this stage must not manufacture a withdrawal from the rule text either.
 #[test]
 fn keeps_a_declaration_guarded_only_by_the_identity_condition() {
-    let node = decided(
-        node(
-            "card",
-            &[("position", "absolute"), ("left", "18px"), ("top", "12px")],
-        ),
-        &["position", "left", "top"],
+    let node = node(
+        "card",
+        &[("position", "absolute"), ("left", "18px"), ("top", "12px")],
     );
     let captured =
         vec!["@media all{.card { position: absolute; left: 18px; top: 12px; }}".to_string()];
@@ -158,8 +143,9 @@ fn does_not_exempt_a_real_breakpoint_merely_wrapped_in_the_identity_condition() 
 /// nothing here may generalise the exemption from the identity condition to media types.
 #[test]
 fn withdraws_against_a_media_type_that_can_be_false() {
-    let node = decided(
+    let node = credited(
         node("card", &[("background-color", "rgb(0, 0, 255)")]),
+        "@media print",
         &["background-color"],
     );
     let captured = vec![

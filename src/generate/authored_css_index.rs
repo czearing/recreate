@@ -1,7 +1,6 @@
 use crate::model::{Node, Styles};
 use std::collections::{BTreeMap, BTreeSet};
 
-use super::authored_css_conditional::Conditional;
 use super::authored_css_table::Table;
 use super::authored_css_value::absolute_length;
 use super::shorthand::Shorthands;
@@ -56,7 +55,6 @@ impl<'a> From<&'a crate::model::PageState> for Authored<'a> {
 
 pub struct Index<'a> {
     table: Table<'a>,
-    conditional: Conditional<'a>,
     shorthands: &'a Shorthands,
 }
 
@@ -65,20 +63,20 @@ impl<'a> Index<'a> {
         let Authored { rules, shorthands } = authored.into();
         let mut index = Self {
             table: Table::default(),
-            conditional: Conditional::default(),
             shorthands,
         };
         let order = super::css_layers::Order::new(rules);
         for rule in rules {
             // A layer is cascade position, not a condition, so its wrapper is peeled and
-            // remembered rather than skipped with the conditional groups below.
+            // remembered rather than skipped with the grouping at-rules below. A grouping
+            // rule's declarations are not the unconditional cascade's, and which of them a
+            // condition decided is the engine's answer rather than this table's.
             let (layer, rule) = super::css_layers::peel(rule);
             let position = order.position(layer.as_deref());
             let Some((selectors, declarations)) = rule.split_once('{') else {
                 continue;
             };
             if selectors.starts_with('@') {
-                index.conditional.add(rule, position);
                 continue;
             }
             index.table.add(selectors, declarations, position);
@@ -86,12 +84,7 @@ impl<'a> Index<'a> {
         index
     }
 
-    /// The declarations every document-answered condition rule that directly targets this
-    /// node states, in cascade order.
-    pub(super) fn conditional_declarations(&self, node: &Node) -> Vec<&'a str> {
-        self.conditional.declarations(node)
-    }
-
+    /// The declarations of every rule this node matches, in cascade order.
     pub fn declarations(&self, node: &Node) -> Styles {
         let mut values: BTreeMap<String, Vec<String>> = BTreeMap::new();
         for index in self.direct_indices(node) {

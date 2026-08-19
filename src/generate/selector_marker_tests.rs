@@ -80,6 +80,8 @@ fn generate(subject: usize, rule: &str) -> (Vec<String>, BTreeMap<String, String
             &nodes[subject],
             &scope,
             &[rule.to_string()],
+            &crate::generate::authored_css_index::Index::new(&[rule.to_string()]),
+            &crate::generate::authored_conditions_measured::from_nodes(&nodes),
             &mut compounds,
         )
         .iter()

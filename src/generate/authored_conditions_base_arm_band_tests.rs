@@ -1,7 +1,7 @@
 //! What a viewport band may state, and what the re-emitted condition already covers.
 
 use super::{decided, node, scene};
-use crate::generate::authored_conditions::restore_unconditional;
+use crate::generate::authored_conditions_base_arm::restore_unconditional;
 use crate::generate::authored_css_index::Index;
 use crate::model::Styles;
 

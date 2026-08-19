@@ -10,7 +10,7 @@
 //! back, and the withdrawal must know whether any layer can be false. Answering it once here is
 //! what keeps a declaration the base rule gives up from being one the output states nowhere.
 
-use super::authored_condition_kind::{document_answered, falsifiable};
+use crate::authored_condition_kind::document_answered;
 
 /// The chain of document-answered conditions a style rule sits inside, innermost first.
 ///
@@ -24,17 +24,13 @@ pub(super) struct Conditions<'a, 'p> {
 impl Conditions<'_, '_> {
     /// The chain spelled as the text that opens it, outermost first — `@media a{@media b`.
     /// Kept as one string so a rule can be grouped by the conditions it sits under before it is
-    /// spelled out, which is what lets rules sharing both be merged onto one selector list.
+    /// spelled out, which is what lets rules sharing both be merged onto one selector list, and
+    /// which is the key the capture credits each measured override to.
     pub(super) fn opening(&self) -> String {
         match self.outer {
             Some(outer) => format!("{}{{{}", outer.opening(), self.prelude),
             None => self.prelude.to_string(),
         }
-    }
-
-    /// Whether any layer of the chain has a false branch at all.
-    pub(super) fn falsifiable(&self) -> bool {
-        falsifiable(self.prelude) || self.outer.is_some_and(Conditions::falsifiable)
     }
 }
 

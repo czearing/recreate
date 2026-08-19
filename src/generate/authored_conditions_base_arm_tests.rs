@@ -3,7 +3,7 @@
 //! Every case drives the shipped stage against a captured style plus the authored rule text
 //! the capture carries, which is what a real capture hands the emitter.
 
-use super::restore_unconditional;
+use crate::generate::authored_conditions_base_arm::restore_unconditional;
 use crate::generate::authored_css_index::Index;
 use crate::model::{Attributes, Node, Rect, Styles};
 
@@ -34,14 +34,26 @@ fn node(classes: &str, style: &[(&str, &str)]) -> Node {
 }
 
 /// The engine's own answer, as the capture records it: the properties whose computed value
-/// moved when the rules the recreation re-emits under a condition were withdrawn.
+/// moved when the rules the recreation re-emits under one condition chain were withdrawn,
+/// credited to that chain spelled as the text that opens it.
 ///
 /// Stated by each case rather than derived here, because deriving it would mean resolving the
 /// cascade from the same authored text the stage under test reads — which is the proxy this
 /// evidence replaced. A case that states none is a page where no condition decided anything.
-fn decided(mut node: Node, properties: &[&str]) -> Node {
-    node.condition_decided = properties.iter().map(|name| (*name).to_string()).collect();
+fn credited(mut node: Node, opening: &str, properties: &[&str]) -> Node {
+    node.condition_decided.insert(
+        opening.to_string(),
+        properties.iter().map(|name| (*name).to_string()).collect(),
+    );
     node
+}
+
+/// The chain the fixtures below spell, so a case whose page carries exactly one falsifiable
+/// condition need not restate it.
+const BREAKPOINT: &str = "@media (min-width: 600px)";
+
+fn decided(node: Node, properties: &[&str]) -> Node {
+    credited(node, BREAKPOINT, properties)
 }
 
 /// The stage as the emitters run it: the captured style is what the base rule would say,
@@ -50,6 +62,31 @@ fn restored(node: &Node, captured: &[String]) -> Styles {
     let mut styles = node.style.clone();
     restore_unconditional(&mut styles, node, &Index::new(captured));
     styles
+}
+
+/// The condition rules the emitter publishes for this node, as the CSS they become.
+fn emitted(node: &Node, captured: &[String]) -> Vec<String> {
+    emitted_sweep(std::slice::from_ref(node), captured)
+}
+
+/// The same, where the sweep measured the node at more than one width. The first is the base
+/// state the classes are built from; the rest are the sampled widths, which are the only
+/// evidence there is for a condition the base width falsifies.
+fn emitted_sweep(nodes: &[Node], captured: &[String]) -> Vec<String> {
+    let classes = std::collections::BTreeMap::from([(nodes[0].path.clone(), "card".to_string())]);
+    let scope = crate::generate::selector_scope::Scope::new(nodes, &classes, "r");
+    let mut compounds = std::collections::BTreeSet::new();
+    crate::generate::authored_conditions::rules(
+        &nodes[0],
+        &scope,
+        captured,
+        &Index::new(captured),
+        &crate::generate::authored_conditions_measured::from_nodes(nodes),
+        &mut compounds,
+    )
+    .iter()
+    .map(crate::generate::authored_conditions::Emitted::text)
+    .collect()
 }
 
 fn scene(subject: &str, condition: &str, over: &str) -> Vec<String> {
@@ -154,3 +191,6 @@ mod shorthand;
 
 #[path = "authored_conditions_base_arm_divided_tests.rs"]
 mod divided;
+
+#[path = "authored_conditions_base_arm_token_tests.rs"]
+mod token;

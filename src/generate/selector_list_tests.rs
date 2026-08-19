@@ -35,11 +35,13 @@ fn media(node: &Node, rules: &[&str]) -> Vec<String> {
         node,
         &super::selector_scope::Scope::new(&nodes, &classes, "r"),
         &rules,
+        &crate::generate::authored_css_index::Index::new(&rules),
+        &crate::generate::authored_conditions_measured::from_nodes(&nodes),
         &mut std::collections::BTreeSet::new(),
     )
-        .iter()
-        .map(crate::generate::authored_conditions::Emitted::text)
-        .collect()
+    .iter()
+    .map(crate::generate::authored_conditions::Emitted::text)
+    .collect()
 }
 
 /// A selector list is a logical OR of independent selectors, so a member that carries no

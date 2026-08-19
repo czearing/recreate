@@ -77,7 +77,7 @@ pub struct Node {
     pub scrollbar_gutter: f64,
     pub style: Styles,
     /// The properties an authored condition the recreation re-emits decided at this element,
-    /// as the engine answered it.
+    /// keyed by the chain of conditions that decided them, spelled as the text that opens it.
     ///
     /// [`Node::style`] is one branch of every condition the page carries — whichever branch
     /// held while the capture read it. The emitter republishes the condition, so it must take
@@ -91,8 +91,22 @@ pub struct Node {
     /// it", not "did this declaration produce this value" — and no table of unit families
     /// closes that gap, because a percentage needs a containing block and a container unit
     /// needs the query container's used size.
-    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
-    pub condition_decided: BTreeSet<String>,
+    ///
+    /// Keyed by the chain rather than pooled, because a property has to be put back under one
+    /// particular prelude: an element sitting under two conditions would otherwise have every
+    /// override restated under both, and the branch below one of them would paint the other's.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub condition_decided: BTreeMap<String, BTreeSet<String>>,
+    /// What each decided property computes to once every republished condition is withdrawn —
+    /// the arm the unconditional rule owes, measured rather than read off the authored text.
+    ///
+    /// The authored text answers first where it can, because the author's own words keep the
+    /// output shaped like its source and say nothing where the author said nothing. It cannot
+    /// answer where the value it states is itself a reference the recreation resolves
+    /// elsewhere, or a share of a shorthand this stage cannot divide; there the engine's
+    /// measurement is the only arm anybody has.
+    #[serde(default, skip_serializing_if = "Styles::is_empty")]
+    pub condition_base: Styles,
     /// The generated boxes this element had, keyed by the selector suffix that names each
     /// one — `::before`, `::after`, `::backdrop`.
     ///

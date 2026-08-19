@@ -10,7 +10,7 @@ pub fn normalize_indexed(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
     apply_authored(styles, node, rules);
     // Runs whatever the unconditional rules said, including nothing: an element styled only
     // from inside a condition still has that condition's branch baked into its sample.
-    super::authored_conditions::restore_unconditional(styles, node, rules);
+    super::authored_conditions_base_arm::restore_unconditional(styles, node, rules);
 }
 
 fn apply_authored(styles: &mut Styles, node: &Node, rules: &Index<'_>) {
