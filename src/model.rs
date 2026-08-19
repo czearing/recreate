@@ -228,6 +228,6 @@ mod pseudo;
 /// consumer inside an [AttributeSequence].
 #[allow(unused_imports)]
 pub use behaviour::SequenceStep;
-pub use behaviour::{Animation, AttributeSequence, StateStyle};
+pub use behaviour::{Animation, AttributeSequence, Relation, StateStyle};
 pub use capture_result::{Acceptance, BrowserCookie, PageState, Specification};
 pub use pseudo::{Pseudo, Pseudos};

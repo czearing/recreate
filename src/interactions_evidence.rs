@@ -192,4 +192,3 @@ pub(super) struct InteractionAlias {
     pub(super) template_tag: String,
     pub(super) template_label: String,
 }
-

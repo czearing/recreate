@@ -14,11 +14,34 @@ pub struct Animation {
     pub timing: Value,
 }
 
+/// How the element holding a state sits relative to the element the rule styles.
+///
+/// Selectors defines exactly one relational pseudo-class, so a state reaches its subject in
+/// one of two ways and no more: from an ancestor, which a descendant combinator expresses,
+/// or from inside the subject, which only `:has()` expresses. Recording which one is what
+/// stops `.card:has(.button:hover)` being re-emitted as `.card:hover`, where the style
+/// spreads over the whole card instead of answering the button.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "snake_case")]
+pub enum Relation {
+    #[default]
+    Ancestor,
+    Contained,
+}
+
+impl Relation {
+    pub fn is_ancestor(&self) -> bool {
+        *self == Self::Ancestor
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct StateStyle {
     pub target: String,
     #[serde(default)]
     pub scope: Option<String>,
+    #[serde(default, skip_serializing_if = "Relation::is_ancestor")]
+    pub relation: Relation,
     pub pseudo: Option<String>,
     #[serde(default)]
     pub target_pseudo: Option<String>,

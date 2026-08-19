@@ -13,7 +13,8 @@ const SCRIPT: &str = include_str!("style_baseline_script.js");
 /// as one evaluable source.
 pub fn source() -> String {
     format!(
-        "{}\n{}\n{}\n{}\n{SCRIPT}",
+        "{}\n{}\n{}\n{}\n{}\n{SCRIPT}",
+        crate::selector_scan::SOURCE,
         crate::scoped_rules::SOURCE,
         crate::generated_boxes::SOURCE,
         crate::capture_motion::SOURCE,

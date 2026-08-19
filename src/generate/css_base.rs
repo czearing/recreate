@@ -69,6 +69,10 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         .iter()
         .map(|node| (node.path.as_str(), node))
         .collect();
+    // Elements needing the same declarations are one rule with a selector list. `Groups` owns
+    // the merge, so a rule only moves where nothing between can disagree.
+    let mut base_groups = super::css_rule_groups::Groups::default();
+    let mut pseudo_css = String::new();
     for node in &base.nodes {
         if node.tag == "#text" {
             continue;
@@ -124,12 +128,17 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
                 declarations = super::css_visual::important_interaction_paint(&declarations);
             }
             if !declarations.is_empty() {
-                css.push_str(&format!(".{class}{{{declarations}}}\n"));
+                base_groups.add((String::new(), None, declarations), format!(".{class}"));
             }
-            super::css_pseudo::append(node, &class, assets, &mut css);
+            super::css_pseudo::append(node, &class, assets, &mut pseudo_css);
         }
         classes.insert(node.path.clone(), class);
     }
+    for ((_, _, declarations), selectors) in base_groups {
+        let selectors = selectors.into_iter().collect::<Vec<_>>().join(",");
+        css.push_str(&format!("{selectors}{{{declarations}}}\n"));
+    }
+    css.push_str(&pseudo_css);
     timing("base");
     super::responsive::append_filtered(
         specification,
@@ -139,59 +148,16 @@ pub fn build<T: Fn(&str)>(request: Request<'_, T>) -> Output {
         changed_paths.as_ref(),
         &fluid_heights,
     );
-    let scoped_compounds =
-        append_authored_conditions(specification, prefix, &classes, &authored_rules, &mut css);
+    let scoped_compounds = super::css_base_conditions::append_authored_conditions(
+        specification,
+        prefix,
+        &classes,
+        &authored_rules,
+        &mut css,
+    );
     Output {
         css,
         classes,
         scoped_compounds,
     }
-}
-
-/// Rules sharing a condition chain and a declaration block are emitted once, on one selector
-/// list. A sheet linked `media="all"` wraps every rule it holds in the identity condition, so
-/// without the merge a page's resets arrive once per element that carries them.
-fn append_authored_conditions(
-    specification: &Specification,
-    prefix: &str,
-    classes: &BTreeMap<String, String>,
-    authored_rules: &super::authored_css::Index<'_>,
-    css: &mut String,
-) -> BTreeSet<String> {
-    let base = &specification.states[0];
-    let measured = super::authored_conditions_measured::Measured::new(&specification.states);
-    let mut groups = super::css_rule_groups::Groups::default();
-    let mut compounds = BTreeSet::new();
-    let scope = super::selector_scope::Scope::new(&base.nodes, classes, prefix);
-    for node in &base.nodes {
-        if classes.get(&node.path).is_none() {
-            continue;
-        };
-        for rule in super::authored_conditions::rules(
-            node,
-            &scope,
-            &base.css_rules,
-            authored_rules,
-            &measured,
-            &mut compounds,
-        ) {
-            groups.add(
-                (String::new(), Some(rule.opening), rule.declarations),
-                rule.selector,
-            );
-        }
-    }
-    for ((_, opening, declarations), selectors) in groups {
-        let opening = opening.unwrap_or_default();
-        css.push_str(
-            &super::authored_conditions::Emitted {
-                selector: selectors.into_iter().collect::<Vec<_>>().join(","),
-                opening,
-                declarations,
-            }
-            .text(),
-        );
-        css.push('\n');
-    }
-    compounds
 }

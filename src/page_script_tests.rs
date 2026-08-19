@@ -17,10 +17,32 @@ fn preserves_media_scope_for_dynamic_state_rules() {
 #[test]
 fn preserves_dynamic_pseudo_element_selectors() {
     let script = source();
-    assert!(script.contains("const pseudoElement = base.match(/::[\\w-]+$/)?.[0] || ''"));
-    assert!(script.contains("document.querySelectorAll(query)"));
+    assert!(script.contains("const box = generatedBoxOf(member)"));
+    assert!(script.contains("document.querySelectorAll(relation.query)"));
     assert!(script.contains("target_pseudo: scoped"));
     assert!(script.contains("`${tailStates.join('')}${pseudoElement}`"));
+}
+
+/// Every stage that reads a selector reads it through the one reader.
+///
+/// A selector list is separated by top-level commas only, so `split(',')` cuts through
+/// `:is(.a, .b)`, `:not([a],[b])` and `[title="a,b"]` alike. What comes out is usually still
+/// a selector, so the stage matches a population the author never named or throws where the
+/// throw is caught — either way the rule leaves no record and nothing reports it. The rule
+/// is stated over the whole script rather than over any one stage, because the defect was a
+/// second copy of the split surviving the repair of the first.
+#[test]
+fn no_stage_divides_a_selector_by_a_bare_comma() {
+    let script = source();
+    assert!(script.contains("const selectorMembers = text =>"));
+    assert!(
+        !script.contains("selectorText.split(','"),
+        "a selector list is still being divided by a bare comma"
+    );
+    assert!(
+        !script.contains("selector.split(','"),
+        "a selector is still being divided by a bare comma"
+    );
 }
 
 #[test]

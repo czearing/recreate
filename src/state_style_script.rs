@@ -7,25 +7,6 @@ __SHORTHAND_EXPANSION__
     'border-width','flex','font','gap','grid','inset','margin','mask','padding',
     'transition'
   ];
-  const scanValue = (text, from, accept) => {
-    let depth = 0;
-    for (let index = from; index < text.length; index++) {
-      const char = text[index];
-      if (char === '\\') { index++; continue; }
-      if (char === '"' || char === "'") {
-        for (index++; index < text.length && text[index] !== char; index++) {
-          if (text[index] === '\\') index++;
-        }
-        continue;
-      }
-      if (char === '(') depth++;
-      else if (char === ')') depth--;
-      if (accept(char, depth)) return index;
-    }
-    return -1;
-  };
-  const closingParen = (text, open) => scanValue(text, open, (char, depth) => char === ')' && !depth);
-  const topLevelComma = text => scanValue(text, 0, (char, depth) => char === ',' && !depth);
   const resolveVariables = (style, element) => {
     const computed = getComputedStyle(element);
     const substitute = value => {
@@ -58,29 +39,45 @@ __SHORTHAND_EXPANSION__
       return `${name}: ${value}${priority ? ` !${priority}` : ''};`;
     }).filter(Boolean).join(' ');
   };
+  // Which states a record can replay. The reader reduces a selector against every state a
+  // page can enter, because a query has to match the page as it rests; this narrower set is
+  // the one an emitted rule can name.
+  const REPLAYABLE_STATE = /^:(hover|focus-visible|focus-within|focus|active)\b/;
+  const replayable = states => states.filter(state => REPLAYABLE_STATE.test(state));
+  // The element holding the state, given the element the rule styles. Both answers come from
+  // the engine: a contained holder is searched for inside the subject, an ancestor one is
+  // searched for upwards from it. Nothing further is derived from the selector text.
+  const stateHolder = (element, relation) => {
+    try {
+      return relation.contained
+        ? element.querySelector(relation.holder)
+        : relation.holder && element.closest(relation.holder);
+    } catch (unmatchable) {
+      return null;
+    }
+  };
   const captureStateStyles = (rule, media) => {
     const reduced = media?.includes('prefers-reduced-motion') || false;
-    for (const selector of rule.selectorText.split(',')) {
-      const states = Array.from(selector.matchAll(dynamicStatePattern), match => match[0]);
-      const tail = selector.trim().split(/[\s>+~]+/).pop() || '';
-      const tailStates = Array.from(tail.matchAll(dynamicStatePattern), match => match[0]);
+    for (const member of selectorMembers(rule.selectorText)) {
+      const box = generatedBoxOf(member);
+      const pseudoElement = box ? box.suffix : '';
+      const relation = stateRelation(box ? box.subject + box.tail : member);
+      const states = replayable(relation.states);
+      const tailStates = replayable(relation.tailStates);
       if (!states.length && !reduced) continue;
-      const base = selector.replace(dynamicStatePattern, '').trim();
-      const pseudoElement = base.match(/::[\w-]+$/)?.[0] || '';
-      const query = base.slice(0, base.length - pseudoElement.length);
-      if (!query) continue;
+      if (!relation.query) continue;
       try {
-        for (const element of document.querySelectorAll(query)) {
-          const stateIndex = selector.search(/:(hover|focus-visible|focus-within|focus|active)\b/);
-          const ownerQuery = stateIndex >= 0 ? selector.slice(0, stateIndex).trim() : '';
-          let owner = null;
-          if (ownerQuery) {
-            try { owner = element.closest(ownerQuery); } catch {}
-          }
+        for (const element of document.querySelectorAll(relation.query)) {
+          const owner = stateHolder(element, relation);
+          // A contained holder is what the rule is about, so an element without one is not
+          // one this rule styles. An ancestor holder that resolves to the element itself is
+          // the ordinary case of a state authored on the subject.
+          if (relation.contained && !owner) continue;
           const scoped = owner && owner !== element;
           const captured = {
             target: pathOf(element),
             scope: scoped ? pathOf(owner) : null,
+            relation: scoped && relation.contained ? 'contained' : 'ancestor',
             pseudo: states.length || pseudoElement
               ? `${scoped ? states[0] : states.join('')}${scoped ? '' : pseudoElement}`
               : null,

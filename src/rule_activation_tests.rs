@@ -4,48 +4,47 @@ use serde_json::{Value, json};
 mod fixture;
 use fixture::scene;
 
-#[path = "rule_activation_layer_tests.rs"]
-mod layer;
-
-#[path = "rule_activation_nesting_tests.rs"]
-mod nesting;
-
-#[path = "rule_activation_definition_tests.rs"]
-mod definition;
-
-#[path = "rule_activation_condition_tests.rs"]
-mod condition;
-
-#[path = "rule_activation_sheet_media_tests.rs"]
-mod sheet_media;
-
-#[path = "rule_activation_recovered_sheet_tests.rs"]
-mod recovered_sheet;
-
-#[path = "rule_activation_import_tests.rs"]
-mod import;
-
 #[path = "rule_activation_base_tests.rs"]
 mod base;
-
-#[path = "rule_activation_shorthand_tests.rs"]
-mod shorthand;
-
+#[path = "rule_activation_condition_tests.rs"]
+mod condition;
 #[path = "capture_conditions_tests.rs"]
 mod conditions;
-
+#[path = "rule_activation_definition_tests.rs"]
+mod definition;
+#[path = "rule_activation_grouping_tests.rs"]
+mod grouping;
+#[path = "rule_activation_import_tests.rs"]
+mod import;
+#[path = "rule_activation_layer_tests.rs"]
+mod layer;
+#[path = "rule_activation_nesting_tests.rs"]
+mod nesting;
+#[path = "rule_activation_recovered_sheet_tests.rs"]
+mod recovered_sheet;
+#[path = "rule_activation_sheet_media_tests.rs"]
+mod sheet_media;
+#[path = "rule_activation_shorthand_tests.rs"]
+mod shorthand;
+#[path = "state_style_probe_tests.rs"]
+mod state_style_probe;
+#[path = "state_style_selector_tests.rs"]
+mod state_style_selector;
 #[path = "state_style_var_tests.rs"]
 mod state_style_var;
 
 const HARNESS: &str = concat!(
     include_str!("rule_activation_cssom.js"),
     "\n",
+    include_str!("rule_activation_selectors.js"),
+    "\n",
     include_str!("rule_activation_harness.js")
 );
 
 fn capture_source() -> String {
     format!(
-        "{}\n{}\n{}",
+        "{}\n{}\n{}\n{}",
+        crate::selector_scan::SOURCE,
         crate::scoped_rules::SOURCE,
         crate::state_style_script::SOURCE
             .replace("__RULE_ACTIVATION__", super::SOURCE)
@@ -87,58 +86,6 @@ fn recorded(result: &Value) -> Vec<String> {
         .iter()
         .map(|rule| rule["text"].as_str().unwrap().to_string())
         .collect()
-}
-
-/// A `@container` block the page's *current* layout cannot satisfy still declares something,
-/// because the recreation is a live document whose container may be resized. What must not
-/// happen is the fabrication: keeping the declarations while dropping the condition, which
-/// publishes as unconditional a rule the author guarded. So the block travels, wrapped.
-#[test]
-fn an_unsatisfied_container_block_keeps_the_condition_that_guards_it() {
-    let rules = recorded(&walk(scene()));
-    let guarded: Vec<_> = rules
-        .iter()
-        .filter(|rule| rule.contains("width: 100%"))
-        .collect();
-    assert_eq!(guarded.len(), 1, "{rules:?}");
-    assert!(
-        guarded[0].starts_with("@container panelwrap (min-width: 900px)"),
-        "a container condition was baked away, publishing an unconditional rule: {rules:?}"
-    );
-}
-
-/// `@supports` keeps its nested rules in the CSSOM when the condition is false, so a walk
-/// that reads them without evaluating the condition records styles no browser applies.
-#[test]
-fn a_false_supports_block_contributes_no_authored_rule() {
-    let rules = recorded(&walk(scene()));
-    assert!(
-        !rules.iter().any(|rule| rule.contains("max-width: 50%")),
-        "recorded a dead @supports declaration: {rules:?}"
-    );
-}
-
-/// The inverse of the two tests above. Discarding every grouped rule would satisfy them
-/// while destroying the styles that do apply, so both directions are asserted.
-#[test]
-fn a_satisfied_condition_still_contributes_its_authored_rule() {
-    let rules = recorded(&walk(scene()));
-    assert!(
-        rules.iter().any(|rule| rule.starts_with(".grid")),
-        "lost a live @supports declaration: {rules:?}"
-    );
-    assert!(
-        rules
-            .iter()
-            .any(|rule| rule.starts_with("@media (min-width: 0px)") && rule.contains(".wide")),
-        "lost a declaration nested in two satisfied conditions: {rules:?}"
-    );
-    assert!(
-        rules
-            .iter()
-            .any(|rule| rule.starts_with(".panel") && rule.contains("padding")),
-        "lost an unconditional declaration: {rules:?}"
-    );
 }
 
 /// Generated output must not restate a rule. The same sheet reaches the walk twice, so a

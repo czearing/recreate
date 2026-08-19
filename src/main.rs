@@ -72,6 +72,7 @@ mod rule_activation_script;
 mod scoped_rules;
 #[cfg(test)]
 mod script_reach;
+mod selector_scan;
 #[cfg(test)]
 #[path = "sequence_phase_tests.rs"]
 mod sequence_phase_tests;

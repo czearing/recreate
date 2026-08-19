@@ -4,6 +4,8 @@ mod flex;
 mod node_rules;
 #[path = "responsive_output.rs"]
 mod output;
+#[path = "responsive_pseudo_rules.rs"]
+mod pseudo_rules;
 #[path = "responsive_rules.rs"]
 mod rules;
 #[path = "responsive_samples.rs"]

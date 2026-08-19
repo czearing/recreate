@@ -33,6 +33,7 @@ fn state(nodes: usize) -> PageState {
         state_styles: vec![StateStyle {
             target: "html>body".into(),
             scope: None,
+            relation: Default::default(),
             pseudo: Some(":focus".into()),
             target_pseudo: None,
             media: None,

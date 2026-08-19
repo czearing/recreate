@@ -138,4 +138,3 @@ fn repeated_collection_actions_share_a_semantic_family() {
         None
     );
 }
-

@@ -1,5 +1,5 @@
 use super::css_rule_groups::Groups;
-use crate::model::StateStyle;
+use crate::model::{Relation, StateStyle};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub fn append(
@@ -32,6 +32,7 @@ pub fn append_inherited(
 type StyleKey<'a> = (
     &'a str,
     Option<&'a str>,
+    Relation,
     Option<&'a str>,
     Option<&'a str>,
     Option<&'a str>,
@@ -63,11 +64,20 @@ fn collect(
             style.target_pseudo.as_deref().unwrap_or_default()
         );
         let selector = match style.scope.as_deref().and_then(|scope| classes.get(scope)) {
-            Some(scope) => format!(
-                "{}{} {target}",
-                selector(scope),
-                style.pseudo.as_deref().unwrap_or_default()
-            ),
+            // The state and the element it styles are two elements, joined the way the author
+            // joined them. A holder above the subject is a descendant rule; a holder inside it
+            // is what `:has()` says and nothing else can say.
+            Some(scope) => {
+                let holder = format!(
+                    "{}{}",
+                    selector(scope),
+                    style.pseudo.as_deref().unwrap_or_default()
+                );
+                match style.relation {
+                    Relation::Ancestor => format!("{holder} {target}"),
+                    Relation::Contained => format!("{target}:has({holder})"),
+                }
+            }
             None => format!("{target}{}", style.pseudo.as_deref().unwrap_or_default()),
         };
         groups.add(key, selector);
@@ -78,6 +88,7 @@ fn style_key(style: &StateStyle) -> StyleKey<'_> {
     (
         style.target.as_str(),
         style.scope.as_deref(),
+        style.relation,
         style.pseudo.as_deref(),
         style.target_pseudo.as_deref(),
         style.media.as_deref(),

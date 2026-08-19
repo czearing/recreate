@@ -34,19 +34,18 @@ const specGeneratedBoxes = {
    circular, because the baseline is measured only for boxes already admitted.
 
    A subject the recreation cannot match at rest is dropped rather than approximated. Dynamic
-   states are stripped because the element is not in one now, and a rule with no subject at
+   states are reduced away because the element is not in one now, and a rule with no subject at
    all conditions the whole document rather than any element, so it belongs to a mechanism
-   this one does not own. */
-const DYNAMIC_STATE = /:(?:hover|focus-visible|focus-within|focus|active|visited|target)\b/g;
-const PSEUDO_ELEMENT_START = /::[\w-]/;
+   this one does not own. Both the list and the reduction come from the shared selector reader:
+   a subject cut out with `split(',')` is a fragment that matches elements the author never
+   named, and `element.matches` then answers about the wrong ones or throws. */
 const authoredBoxes = (selectorText, into) => {
-  for (const part of selectorText.split(',')) {
-    const at = part.search(PSEUDO_ELEMENT_START);
-    if (at < 0) continue;
-    const suffix = `::${part.slice(at + 2).match(/^[\w-]+/)[0]}`;
-    const subject = part.slice(0, at).replace(DYNAMIC_STATE, '').trim();
-    if (!subject || specGeneratedBoxes[suffix]) continue;
-    into.set(suffix, (into.get(suffix) || new Set()).add(subject));
+  for (const member of selectorMembers(selectorText)) {
+    const box = generatedBoxOf(member);
+    if (!box) continue;
+    const subject = restingSelector(box.subject);
+    if (!subject || specGeneratedBoxes[box.suffix]) continue;
+    into.set(box.suffix, (into.get(box.suffix) || new Set()).add(subject));
   }
 };
 /* Style rules wherever they are written: inside a condition, inside a nesting parent and

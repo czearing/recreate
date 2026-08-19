@@ -1,6 +1,6 @@
 //! The four regression cases the filed item required alongside the fix. They share the
 //! fixtures of the primary suite because they exercise the same predicate.
-use crate::node_alignment_tests::{division, insertion_of, paragraph, state, PARENT};
+use crate::node_alignment_tests::{PARENT, division, insertion_of, paragraph, state};
 
 /// Regression 1: inserted between two unlike siblings, not at the front.
 #[test]

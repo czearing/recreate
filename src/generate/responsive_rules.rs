@@ -1,7 +1,4 @@
-use super::{
-    flex::{constrained_by_flex_chain, shrunk_flex_item},
-    node_rules::append_node_rules_indexed,
-};
+use super::flex::{constrained_by_flex_chain, shrunk_flex_item};
 use crate::model::{Node, Specification};
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -32,10 +29,10 @@ pub fn append_filtered(
             .collect();
         let authored_rules = super::super::authored_css::Index::new(*state);
         let shrunk_roots = shrunk_roots(&state.nodes, &base_nodes, &state_nodes);
-        let mut rules = String::new();
-        // Nodes that share a class produce the same band rule, so emitting one per node
-        // repeats it verbatim once per element.
-        let mut emitted = HashSet::new();
+        // Nodes needing the same declarations at this width are one rule with a selector list.
+        // Keyed on the declarations alone, so the grouping does not depend on how many
+        // elements happen to share a resting class.
+        let mut grouped: BTreeMap<Vec<(String, String)>, Vec<&str>> = BTreeMap::new();
         for node in &state.nodes {
             if paths.is_some_and(|paths| !paths.contains(&node.path)) {
                 continue;
@@ -45,22 +42,29 @@ pub fn append_filtered(
             else {
                 continue;
             };
-            let rule = append_node_rules_indexed(
+            let parts = super::node_rules::node_rule_parts(
                 base_node,
                 node,
                 node.parent
                     .as_deref()
                     .and_then(|parent| state_nodes.get(parent).copied()),
                 (&base.viewport, &state.viewport),
-                class,
                 assets,
                 &authored_rules,
                 fluid_heights.contains(&node.path),
                 constrained_by_flex_chain(node, &shrunk_roots, &state_nodes),
             );
-            if !rule.is_empty() && emitted.insert(rule.clone()) {
-                rules.push_str(&rule);
+            if parts.is_empty() {
+                continue;
             }
+            let classes = grouped.entry(parts).or_default();
+            if !classes.contains(&class.as_str()) {
+                classes.push(class);
+            }
+        }
+        let mut rules = String::new();
+        for (parts, classes) in &grouped {
+            rules.push_str(&super::node_rules::parts_text(classes, parts));
         }
         if !rules.is_empty() {
             let wider = if index == 0 {

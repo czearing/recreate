@@ -47,6 +47,7 @@ fn state_styles_rewrite_the_longer_asset_url_first() {
     let style = StateStyle {
         target: "html>body:nth-of-type(1)>div:nth-of-type(1)".into(),
         scope: None,
+        relation: Default::default(),
         pseudo: Some(":hover".into()),
         target_pseudo: None,
         media: None,

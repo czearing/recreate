@@ -8,6 +8,7 @@ fn hover(target: &str, declarations: &str) -> StateStyle {
     StateStyle {
         target: target.into(),
         scope: None,
+        relation: Default::default(),
         pseudo: Some(":hover".into()),
         target_pseudo: None,
         media: None,

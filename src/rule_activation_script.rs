@@ -9,14 +9,12 @@
 /// at least one element it selects receives the sentinel. One code path covers `@media`,
 /// `@supports`, `@container` and anything conditional that follows them.
 pub const SOURCE: &str = r#"
-  const dynamicStatePattern = /:(hover|focus-visible|focus-within|focus|active)\b/g;
-  // A probe rule must be able to match right now, so states the page is not currently in
-  // are stripped. What is left measures the at-rule condition and nothing else.
-  const staticSelector = selector => selector
-    .replace(dynamicStatePattern, '')
-    .replace(/::[\w-]+/g, '')
-    .split(',')
-    .map(part => part.trim())
+  // A probe rule must be able to match right now, so the states the page is not currently in
+  // are reduced away and the boxes it would generate are dropped. What is left measures the
+  // at-rule condition and nothing else. Both reductions are the reader's, because a probe
+  // built by cutting selector text apart measures whatever the fragment happens to match.
+  const staticSelector = selector => selectorMembers(selector)
+    .map(member => restingSelector(withoutGeneratedBoxes(member)))
     .filter(Boolean)
     .join(', ');
   const preludeOf = rule => {

@@ -4,6 +4,7 @@ fn style(target: &str, pseudo: Option<&str>, declarations: &str) -> StateStyle {
     StateStyle {
         target: target.into(),
         scope: None,
+        relation: Default::default(),
         pseudo: pseudo.map(str::to_string),
         target_pseudo: None,
         media: None,
@@ -22,6 +23,31 @@ fn emits_ancestor_state_selector() {
     let mut css = String::new();
     append(&[scoped], &classes, &BTreeMap::new(), &mut css);
     assert!(css.contains(".card:hover .menu{opacity: 1;}"));
+}
+
+/// A state held by something the subject contains is a different rule from one held above it,
+/// and only `:has()` expresses it. Emitting the pair as a descendant inverts the containment,
+/// so the declarations land on every descendant of the card instead of on the card, and the
+/// element the author made the rule answer to is not in the selector at all.
+#[test]
+fn emits_a_contained_state_holder_as_the_relation_the_author_wrote() {
+    let classes = BTreeMap::from([
+        ("html>body>div".into(), "card".into()),
+        ("html>body>div>button".into(), "menu".into()),
+    ]);
+    let mut contained = style("html>body>div", Some(":hover"), "border-color: green;");
+    contained.scope = Some("html>body>div>button".into());
+    contained.relation = crate::model::Relation::Contained;
+    let mut css = String::new();
+    append(&[contained], &classes, &BTreeMap::new(), &mut css);
+    assert!(
+        css.contains(".card:has(.menu:hover){border-color: green;}"),
+        "the card answers the button it contains: {css}"
+    );
+    assert!(
+        !css.contains(".menu:hover .card"),
+        "the containment was inverted into a descendant rule: {css}"
+    );
 }
 
 #[test]

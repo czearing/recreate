@@ -48,6 +48,7 @@ mod component_identity;
 mod compound;
 mod css;
 mod css_base;
+mod css_base_conditions;
 mod css_base_style;
 mod css_closure;
 mod css_custom_properties;
@@ -73,6 +74,10 @@ mod css_pseudo_rule_tests;
 #[cfg(test)]
 #[path = "css_pseudo_signature_tests.rs"]
 mod css_pseudo_signature_tests;
+#[cfg(test)]
+mod responsive_band_grouping_tests;
+#[cfg(test)]
+mod state_identity_tests;
 
 mod css_rule_groups;
 mod css_rule_split;

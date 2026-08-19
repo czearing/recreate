@@ -17,11 +17,7 @@ const elements = scene.elements.map(spec => ({
   shadowRoot: null
 }));
 
-const matchesSelector = (selector, element) =>
-  selector
-    .split(',')
-    .map(part => part.trim())
-    .some(part => part === '*' || (part.startsWith('.') && element.classes.includes(part.slice(1))));
+
 
 // Which elements an at-rule prelude holds for, answered by the scene exactly as a browser
 // answers it from the viewport or from a container's used size.
@@ -48,6 +44,17 @@ const applyProbeBlock = text => {
     }
   }
 };
+
+// The engine's two searches from an element, which is how the capture asks where a state is
+// held rather than deriving it from more selector text.
+for (const element of elements) {
+  element.querySelector = selector =>
+    elements.find(node => contains(element, node) && matchesSelector(selector, node)) || null;
+  element.closest = selector => {
+    for (const node of ancestry(element)) if (matchesSelector(selector, node)) return node;
+    return null;
+  };
+}
 
 const document = {
   // A sheet with no location inherits this, which is what CSSOM's null `href` means.

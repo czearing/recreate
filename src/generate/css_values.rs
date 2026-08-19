@@ -32,10 +32,90 @@ pub fn responsive_signatures_for(
             }
         }
     }
-    signatures
+    let resting: BTreeMap<String, String> = signatures
         .into_iter()
         .map(|(path, signature)| (path, signature.finish()))
+        .collect();
+    let mut folded = BTreeMap::<String, Signature>::new();
+    for state in &specification.states {
+        for style in &state.state_styles {
+            append_state_style(&mut folded, &resting, style, assets);
+        }
+    }
+    resting
+        .iter()
+        .map(|(path, bytes)| {
+            let signature = folded
+                .remove(path)
+                .map_or_else(|| bytes.clone(), |signature: Signature| signature.finish());
+            (path.clone(), signature)
+        })
         .collect()
+}
+
+/// Folds in a rule an element receives only while the page is in some state.
+///
+/// An element's identity is the rules it will receive, and a state rule is one of them: two
+/// elements that rest identically but answer focus differently are two elements, and giving
+/// them one class publishes two rules with the same selector, of which only the last survives.
+/// Both sides are folded, because a rule names two elements — the one it styles and the one
+/// holding the state — and moving either changes what is emitted.
+///
+/// The counterpart is folded by its resting identity rather than by its path. A path is unique
+/// per element, so folding one would split every reused component into as many classes as it
+/// has instances, which is the collapse this whole mechanism exists to perform. A resting
+/// identity is exactly the question being asked one level down: two rules differ when the
+/// elements they join differ.
+///
+/// An element no state rule names is left out of the map entirely, so its identity stays the
+/// resting digest untouched. Folding "nothing" into every element would be equally correct and
+/// would rename every class on every page for no change in meaning.
+fn append_state_style(
+    signatures: &mut BTreeMap<String, Signature>,
+    resting: &BTreeMap<String, String>,
+    style: &crate::model::StateStyle,
+    assets: &BTreeMap<String, String>,
+) {
+    let counterpart = |path: Option<&str>| {
+        path.and_then(|path| resting.get(path))
+            .map(String::as_str)
+            .unwrap_or_default()
+    };
+    for (path, side, other) in [
+        (
+            style.target.as_str(),
+            "target",
+            counterpart(style.scope.as_deref()),
+        ),
+        (
+            style.scope.as_deref().unwrap_or_default(),
+            "scope",
+            counterpart(Some(style.target.as_str())),
+        ),
+    ] {
+        let Some(bytes) = resting.get(path) else {
+            continue;
+        };
+        let signature = signatures.entry(path.to_string()).or_insert_with(|| {
+            let mut signature = Signature::new();
+            signature.value(bytes);
+            signature
+        });
+        signature.slot();
+        signature.value(side);
+        signature.value(other);
+        signature.value(match style.relation {
+            crate::model::Relation::Ancestor => "ancestor",
+            crate::model::Relation::Contained => "contained",
+        });
+        signature.pair("pseudo", style.pseudo.as_deref().unwrap_or_default());
+        signature.pair(
+            "target-pseudo",
+            style.target_pseudo.as_deref().unwrap_or_default(),
+        );
+        signature.pair("media", style.media.as_deref().unwrap_or_default());
+        signature.value(&super::asset_urls::rewrite(&style.declarations, assets));
+    }
 }
 
 /// Folds a style block in as the emitted rule will spell it. An element's identity is the
