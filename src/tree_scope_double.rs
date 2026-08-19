@@ -20,6 +20,9 @@ class ShadowRoot {
     this.host = host;
     this.children = [];
     this.adoptedStyleSheets = [];
+    // A scope's own sheets are the ones its tree holds; these fixtures author none inside a
+    // shadow root, so the list is empty rather than absent. Absent is what no scope ever is.
+    this.styleSheets = [];
     this.scope = this;
   }
   add(child){ child.parent = this.host; child.scope = this; this.children.push(child); return child; }

@@ -13,5 +13,13 @@
 pub const SOURCE: &str = include_str!("scoped_rules.js");
 
 #[cfg(test)]
+#[path = "scoped_rules_double.rs"]
+mod double;
+
+#[cfg(test)]
 #[path = "scoped_rules_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "scoped_rules_weight_tests.rs"]
+mod weight_tests;

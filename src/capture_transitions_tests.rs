@@ -37,6 +37,7 @@ class CSSStyleSheet {
 globalThis.CSSStyleSheet = CSSStyleSheet;
 const document = {
   querySelectorAll: () => [],
+  styleSheets: [],
   adoptedStyleSheets: [],
   getAnimations: options => root.getAnimations(options)
 };
@@ -136,12 +137,21 @@ fn a_resting_read_measures_with_transitions_suspended() {
         "[globalThis.during, globalThis.sheets, globalThis.style]",
     );
     assert_eq!(
-        seen,
-        serde_json::json!([
-            ["*,*::before,*::after{transition-property:none !important}"],
-            [],
-            { "color": "red" }
-        ])
+        seen[0]
+            .as_array()
+            .and_then(|during| during.first())
+            .and_then(|text| text.as_str())
+            .map(|text| text.contains("*,*::before,*::after{transition-property:none !important}")),
+        Some(true),
+        "the read is taken with transitions declared away: {seen}"
+    );
+    assert_eq!(
+        (&seen[1], &seen[2]),
+        (
+            &serde_json::json!([]),
+            &serde_json::json!({ "color": "red" })
+        ),
+        "the suspension lasts exactly as long as the read: {seen}"
     );
 }
 

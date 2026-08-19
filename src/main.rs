@@ -89,6 +89,8 @@ mod style_baseline_pruning_tests;
 mod style_baseline_scope_tests;
 #[cfg(test)]
 mod style_baseline_scroll_tests;
+#[cfg(test)]
+mod style_baseline_weight_tests;
 mod surface_content;
 #[cfg(test)]
 mod tree_scope_double;

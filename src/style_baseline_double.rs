@@ -109,6 +109,12 @@ globalThis.unsupported = new Set();
 // when the revert did not reach it, and reporting that apart is the whole of what distinguishes
 // a baseline from the live value it is meant to be compared against.
 globalThis.pseudoAuthored = new Set();
+// Whether the page's own declaration outranks the probe's. An important author declaration sits
+// at the top of the author origin and beats any universal selector the probe can write, so the
+// only rule that measures it is one the cascade sorts ahead of it before specificity is ever
+// consulted. Modelled on the shape of the carrier rather than on its name, because what wins is
+// the position, and a probe that merely selects harder loses here for the reason a page does it.
+globalThis.pseudoImportant = new Set();
 // `walked` is every element the probe took an element baseline for, which is the walk's own
 // record of what it reached, whatever tree scope it reached it through.
 globalThis.walked = [];
@@ -116,7 +122,9 @@ const pseudoValue = (element, pseudo) => {
   const key = element.name + pseudo;
   const scope = element.scope;
   const declared = globalThis.declaredIn(scope, scope === globalThis.document ? head.children : scope.children);
-  const reverted = declared.some(text => text.includes('*' + pseudo + '{'));
+  const carrier = declared.find(text => text.includes('*' + pseudo + '{'));
+  const outranked = globalThis.pseudoImportant.has(key) && !/^\s*@layer\s/.test(carrier || '');
+  const reverted = carrier !== undefined && !outranked;
   return (!reverted && globalThis.pseudoAuthored.has(key) ? 'pseudo-authored:' : 'pseudo:') + key;
 };
 globalThis.getComputedStyle = (element, pseudo) => {

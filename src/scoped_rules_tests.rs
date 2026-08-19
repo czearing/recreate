@@ -7,47 +7,7 @@
 //! had declared nothing - and says so to nobody, because the read still succeeds and hands back
 //! the page's own live values, which is what a page with nothing to say looks like.
 
-use crate::node_eval;
-
-/// A page of nested tree scopes, each recording what it was asked to adopt and when. `order` is
-/// what separates "installed everywhere" from "installed everywhere eventually": a read that
-/// runs before the last scope adopted is a read taken under a partial condition.
-const DOUBLE: &str = r#"
-globalThis.log = [];
-class CSSStyleSheet {
-  replaceSync(text){ this.text = text; }
-}
-globalThis.CSSStyleSheet = CSSStyleSheet;
-const scope = name => {
-  const made = {
-    name,
-    hosts: [],
-    _adopted: [],
-    get adoptedStyleSheets(){ return this._adopted; },
-    set adoptedStyleSheets(next){
-      globalThis.log.push(name + ':' + next.map(sheet => sheet.text).join('|'));
-      this._adopted = next;
-    },
-    querySelectorAll: () => made.hosts
-  };
-  return made;
-};
-const document = scope('document');
-const outer = scope('outer');
-const inner = scope('inner');
-const sibling = scope('sibling');
-document.hosts = [{ shadowRoot: outer }, { shadowRoot: sibling }, { shadowRoot: null }];
-outer.hosts = [{ shadowRoot: inner }];
-globalThis.inForce = () =>
-  [document, outer, inner, sibling].map(each => each.adoptedStyleSheets.map(sheet => sheet.text));
-"#;
-
-fn evaluate(body: &str, expression: &str) -> serde_json::Value {
-    node_eval::evaluate(
-        &format!("{DOUBLE}\n{}\n{body}", crate::scoped_rules::SOURCE),
-        expression,
-    )
-}
+use super::double::evaluate;
 
 /// The defect. A rule installed for the duration of a read has to hold wherever that read
 /// looks, and a shadow tree is reached by no sheet of the document's.
@@ -57,11 +17,17 @@ fn a_declared_rule_is_in_force_in_every_tree_scope_during_the_read() {
         "const seen = underRules('R', () => globalThis.inForce());",
         "seen",
     );
-    assert_eq!(
-        seen,
-        serde_json::json!([["R"], ["R"], ["R"], ["R"]]),
-        "a scope the read reaches but the rule does not is measured as though nothing was declared"
-    );
+    let scopes = seen.as_array().expect("one reading per scope");
+    assert_eq!(scopes.len(), 4, "{seen}");
+    for scope in scopes {
+        let held = scope.as_array().expect("the sheets one scope holds");
+        assert_eq!(held.len(), 1, "one carrier per scope: {seen}");
+        assert!(
+            held[0].as_str().expect("sheet text").contains('R'),
+            "a scope the read reaches but the rule does not is measured as though nothing was \
+             declared: {seen}"
+        );
+    }
 }
 
 /// A root inside a root is a scope like any other. Delivery that walked one level would repair
