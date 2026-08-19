@@ -49,7 +49,7 @@ fn motion_the_read_itself_starts_is_held_out_of_everything_read_after_it() {
     let seen = evaluate(
         "globalThis.style['margin-left'] = '10px';\
          \nconst resume = restingRead(() => { \
-         new CSSAnimation('restarted', 'margin-left', undefined, false, '40px'); });\
+         animate('restarted', 'margin-left', { frame: '40px' }); });\
          \nglobalThis.afterRead = computed('margin-left');\
          \nresume();",
         "[globalThis.afterRead, computed('margin-left')]",
@@ -69,7 +69,7 @@ fn motion_the_read_itself_starts_is_held_out_of_everything_read_after_it() {
 fn a_value_read_under_a_running_animation_is_the_one_the_page_rests_at() {
     let seen = evaluate(
         "globalThis.style['margin-left'] = '10px';\
-         \nnew CSSAnimation('shift', 'margin-left', undefined, false, '40px');\
+         \nanimate('shift', 'margin-left', { frame: '40px' });\
          \nconst resume = restingRead(() => { globalThis.read = computed('margin-left'); });\
          \nresume();",
         "[globalThis.read, computed('margin-left')]",
@@ -88,7 +88,7 @@ fn a_value_read_under_a_running_animation_is_the_one_the_page_rests_at() {
 #[test]
 fn a_property_only_an_animation_gives_a_value_is_read_as_unset() {
     let seen = evaluate(
-        "new CSSAnimation('spin', 'transform', undefined, false, 'matrix(0, 1, -1, 0, 0, 0)');\
+        "animate('spin', 'transform', { frame: 'matrix(0, 1, -1, 0, 0, 0)' });\
          \nconst resume = restingRead(() => { globalThis.read = computed('transform'); });\
          \nresume();",
         "globalThis.read === undefined",
@@ -103,12 +103,12 @@ fn a_property_only_an_animation_gives_a_value_is_read_as_unset() {
 #[test]
 fn the_page_is_left_animating_exactly_as_it_was_found() {
     let seen = evaluate(
-        "const running = new CSSAnimation('spin', 'transform', undefined, false, 'rotate(90deg)');\
+        "const running = animate('spin', 'transform', { frame: 'rotate(90deg)' });\
          \nconst effect = running.effect;\
          \nconst resume = restingRead(() => { globalThis.duringEffect = running.effect; });\
          \nresume();\
          \nglobalThis.same = running.effect === effect;",
-        "[globalThis.duringEffect, globalThis.same, names(), globalThis.running[0].playState]",
+        "[globalThis.duringEffect, globalThis.same, names(), globalThis.animations[0].playState]",
     );
     assert_eq!(
         seen,
@@ -124,7 +124,7 @@ fn the_page_is_left_animating_exactly_as_it_was_found() {
 fn motion_no_style_sheet_owns_is_held_out_too() {
     let seen = evaluate(
         "globalThis.style['letter-spacing'] = 'normal';\
-         \nnew Animation('scripted', 'letter-spacing', undefined, false, '77px');\
+         \nscripted('scripted', 'letter-spacing', { frame: '77px' });\
          \nconst resume = restingRead(() => { globalThis.read = computed('letter-spacing'); });\
          \nresume();",
         "[globalThis.read, computed('letter-spacing')]",
@@ -138,7 +138,7 @@ fn motion_no_style_sheet_owns_is_held_out_too() {
 #[test]
 fn a_transition_is_brought_to_its_end_rather_than_held_out() {
     let seen = evaluate(
-        "new CSSTransition('paint', 'color', 'rgb(0, 0, 255)', false, 'rgb(9, 9, 9)');\
+        "transition('paint', 'color', 'rgb(0, 0, 255)', { frame: 'rgb(9, 9, 9)' });\
          \nconst resume = restingRead(() => { globalThis.duringNames = names(); });\
          \nresume();",
         "[globalThis.duringNames, globalThis.style, names()]",
@@ -164,19 +164,4 @@ fn the_page_is_handed_back_after_the_reading_and_before_the_motion_is_recorded()
         walk < release && release < recorded,
         "release at {release} sits between the walk at {walk} and the record at {recorded}"
     );
-}
-
-/// An animation the platform has already left without an effect is passed over rather than
-/// recorded, so the release puts back only what it took. Without this the suspension would
-/// invent an entry whose restoration writes `null` onto an animation it never touched.
-#[test]
-fn an_animation_that_carries_no_effect_is_passed_over_rather_than_recorded() {
-    let seen = evaluate(
-        "const bare = new CSSAnimation('bare', 'opacity', undefined, false, '0.5');\
-         \nbare.effect = null;\
-         \nconst resume = restingRead(() => {});\
-         \nresume();",
-        "[globalThis.running[0].effect, names()]",
-    );
-    assert_eq!(seen, serde_json::json!([null, ["bare"]]), "{seen}");
 }

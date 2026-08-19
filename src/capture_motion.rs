@@ -40,12 +40,23 @@
 //! from. A transition only delays the after-change style, which is the value the cascade
 //! already produced, so seeking it to its end lands on the value the page rests at and
 //! invents nothing. An animation declares its own endpoints as keyframes in an origin above
-//! the cascade, so no frame of it is ever that value — not the last, not the first, not the
-//! one a fill holds — and a property an animation drives but the author never declared rests
-//! at a value that appears in no keyframe at all. Motion whose end the cascade produced is
-//! sought; motion that declares its own is held out of the read. That also answers, rather
-//! than merely accommodates, why an animation may not be finished: its end is the wrong
-//! value, and an endless one has no end to reach.
+//! the cascade, so no frame it is passing through is that value, and a property an animation
+//! drives but the author never declared rests at a value that appears in no keyframe at all.
+//! Motion whose end the cascade produced is sought; motion that declares its own is held out
+//! of the read. That also answers, rather than merely accommodates, why an animation may not
+//! be finished: the frame it would land on is the wrong value, and an endless one has no end
+//! to reach.
+//!
+//! An animation is not held out of the read entirely, though, because one of its frames does
+//! outlive it. A fill keeps the effect applying after the active interval ends, indefinitely,
+//! and there is no later moment at which the element reverts — so that value is not a frame
+//! the clock caught, it is where the page rests, and every closed Drawer in the shipped
+//! bundle rests on one with nothing in its own declarations saying so. So each effect is
+//! offered the place its animation comes to rest — the end it is travelling towards while it
+//! is running, and wherever it already stands when it is not — and the engine decides what
+//! applies there. A fill applies; a `none` fill applies nothing; an endless animation has no
+//! resting time to be offered. Nothing here reads what was written, so `forwards`, `both`, a
+//! reversed direction and a script-started animation all travel the same path.
 //!
 //! Held out by detaching the effect, because that is the one handle every animation has. A
 //! declaration would reach only what the CSS owns, leaving anything a script started still
@@ -53,7 +64,10 @@
 //! the recreation needs to animate at all. Detaching keeps the animation, its timeline
 //! position and its play state, so the page is left moving exactly as it was found; the
 //! alternatives do not, since cancelling discards all three and pausing goes on applying the
-//! frame — the same objection this file already makes to a paused transition.
+//! frame — the same objection this file already makes to a paused transition. A fill is kept
+//! by moving the same effect, not the animation: an effect belongs to one animation at a
+//! time, so a detached one can be presented from a scratch animation held at its end while
+//! the page's own is left exactly as detaching already left it.
 //!
 //! The hold spans the whole reading rather than one pass, because every value a capture
 //! records is read from the page and an animation is applying throughout. It is released
@@ -77,19 +91,55 @@ pub const SOURCE: &str = r#"
     }
   };
   // Detaching the effect leaves the animation itself untouched, so what is put back is the
-  // same effect on the same animation at the same point on its timeline. An animation that
-  // has none already contributes nothing and is passed over rather than recorded, so nothing
-  // is put back that was not taken.
+  // same effect on the same animation at the same point on its timeline.
+  //
+  // A detached effect applies nothing, which is right for a frame and wrong for a fill. So it
+  // is offered the place it comes to rest: a scratch animation on the same timeline, seeked to
+  // that time. Whether anything is applied there is then not a question anyone has to ask — the
+  // engine answers it by applying a fill and applying nothing otherwise, so `forwards`, `both`,
+  // `backwards`, `none`, a reversed direction and a script-started animation all arrive at the
+  // right value without a clause each. An effect with no finite resting time has no such moment
+  // to be offered, which is the whole of the endless case.
+  //
+  // The scratch animations are relevant animations over the page's own elements, so the page
+  // reports them like any other and the second sweep would hold them in turn. Knowing them is
+  // what keeps one effect under one holder, since two releases claiming the same effect leave
+  // it wherever the last one put it.
+  const restingHolders = new WeakSet();
+  // Where the animation stops. It is only going anywhere while it is running, and which way it
+  // is going is the sign of its rate; a pause, a zero rate and a finish are all the same
+  // statement, which is that it is already there. Reading the end time of an animation that
+  // will never reach it would record a frame the page never shows, which is the defect this
+  // policy exists to prevent rather than a second version of it.
+  const restingTime = animation => {
+    const rate = animation.playState === 'running' ? animation.playbackRate : 0;
+    if (rate > 0) return animation.effect.getComputedTiming().endTime;
+    if (rate < 0) return 0;
+    return animation.currentTime;
+  };
+  // The engine does not report an animation with nothing to apply, so a hold never meets one and
+  // needs no guard against it. Measured rather than assumed: an animation whose effect has been
+  // set to null leaves `getAnimations()` at once, as does one that has finished without a fill.
+  const holdAtRest = (animation, effect, at) => {
+    if (!Number.isFinite(at)) return;
+    const holder = new Animation(effect, animation.timeline);
+    restingHolders.add(holder);
+    holder.currentTime = at;
+  };
   const suspendAnimations = root => {
     const suspended = [];
     for (const animation of root.getAnimations({ subtree: true })) {
-      if (transitional(animation)) continue;
+      if (transitional(animation) || restingHolders.has(animation)) continue;
       const effect = animation.effect;
-      if (!effect) continue;
+      const at = restingTime(animation);
       animation.effect = null;
+      holdAtRest(animation, effect, at);
       suspended.push([animation, effect]);
     }
     return () => {
+      // Putting the effect back takes it off whatever was presenting it, because an effect
+      // belongs to one animation at a time. So the holder needs no dismissal of its own; it is
+      // left with nothing to apply and the page stops reporting it.
       for (const [animation, effect] of suspended) animation.effect = effect;
       suspended.length = 0;
     };

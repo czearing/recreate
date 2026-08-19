@@ -24,8 +24,8 @@ use crate::capture_motion_double::evaluate;
 #[test]
 fn every_transition_in_flight_reaches_its_resting_value() {
     let read = evaluate(
-        "new CSSTransition('paint', 'background-color', 'rgb(0, 0, 255)');\
-         \nnew CSSTransition('other', 'opacity', '0.25');\
+        "transition('paint', 'background-color', 'rgb(0, 0, 255)', {});\
+         \ntransition('other', 'opacity', '0.25', {});\
          \narriveTransitions(root);",
         "[globalThis.style, names()]",
     );
@@ -43,7 +43,7 @@ fn every_transition_in_flight_reaches_its_resting_value() {
 #[test]
 fn a_property_the_rule_never_names_arrives_the_same_way() {
     let read = evaluate(
-        "new CSSTransition('f', 'filter', 'blur(4px)');\narriveTransitions(root);",
+        "transition('f', 'filter', 'blur(4px)', {});\narriveTransitions(root);",
         "globalThis.style",
     );
     assert_eq!(read, serde_json::json!({ "filter": "blur(4px)" }));
@@ -56,7 +56,7 @@ fn a_property_the_rule_never_names_arrives_the_same_way() {
 #[test]
 fn an_animation_is_never_advanced_to_its_end() {
     let read = evaluate(
-        "new Animation('keyframed', 'opacity', '1');\narriveTransitions(root);",
+        "scripted('keyframed', 'opacity', { to: '1' });\narriveTransitions(root);",
         "[globalThis.style, names()]",
     );
     assert_eq!(read, serde_json::json!([{}, ["keyframed"]]));
@@ -76,8 +76,8 @@ fn a_page_with_nothing_in_flight_is_left_alone() {
 #[test]
 fn a_transition_without_a_resting_value_does_not_abandon_the_rest() {
     let read = evaluate(
-        "new CSSTransition('endless', 'color', 'red', true);\
-         \nnew CSSTransition('paint', 'opacity', '0.5');\
+        "transition('endless', 'color', 'red', { endless: true });\
+         \ntransition('paint', 'opacity', '0.5', {});\
          \narriveTransitions(root);",
         "[globalThis.style, names()]",
     );
@@ -93,7 +93,7 @@ fn a_transition_without_a_resting_value_does_not_abandon_the_rest() {
 fn a_resting_read_measures_with_transitions_suspended() {
     let seen = evaluate(
         "restingRead(() => { globalThis.during = globalThis.sheets.slice(); \
-         new CSSTransition('provoked', 'color', 'red'); });",
+         transition('provoked', 'color', 'red', {}); });",
         "[globalThis.during, globalThis.sheets, globalThis.style]",
     );
     assert_eq!(
@@ -121,7 +121,7 @@ fn a_resting_read_measures_with_transitions_suspended() {
 #[test]
 fn a_moving_read_leaves_the_page_moving() {
     let seen = evaluate(
-        "new CSSTransition('entry', 'opacity', '1');\nmovingRead(() => {});",
+        "transition('entry', 'opacity', '1', {});\nmovingRead(() => {});",
         "[globalThis.sheets, globalThis.style, names()]",
     );
     assert_eq!(seen, serde_json::json!([[], {}, ["entry"]]));

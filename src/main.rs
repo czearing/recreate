@@ -19,6 +19,9 @@ mod capture_motion_animation_tests;
 #[cfg(test)]
 mod capture_motion_double;
 #[cfg(test)]
+#[path = "capture_motion_fill_tests.rs"]
+mod capture_motion_fill_tests;
+#[cfg(test)]
 #[path = "capture_motion_tests.rs"]
 mod capture_motion_tests;
 mod capture_settle;
