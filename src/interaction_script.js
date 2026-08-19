@@ -2,7 +2,7 @@
 __STYLE_BASELINE__
 __ASSET_ATTRIBUTES__
   const skipped = element => false;
-  __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
+  const resumeMotion = __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
 __NODE_PATH__
   const visible = element => {
     const rect = element.getBoundingClientRect();
@@ -77,6 +77,8 @@ __SELECTION__
   for (const element of document.querySelectorAll('*')) {
     if (selected.has(element)) capture(element);
   }
+  // The reading is over; the page is handed back to the next interaction still moving.
+  resumeMotion();
   const assets = recreateAssetUrls(nodes, []);
 __ASSET_CAPTURE__
   return JSON.stringify({

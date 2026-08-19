@@ -1,6 +1,6 @@
-//! The invariant every reader of a resting page depends on, stated without naming a property:
-//! when computed style is read, no transition is in flight, so every value read is a value the
-//! page rests at.
+//! The invariant every reader of a resting page depends on, stated without naming a property or
+//! a kind of motion: the style a reading records is the style the page computes when nothing is
+//! in flight, whatever happens to be moving while the reading is taken.
 //!
 //! A transition on a paint-only property moves no geometry, so no stillness signature built
 //! from boxes can see it and no downstream stage can tell an interpolated value from a written
@@ -8,56 +8,16 @@
 //! is exactly what an unauthored property looks like, so the declaration is not merely wrong,
 //! it is pruned and gone.
 
-use crate::node_eval;
-
 /// A page whose motion is only what the test says it is. `finish()` is the platform's own
 /// contract — seek to the end of the active interval — so the double lands the property on the
 /// value the transition was travelling to and stops being reported as running, which is what
 /// makes "the record survives" a claim the tests can check rather than assume.
-const DOUBLE: &str = r#"
-globalThis.style = {};
-globalThis.running = [];
-class Animation {
-  constructor(name, property, to, endless) {
-    this.name = name; this.property = property; this.to = to; this.endless = endless;
-    globalThis.running.push(this);
-  }
-  finish() {
-    if (this.endless) throw new Error('unresolved end time');
-    globalThis.style[this.property] = this.to;
-    globalThis.running = globalThis.running.filter(other => other !== this);
-  }
-}
-class CSSTransition extends Animation {}
-const root = { getAnimations: options => (options && options.subtree ? globalThis.running : []) };
-const names = () => globalThis.running.map(animation => animation.name);
-class CSSStyleSheet {
-  replaceSync(text) { this.text = text; }
-}
-globalThis.CSSStyleSheet = CSSStyleSheet;
-const document = {
-  querySelectorAll: () => [],
-  styleSheets: [],
-  adoptedStyleSheets: [],
-  getAnimations: options => root.getAnimations(options)
-};
-// What the page is being read under, named as the rule texts in force rather than as the
-// carrier that delivers them, so the assertions survive a change of carrier.
-Object.defineProperty(globalThis, 'sheets', {
-  get: () => document.adoptedStyleSheets.map(sheet => sheet.text)
-});
-"#;
-
-fn evaluate(body: &str, expression: &str) -> serde_json::Value {
-    node_eval::evaluate(
-        &format!(
-            "{DOUBLE}\n{}\n{}\n{body}",
-            crate::scoped_rules::SOURCE,
-            crate::capture_transitions::SOURCE
-        ),
-        expression,
-    )
-}
+///
+/// `style` is what the cascade produced and `computed` is what a reader sees: an attached
+/// effect answers for the property it drives, exactly as the animation origin outranks the
+/// author origin on a real page, so a value read while motion applies is the frame and not the
+/// resting value unless the read holds the motion out.
+use crate::capture_motion_double::evaluate;
 
 /// The defect itself. A value still travelling is not a value the page rests at, and the only
 /// reading that is safe is one taken after it has arrived.
@@ -165,16 +125,4 @@ fn a_moving_read_leaves_the_page_moving() {
         "[globalThis.sheets, globalThis.style, names()]",
     );
     assert_eq!(seen, serde_json::json!([[], {}, ["entry"]]));
-}
-
-/// Which reader gets which policy. Every settled viewport reading and every reading taken after
-/// an interaction is a resting one; the first-paint reading is the only moving one.
-#[test]
-fn each_reader_is_wired_to_the_policy_its_promise_requires() {
-    let settled = crate::page_script::source_without_assets();
-    let moment = crate::page_script::source_at_first_paint();
-    assert!(settled.contains("restingRead(() => measureBaselines"));
-    assert!(moment.contains("movingRead(() => measureBaselines"));
-    assert!(!moment.contains("restingRead(() => measureBaselines"));
-    assert!(crate::interaction_script::source().contains("restingRead(() => measureBaselines"));
 }

@@ -7,7 +7,7 @@ __ASSET_ATTRIBUTES__
   const skipped = element =>
     ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup');
   const isBlockingOverlay = __BLOCKING_OVERLAY__;
-  __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
+  const resumeMotion = __MOTION_POLICY__(() => measureBaselines(document.documentElement, skipped));
   const computedStyles = new WeakMap(), computedStylePropertySet = new Set();
   const scan = element => {
     if (ignored.has(element.tagName) || element.hasAttribute('data-recreate-startup')) return;
@@ -165,6 +165,9 @@ __NODE_PATH__
     }
   };
   walk(document.documentElement);
+  // The reading is over, so the page may move again — and must, because the next reader's
+  // whole subject is the motion this one was holding out.
+  resumeMotion();
   const liveAnimations = document.getAnimations({ subtree: true }).map(animation => {
     const timing = animation.effect?.getTiming?.() || {};
     return {

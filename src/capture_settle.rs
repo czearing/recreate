@@ -18,7 +18,7 @@
 //! frames of one hash identically. That second question is not asked here and cannot be,
 //! because the capture's own baseline measurement provokes a transition on every element it
 //! reverts and restores, so any answer taken before it would already be stale.
-//! `capture_transitions` answers it by suspending transitions for the reading that needs one,
+//! `capture_motion` answers it by suspending transitions for the reading that needs one,
 //! and the signature is left to answer only the question it can answer.
 
 use crate::blocking_overlay;

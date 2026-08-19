@@ -12,14 +12,19 @@ mod browser;
 mod browser_session_tests;
 mod capture;
 mod capture_conditions;
+mod capture_motion;
+#[cfg(test)]
+#[path = "capture_motion_animation_tests.rs"]
+mod capture_motion_animation_tests;
+#[cfg(test)]
+mod capture_motion_double;
+#[cfg(test)]
+#[path = "capture_motion_tests.rs"]
+mod capture_motion_tests;
 mod capture_settle;
 #[cfg(test)]
 mod capture_settle_budget_tests;
 mod capture_shorthands;
-mod capture_transitions;
-#[cfg(test)]
-#[path = "capture_transitions_tests.rs"]
-mod capture_transitions_tests;
 mod cdp;
 mod cli;
 mod compare;

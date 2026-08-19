@@ -16,7 +16,7 @@ pub fn source() -> String {
         "{}\n{}\n{}\n{SCRIPT}",
         crate::scoped_rules::SOURCE,
         crate::generated_boxes::SOURCE,
-        crate::capture_transitions::SOURCE
+        crate::capture_motion::SOURCE
     )
 }
 

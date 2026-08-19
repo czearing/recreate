@@ -1,4 +1,4 @@
-//! Makes a value that is still travelling arrive, so the style capture reads is a resting one.
+//! Holds motion out of a reading, so the style capture records is the style the page rests at.
 //!
 //! Capture reads a page through `getComputedStyle`, which reports the value in force at the
 //! instant it is asked. A CSS transition makes that instant matter: for the length of the
@@ -36,17 +36,34 @@
 //! those there reads a later page than the one requested and leaves the page holding values
 //! that stop the motion being provoked again, so it is lost to every later reader too.
 //!
-//! Only transitions. A transition interpolates the base style towards the after-change
-//! style, so its end value *is* the resting computed value. An animation applies in a higher
-//! cascade origin that overrides the base style, so its end value is not what the element
-//! rests at, and an animation may repeat forever, which makes "let it reach the end" a thing
-//! that never happens. That is a difference in what the two kinds of motion mean, not a list
-//! of cases, which is why it is expressed as the platform's own type rather than as names.
+//! One rule decides both kinds of motion, and it is about where the motion's endpoint comes
+//! from. A transition only delays the after-change style, which is the value the cascade
+//! already produced, so seeking it to its end lands on the value the page rests at and
+//! invents nothing. An animation declares its own endpoints as keyframes in an origin above
+//! the cascade, so no frame of it is ever that value — not the last, not the first, not the
+//! one a fill holds — and a property an animation drives but the author never declared rests
+//! at a value that appears in no keyframe at all. Motion whose end the cascade produced is
+//! sought; motion that declares its own is held out of the read. That also answers, rather
+//! than merely accommodates, why an animation may not be finished: its end is the wrong
+//! value, and an endless one has no end to reach.
 //!
-//! Nothing about the motion is lost by ending it. The lifecycle recorder samples motion as it
-//! runs and the first-paint reading holds the frame the page began on, so how the page arrived
-//! is recorded by the stages whose subject that is, and this one is left free to record only
-//! where it arrived.
+//! Held out by detaching the effect, because that is the one handle every animation has. A
+//! declaration would reach only what the CSS owns, leaving anything a script started still
+//! applying its frame, and declaring `animation-name` away would delete the very longhands
+//! the recreation needs to animate at all. Detaching keeps the animation, its timeline
+//! position and its play state, so the page is left moving exactly as it was found; the
+//! alternatives do not, since cancelling discards all three and pausing goes on applying the
+//! frame — the same objection this file already makes to a paused transition.
+//!
+//! The hold spans the whole reading rather than one pass, because every value a capture
+//! records is read from the page and an animation is applying throughout. It is released
+//! before the motion itself is recorded, so the reader whose subject is how the page moves
+//! still sees every animation the page has.
+//!
+//! Nothing about the motion is lost by ending or suspending it. The lifecycle recorder
+//! samples motion as it runs and the first-paint reading holds the frame the page began on,
+//! so how the page arrived is recorded by the stages whose subject that is, and this one is
+//! left free to record only where it arrived.
 pub const SOURCE: &str = r#"
   const transitional = animation =>
     typeof CSSTransition !== 'undefined' && animation instanceof CSSTransition;
@@ -59,15 +76,45 @@ pub const SOURCE: &str = r#"
       try { animation.finish(); } catch (unresolved) {}
     }
   };
+  // Detaching the effect leaves the animation itself untouched, so what is put back is the
+  // same effect on the same animation at the same point on its timeline. An animation that
+  // has none already contributes nothing and is passed over rather than recorded, so nothing
+  // is put back that was not taken.
+  const suspendAnimations = root => {
+    const suspended = [];
+    for (const animation of root.getAnimations({ subtree: true })) {
+      if (transitional(animation)) continue;
+      const effect = animation.effect;
+      if (!effect) continue;
+      animation.effect = null;
+      suspended.push([animation, effect]);
+    }
+    return () => {
+      for (const [animation, effect] of suspended) animation.effect = effect;
+      suspended.length = 0;
+    };
+  };
   // Declaring the transitions away rather than pausing them, because a paused transition is
   // still applying its interpolated value over the one being measured. Removing the rules
   // provokes nothing: every change made under them is already the page's current value.
   const restingRead = read => {
+    // Twice, because the measurement in the middle of the read is the page's largest source of
+    // motion for the same reason it is its largest source of transitions: reverting an element
+    // and putting its style attribute back removes and restores `animation-name`, which ends
+    // every animation held out here and starts a fresh one in its place. Holding out what was
+    // running before the read leaves the measurement itself resting; holding out what the
+    // measurement started leaves every reading taken after it resting too.
+    const releases = [suspendAnimations(document)];
     underRules('*,*::before,*::after{transition-property:none !important}', read);
+    releases.push(suspendAnimations(document));
     // Suspending a transition holds its interpolated value out of the read; it does not give
     // the transition a resting value. Every later stage reads a page that has one, so the
     // motion still in flight is brought to its end once the read is over.
     arriveTransitions(document);
+    return () => { for (const release of releases) release(); };
   };
-  const movingRead = read => read();
+  const movingRead = read => {
+    read();
+    return () => {};
+  };
 "#;

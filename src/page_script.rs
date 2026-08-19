@@ -21,9 +21,10 @@ fn source_template() -> String {
 
 /// How the reader treats motion still under way.
 ///
-/// A read of a resting page must not land mid-transition, because an interpolated value is one
-/// the author never wrote. A read of a single moment must land wherever that moment is, so it
-/// leaves the page moving exactly as it found it.
+/// A read of a resting page must not land on a value some motion is applying, because neither a
+/// value still travelling nor a keyframe is one the author wrote. A read of a single moment must
+/// land wherever that moment is, so it leaves the page moving exactly as it found it. Both hand
+/// the page back once their reading is over, so what a reader suspends it also restores.
 pub const RESTING: &str = "restingRead";
 const AS_FOUND: &str = "movingRead";
 
