@@ -88,7 +88,7 @@ __NODE_PATH__
       attributes,
       control_state: recreateControlState(element),
       disabled: element.matches(':disabled'),
-      modal: element.matches(':modal'),
+      promotion: recreateTopLayer(element),
       blocking_overlay: isBlockingOverlay(element),
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,

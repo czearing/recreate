@@ -98,6 +98,7 @@ mod style_baseline_scroll_tests;
 #[cfg(test)]
 mod style_baseline_weight_tests;
 mod surface_content;
+mod top_layer;
 #[cfg(test)]
 mod tree_scope_double;
 mod updater;

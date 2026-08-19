@@ -20,9 +20,9 @@ class Element {
     this.scrollable = scrollable;
     this.scrollLeft = 0;
     this.scrollTop = 0;
-    this.modal = false;
+    this.promotion = '';
   }
-  matches(selector){ return selector === ':modal' && this.modal; }
+  matches(selector){ return selector !== '' && selector === this.promotion; }
   collapse(){ this.scrollLeft = 0; this.scrollTop = 0; this.scrollable = false; }
   appendChild(child){ this.children.push(child); return child; }
   removeChild(child){ this.children = this.children.filter(item => item !== child); }

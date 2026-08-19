@@ -65,21 +65,6 @@ fn records_the_live_control_state_in_every_node_record() {
     }
 }
 
-/// Both node-record producers must ask the engine whether the element was in the top layer,
-/// and both must be kept in step. Nothing else can answer it: `show()`, `showModal()` and a
-/// hand-authored `<dialog open>` all set the same `open` attribute, there is no `element.modal`
-/// property, and the top layer is a user-agent list no element in the document declares. A
-/// producer that omits this reports a modal dialog and a floating panel as the same record.
-#[test]
-fn records_the_engine_answered_top_layer_membership_in_every_node_record() {
-    for script in [source(), crate::interaction_script::source()] {
-        assert!(script.contains("modal: element.matches(':modal')"));
-        // The two attribute-shaped substitutes, both of which are silent on modality.
-        assert!(!script.contains("modal: element.open"));
-        assert!(!script.contains("aria-modal"));
-    }
-}
-
 /// The live value must never be smuggled in as a text child. An `<input>` is a void element
 /// and cannot have children, so a text node there is not the control's value in any sense
 /// the DOM or React recognises: it renders as stray text beside an empty control, while a

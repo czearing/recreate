@@ -136,9 +136,6 @@ mod jsx_states;
 mod jsx_text_entry;
 mod jsx_variants;
 #[cfg(test)]
-#[path = "modal_top_layer_tests.rs"]
-mod modal_top_layer_tests;
-#[cfg(test)]
 #[path = "mount_tests.rs"]
 mod mount_tests;
 mod names;
@@ -245,6 +242,13 @@ mod style_delta;
 #[cfg(test)]
 #[path = "style_reversion_tests.rs"]
 mod style_reversion_tests;
+#[cfg(test)]
+#[path = "top_layer_tests.rs"]
+mod top_layer_tests;
+
+#[cfg(test)]
+#[path = "top_layer_scrim_tests.rs"]
+mod top_layer_scrim_tests;
 
 #[cfg(test)]
 mod artifact_hermeticity_tests;

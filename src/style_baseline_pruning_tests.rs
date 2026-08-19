@@ -83,24 +83,36 @@ fn enumerates_no_custom_property_in_the_baseline() {
 /// the other way, never record the one scrim that exists. The engine answers instead, and the
 /// answer moves the reading: the same element measured with and without top-layer membership
 /// produces a baseline and no baseline.
+///
+/// Asked once per way into the top layer, because the engine generates the box for the layer
+/// and not for the elements that inert the page. A popover's own scrim is transparent by
+/// default rather than absent, so a gate spelled from `:modal` declines to look for a box the
+/// engine really generated.
 #[test]
 fn measures_a_backdrop_baseline_for_exactly_the_elements_the_engine_promoted() {
-    let seen = evaluate(
-        "const plainRun = (read(), globalThis.pseudoMeasured);\
-         \nmarked.modal = true;\
-         \nglobalThis.promoted = (read(), globalThis.pseudoMeasured);\
-         \nglobalThis.plainRun = plainRun;",
-        "[globalThis.plainRun, globalThis.promoted]",
-    );
-    assert_eq!(seen, serde_json::json!([[], ["P#marked::backdrop"]]));
+    for promotion in [":modal", ":popover-open", ":fullscreen"] {
+        let seen = evaluate(
+            &format!(
+                "const plainRun = (read(), globalThis.pseudoMeasured);\
+                 \nmarked.promotion = '{promotion}';\
+                 \nglobalThis.promoted = (read(), globalThis.pseudoMeasured);\
+                 \nglobalThis.plainRun = plainRun;"
+            ),
+            "[globalThis.plainRun, globalThis.promoted]",
+        );
+        assert_eq!(
+            seen,
+            serde_json::json!([[], ["P#marked::backdrop"]]),
+            "{promotion}"
+        );
+    }
 }
 
 /// Deciding whether a box exists must not cost a read for a box that decides without one.
 /// Resolving a pseudo-element's computed style is a separate layout-sensitive read the engine
 /// cannot share with the element's own, so a third entry in the list would otherwise add one
 /// per element on every page — enough, measured on a scene whose capture races a timed
-/// attribute sequence, to change which phase the capture catches. `::backdrop` answers from
-/// `:modal` alone, so the five elements here cost exactly the two content reads each that they
+/// attribute sequence, to change which phase the capture catches. `::backdrop` answers from the promotion alone, so the five elements here cost exactly the two content reads each that they
 /// cost before it existed.
 #[test]
 fn costs_no_pseudo_read_for_a_box_that_decides_without_one() {

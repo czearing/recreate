@@ -50,7 +50,7 @@ __SELECTION__
       rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       style: authoredStyles(styleMap(computedStyle), baselineOf(element)),
       disabled: element.matches(':disabled'),
-      modal: element.matches(':modal'),
+      promotion: recreateTopLayer(element),
       rtl: computedStyle.direction === 'rtl',
       writing_mode: computedStyle.writingMode,
       pseudos: {}

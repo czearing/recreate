@@ -16,7 +16,7 @@
 const specGeneratedBoxes = {
   '::before': (element, content) => content() !== '',
   '::after': (element, content) => content() !== '',
-  '::backdrop': element => element.matches(':modal')
+  '::backdrop': element => recreateTopLayer(element) !== ''
 };
 /* Every other pseudo-element exists because an author wrote a rule for one, and the platform
    offers no way to ask which ones a document wrote: `getComputedStyle` and `Element.pseudo()`

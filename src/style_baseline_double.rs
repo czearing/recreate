@@ -30,11 +30,11 @@ class Element {
     this.attributes = new Map();
     this.style = Symbol('clobbered');
     this.reverted = false;
-    this.modal = false;
+    this.promotion = '';
     this.parent = null;
   }
   matches(selector){
-    if (selector === ':modal') return this.modal;
+    if (selector.startsWith(':')) return selector === this.promotion;
     return selector.split(',').some(part => {
       const trimmed = part.trim();
       if (trimmed === '*') return true;

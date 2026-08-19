@@ -376,6 +376,13 @@ pub fn app(
     )
     .unwrap();
     let selector = jsx_variants::selector();
+    let promotion_calls = serde_json::to_string(
+        &crate::top_layer::Promotion::REPLAY
+            .iter()
+            .map(|(_, call)| *call)
+            .collect::<Vec<_>>(),
+    )
+    .unwrap();
     let carousel_state = carousel_state.to_string();
     let output = fill(
         APP_TEMPLATE,
@@ -405,6 +412,7 @@ pub fn app(
             ("//__RECREATE_VIEWS__\n", &views),
             ("\"__RECREATE_VIEW_NAMES__\"", &view_names),
             ("\"__RECREATE_RENDER_STATE__\"", &render_state),
+            ("\"__RECREATE_PROMOTION_CALLS__\"", &promotion_calls),
         ],
     );
     let output = output.replace(

@@ -23,9 +23,12 @@ mod tests {
     /// The existence of a box is decided by the condition its own specification states, and
     /// the two conditions are genuinely different. Reading `content` for `::backdrop` would
     /// record a phantom scrim on every element, because a `::backdrop` never has content.
+    /// The scrim's condition is top-layer membership, not inertness: the engine generates it
+    /// for a popover too, whose default is transparent rather than absent.
     #[test]
     fn keys_the_backdrop_on_membership_and_the_content_boxes_on_content() {
-        assert!(SOURCE.contains("'::backdrop': element => element.matches(':modal')"));
+        assert!(SOURCE.contains("'::backdrop': element => recreateTopLayer(element) !== ''"));
+        assert!(!SOURCE.contains(":modal"));
         assert!(SOURCE.contains("'::before': (element, content) => content() !== ''"));
         assert!(SOURCE.contains("'::after': (element, content) => content() !== ''"));
     }

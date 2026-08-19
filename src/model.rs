@@ -117,26 +117,35 @@ pub struct Node {
     /// missed keeps compiling and simply stops noticing that box changed.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub pseudos: Pseudos,
-    /// Whether the element was in the top layer when the page was read.
+    /// Why the element was in the top layer when the page was read, or nothing if it was not.
     ///
     /// The top layer is a user-agent list, not a property of any element: `showModal()`,
-    /// `requestFullscreen()` and an invoked modal popover put an element in it, and nothing
-    /// in the document declares that. The `open` content attribute cannot answer it, because
+    /// `showPopover()` and `requestFullscreen()` put an element in it, and nothing in the
+    /// document declares that. The `open` content attribute cannot answer it, because
     /// `show()` and `showModal()` set that same attribute — it records that a dialog is being
-    /// shown, not that it is modal. Computed style cannot either, and is worse than silent:
-    /// the user-agent sheet gives `dialog:modal` its own `position` and `inset`, so a
-    /// snapshot picks up plausible centring geometry and the record looks complete.
+    /// shown, not that it is modal — and a popover has no declarative open state at all.
+    /// Computed style cannot either, and is worse than silent: the user-agent sheet gives
+    /// `dialog:modal` its own `position` and `inset`, so a snapshot picks up plausible
+    /// centring geometry and the record looks complete.
     ///
     /// This is the concession [`Node::disabled`] already makes, under a stronger premise.
     /// There, re-deriving the answer was merely awkward; here it is impossible, because no
-    /// element anywhere in the document carries a value implying the promotion. `:modal` is
-    /// specified to select exactly the elements excluding interaction with everything outside
-    /// them, so the answer is taken from the engine and recorded once.
+    /// element anywhere in the document carries a value implying the promotion, so the answer
+    /// is taken from the engine and recorded once.
+    ///
+    /// It carries the reason rather than a flag because the three entrants replay as three
+    /// different calls and one of them replays as none, which no single bit can express. A
+    /// flag spelled from inertness loses the largest entrant outright: `:modal` selects the
+    /// elements excluding interaction with everything outside them, which a popover
+    /// deliberately never does, so an open popover recorded that way asserts it was an
+    /// ordinary in-flow box.
     ///
     /// It decides two things at once, which is why it is one field and not two: what the
-    /// recreation must replay, and whether a `::backdrop` box exists to be recorded at all.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub modal: bool,
+    /// recreation must replay, and whether a `::backdrop` box exists to be recorded at all —
+    /// the engine generates that box for the top layer, not for the elements that inert the
+    /// page.
+    #[serde(default, skip_serializing_if = "crate::top_layer::Promotion::absent")]
+    pub promotion: crate::top_layer::Promotion,
     /// Whether the element matched `:disabled` when the page was read.
     ///
     /// Disabled is not always borne by the element that shows it: a `<fieldset disabled>`
