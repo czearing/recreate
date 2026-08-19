@@ -8,14 +8,19 @@ globalThis.style = {};
 globalThis.running = [];
 class Animation {
   constructor(name, property, to, endless, applied) {
-    this.name = name; this.property = property; this.to = to; this.endless = endless;
+    this.name = name; this.property = property; this.endless = endless;
     this.playState = 'running';
-    this.effect = applied === undefined ? null : { property, frame: applied };
+    // The endpoint travels with the effect, as it does on the platform: an effect is what
+    // declares where the motion is going, so an animation whose effect has been detached has
+    // no end left to be sought to. That is why holding motion out and bringing it to its end
+    // are not interchangeable, and it is the only place the double can express it.
+    this.effect = { property, to, frame: applied };
     globalThis.running.push(this);
   }
   finish() {
+    if (!this.effect) return;
     if (this.endless) throw new Error('unresolved end time');
-    globalThis.style[this.property] = this.to;
+    globalThis.style[this.property] = this.effect.to;
     globalThis.running = globalThis.running.filter(other => other !== this);
   }
 }
@@ -23,7 +28,8 @@ class CSSTransition extends Animation {}
 class CSSAnimation extends Animation {}
 const computed = property => {
   for (const animation of globalThis.running) {
-    if (animation.effect && animation.effect.property === property) return animation.effect.frame;
+    const effect = animation.effect;
+    if (effect && effect.property === property && effect.frame !== undefined) return effect.frame;
   }
   return globalThis.style[property];
 };

@@ -4,6 +4,24 @@
 //! frame ever holds.
 
 use crate::capture_motion_double::evaluate;
+
+/// Where a reader hands the page back, as a statement rather than as a spelling. A call that
+/// has been commented out still spells itself, so a check that only looks for the text passes
+/// over the one edit that would silently leave every later stage — including the recorder whose
+/// whole subject is the motion — reading a page that no longer moves.
+fn release_offset(source: &str) -> usize {
+    source
+        .match_indices("resumeMotion();")
+        .find(|(at, _)| {
+            source[..*at]
+                .rsplit('\n')
+                .next()
+                .is_some_and(|line| line.trim().is_empty())
+        })
+        .map(|(at, _)| at)
+        .expect("the reader hands the page back once its reading is over")
+}
+
 /// Which reader gets which policy. Every settled viewport reading and every reading taken after
 /// an interaction is a resting one; the first-paint reading is the only moving one. Each also
 /// hands the page back, because a policy that suspends motion and is never released would leave
@@ -18,10 +36,7 @@ fn each_reader_is_wired_to_the_policy_its_promise_requires() {
     assert!(!moment.contains("restingRead(() => measureBaselines"));
     assert!(interaction.contains("restingRead(() => measureBaselines"));
     for source in [&settled, &moment, &interaction] {
-        assert!(
-            source.contains("resumeMotion()"),
-            "the reader hands the page back once its reading is over"
-        );
+        release_offset(source);
     }
 }
 
@@ -143,10 +158,25 @@ fn a_transition_is_brought_to_its_end_rather_than_held_out() {
 fn the_page_is_handed_back_after_the_reading_and_before_the_motion_is_recorded() {
     let source = crate::page_script::source_without_assets();
     let walk = source.find("walk(document.documentElement)").unwrap();
-    let release = source.find("resumeMotion()").unwrap();
+    let release = release_offset(&source);
     let recorded = source.find("const liveAnimations").unwrap();
     assert!(
         walk < release && release < recorded,
         "release at {release} sits between the walk at {walk} and the record at {recorded}"
     );
+}
+
+/// An animation the platform has already left without an effect is passed over rather than
+/// recorded, so the release puts back only what it took. Without this the suspension would
+/// invent an entry whose restoration writes `null` onto an animation it never touched.
+#[test]
+fn an_animation_that_carries_no_effect_is_passed_over_rather_than_recorded() {
+    let seen = evaluate(
+        "const bare = new CSSAnimation('bare', 'opacity', undefined, false, '0.5');\
+         \nbare.effect = null;\
+         \nconst resume = restingRead(() => {});\
+         \nresume();",
+        "[globalThis.running[0].effect, names()]",
+    );
+    assert_eq!(seen, serde_json::json!([null, ["bare"]]), "{seen}");
 }
