@@ -103,6 +103,23 @@ fn the_element_holding_a_state_carries_the_rule_as_well() {
     );
 }
 
+/// The combinator is part of the rule the element receives, so two elements reached from the
+/// same holder by different combinators are two elements. Sharing one class would emit both
+/// `+` and `~` against it, and the wider one would paint the element the author excluded.
+#[test]
+fn two_elements_reached_by_different_combinators_are_two_elements() {
+    let paths = paths();
+    let mut adjacent = state_style(&paths[0], Some(&paths[2]), "color: red;");
+    adjacent.relation = Relation::PreviousSibling;
+    let mut general = state_style(&paths[1], Some(&paths[2]), "color: red;");
+    general.relation = Relation::PrecedingSibling;
+    let signatures = signatures(vec![adjacent, general]);
+    assert_ne!(
+        signatures[0], signatures[1],
+        "two elements joined to one holder by different combinators were given one identity"
+    );
+}
+
 /// The inverse guard. Identity must not be traded for a stylesheet with one class per element:
 /// two elements receiving the same rule from equivalent places still share one.
 #[test]

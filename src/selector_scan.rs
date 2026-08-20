@@ -11,7 +11,14 @@
 /// throws where the throw is swallowed and the rule leaves no record at all.
 ///
 /// Declared here, ahead of every reader, so a selector cannot be read two ways.
-pub const SOURCE: &str = include_str!("selector_scan.js");
+///
+/// Split in two along the seam the file already had: `selector_scan.js` reads characters and
+/// counts nesting, `selector_reader.js` is every question a stage asks on top of it.
+pub const SOURCE: &str = concat!(
+    include_str!("selector_scan.js"),
+    "\n",
+    include_str!("selector_reader.js")
+);
 
 #[cfg(test)]
 #[path = "selector_scan_tests.rs"]

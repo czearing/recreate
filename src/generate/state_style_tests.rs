@@ -1,6 +1,6 @@
 use super::*;
 
-fn style(target: &str, pseudo: Option<&str>, declarations: &str) -> StateStyle {
+pub(super) fn style(target: &str, pseudo: Option<&str>, declarations: &str) -> StateStyle {
     StateStyle {
         target: target.into(),
         scope: None,

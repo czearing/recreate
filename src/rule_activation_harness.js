@@ -13,6 +13,7 @@ const authoredSheetTexts = scene.authoredSheets || [];
 // is how a custom property inherited from `:root` reaches `getComputedStyle` in a browser.
 const elements = scene.elements.map(spec => ({
   ...spec,
+  attributes: { ...spec.attributes },
   probes: { ...spec.computed },
   shadowRoot: null
 }));
@@ -46,13 +47,20 @@ const applyProbeBlock = text => {
 };
 
 // The engine's two searches from an element, which is how the capture asks where a state is
-// held rather than deriving it from more selector text.
+// held rather than deriving it from more selector text. An attribute can be set and taken off
+// again, which is how a stage pins one element inside a query it hands to the engine.
 for (const element of elements) {
   element.querySelector = selector =>
     elements.find(node => contains(element, node) && matchesSelector(selector, node)) || null;
   element.closest = selector => {
     for (const node of ancestry(element)) if (matchesSelector(selector, node)) return node;
     return null;
+  };
+  element.setAttribute = (name, value) => {
+    element.attributes[name] = value;
+  };
+  element.removeAttribute = name => {
+    delete element.attributes[name];
   };
 }
 
@@ -67,6 +75,7 @@ const document = {
     }
   },
   createElement: () => ({ textContent: '', remove: () => {} }),
+  querySelector: selector => elements.find(element => matchesSelector(selector, element)) || null,
   querySelectorAll: selector => elements.filter(element => matchesSelector(selector, element))
 };
 

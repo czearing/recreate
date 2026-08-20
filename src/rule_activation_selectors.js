@@ -46,6 +46,15 @@ const compoundMatches = (compound, element) => {
     if (rest[0] === ')' || rest[0] === ',' || rest[0] === '(') {
       throw new Error(`unbalanced selector: ${compound}`);
     }
+    const relational = /^:has\(/.exec(rest);
+    if (relational) {
+      const close = doubleParen(rest, relational[0].length - 1);
+      if (close < 0) throw new Error(`unbalanced selector: ${compound}`);
+      matched = matched && doubleMembers(rest.slice(relational[0].length, close))
+        .some(branch => reaches(segments(branch), element));
+      rest = rest.slice(close + 1);
+      continue;
+    }
     const logical = /^:(is|where|not)\(/.exec(rest);
     if (logical) {
       const open = logical[0].length - 1;
@@ -80,19 +89,92 @@ const compoundMatches = (compound, element) => {
 
 const contains = (ancestor, element) => element.path.startsWith(`${ancestor.path}/`);
 
-// A member is read right to left: the subject must match the last compound, and every
-// compound before it must match some ancestor of it.
-const memberMatches = (member, element) => {
-  const compounds = member.trim().split(/\s+/);
-  if (!compoundMatches(compounds.pop(), element)) return false;
-  let subject = element;
-  while (compounds.length) {
-    const compound = compounds.pop();
-    const ancestor = elements.find(node => contains(node, subject) && compoundMatches(compound, node));
-    if (!ancestor) return false;
-    subject = ancestor;
+// The DOM the double models, read off the paths the scene declares. Document order is the
+// order the scene lists its elements in, which is what decides sibling direction.
+const parentPath = path => path.slice(0, path.lastIndexOf('/'));
+const siblings = element => elements.filter(node => parentPath(node.path) === parentPath(element.path));
+const preceding = element => {
+  const row = siblings(element);
+  return row.slice(0, row.indexOf(element));
+};
+const following = element => {
+  const row = siblings(element);
+  return row.slice(row.indexOf(element) + 1);
+};
+const parent = element => elements.filter(node => node.path === parentPath(element.path));
+
+// Selectors defines four combinators, and each names one axis in each direction. `LEFT` is
+// what a complex selector walks when it reads right to left; `RIGHT` is what a relative
+// selector inside `:has()` reaches from its anchor. Nothing else distinguishes them.
+const LEFT = {
+  ' ': element => elements.filter(node => contains(node, element)),
+  '>': parent,
+  '+': element => preceding(element).slice(-1),
+  '~': preceding
+};
+const RIGHT = {
+  ' ': element => elements.filter(node => contains(element, node)),
+  '>': element => elements.filter(node => parentPath(node.path) === element.path),
+  '+': element => following(element).slice(0, 1),
+  '~': following
+};
+
+// A member cut into compounds, each carrying the combinator that precedes it. A combinator
+// only separates compounds at the top level, so the space in `[title="a b"]` divides nothing.
+// A leading combinator leaves the first compound's join set, which is what makes a relative
+// selector relative; an absent one is the descendant combinator.
+const segments = member => {
+  const parts = [];
+  let depth = 0;
+  let text = '';
+  let join = null;
+  const push = () => {
+    parts.push({ join, compound: text });
+    text = '';
+    join = null;
+  };
+  for (const character of member) {
+    if (character === '(' || character === '[') depth++;
+    else if (character === ')' || character === ']') depth--;
+    if (!depth && ' \t\n>+~'.includes(character)) {
+      if (text) push();
+      if ('>+~'.includes(character)) join = character;
+      else if (join === null) join = ' ';
+      continue;
+    }
+    text += character;
   }
-  return true;
+  if (text) push();
+  if (parts.length && parts[0].join === null) parts[0].join = ' ';
+  return parts;
+};
+
+// Whether the anchor reaches this relative selector, walking left to right.
+const reaches = (parts, anchor) => {
+  const [head, ...rest] = parts;
+  return RIGHT[head.join](anchor).some(
+    node => compoundMatches(head.compound, node) && (!rest.length || reaches(rest, node))
+  );
+};
+
+// A member is read right to left: the subject matches the last compound, and each compound
+// before it matches some element on the axis its combinator names. The search backtracks,
+// because the first candidate on an axis need not be the one that lets the rest of the
+// member match.
+const memberMatches = (member, element) => {
+  const parts = segments(member.trim());
+  const subject = parts.pop();
+  if (!compoundMatches(subject.compound, element)) return false;
+  const reachedBy = (remaining, join, node) => {
+    if (!remaining.length) return true;
+    const head = remaining[remaining.length - 1];
+    return LEFT[join](node).some(
+      candidate =>
+        compoundMatches(head.compound, candidate) &&
+        reachedBy(remaining.slice(0, -1), head.join, candidate)
+    );
+  };
+  return reachedBy(parts, subject.join, element);
 };
 
 const matchesSelector = (selector, element) =>

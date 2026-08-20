@@ -104,10 +104,7 @@ fn append_state_style(
         signature.slot();
         signature.value(side);
         signature.value(other);
-        signature.value(match style.relation {
-            crate::model::Relation::Ancestor => "ancestor",
-            crate::model::Relation::Contained => "contained",
-        });
+        signature.value(style.relation.name());
         signature.pair("pseudo", style.pseudo.as_deref().unwrap_or_default());
         signature.pair(
             "target-pseudo",

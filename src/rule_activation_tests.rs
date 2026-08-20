@@ -28,6 +28,8 @@ mod sheet_media;
 mod shorthand;
 #[path = "state_style_probe_tests.rs"]
 mod state_style_probe;
+#[path = "state_style_relation_tests.rs"]
+mod state_style_relation;
 #[path = "state_style_selector_tests.rs"]
 mod state_style_selector;
 #[path = "state_style_var_tests.rs"]

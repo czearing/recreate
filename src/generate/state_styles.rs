@@ -65,19 +65,16 @@ fn collect(
         );
         let selector = match style.scope.as_deref().and_then(|scope| classes.get(scope)) {
             // The state and the element it styles are two elements, joined the way the author
-            // joined them. A holder above the subject is a descendant rule; a holder inside it
-            // is what `:has()` says and nothing else can say.
-            Some(scope) => {
-                let holder = format!(
+            // joined them. Which combinator that was is the record's business; spelling it is
+            // the relation's.
+            Some(scope) => style.relation.join(
+                &format!(
                     "{}{}",
                     selector(scope),
                     style.pseudo.as_deref().unwrap_or_default()
-                );
-                match style.relation {
-                    Relation::Ancestor => format!("{holder} {target}"),
-                    Relation::Contained => format!("{target}:has({holder})"),
-                }
-            }
+                ),
+                &target,
+            ),
             None => format!("{target}{}", style.pseudo.as_deref().unwrap_or_default()),
         };
         groups.add(key, selector);
@@ -118,6 +115,10 @@ fn emit(groups: Groups, css: &mut String) {
 #[cfg(test)]
 #[path = "state_style_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "state_style_relation_tests.rs"]
+mod relation_tests;
 
 #[cfg(test)]
 #[path = "state_order_tests.rs"]

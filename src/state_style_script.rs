@@ -44,14 +44,27 @@ __SHORTHAND_EXPANSION__
   // the one an emitted rule can name.
   const REPLAYABLE_STATE = /^:(hover|focus-visible|focus-within|focus|active)\b/;
   const replayable = states => states.filter(state => REPLAYABLE_STATE.test(state));
-  // The element holding the state, given the element the rule styles. Both answers come from
-  // the engine: a contained holder is searched for inside the subject, an ancestor one is
-  // searched for upwards from it. Nothing further is derived from the selector text.
+  // The element holding the state, given the element the rule styles. Every answer comes from
+  // the engine, and the three cases are the three shapes the grammar has: the holder is
+  // inside the subject, the holder *is* the subject, or a join separates them. For the join
+  // the subject is pinned with an attribute and the authored text is inverted with `:has()`,
+  // whose argument is a relative selector anchored at the element it is attached to — so one
+  // query answers `~`, `+`, `>`, descendant and any chain of them, and nothing here names a
+  // combinator. `closest` is deliberately absent: it walks one axis, so using it to find the
+  // holder silently made "not an ancestor" mean "no holder at all".
+  const HOLDER_MARK = 'data-recreate-holder';
   const stateHolder = (element, relation) => {
     try {
-      return relation.contained
-        ? element.querySelector(relation.holder)
-        : relation.holder && element.closest(relation.holder);
+      if (relation.contained) return element.querySelector(relation.holder);
+      if (!relation.rest) return element;
+      element.setAttribute(HOLDER_MARK, '');
+      try {
+        return document.querySelector(
+          `${relation.holder}:has(${relation.rest}[${HOLDER_MARK}])`
+        );
+      } finally {
+        element.removeAttribute(HOLDER_MARK);
+      }
     } catch (unmatchable) {
       return null;
     }
@@ -77,7 +90,7 @@ __SHORTHAND_EXPANSION__
           const captured = {
             target: pathOf(element),
             scope: scoped ? pathOf(owner) : null,
-            relation: scoped && relation.contained ? 'contained' : 'ancestor',
+            relation: scoped ? relation.axis : 'ancestor',
             pseudo: states.length || pseudoElement
               ? `${scoped ? states[0] : states.join('')}${scoped ? '' : pseudoElement}`
               : null,
