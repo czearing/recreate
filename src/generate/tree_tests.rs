@@ -41,11 +41,6 @@ fn collapses_components_that_would_emit_the_same_body() {
         ("b".to_string(), &second),
         ("c".to_string(), &third),
     ]);
-    let classes = BTreeMap::from([
-        ("a".to_string(), "r1".to_string()),
-        ("b".to_string(), "r1".to_string()),
-        ("c".to_string(), "r1".to_string()),
-    ]);
     let merged = merge_identical_bodies(
         vec![
             (vec!["a".to_string()], 3),
@@ -53,9 +48,23 @@ fn collapses_components_that_would_emit_the_same_body() {
             (vec!["c".to_string()], 2),
         ],
         &nodes,
-        &classes,
     );
     assert_eq!(merged.len(), 2);
     assert_eq!(merged[0].0, vec!["a".to_string(), "b".to_string()]);
     assert_eq!(merged[1].0, vec!["c".to_string()]);
+}
+
+/// Styling is a prop, so two groups of the same tag are one component however differently they
+/// are styled. Keying the body on the class instead emitted one component per style bucket.
+#[test]
+fn a_differently_styled_group_is_not_a_separate_component() {
+    let first = probe("a", "radialGradient");
+    let second = probe("b", "radialGradient");
+    let nodes = BTreeMap::from([("a".to_string(), &first), ("b".to_string(), &second)]);
+    let merged = merge_identical_bodies(
+        vec![(vec!["a".to_string()], 2), (vec!["b".to_string()], 2)],
+        &nodes,
+    );
+    assert_eq!(merged.len(), 1);
+    assert_eq!(merged[0].0, vec!["a".to_string(), "b".to_string()]);
 }

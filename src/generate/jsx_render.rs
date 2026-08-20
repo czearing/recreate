@@ -19,11 +19,15 @@ pub fn component(component: &super::tree::Component, components: &Components) ->
         return String::new();
     };
     let class = components.classes.get(root).cloned().unwrap_or_default();
+    // The class is a default rather than a baked-in literal, so one component serves every
+    // element of this tag however it is styled, and a call site that passes nothing still
+    // renders exactly what it rendered before.
+    let default = serde_json::to_string(&class).unwrap_or_else(|_| "\"\"".to_string());
     format!(
-        "import React from 'react';\nexport default function {}({{children,...props}}){{return <{} className={} {{...props}}>{{children}}</{}>}}\n",
+        "import React from 'react';\nexport default function {}({{children,className={},...props}}){{return <{} className={{className}} {{...props}}>{{children}}</{}>}}\n",
         component.name,
+        default,
         jsx_tag(&node.tag),
-        quoted(&class),
         jsx_tag(&node.tag)
     )
 }
@@ -56,9 +60,11 @@ pub(super) fn render(
     }
     if allow_component && let Some(index) = components.by_root.get(path) {
         let name = &components.items[*index].name;
+        let class = components.classes.get(path).cloned().unwrap_or_default();
         let attributes = format!("{}{}", attributes(node, assets), adopted(path, components));
         return format!(
-            "{indent}<{name}{attributes}{}>\n{}{indent}</{name}>\n",
+            "{indent}<{name} className={}{attributes}{}>\n{}{indent}</{name}>\n",
+            quoted(&class),
             event(path, handlers),
             children
         );

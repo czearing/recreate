@@ -66,8 +66,12 @@ pub fn components(specification: &Specification, classes: &BTreeMap<String, Stri
             .cmp(left_size)
             .then_with(|| left_roots.cmp(right_roots))
     });
+    // Merging before the budget is applied, so the 80 slots are spent on 80 distinct components
+    // rather than on repeated styles of the same few: a real capture filled 67 of them with
+    // variants that collapse to 14.
+    let candidates = merge_identical_bodies(candidates, &nodes);
+    let mut candidates = candidates;
     candidates.truncate(80);
-    let candidates = merge_identical_bodies(candidates, &nodes, classes);
     let mut names = HashMap::new();
     let items: Vec<Component> = candidates
         .into_iter()
