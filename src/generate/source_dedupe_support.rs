@@ -65,13 +65,18 @@ pub fn reusable_svg(svg: &str) -> bool {
         && !svg.contains("onKeyDown=")
 }
 
-/// A block this stage relocates lands in a module that re-establishes nothing, so it may name
-/// nothing it does not bind. The trigger attribute is a separate hazard: it is a document-scoped
-/// value rather than a free name, and duplicating it would point two elements at one identity.
-pub fn reusable_block(block: &str) -> bool {
+/// A block this stage relocates lands in a module that defines nothing itself, so every name it
+/// uses must come from somewhere. A name the package exports is one the module can simply import,
+/// so it is no obstacle; only a name nothing exports, such as a local binding of the view it came
+/// from, would arrive undefined. The trigger attribute is a separate hazard: it is a
+/// document-scoped value rather than a free name, and duplicating it would point two elements at
+/// one identity.
+pub fn reusable_block(block: &str, exported: &std::collections::BTreeSet<String>) -> bool {
     (1_000..=100_000).contains(&block.len())
         && !block.contains("data-recreate-trigger")
-        && super::source_free_names::free_names(block).is_empty()
+        && super::source_free_names::free_names(block)
+            .iter()
+            .all(|name| exported.contains(name))
 }
 
 pub fn normalize(source: &str) -> String {

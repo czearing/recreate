@@ -1,4 +1,5 @@
 use super::super::{source_dedupe_support::reusable_block, source_free_names::free_names};
+use std::collections::BTreeSet;
 
 fn names(fragment: &str) -> Vec<String> {
     free_names(fragment).into_iter().collect()
@@ -57,16 +58,28 @@ fn keeps_the_shared_block_gate_refusing_a_document_scoped_trigger() {
         "<div data-recreate-trigger={{\"7\"}}>\n{}\n</div>",
         "  <span>{\"padding\"}</span>\n".repeat(80)
     );
-    assert!(!reusable_block(&block));
+    assert!(!reusable_block(&block, &BTreeSet::new()));
 }
 
 #[test]
-fn refuses_a_shared_block_naming_a_component_it_cannot_bind() {
+fn refuses_a_shared_block_naming_a_component_nothing_exports() {
     let block = format!(
         "<div>\n{}\n</div>",
         "  <Label>{\"padding\"}</Label>\n".repeat(80)
     );
-    assert!(!reusable_block(&block));
+    assert!(!reusable_block(&block, &BTreeSet::new()));
+}
+
+#[test]
+fn accepts_a_shared_block_naming_a_component_the_package_exports() {
+    let block = format!(
+        "<div>\n{}\n</div>",
+        "  <Label>{\"padding\"}</Label>\n".repeat(80)
+    );
+    assert!(reusable_block(
+        &block,
+        &["Label".to_string()].into_iter().collect()
+    ));
 }
 
 #[test]
@@ -75,5 +88,5 @@ fn lets_the_shared_block_gate_accept_markup_that_binds_everything_it_names() {
         "<div>\n{}\n</div>",
         "  <span>{\"padding\"}</span>\n".repeat(80)
     );
-    assert!(reusable_block(&block));
+    assert!(reusable_block(&block, &BTreeSet::new()));
 }

@@ -123,19 +123,18 @@ pub async fn write_project(
         &root.join("public").join("assets"),
         &relocation_css,
     )?;
+    let exported = components
+        .items
+        .iter()
+        .map(|component| component.name.clone())
+        .collect();
     if let Some(block_source) =
-        source_dedupe::extract_repeated_blocks(&mut [&mut app_source, &mut state_source])
+        source_dedupe::extract_repeated_blocks(&mut [&mut app_source, &mut state_source], &exported)
     {
         source_generated_blocks::write(&source.join("components"), &block_source)?;
     }
-    let generated_items = super::source_item_dedupe::extract(
-        &mut [&mut app_source, &mut state_source],
-        &components
-            .items
-            .iter()
-            .map(|component| component.name.clone())
-            .collect(),
-    );
+    let generated_items =
+        super::source_item_dedupe::extract(&mut [&mut app_source, &mut state_source], &exported);
     if !generated_items.is_empty() {
         let directory = source.join("components").join("CollectionItems");
         fs::create_dir_all(&directory)?;

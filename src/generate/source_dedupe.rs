@@ -2,13 +2,18 @@ use super::source_dedupe_support::{
     component, jsx_blocks, normalize, replace_ranges, reusable_block,
 };
 use sha2::{Digest, Sha256};
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
-pub fn extract_repeated_blocks(sources: &mut [&mut String]) -> Option<String> {
+/// `exported` is the set of component names the destination package publishes, which is what a
+/// lifted block is allowed to go on naming: the module it lands in can import any of them.
+pub fn extract_repeated_blocks(
+    sources: &mut [&mut String],
+    exported: &BTreeSet<String>,
+) -> Option<String> {
     let mut groups = HashMap::<String, Vec<(usize, usize, usize)>>::new();
     for (source_index, source) in sources.iter().enumerate() {
         for (start, end, block) in jsx_blocks(source) {
-            if reusable_block(&block) {
+            if reusable_block(&block, exported) {
                 groups
                     .entry(normalize(&block))
                     .or_default()
@@ -58,12 +63,28 @@ pub fn extract_repeated_blocks(sources: &mut [&mut String]) -> Option<String> {
             "import * as SharedComponents from './components/SharedComponents.jsx';\n",
         );
     }
+    // The lifted definitions keep naming the package's components, so the module they land in
+    // states where those names come from. Only the ones actually named are imported, because a
+    // module that imports a name it never uses is one the bundler has to prove is inert.
+    let used = definitions
+        .iter()
+        .flat_map(|(_, block)| super::source_free_names::free_names(block))
+        .collect::<BTreeSet<_>>();
+    let imports = if used.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "import {{{}}} from '../index.js';\n",
+            used.into_iter().collect::<Vec<_>>().join(",")
+        )
+    };
     Some(
-        definitions
-            .into_iter()
-            .map(|(name, block)| component(&name, &block))
-            .collect::<Vec<_>>()
-            .join("\n"),
+        imports
+            + &definitions
+                .into_iter()
+                .map(|(name, block)| component(&name, &block))
+                .collect::<Vec<_>>()
+                .join("\n"),
     )
 }
 
@@ -94,9 +115,50 @@ mod tests {
         let nested = block.replace('\n', "\n  ");
         let mut left = format!("<main>\n  {nested}\n</main>");
         let mut right = format!("<aside>\n  {nested}\n</aside>");
-        let module = super::extract_repeated_blocks(&mut [&mut left, &mut right]).unwrap();
+        let module = super::extract_repeated_blocks(
+            &mut [&mut left, &mut right],
+            &std::collections::BTreeSet::new(),
+        )
+        .unwrap();
         assert!(left.contains("<SharedComponents.ReusableBlock"));
         assert!(right.contains("<SharedComponents.ReusableBlock"));
         assert_eq!(module.matches("<section>").count(), 1);
+    }
+
+    #[test]
+    fn a_block_naming_an_exported_component_is_lifted_with_its_import() {
+        let rows = (0..20)
+            .map(|_| "  <Label>{\"Repeated static content with enough markup here\"}</Label>")
+            .collect::<Vec<_>>()
+            .join("\n");
+        let block = format!("<section>\n{rows}\n</section>");
+        let nested = block.replace('\n', "\n  ");
+        let mut left = format!("<main>\n  {nested}\n</main>");
+        let mut right = format!("<aside>\n  {nested}\n</aside>");
+        let exported = ["Label".to_string()].into_iter().collect();
+        let module = super::extract_repeated_blocks(&mut [&mut left, &mut right], &exported)
+            .expect("a block whose only free name is exported is reusable");
+        assert!(module.starts_with("import {Label} from '../index.js';\n"));
+        assert_eq!(module.matches("<section>").count(), 1);
+        assert!(left.contains("<SharedComponents.ReusableBlock"));
+    }
+
+    #[test]
+    fn a_block_naming_something_nothing_exports_is_left_alone() {
+        let rows = (0..20)
+            .map(|_| "  <div>{describe(\"Repeated static content with markup\")}</div>")
+            .collect::<Vec<_>>()
+            .join("\n");
+        let block = format!("<section>\n{rows}\n</section>");
+        let nested = block.replace('\n', "\n  ");
+        let mut left = format!("<main>\n  {nested}\n</main>");
+        let mut right = format!("<aside>\n  {nested}\n</aside>");
+        assert!(
+            super::extract_repeated_blocks(
+                &mut [&mut left, &mut right],
+                &["Label".to_string()].into_iter().collect(),
+            )
+            .is_none()
+        );
     }
 }
