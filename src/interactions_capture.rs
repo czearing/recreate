@@ -25,17 +25,39 @@ pub struct CapturedGraph {
 
 pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<CapturedGraph> {
     let mut rest = RestingStates::default();
-    let (mut interactions, aliases) = capture_states(cdp, &mut rest, baselines).await?;
+    let mut interactions = Vec::new();
+    let mut aliases = Vec::new();
+    // The sweep drives a live browser and any single candidate can wedge it. Everything captured
+    // before that point is still valid evidence, so the accumulators are owned here rather than
+    // returned: an interruption costs the remaining candidates instead of the whole sweep.
+    let interrupted = capture_states(cdp, &mut rest, baselines, &mut interactions, &mut aliases)
+        .await
+        .err();
+    if let Some(error) = &interrupted {
+        eprintln!(
+            "stopped interaction capture after {} interactions: {error:#}",
+            interactions.len()
+        );
+    }
     deduplicate(&mut interactions);
     let base_states = interactions.len();
-    let mut transitions =
+    let mut transitions = if interrupted.is_some() {
+        interactions
+            .iter()
+            .enumerate()
+            .map(|(index, interaction)| edge(0, index + 1, interaction))
+            .collect()
+    } else {
         match discover_transitions(cdp, &mut rest, baselines, &mut interactions).await {
             Ok(transitions) => transitions,
             Err(error) => {
+                // Losing the browser is not fatal either: everything downstream of the sweep
+                // works from the specification alone, so the partial graph is still written.
                 if recreate_browser::transport_lost(&error) {
-                    return Err(error.context("lost the browser during transition expansion"));
+                    eprintln!("lost the browser during transition expansion: {error:#}");
+                } else {
+                    eprintln!("stopped optional transition expansion: {error:#}");
                 }
-                eprintln!("stopped optional transition expansion: {error:#}");
                 interactions.truncate(base_states);
                 interactions
                     .iter()
@@ -43,7 +65,8 @@ pub async fn capture_graph(cdp: &mut Cdp, baselines: &[PageState]) -> Result<Cap
                     .map(|(index, interaction)| edge(0, index + 1, interaction))
                     .collect()
             }
-        };
+        }
+    };
     for alias in aliases {
         let Some(destination) = interactions.iter().position(|interaction| {
             interaction.trigger_path == alias.template_path
@@ -68,17 +91,17 @@ pub(super) async fn capture_states(
     cdp: &mut Cdp,
     rest: &mut RestingStates,
     baselines: &[PageState],
-) -> Result<(Vec<Interaction>, Vec<InteractionAlias>)> {
+    interactions: &mut Vec<Interaction>,
+    aliases: &mut Vec<InteractionAlias>,
+) -> Result<()> {
     let Some(first) = baselines.first() else {
-        return Ok((Vec::new(), Vec::new()));
+        return Ok(());
     };
     let mut initial = Some(restore(cdp, rest, first, false).await?);
     let candidates: Vec<Candidate> = serde_json::from_value(
         cdp.evaluate(&super::interactions_scripts::candidates())
             .await?,
     )?;
-    let mut interactions = Vec::new();
-    let mut aliases = Vec::new();
     for candidate in &candidates {
         cdp.take_events();
         if candidate.disabled || candidate.navigates {
@@ -195,5 +218,5 @@ pub(super) async fn capture_states(
         });
         cdp.take_events();
     }
-    Ok((interactions, aliases))
+    Ok(())
 }

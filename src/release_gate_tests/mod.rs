@@ -140,6 +140,7 @@ async fn validate_fixture(
         reuse: false,
         reload: false,
         spec_only: false,
+        interactions: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),

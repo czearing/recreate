@@ -23,6 +23,7 @@ pub async fn connect(url: &str, endpoint: &str) -> Result<browser::Session> {
         reuse: false,
         reload: false,
         spec_only: false,
+        interactions: false,
         target: None,
         cdp_url: endpoint.into(),
         out: Default::default(),

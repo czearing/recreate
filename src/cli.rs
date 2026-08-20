@@ -64,6 +64,11 @@ pub struct CaptureArgs {
     /// Write capture evidence without generating the React project.
     #[arg(long)]
     pub spec_only: bool,
+    /// Also drive the page to capture menu, dialog, and flyout contents. Off by default: the
+    /// sweep costs minutes and scales with page size, while hover, focus, active, transition,
+    /// and keyframe behavior is already recorded by the baseline read.
+    #[arg(long)]
+    pub interactions: bool,
     /// Advanced override for a specific browser tab.
     #[arg(long)]
     pub target: Option<String>,
@@ -156,6 +161,34 @@ mod tests {
             panic!("expected capture");
         };
         assert!(args.spec_only);
+    }
+
+    /// The interaction sweep drives the page candidate by candidate and scales with the size of
+    /// the document, so it is the one part of a capture that can cost minutes. Baseline capture
+    /// already records hover, focus, active, transition, and keyframe behavior, which makes the
+    /// sweep an explicit request rather than a cost every capture pays by default.
+    #[test]
+    fn captures_baseline_behavior_without_driving_the_page() {
+        let cli = Cli::try_parse_from(["recreate", "capture", "https://example.com"]).unwrap();
+        let Command::Capture(args) = cli.command else {
+            panic!("expected capture");
+        };
+        assert!(!args.interactions);
+    }
+
+    #[test]
+    fn drives_the_page_only_when_asked() {
+        let cli = Cli::try_parse_from([
+            "recreate",
+            "capture",
+            "https://example.com",
+            "--interactions",
+        ])
+        .unwrap();
+        let Command::Capture(args) = cli.command else {
+            panic!("expected capture");
+        };
+        assert!(args.interactions);
     }
 
     #[test]

@@ -121,12 +121,7 @@ async fn capture_into(
         .first()
         .map(|state| state.url.clone())
         .unwrap_or_else(|| requested_url.clone());
-    let interaction_graph = if args.spec_only {
-        interactions::CapturedGraph {
-            interactions: Vec::new(),
-            transitions: Vec::new(),
-        }
-    } else {
+    let interaction_graph = if args.interactions {
         let interactions_started = std::time::Instant::now();
         let captured = interactions::capture_graph(cdp, &states).await?;
         eprintln!(
@@ -135,6 +130,11 @@ async fn capture_into(
             interactions_started.elapsed().as_secs_f64()
         );
         captured
+    } else {
+        interactions::CapturedGraph {
+            interactions: Vec::new(),
+            transitions: Vec::new(),
+        }
     };
     let mut specification = Specification {
         schema_version: 1,

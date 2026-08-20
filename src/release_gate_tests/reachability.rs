@@ -59,6 +59,7 @@ async fn reach(url: &str, port: u16) -> anyhow::Result<usize> {
         reuse: false,
         reload: false,
         spec_only: true,
+        interactions: false,
         target: None,
         cdp_url: format!("http://127.0.0.1:{port}"),
         out: PathBuf::new(),

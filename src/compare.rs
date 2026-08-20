@@ -64,6 +64,7 @@ pub async fn run(args: VerifyArgs) -> Result<()> {
             reuse: false,
             reload: false,
             spec_only: false,
+            interactions: false,
             target: None,
             cdp_url: args.cdp_url.clone(),
             out: PathBuf::new(),
