@@ -21,12 +21,18 @@ pub fn extract_repeated_blocks(
             }
         }
     }
+    // Order by what lifting a group actually saves — its size times the copies it removes — not by
+    // size alone. A large block occurring twice used to outrank a smaller one occurring thirty
+    // times, and because a lifted range is then closed to overlapping groups, the smaller block was
+    // never liftable again and stayed duplicated inside every block that contained it.
     let mut groups = groups
         .into_iter()
         .filter(|(_, occurrences)| occurrences.len() > 1)
         .collect::<Vec<_>>();
-    groups.sort_by(|(left, _), (right, _)| {
-        right.len().cmp(&left.len()).then_with(|| left.cmp(right))
+    groups.sort_by(|(left, left_uses), (right, right_uses)| {
+        saving(right, right_uses.len())
+            .cmp(&saving(left, left_uses.len()))
+            .then_with(|| left.cmp(right))
     });
     let mut occupied = vec![Vec::<(usize, usize)>::new(); sources.len()];
     let mut replacements = vec![Vec::<(usize, usize, String)>::new(); sources.len()];
@@ -88,6 +94,12 @@ pub fn extract_repeated_blocks(
     )
 }
 
+/// What lifting a group is worth: every occurrence past the first stops being a copy of the block
+/// and becomes a one-line call.
+fn saving(block: &str, occurrences: usize) -> usize {
+    block.len() * (occurrences - 1)
+}
+
 fn generated_name(prefix: &str, source: &str) -> String {
     format!(
         "{prefix}{}",
@@ -141,6 +153,50 @@ mod tests {
         assert!(module.starts_with("import {Label} from '../index.js';\n"));
         assert_eq!(module.matches("<section>").count(), 1);
         assert!(left.contains("<SharedComponents.ReusableBlock"));
+    }
+
+    #[test]
+    fn lifts_the_group_that_removes_the_most_markup_first() {
+        let inner = (0..20)
+            .map(|_| "  <span>{\"An inner block repeated across many containers\"}</span>")
+            .collect::<Vec<_>>()
+            .join("\n");
+        let inner_block = format!("<section>\n{inner}\n</section>");
+        let padding = (0..40)
+            .map(|index| {
+                format!("  <p>{{\"unique filler line {index} keeping the outer block large\"}}</p>")
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        let indent = |source: &str| {
+            source
+                .lines()
+                .map(|line| format!("  {line}"))
+                .collect::<Vec<_>>()
+                .join("\n")
+        };
+        // The outer block is far larger but appears twice; the inner one appears in every source,
+        // so lifting the inner removes much more markup even though each copy is smaller.
+        let outer = format!("<article>\n{}\n{padding}\n</article>", indent(&inner_block));
+        let mut first = format!("<main>\n{}\n</main>", indent(&outer));
+        let mut second = format!("<aside>\n{}\n</aside>", indent(&outer));
+        let mut others = (0..6)
+            .map(|_| format!("<div>\n{}\n</div>", indent(&inner_block)))
+            .collect::<Vec<_>>();
+        let mut sources = vec![&mut first, &mut second];
+        sources.extend(others.iter_mut());
+        let module =
+            super::extract_repeated_blocks(&mut sources, &std::collections::BTreeSet::new())
+                .expect("a repeated block is liftable");
+        assert!(
+            module.contains("An inner block repeated"),
+            "the block that removes the most markup must be the one lifted"
+        );
+        assert!(
+            !module.contains("unique filler line"),
+            "the larger block occurring twice must not consume the range the frequent block needs"
+        );
+        assert!(first.contains("<SharedComponents.ReusableBlock"));
     }
 
     #[test]

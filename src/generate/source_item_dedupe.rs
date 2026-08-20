@@ -29,8 +29,10 @@ pub fn extract(sources: &mut [&mut String], components: &BTreeSet<String>) -> Ve
         .into_iter()
         .filter(|(_, occurrences)| occurrences.len() > 1)
         .collect::<Vec<_>>();
-    groups.sort_by(|(left, _), (right, _)| {
-        right.len().cmp(&left.len()).then_with(|| left.cmp(right))
+    groups.sort_by(|(left, left_uses), (right, right_uses)| {
+        (right.len() * (right_uses.len() - 1))
+            .cmp(&(left.len() * (left_uses.len() - 1)))
+            .then_with(|| left.cmp(right))
     });
     let mut occupied = vec![Vec::<(usize, usize)>::new(); sources.len()];
     let mut replacements = vec![Vec::<(usize, usize, String)>::new(); sources.len()];
