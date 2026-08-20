@@ -39,6 +39,8 @@ mod flex_tests;
 mod intrinsic_tests;
 #[path = "responsive_layout_tests.rs"]
 mod layout_tests;
+#[path = "responsive_output_reset_tests.rs"]
+mod output_reset_tests;
 #[path = "responsive_output_tests.rs"]
 mod output_tests;
 #[path = "responsive_provenance_tests.rs"]

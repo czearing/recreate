@@ -57,8 +57,13 @@ fn an_unrecognised_property_is_not_second_guessed() {
 /// Kept from the deleted normalize step: a side with no border draws nothing, so its
 /// width and colour describe an edge that does not exist. This is a statement about a
 /// pair of values, not about a property name, which is why it survives.
+///
+/// The style keyword is the determinant of that pair, not a third member of it. It is
+/// what makes the other two inert, and it is the only one of the three that can beat the
+/// user agent's own border on the tag the class lands on. This assertion used to read
+/// `!css.contains("border-top")`, which pinned its deletion as intended behaviour.
 #[test]
-fn a_border_side_that_draws_nothing_takes_its_width_and_colour_with_it() {
+fn a_border_side_that_draws_nothing_keeps_its_style_and_drops_its_width_and_colour() {
     let css = render(&[
         ("border-top-style", "none"),
         ("border-top-width", "3px"),
@@ -66,7 +71,9 @@ fn a_border_side_that_draws_nothing_takes_its_width_and_colour_with_it() {
         ("border-left-style", "solid"),
         ("border-left-width", "2px"),
     ]);
-    assert!(!css.contains("border-top"), "{css}");
+    assert!(css.contains("border-top-style:none"), "{css}");
+    assert!(!css.contains("border-top-width"), "{css}");
+    assert!(!css.contains("border-top-color"), "{css}");
     assert!(css.contains("border-left-width:2px"), "{css}");
 }
 

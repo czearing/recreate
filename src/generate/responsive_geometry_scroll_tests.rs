@@ -107,6 +107,36 @@ fn a_default_width_scrollbar_is_compensated_exactly_as_a_thin_one() {
     );
 }
 
+/// The band's own instruction has to survive the emitter, or the function that writes it is
+/// dead code. A band that no longer reserves a gutter says the border is gone; while the
+/// emitter deleted `border-right-style: none` by value, that sentence was erased before it
+/// reached the stylesheet, the band said nothing, and the base rule went on painting the
+/// border the band had removed. Nothing reported it, because the writer and the deleter
+/// were in different files and each looked correct alone.
+#[test]
+fn a_band_that_lost_its_gutter_emits_the_border_removal_it_wrote() {
+    let mut styles = Styles::new();
+    preserve_space(
+        &mut styles,
+        &pane(0.0, &[("width", "300px")]),
+        Some(&pane(10.0, &[("width", "290px"), ("overflow-y", "auto")])),
+        &VIEWPORT,
+    );
+    assert_eq!(
+        styles.get("border-right-style").map(String::as_str),
+        Some("none"),
+        "the band did not write the removal at all"
+    );
+    let css = crate::generate::responsive::output_declarations(
+        &styles,
+        &std::collections::BTreeMap::new(),
+    );
+    assert!(css.contains("border-right-style:none"), "{css}");
+}
+
+/// A named pane case: what it is, the gutter the capture measured, and its style map.
+type PaneCase<'a> = (&'a str, f64, &'a [(&'a str, &'a str)]);
+
 /// The opposite defect, which is the one a hasty widening lands on.
 ///
 /// The first two panes are scroll-adjacent but reserve no space, so the capture measured
@@ -118,7 +148,7 @@ fn a_default_width_scrollbar_is_compensated_exactly_as_a_thin_one() {
 /// scrollbar, so adding the measured gutter would invent space.
 #[test]
 fn a_pane_that_reserved_nothing_keeps_its_authored_width() {
-    let untouched: [(&str, f64, &[(&str, &str)]); 4] = [
+    let untouched: [PaneCase; 4] = [
         (
             "overflow-y: hidden",
             0.0,

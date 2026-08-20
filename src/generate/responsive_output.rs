@@ -60,13 +60,15 @@ pub fn output_declarations(styles: &Styles, assets: &BTreeMap<String, String>) -
 fn normalize(styles: &mut Styles) {
     remove_overridden_shorthands(styles);
     remove_static_insets(styles);
+    // The style keyword is the determinant of the pair, not a member of it: it is what
+    // makes the width and colour inert, and the only one of the three that can beat the
+    // user agent's own border on the tag this class lands on.
     for side in ["top", "right", "bottom", "left"] {
         let style = format!("border-{side}-style");
         if styles
             .get(&style)
             .is_some_and(|value| value == "none" || value == "hidden")
         {
-            styles.remove(&style);
             styles.remove(&format!("border-{side}-width"));
             styles.remove(&format!("border-{side}-color"));
         }
