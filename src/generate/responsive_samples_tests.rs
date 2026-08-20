@@ -80,11 +80,7 @@ fn a_size_the_author_spelled_only_through_a_shorthand_survives() {
         let css = emitted(
             &item(
                 "item",
-                &[
-                    ("display", "flex"),
-                    ("flex-grow", "1"),
-                    ("flex-basis", value),
-                ],
+                &[("display", "flex"), ("flex-grow", "1"), ("flex-basis", value)],
             ),
             &[&rule],
             &shorthands,
@@ -156,7 +152,10 @@ fn a_shorthand_keeps_only_the_sizes_its_division_names() {
             ("flex-basis", "320px"),
         ],
     )]);
-    let mut row = item("row", &[("display", "flex"), ("flex-basis", "320px")]);
+    let mut row = item(
+        "row",
+        &[("display", "flex"), ("flex-basis", "320px")],
+    );
     row.style.insert("min-width".into(), "180px".into());
     let css = emitted(&row, &[&rule], &shorthands);
     assert!(css.contains("flex-basis:320px"), "{css}");
