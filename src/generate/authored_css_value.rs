@@ -5,7 +5,23 @@
 //! that condition rather than folding it into the base rule.
 
 use super::authored_css_table::Table;
+use super::shorthand::{Claim, Shorthands};
 use crate::model::Node;
+
+/// What the authored sheet says about one property on one element.
+///
+/// The three answers are distinct because deleting on the wrong one is silent. "The author
+/// declared nothing" licenses removing a sampled measurement; "the author declared something
+/// this stage could not read" does not, because removing it publishes the property's initial
+/// value in place of one the source never took.
+pub(super) enum Declared {
+    /// No rule this node matches declares the property.
+    Absent,
+    /// A rule declares it, through a value this stage cannot divide into longhands.
+    Unreadable,
+    /// A rule declares it, and this is the value to emit.
+    Value(String),
+}
 
 /// A value made only of absolute pixel lengths. It resolves to itself, so comparing it
 /// against the captured computed value is exact — unlike `1fr`, `auto`, or a percentage,
@@ -41,31 +57,79 @@ pub(super) fn absolute_length(value: &str) -> bool {
 /// Fluent gives a card `padding: var(--component-card-padding)` while the page
 /// also authors `.card { padding: 0px }`; the card computes to 12px, so the
 /// literal lost and only the custom-property reference may be emitted.
-pub(super) fn authored(table: &Table<'_>, node: &Node, property: &str) -> Option<String> {
-    let candidates = candidates(table, node, property);
-    let Some(sampled) = node.style.get(property) else {
-        return candidates.into_iter().next_back();
-    };
-    if let Some(agreeing) = candidates.iter().rev().find(|value| *value == sampled) {
-        return Some(agreeing.clone());
+pub(super) fn authored(
+    table: &Table<'_>,
+    shorthands: &Shorthands,
+    node: &Node,
+    property: &str,
+) -> Option<String> {
+    match declared(table, shorthands, node, property) {
+        Declared::Value(value) => Some(value),
+        Declared::Absent | Declared::Unreadable => None,
     }
-    let last = candidates.last();
-    if last.is_some_and(|value| absolute_length(value)) {
-        return Some(sampled.clone());
-    }
-    last.cloned()
 }
 
-/// Every authored value for `property` on this node, in cascade order.
-fn candidates(table: &Table<'_>, node: &Node, property: &str) -> Vec<String> {
-    table
-        .declarations_of(node)
-        .filter(|(name, _)| {
-            super::authored_css_rules::physical_property(node, name).answers(name, property)
-        })
-        .map(|(_, value)| value.trim().trim_end_matches('}').trim().to_string())
-        .filter(|value| !value.is_empty() && !super::authored_css_rules::cascade_keyword(value))
-        .collect()
+/// The same reading, with the answer the `Option` above cannot carry.
+pub(super) fn declared(
+    table: &Table<'_>,
+    shorthands: &Shorthands,
+    node: &Node,
+    property: &str,
+) -> Declared {
+    let (candidates, unreadable) = candidates(table, shorthands, node, property);
+    let Some(last) = candidates.last() else {
+        return if unreadable {
+            Declared::Unreadable
+        } else {
+            Declared::Absent
+        };
+    };
+    let Some(sampled) = node.style.get(property) else {
+        return Declared::Value(last.clone());
+    };
+    if let Some(agreeing) = candidates.iter().rev().find(|value| *value == sampled) {
+        return Declared::Value(agreeing.clone());
+    }
+    if absolute_length(last) {
+        return Declared::Value(sampled.clone());
+    }
+    Declared::Value(last.clone())
+}
+
+/// Every authored value for `property` on this node, in cascade order, and whether any rule
+/// declared it through a value that produced none.
+///
+/// A shorthand is asked of the engine's own division of the block, recorded by the capture,
+/// rather than of a table of families written here — the same source the whole-declaration
+/// reader already trusts. Without it a sheet is read only for the names it happens to spell,
+/// and CSSOM reserialises a complete set of longhands back into its shorthand, so the spelling
+/// a page was authored in is not the spelling that arrives.
+fn candidates(
+    table: &Table<'_>,
+    shorthands: &Shorthands,
+    node: &Node,
+    property: &str,
+) -> (Vec<String>, bool) {
+    let mut values = Vec::new();
+    let mut unreadable = false;
+    for block in table.blocks(node) {
+        for (name, value) in super::css_declaration::parsed(block) {
+            let value = value.trim().trim_end_matches('}').trim();
+            if value.is_empty() || super::authored_css_rules::cascade_keyword(value) {
+                continue;
+            }
+            if super::authored_css_rules::physical_property(node, name).answers(name, property) {
+                values.push(value.to_string());
+                continue;
+            }
+            match super::shorthand::claim(shorthands, block, name, value, property) {
+                Claim::Value(share) => values.push(share.to_string()),
+                Claim::Unsettled => unreadable = true,
+                Claim::Elsewhere => (),
+            }
+        }
+    }
+    (values, unreadable)
 }
 
 /// The last authored value for `property` parsed as a positive integer, for the attributes

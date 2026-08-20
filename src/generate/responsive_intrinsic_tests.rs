@@ -82,6 +82,53 @@ fn does_not_second_guess_a_value_the_capture_already_judged() {
     assert!(!css.contains("left:auto"), "{css}");
 }
 
+/// The captured `flex-basis` of a flex item is not `auto`, and the sheet spells it only
+/// inside the `flex` shorthand, because CSSOM reserialises the longhands the author wrote.
+/// A reader blind to the division reports the property unauthored and the emitter drops it,
+/// which content-sizes an item the author gave a definite basis.
+///
+/// The sampled `width` beside it is the control that stops the repair becoming "keep every
+/// size": no rule declares it, so it is still a measurement of one viewport and still goes.
+#[test]
+fn keeps_a_definite_flex_basis_the_sheet_spells_only_as_a_shorthand() {
+    let viewport = Viewport {
+        width: 1200,
+        height: 800,
+        dpr: 1.0,
+    };
+    let parent = node("div", 0.0, 1200.0);
+    let block = "display: flex; flex: 1 1 320px;";
+    let rules = vec![format!(".item {{ {block} }}")];
+    let shorthands = crate::generate::shorthand::Shorthands::from([(
+        block.to_string(),
+        [
+            ("flex-grow".to_string(), "1".to_string()),
+            ("flex-shrink".to_string(), "1".to_string()),
+            ("flex-basis".to_string(), "320px".to_string()),
+        ]
+        .into_iter()
+        .collect(),
+    )]);
+    let mut item = node("div", 0.0, 679.0);
+    item.attributes.insert("class".into(), "item".into());
+    item.style.insert("display".into(), "flex".into());
+    item.style.insert("flex-grow".into(), "1".into());
+    item.style.insert("flex-basis".into(), "320px".into());
+    let css = base_declarations(
+        &item,
+        Some(&parent),
+        &viewport,
+        &Default::default(),
+        crate::generate::authored_css::Authored {
+            rules: &rules,
+            shorthands: &shorthands,
+        },
+        false,
+    );
+    assert!(css.contains("flex-basis:320px"), "{css}");
+    assert!(!css.contains("width:679px"), "{css}");
+}
+
 /// An inset is load-bearing on a positioned box: it is what stops an authored offset on
 /// the opposite edge from applying.
 #[test]

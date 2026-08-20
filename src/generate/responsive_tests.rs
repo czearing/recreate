@@ -47,3 +47,5 @@ mod output_tests;
 mod provenance_tests;
 #[path = "responsive_root_tests.rs"]
 mod root_tests;
+#[path = "responsive_samples_tests.rs"]
+mod samples_tests;

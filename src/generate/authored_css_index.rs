@@ -134,7 +134,17 @@ impl<'a> Index<'a> {
     }
 
     pub fn authored_value(&self, node: &Node, property: &str) -> Option<String> {
-        super::authored_css_value::authored(&self.table, node, property)
+        super::authored_css_value::authored(&self.table, self.shorthands, node, property)
+    }
+
+    /// What the sheet says about one property, keeping "declared but unreadable" apart from
+    /// "not declared". A caller that deletes a measurement may act on the second alone.
+    pub(super) fn authored_declaration(
+        &self,
+        node: &Node,
+        property: &str,
+    ) -> super::authored_css_value::Declared {
+        super::authored_css_value::declared(&self.table, self.shorthands, node, property)
     }
 
     /// The unconditional cascade's last word on each of `properties`, with the agreement

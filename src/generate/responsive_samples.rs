@@ -15,6 +15,7 @@
 //! `preserve_space` reserves a thin scrollbar's gutter as a plain pixel width, and a
 //! spelling test would delete it as if the capture had produced it.
 
+use crate::generate::authored_css_value::Declared;
 use crate::model::{Node, Styles};
 
 /// The size properties, in the two axes plus the shorthands that resolve to them.
@@ -36,6 +37,11 @@ const ORIGIN_PROPERTIES: [&str; 2] = ["transform-origin", "perspective-origin"];
 /// If the source authored a size, the authored value is used verbatim; otherwise nothing
 /// is emitted and the box is sized by the same flow that sized it in the source.
 ///
+/// "Otherwise" is the author having declared no arm, which is not the same answer as this
+/// stage having failed to read the one they wrote. A size spelled inside a shorthand the
+/// capture recorded no division for is present and unreadable, and the sample stays: deleting
+/// it would publish the property's initial value, which is a size the source never took.
+///
 /// Replaced elements are the one exception, and not a per-site one: they have no in-flow
 /// content to reflow, and their box must be reserved or the page shifts as they load.
 pub(in crate::generate) fn remove_sampled_sizes(
@@ -50,9 +56,10 @@ pub(in crate::generate) fn remove_sampled_sizes(
         if !is_sample(styles, &node.style, property) {
             continue;
         }
-        match css_rules.authored_value(node, property) {
-            Some(authored) => styles.insert(property.into(), authored),
-            None => styles.remove(property),
+        match css_rules.authored_declaration(node, property) {
+            Declared::Value(authored) => styles.insert(property.into(), authored),
+            Declared::Unreadable => continue,
+            Declared::Absent => styles.remove(property),
         };
     }
 }

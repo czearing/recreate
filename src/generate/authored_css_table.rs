@@ -131,11 +131,20 @@ impl<'a> Table<'a> {
         &'n self,
         node: &Node,
     ) -> impl DoubleEndedIterator<Item = (&'n str, &'n str)> {
-        self.matching(node)
+        self.blocks(node)
             .into_iter()
-            .flat_map(|index| super::css_declaration::parsed(self.rules[index].declarations))
+            .flat_map(super::css_declaration::parsed)
             .collect::<Vec<_>>()
             .into_iter()
+    }
+
+    /// The same walk, keeping each declaration's own block. A recorded shorthand division is
+    /// keyed by block text, so a reader that needs one cannot work from declarations alone.
+    pub(super) fn blocks<'n>(&'n self, node: &Node) -> Vec<&'n str> {
+        self.matching(node)
+            .into_iter()
+            .map(|index| self.rules[index].declarations)
+            .collect()
     }
 
     /// This table's last word on each of `properties` for `node`, taking each declaration at
