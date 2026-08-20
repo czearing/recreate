@@ -82,6 +82,47 @@ fn keeps_a_responsive_band_that_disagrees_with_the_base() {
     );
 }
 
+/// An interaction repaints the page under its own class names, so the same authored state rule
+/// reaches those elements too. It is one authored rule, so it must reach the stylesheet once:
+/// publishing it separately for each class map writes the same declarations twice and grows the
+/// output by a copy per interaction without changing what any element paints.
+#[test]
+fn publishes_a_base_state_rule_once_for_every_class_map_that_carries_it() {
+    let mut specification = specification(["color: rgb(0, 0, 255);"; 5]);
+    let mut interaction_state = state(1920);
+    interaction_state.state_styles = Vec::new();
+    specification.interactions = vec![crate::model::Interaction {
+        trigger_path: TARGET.into(),
+        trigger_tag: "button".into(),
+        trigger_label: "open".into(),
+        trigger_occurrence: None,
+        focused_path: None,
+        states: vec![interaction_state],
+    }];
+    let base = vec![BTreeMap::from([(TARGET.to_string(), "rTARGET".to_string())]); 5];
+    let interaction_classes = vec![vec![BTreeMap::from([(
+        TARGET.to_string(),
+        "sTARGET".to_string(),
+    )])]];
+
+    let mut css = String::new();
+    append(
+        &specification,
+        &base,
+        &interaction_classes,
+        &BTreeMap::new(),
+        &mut css,
+    );
+
+    assert_eq!(css.matches("rTARGET:hover").count(), 1, "css:\n{css}");
+    assert_eq!(css.matches("sTARGET:hover").count(), 1, "css:\n{css}");
+    assert_eq!(
+        css.matches("color: rgb(0, 0, 255);").count(),
+        1,
+        "both class maps name one rule, so its declarations are written once:\n{css}"
+    );
+}
+
 /// Bands that restate the base are dropped without disturbing the boundaries of the bands that
 /// remain, because the widths that define a band come from the captured viewport list, not from
 /// which neighbours happened to be emitted.

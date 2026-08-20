@@ -18,6 +18,8 @@ mod grouping;
 mod import;
 #[path = "rule_activation_layer_tests.rs"]
 mod layer;
+#[path = "rule_activation_nested_rule_tests.rs"]
+mod nested_rule;
 #[path = "rule_activation_nesting_tests.rs"]
 mod nesting;
 #[path = "rule_activation_recovered_sheet_tests.rs"]
@@ -38,6 +40,8 @@ mod state_style_var;
 const HARNESS: &str = concat!(
     include_str!("rule_activation_cssom.js"),
     "\n",
+    include_str!("rule_activation_cssom_sheets.js"),
+    "\n",
     include_str!("rule_activation_selectors.js"),
     "\n",
     include_str!("rule_activation_harness.js")
@@ -57,7 +61,15 @@ fn capture_source() -> String {
 
 /// Runs the real capture walk over a scripted CSSOM and returns what it recorded.
 fn walk(scene: Value) -> Value {
-    let script = HARNESS
+    walk_on(scene, HARNESS.to_string())
+}
+
+/// The same walk against a CSSOM whose interfaces the caller has restated. Chromium 151
+/// answers `CSSStyleRule.prototype instanceof CSSGroupingRule` with `false`, but the CSSWG
+/// has resolved to make a style rule a grouping rule, so the record must not depend on which
+/// of the two an engine ships.
+fn walk_on(scene: Value, harness: String) -> Value {
+    let script = harness
         .replace("__SCENE__", &scene.to_string())
         .replace("__CAPTURE__", &capture_source());
     let directory = tempfile::tempdir().unwrap();
@@ -73,6 +85,19 @@ fn walk(scene: Value) -> Value {
         String::from_utf8_lossy(&output.stderr)
     );
     serde_json::from_slice(&output.stdout).unwrap()
+}
+
+/// The double as an engine that has made a style rule a grouping rule.
+fn grouping_style_rule_harness() -> String {
+    let restated = HARNESS.replace(
+        "class CSSStyleRule {}",
+        "class CSSStyleRule extends CSSGroupingRule {}",
+    );
+    assert_ne!(
+        restated, HARNESS,
+        "the double no longer declares CSSStyleRule"
+    );
+    restated
 }
 
 fn style(selector: &str, name: &str, value: &str) -> Value {

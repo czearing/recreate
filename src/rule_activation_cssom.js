@@ -12,6 +12,11 @@ const CSSRule = { MEDIA_RULE: 4 };
 // children: @media, @supports, @container, @layer and @scope are CSSGroupingRule, while
 // @keyframes is not. The walk descends by that test, so the double has to model it.
 class CSSGroupingRule {}
+// A style rule is not a grouping rule — measured in Edge, where
+// `CSSStyleRule.prototype instanceof CSSGroupingRule` is false — yet CSS Nesting gives it
+// children all the same. Modelling it as its own class is what lets the walk ask "does this
+// rule contain rules" and "is this rule a record" as the two separate questions they are.
+class CSSStyleRule {}
 // An @import is the one rule whose child is a whole sheet rather than a rule list, and it
 // is deliberately not a CSSGroupingRule — which is why the walk saw it as a leaf.
 class CSSImportRule {}
@@ -102,13 +107,28 @@ const makeRule = (spec, conditions) => {
   }
   if (spec.selectorText) {
     const style = makeStyle(spec.declarations, spec.expanded);
-    const rule = {
+    // A style rule serialises its nested children inside its own block, which is why a child
+    // recorded again would publish the same declarations twice.
+    const nested = (spec.rules || []).map(child => buildRule(child, conditions));
+    const body = [declarationText(spec.declarations || {}), ...nested.map(child => child.cssText)]
+      .filter(Boolean)
+      .join(' ');
+    const rule = Object.assign(new CSSStyleRule(), {
       selectorText: spec.selectorText,
-      cssText: `${spec.selectorText} { ${declarationText(spec.declarations)} }`,
+      cssText: `${spec.selectorText} { ${body} }`,
+      cssRules: nested,
       style
-    };
+    });
+    for (const child of nested) child.parentRule = rule;
     liveRules.push({ selectorText: spec.selectorText, style, conditions, rule });
     return rule;
+  }
+  // A run of declarations sitting after a nested rule is wrapped in a nested declarations
+  // rule, which carries a block but no selector of its own and matches exactly what its
+  // parent matches. It is the one rule shape whose subject is nowhere in its own text. It is
+  // deliberately absent from `liveRules`, which is keyed by selector text it does not have.
+  if (spec.nestedDeclarations) {
+    return { cssText: declarationText(spec.nestedDeclarations), style: makeStyle(spec.nestedDeclarations) };
   }
   // A definition rule such as @property, @font-face or @position-try has a block of
   // descriptors and no children at all, so it exposes neither `selectorText` nor `cssRules`.
@@ -133,64 +153,9 @@ const makeRule = (spec, conditions) => {
   };
   // A keyframes block exposes children without grouping style rules, which is the shape
   // that must not be descended into.
-  return spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
+  const built = spec.keyframes ? grouped : Object.assign(new CSSGroupingRule(), grouped);
+  // Every rule knows what encloses it, which is the only route to the subject of a rule whose
+  // own text does not state one.
+  for (const child of rules) child.parentRule = built;
+  return built;
 };
-
-// A sheet is more than its rule list: its `media` conditions everything inside without
-// appearing inside, and its `href` is the only identity a recovered text carries. A scene
-// may spell a sheet as a bare rule list when it exercises neither.
-//
-// Reads are counted because a walk with no bound on the import graph does not crash — the
-// recursion unwinds into the same catch that guards an unreadable sheet — so its only
-// observable is how much work it did before silently giving up.
-// Every rule a sheet holds names that sheet, however deeply an at-rule encloses it. A stage
-// that switches a sheet off to rewrite its rules reaches them all through this link.
-const stampSheet = (rule, sheet) => {
-  if (rule.selectorText) rule.parentStyleSheet = sheet;
-  for (const nested of rule.cssRules || []) stampSheet(nested, sheet);
-};
-
-let reads = 0;
-const buildSheet = spec => {
-  const plain = Array.isArray(spec);
-  const sheet = {
-    href: plain ? null : spec.href || null,
-    media: { mediaText: plain ? '' : spec.media || '' },
-    // A sheet the page itself switched off must be found switched off afterwards, so the
-    // double carries the switch rather than assuming every sheet starts on.
-    disabled: plain ? false : !!spec.disabled,
-    get cssRules() {
-      reads++;
-      if (!plain && spec.unreadable) throw new Error('SecurityError');
-      return (plain ? spec : spec.rules).map(rule => {
-        const built = buildRule(rule);
-        stampSheet(built, sheet);
-        return built;
-      });
-    }
-  };
-  return sheet;
-};
-
-// Two imports of one address are two independent sheets, so a scene names a sheet only when
-// it needs both rules to reach the *same* object — which is what makes a cycle expressible.
-const namedSheets = new Map();
-const namedSheet = name => {
-  if (!namedSheets.has(name)) namedSheets.set(name, buildSheet(scene.named[name]));
-  return namedSheets.get(name);
-};
-
-// The browser parses a recovered sheet's text; the double looks up what that text parses
-// to, so the walk's own decisions about the fallback are observable without a CSS parser.
-// The count is reported because "did not parse this again" is the whole point of the
-// fallback's guard and leaves no trace in what was recorded.
-let parses = 0;
-class CSSStyleSheet {
-  constructor() {
-    this.cssRules = [];
-  }
-  replaceSync(text) {
-    parses++;
-    this.cssRules = ((scene.parsed || {})[text] || []).map(rule => buildRule(rule));
-  }
-}

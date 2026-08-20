@@ -61,7 +61,7 @@ const compoundMatches = (compound, element) => {
       const close = doubleParen(rest, open);
       if (close < 0) throw new Error(`unbalanced selector: ${compound}`);
       const any = doubleMembers(rest.slice(open + 1, close))
-        .some(branch => compoundMatches(branch, element));
+        .some(branch => memberMatches(branch, element));
       matched = matched && (logical[1] === 'not' ? !any : any);
       rest = rest.slice(close + 1);
       continue;

@@ -60,7 +60,11 @@ const eachAuthoredSelector = (sheet, visit, seen) => {
   const descend = list => {
     for (const rule of Array.from(list || [])) {
       if (rule.styleSheet) eachAuthoredSelector(rule.styleSheet, visit, seen);
-      else if (rule.selectorText) visit(rule.selectorText);
+      // A style rule both selects and contains, so its own selector is read and its children
+      // are walked. `subjectOf` composes a nested selector with the rule it sits in, which is
+      // the only place that composition exists. A rule with no selector of its own names no
+      // pseudo-element, so it has nothing to contribute here.
+      else if (rule.selectorText) visit(subjectOf(rule));
       if (rule.cssRules && !rule.styleSheet) descend(rule.cssRules);
     }
   };

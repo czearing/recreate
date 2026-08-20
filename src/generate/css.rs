@@ -1,4 +1,4 @@
-use super::{animations, startup_overlays, state_styles};
+use super::{animations, startup_overlays};
 use crate::model::Specification;
 #[cfg(test)]
 use crate::model::Styles;
@@ -78,22 +78,6 @@ pub(super) fn build_scoped(
         &mut css,
     );
     startup_overlays::append(&specification.states, &mut css);
-    let inherited = specification
-        .interactions
-        .iter()
-        .zip(&interaction_classes)
-        .map(|(interaction, classes)| {
-            (
-                interaction
-                    .states
-                    .first()
-                    .map(|state| state.state_styles.as_slice())
-                    .unwrap_or_default(),
-                classes,
-            )
-        })
-        .collect::<Vec<_>>();
-    state_styles::append_inherited(&base.state_styles, &classes, &inherited, assets, &mut css);
     let declared = super::custom_properties::declared_names(&specification.states);
     super::css_custom_properties::append_for_spec(
         specification,

@@ -110,7 +110,50 @@ fn every_substituted_state_declaration_balances_its_parentheses() {
     }
 }
 
-/// Balance alone is satisfied by recording nothing, and by recording the fallback when the
+/// A shorthand whose value holds `var()` cannot be divided until the reference resolves, so
+/// the engine stores its longhands present and blank and keeps the authored text on the
+/// shorthand — measured in Edge, where `outline: var(--w) solid var(--c)` iterates
+/// `outline-color`, `outline-style` and `outline-width` with every one reading empty.
+///
+/// The rule here is flat and unnested, because this loss has nothing to do with where the rule
+/// was written: a capture that enumerates longhands loses the declaration either way. It is
+/// pinned as a value rather than as a spelling, so a fix that re-lists shorthand names by hand
+/// cannot satisfy it for the family nobody listed.
+#[test]
+fn a_shorthand_holding_a_reference_is_recorded_rather_than_divided_away() {
+    let scene = json!({
+        "elements": [{
+            "path": "/main/ring",
+            "classes": ["ring"],
+            "computed": { "--w": "2px", "--c": "rgb(36, 36, 36)" }
+        }],
+        "matching": {},
+        "sheets": [[{
+            "selectorText": ".ring:focus-visible",
+            "declarations": { "outline": "var(--w) solid var(--c)", "outline-offset": "1px" },
+            "expanded": {
+                "outline-color": "",
+                "outline-style": "",
+                "outline-width": "",
+                "outline-offset": "1px"
+            }
+        }]]
+    });
+    let recorded = walk(scene)["stateStyles"][0]["declarations"]
+        .as_str()
+        .unwrap_or("")
+        .to_string();
+
+    assert!(
+        recorded.contains("outline: 2px solid rgb(36, 36, 36)"),
+        "the focus ring was divided away into blank longhands: {recorded:?}"
+    );
+    assert!(
+        recorded.contains("outline-offset: 1px"),
+        "the longhand beside the shorthand was lost with it: {recorded:?}"
+    );
+}
+
 /// property is defined. Each arm therefore pins the value the browser would have painted.
 #[test]
 fn each_fallback_arm_resolves_to_the_value_the_engine_would_paint() {

@@ -4,6 +4,44 @@
    activation probe and the generated-box scan — so a selector cannot be read two ways.
    Concatenated after `selector_scan.js`, whose scanner these readers are built from. */
 const PSEUDO_NAME = /^::?[\w-]+/;
+
+/* Which elements a rule styles, which its own text need not state.
+
+   CSS Nesting makes a selector relative to the rule it is written in, and the CSSOM
+   absolutises it before serialising, so the nesting selector is always spelled out — `> .a`
+   arrives as `& > .a`. One substitution therefore covers every shape at once, including the
+   ones that do not lead with it: `.other &`, `:not(&)`, `& .a & .b`.
+
+   `&` stands for the parent's selector list wrapped in `:is()`, not for its text. The two
+   differ wherever the parent is a list — prefixing `.a, .b` yields `.a, .b:hover`, which
+   leaves `.a` unstated — and in specificity, and in that neither `&` nor `:is()` reaches a
+   pseudo-element the parent named. Substituting `:is(parent)` is the definition rather than
+   an approximation of it.
+
+   A rule carrying declarations but no selector at all matches exactly what its parent
+   matches, pseudo-elements included, so its subject is its parent's with nothing put in. */
+const nestingParent = rule => {
+  for (let above = rule.parentRule; above; above = above.parentRule) {
+    if (above.selectorText !== undefined) return above;
+  }
+  return null;
+};
+const substituteNesting = (selector, parent) => {
+  let out = '';
+  let from = 0;
+  for (;;) {
+    const at = scanValue(selector, from, char => char === '&');
+    if (at < 0) return out + selector.slice(from);
+    out += selector.slice(from, at) + parent;
+    from = at + 1;
+  }
+};
+const subjectOf = rule => {
+  const parent = nestingParent(rule);
+  if (rule.selectorText === undefined) return parent ? subjectOf(parent) : '';
+  if (!parent) return rule.selectorText;
+  return substituteNesting(rule.selectorText, `:is(${subjectOf(parent)})`);
+};
 /* Every state a page enters and leaves. A selector is reduced against all of them, because a
    probe or a subject has to match the page as it rests; which of them a record can replay is
    a narrower question, asked by the stage that records. */

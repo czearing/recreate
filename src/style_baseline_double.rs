@@ -34,6 +34,9 @@ class Element {
     this.parent = null;
   }
   matches(selector){
+    // `&` composes into `:is(parent)`, which the engine accepts wherever a compound may stand.
+    const wrapped = /^:(?:is|where)\((.*)\)$/.exec(selector.trim());
+    if (wrapped) return this.matches(wrapped[1]);
     if (selector.startsWith(':')) return selector === this.promotion;
     return selector.split(',').some(part => {
       const trimmed = part.trim();
@@ -83,14 +86,23 @@ head.appendChild = child => head.add(child);
 // The selectors a document authored, as the only thing the scan reads from a sheet. Tests set
 // `globalThis.authoredSelectors` to a list of selector texts, which is what `cssRules` yields once the
 // walk has descended through whatever conditions they were written inside.
+// An entry is either a selector on its own or `{ selectorText, cssRules }`, which is the shape a
+// rule written inside another one arrives in: the child states its selector relative to the rule
+// it sits in and reaches that rule through `parentRule`.
 globalThis.authoredSelectors = [];
+const authoredRule = (spec, parentRule) => {
+  const rule = { selectorText: typeof spec === 'string' ? spec : spec.selectorText, parentRule };
+  rule.cssRules = (typeof spec === 'string' ? [] : spec.cssRules || [])
+    .map(child => authoredRule(child, rule));
+  return rule;
+};
 globalThis.document = {
   documentElement,
   head,
   querySelectorAll: selector =>
     [documentElement, ...lightDescendants(documentElement)].filter(element => element.matches(selector)),
   get styleSheets(){
-    return [{ get cssRules(){ return globalThis.authoredSelectors.map(selectorText => ({ selectorText })); } }];
+    return [{ get cssRules(){ return globalThis.authoredSelectors.map(spec => authoredRule(spec, null)); } }];
   },
   adoptedStyleSheets: []
 };
