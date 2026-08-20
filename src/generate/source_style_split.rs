@@ -1,6 +1,7 @@
 use super::{
     generated_source::{generated_class, jsx_classes, jsx_files},
     source_style_compact::compact_unique_generated,
+    source_style_constants::group_constants,
     source_style_support::{brace_delta, css_classes, format_css},
 };
 use anyhow::Result;
@@ -28,21 +29,27 @@ pub fn split(source: &Path) -> Result<()> {
     let css_file = source.join("styles.css");
     let mut shared = String::new();
     let mut scoped = BTreeMap::<PathBuf, String>::new();
+    let mut retained = String::new();
     for line in fs::read_to_string(&css_file)?.lines() {
+        if !line.trim_start().starts_with('@') {
+            let mut generated = css_classes(line)
+                .into_iter()
+                .filter(|class_name| generated_class(class_name))
+                .peekable();
+            if generated.peek().is_some() && generated.all(|name| !owners.contains_key(name)) {
+                continue;
+            }
+        }
+        retained.push_str(line);
+        retained.push('\n');
+    }
+    for line in group_constants(&retained).lines() {
         if line.trim_start().starts_with('@') {
             shared.push_str(line);
             shared.push('\n');
             continue;
         }
-        let all_classes = css_classes(line);
-        let mut generated = all_classes
-            .iter()
-            .filter(|class_name| generated_class(class_name))
-            .peekable();
-        if generated.peek().is_some() && generated.all(|name| !owners.contains_key(*name)) {
-            continue;
-        }
-        let classes = all_classes
+        let classes = css_classes(line)
             .into_iter()
             .filter(|class_name| owners.contains_key(*class_name))
             .collect::<Vec<_>>();

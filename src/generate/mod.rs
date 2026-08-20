@@ -216,6 +216,7 @@ mod source_item_names;
 mod source_item_tests;
 mod source_split;
 mod source_style_compact;
+mod source_style_constants;
 mod source_style_shards;
 mod source_style_split;
 mod source_style_support;
