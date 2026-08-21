@@ -50,6 +50,12 @@ pub fn extract_repeated_blocks(
             continue;
         }
         let name = block_name(&block);
+        // Lifting has to pay for itself: the block is still written once as a definition, and every
+        // occurrence still costs a call. A block that is merely large is not worth lifting, and a
+        // small one repeated often is.
+        if !pays(&block, &name, available.len()) {
+            continue;
+        }
         for (source_index, start, end) in available {
             occupied[source_index].push((start, end));
             replacements[source_index].push((start, end, format!("<SharedComponents.{name} />")));
@@ -98,6 +104,14 @@ pub fn extract_repeated_blocks(
 /// and becomes a one-line call.
 fn saving(block: &str, occurrences: usize) -> usize {
     block.len() * (occurrences - 1)
+}
+
+/// Whether lifting a group removes more source than it adds. The block is written once as a
+/// definition wrapped in a component, and each occurrence is replaced by a call.
+fn pays(block: &str, name: &str, occurrences: usize) -> bool {
+    let call = format!("<SharedComponents.{name} />").len();
+    let definition = block.len() + component(name, "").len();
+    block.len() * occurrences > definition + call * occurrences
 }
 
 fn generated_name(prefix: &str, source: &str) -> String {

@@ -71,8 +71,13 @@ pub fn reusable_svg(svg: &str) -> bool {
 /// from, would arrive undefined. The trigger attribute is a separate hazard: it is a
 /// document-scoped value rather than a free name, and duplicating it would point two elements at
 /// one identity.
+///
+/// Size is deliberately not the test of whether lifting is worth it: what a lift saves depends on
+/// how many copies it removes, which is only known once a block's occurrences are grouped. This
+/// checks that a block is SAFE to lift and large enough to be worth naming; the caller decides
+/// whether it pays.
 pub fn reusable_block(block: &str, exported: &std::collections::BTreeSet<String>) -> bool {
-    (1_000..=100_000).contains(&block.len())
+    (120..=100_000).contains(&block.len())
         && !block.contains("data-recreate-trigger")
         && super::source_free_names::free_names(block)
             .iter()
