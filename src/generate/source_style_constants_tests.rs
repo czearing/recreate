@@ -11,11 +11,24 @@ fn emits_a_declaration_shared_by_every_rule_once() {
 }
 
 #[test]
-fn keeps_a_property_that_varies_anywhere_in_place() {
+fn shares_a_value_even_though_the_property_varies_elsewhere() {
     let css = ".a{float:none}\n.b{float:left}\n.c{float:none}\n";
     let grouped = group_constants(css);
-    assert_eq!(grouped.matches("float:none").count(), 2);
+    // One rule disagreeing must not cost every rule that agrees: `.a` and `.c` still share.
+    assert_eq!(grouped.matches("float:none").count(), 1);
+    assert!(grouped.contains(".a,.c{float:none}"));
     assert!(grouped.contains(".b{float:left}"));
+}
+
+#[test]
+fn leaves_a_property_two_rules_on_one_selector_disagree_on_in_place() {
+    // Which value `.a` computes depends on rule order, so moving either copy to the front could
+    // change the winner. Only `.b` and `.c`, which no second rule contests, may share.
+    let css = ".a{color:red}\n.a{color:blue}\n.b{color:blue}\n.c{color:blue}\n";
+    let grouped = group_constants(css);
+    assert!(grouped.contains(".b,.c{color:blue}"));
+    assert!(grouped.contains(".a{color:red}"));
+    assert!(grouped.contains(".a{color:blue}"));
 }
 
 #[test]
